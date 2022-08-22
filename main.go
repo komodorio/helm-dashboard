@@ -6,6 +6,11 @@ import (
 	"net/http"
 )
 
+var (
+	version = "dev"
+	commit  = "dev"
+)
+
 func main() {
 	go func() {
 		err := webbrowser.Open("http://localhost:8080")
