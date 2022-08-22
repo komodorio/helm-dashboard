@@ -1,6 +1,6 @@
 module github.com/komodorio/helm-dashboard
 
-go 1.17
+go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.8.1
