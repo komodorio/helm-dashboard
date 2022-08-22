@@ -1,9 +1,11 @@
 package main
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/toqueteos/webbrowser"
 	_ "k8s.io/client-go/plugin/pkg/client/auth" //required for auth
 	"net/http"
+	"os"
 )
 
 var (
@@ -12,7 +14,14 @@ var (
 )
 
 func main() {
+	log.Infof("Helm Dashboard by Komodor, version %s (%s)", version, commit)
+
+	if len(os.Args) > 1 {
+		os.Exit(0)
+	}
+
 	go func() {
+		// TODO: if it's already running - just open the tab, check that it's another instance of us via API
 		err := webbrowser.Open("http://localhost:8080")
 		if err != nil {
 			return

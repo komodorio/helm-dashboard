@@ -32,3 +32,5 @@ jobs:
         with:
           version: latest
           args: release --snapshot --rm-dist
+      - name: Test Binary is Runnable
+        run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
