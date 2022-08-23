@@ -13,7 +13,14 @@ import (
 var staticFS embed.FS
 
 func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
-	api := gin.Default()
+	var api *gin.Engine
+	if os.Getenv("DEBUG") == "" {
+		api = gin.New()
+		api.Use(gin.Recovery())
+	} else {
+		api = gin.Default()
+	}
+
 	fs := http.FS(staticFS)
 
 	// local dev speed-up
