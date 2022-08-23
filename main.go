@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard"
 	log "github.com/sirupsen/logrus"
 	"github.com/toqueteos/webbrowser"
-	_ "k8s.io/client-go/plugin/pkg/client/auth" //required for auth
-	"net/http"
 	"os"
 )
 
@@ -15,25 +15,32 @@ var (
 )
 
 func main() {
-	log.Infof("Helm Dashboard by Komodor, version %s (%s @ %s)", version, commit, date)
+	setupLogging()
 
-	if len(os.Args) > 1 {
+	// TODO: proper command-line parsing
+	if len(os.Args) > 1 { // dirty thing to allow --help to work
 		os.Exit(0)
 	}
 
-	go func() {
-		// TODO: if it's already running - just open the tab, check that it's another instance of us via API
-		err := webbrowser.Open("http://localhost:8080")
-		if err != nil {
-			return
-		}
-	}()
+	address, webServerDone, err := dashboard.StartServer()
 
-	panic(http.ListenAndServe(":8080", http.FileServer(http.Dir("/tmp"))))
-	/* v := cmd.NewRootCmd(os.Stdout, os.Args[1:])
-	if err := v.Execute(); err != nil {
-		os.Exit(1)
+	log.Infof("Opening web UI: %s", address)
+	err = webbrowser.Open("http://localhost:8080")
+	if err != nil {
+		log.Warnf("Failed to open Web browser for URL: %s", err)
 	}
 
-	*/
+	<-webServerDone
+	log.Infof("Done.")
+}
+
+func setupLogging() {
+	if os.Getenv("DEBUG") == "" {
+		log.SetLevel(log.InfoLevel)
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		log.SetLevel(log.DebugLevel)
+		gin.SetMode(gin.DebugMode)
+	}
+	log.Infof("Helm Dashboard by Komodor, version %s (%s @ %s)", version, commit, date)
 }
