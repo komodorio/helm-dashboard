@@ -21,7 +21,7 @@ func StartServer() (string, ControlChan, error) {
 	}
 
 	abort := make(ControlChan)
-	api := newApi(abort)
+	api := newApi(abort, data)
 	done := startBackgroundServer(address, api, abort)
 
 	if strings.HasPrefix(address, ":") {
