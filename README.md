@@ -18,6 +18,15 @@ go build -o bin/dashboard .
 
 Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require reinstall of a plugin.
 
+To use the plugin, run in your terminal:
+```shell
+helm dashboard
+```
+
+Then, use the web UI. 
+
+## Uninstalling
+
 To uninstall, run:
 ```shell
 helm plugin uninstall dashboard
