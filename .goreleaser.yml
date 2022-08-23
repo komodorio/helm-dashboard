@@ -3,7 +3,7 @@
 builds:
   - main: ./main.go
     binary: helm-dashboard
-    ldflags: -s -w -X github.com/komodorio/helm-dashboard/main.version={{.Version}} -X github.com/komodorio/helm-dashboard/main.commit={{.Commit}}
+    ldflags: -s -w -X main.version={{.Version}} -X main.version={{.Version}} -X main.version={{.Version}} -X main.date={{.Date}}
     goos:
       - windows
       - darwin

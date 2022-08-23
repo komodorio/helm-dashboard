@@ -26,3 +26,5 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test Binary Versions
+        run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"

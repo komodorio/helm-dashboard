@@ -10,11 +10,12 @@ import (
 
 var (
 	version = "dev"
-	commit  = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 func main() {
-	log.Infof("Helm Dashboard by Komodor, version %s (%s)", version, commit)
+	log.Infof("Helm Dashboard by Komodor, version %s (%s @ %s)", version, commit, date)
 
 	if len(os.Args) > 1 {
 		os.Exit(0)

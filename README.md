@@ -2,6 +2,27 @@
 
 A simplified way of working with Helm.
 
+## Local Testing
+
+Until we make our repo public, we have to use a custom way to install the plugin.
+
+To install, checkout the source code and run from source dir:
+```shell
+helm plugin install .
+```
+
+There is a need to build binary for plugin to function, run:
+```shell
+go build -o bin/dashboard .
+```
+
+Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require reinstall of a plugin.
+
+To uninstall, run:
+```shell
+helm plugin uninstall dashboard
+```
+
 
 ## Roadmap
 
