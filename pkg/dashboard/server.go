@@ -2,17 +2,12 @@ package dashboard
 
 import (
 	"context"
-	"embed"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
+	"strings"
 )
-
-// content holds our static web server content.
-
-//go:embed static/*
-var content embed.FS
 
 func StartServer() (string, ControlChan, error) {
 	data := DataLayer{}
@@ -27,20 +22,12 @@ func StartServer() (string, ControlChan, error) {
 
 	abort := make(ControlChan)
 	api := newApi(abort)
-
 	done := startBackgroundServer(address, api, abort)
 
+	if strings.HasPrefix(address, ":") {
+		address = "localhost" + address
+	}
 	return "http://" + address, done, nil
-}
-
-func newApi(abortWeb ControlChan) *gin.Engine {
-	api := gin.Default()
-	//api.Handle(http.MethodGet, "/static/", http.StripPrefix("/static/", http.FileServer(http.FS(content))))
-	api.GET("/albums", getAlbums)
-	api.DELETE("/", func(c *gin.Context) {
-		abortWeb <- struct{}{}
-	})
-	return api
 }
 
 func startBackgroundServer(addr string, routes *gin.Engine, abort ControlChan) ControlChan {
@@ -64,9 +51,4 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort ControlChan) C
 	}()
 
 	return control
-}
-
-// getAlbums responds with the list of all albums as JSON.
-func getAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, struct{}{})
 }

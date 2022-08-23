@@ -24,10 +24,14 @@ func main() {
 
 	address, webServerDone, err := dashboard.StartServer()
 
-	log.Infof("Opening web UI: %s", address)
-	err = webbrowser.Open("http://localhost:8080")
-	if err != nil {
-		log.Warnf("Failed to open Web browser for URL: %s", err)
+	if os.Getenv("HD_NOBROWSER") == "" {
+		log.Infof("Opening web UI: %s", address)
+		err = webbrowser.Open("http://localhost:8080")
+		if err != nil {
+			log.Warnf("Failed to open Web browser for URL: %s", err)
+		}
+	} else {
+		log.Infof("Access web UI at: %s", address)
 	}
 
 	<-webServerDone
