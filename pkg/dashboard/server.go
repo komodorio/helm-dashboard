@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func StartServer() (string, ControlChan, error) {
+func StartServer() (string, ControlChan) {
 	data := DataLayer{}
 	data.CheckConnectivity()
 
@@ -27,11 +27,11 @@ func StartServer() (string, ControlChan, error) {
 	if strings.HasPrefix(address, ":") {
 		address = "localhost" + address
 	}
-	return "http://" + address, done, nil
+	return "http://" + address, done
 }
 
 func startBackgroundServer(addr string, routes *gin.Engine, abort ControlChan) ControlChan {
-	control := make(ControlChan)
+	done := make(ControlChan)
 	server := &http.Server{Addr: addr, Handler: routes}
 
 	go func() {
@@ -39,7 +39,7 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort ControlChan) C
 		if err != nil && err != http.ErrServerClosed {
 			panic(err) // TODO: in case of "port busy", check that it's another instance of us and just open browser
 		}
-		control <- struct{}{}
+		done <- struct{}{}
 	}()
 
 	go func() {
@@ -50,5 +50,5 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort ControlChan) C
 		}
 	}()
 
-	return control
+	return done
 }
