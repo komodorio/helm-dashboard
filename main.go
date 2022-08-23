@@ -26,7 +26,7 @@ func main() {
 
 	if os.Getenv("HD_NOBROWSER") == "" {
 		log.Infof("Opening web UI: %s", address)
-		err = webbrowser.Open("http://localhost:8080")
+		err := webbrowser.Open(address)
 		if err != nil {
 			log.Warnf("Failed to open Web browser for URL: %s", err)
 		}
