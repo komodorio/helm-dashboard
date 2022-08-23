@@ -54,7 +54,7 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 		abortWeb <- struct{}{}
 	})
 
-	api.GET("/api", func(c *gin.Context) {
+	api.GET("/api/charts", func(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, data.ListInstalled())
 	})
 
