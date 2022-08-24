@@ -13,7 +13,14 @@ import (
 var staticFS embed.FS
 
 func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
-	api := gin.Default()
+	var api *gin.Engine
+	if os.Getenv("DEBUG") == "" {
+		api = gin.New()
+		api.Use(gin.Recovery())
+	} else {
+		api = gin.Default()
+	}
+
 	fs := http.FS(staticFS)
 
 	// local dev speed-up
@@ -47,8 +54,22 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 		abortWeb <- struct{}{}
 	})
 
-	api.GET("/api", func(c *gin.Context) {
-		c.IndentedJSON(http.StatusOK, data.ListInstalled())
+	api.GET("/api/helm/charts", func(c *gin.Context) {
+		res, err := data.ListInstalled()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.GET("/api/kube/contexts", func(c *gin.Context) {
+		res, err := data.ListContexts()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
 	})
 
 	return api

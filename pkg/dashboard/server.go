@@ -6,14 +6,21 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
-	"strings"
 )
 
 func StartServer() (string, ControlChan) {
 	data := DataLayer{}
-	data.CheckConnectivity()
+	err := data.CheckConnectivity()
+	if err != nil {
+		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
+		os.Exit(1) // TODO: propagate error instead?
+	}
 
 	address := os.Getenv("HD_BIND")
+	if address == "" {
+		address = "localhost"
+	}
+
 	if os.Getenv("HD_PORT") == "" {
 		address += ":8080" // TODO: better default port to clash less?
 	} else {
@@ -24,9 +31,6 @@ func StartServer() (string, ControlChan) {
 	api := newRouter(abort, data)
 	done := startBackgroundServer(address, api, abort)
 
-	if strings.HasPrefix(address, ":") {
-		address = "localhost" + address
-	}
 	return "http://" + address, done
 }
 
