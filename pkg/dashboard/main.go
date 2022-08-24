@@ -59,7 +59,7 @@ func (l *DataLayer) CheckConnectivity() error {
 }
 
 type KubeContext struct {
-	isCurrent bool
+	IsCurrent bool
 	Name      string
 	Cluster   string
 	AuthInfo  string
@@ -76,7 +76,7 @@ func (l *DataLayer) ListContexts() (res []KubeContext, err error) {
 	lines := strings.Split(out, "\n")
 
 	// find field positions
-	fields := regexp.MustCompile(`(\\w+\\s+)`).FindAllString(lines[0], -1)
+	fields := regexp.MustCompile(`(\w+\s+)`).FindAllString(lines[0], -1)
 	cur := len(fields[0])
 	name := cur + len(fields[1])
 	cluster := name + len(fields[2])
@@ -89,7 +89,7 @@ func (l *DataLayer) ListContexts() (res []KubeContext, err error) {
 		}
 
 		res = append(res, KubeContext{
-			isCurrent: strings.TrimSpace(line[0:cur]) == "*",
+			IsCurrent: strings.TrimSpace(line[0:cur]) == "*",
 			Name:      strings.TrimSpace(line[cur:name]),
 			Cluster:   strings.TrimSpace(line[name:cluster]),
 			AuthInfo:  strings.TrimSpace(line[cluster:auth]),
