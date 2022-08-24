@@ -11,7 +11,9 @@ $(function () {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
         data.forEach(function (elm) {
-            let label = elm.Name + " (" + elm.Cluster + "/" + elm.AuthInfo + "/" + elm.Namespace + ")"
+            // aws CLI uses complicated context names, the suffix does not work well
+            // maybe we should have an `if` statement here
+            let label = elm.Name //+ " (" + elm.Cluster + "/" + elm.AuthInfo + "/" + elm.Namespace + ")"
             let opt = $("<option></option>").val(elm.Name).text(label)
             if (elm.isCurrent) {
                 opt.attr("selected", "selected")

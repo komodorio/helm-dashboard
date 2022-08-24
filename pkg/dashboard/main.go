@@ -28,7 +28,7 @@ func (l *DataLayer) runCommand(cmd ...string) (string, error) {
 	//prog.Stdout, prog.Stderr = os.Stdout, os.Stderr
 	if err := prog.Run(); err != nil {
 		if eerr, ok := err.(*exec.ExitError); ok {
-			return "", errors.New(fmt.Sprintf("Failed to run command %s: %s", cmd, eerr))
+			return "", fmt.Errorf("failed to run command %s: %s", cmd, eerr)
 		}
 		return "", err
 	}
@@ -76,7 +76,7 @@ func (l *DataLayer) ListContexts() (res []KubeContext, err error) {
 	lines := strings.Split(out, "\n")
 
 	// find field positions
-	fields := regexp.MustCompile("(\\w+\\s+)").FindAllString(lines[0], -1)
+	fields := regexp.MustCompile(`(\\w+\\s+)`).FindAllString(lines[0], -1)
 	cur := len(fields[0])
 	name := cur + len(fields[1])
 	cluster := name + len(fields[2])

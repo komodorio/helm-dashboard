@@ -57,7 +57,7 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 	api.GET("/api/helm/charts", func(c *gin.Context) {
 		res, err := data.ListInstalled()
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 		c.IndentedJSON(http.StatusOK, res)
@@ -66,7 +66,7 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 	api.GET("/api/kube/contexts", func(c *gin.Context) {
 		res, err := data.ListContexts()
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 		c.IndentedJSON(http.StatusOK, res)
