@@ -1,29 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <link rel="icon" href="https://komodor.com/wp-content/uploads/2021/05/favicon-50x50.png"/>
+    <link rel="icon" href="static/logo.png"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Helm Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
     <link href="static/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
 </head>
 <body>
 
 <div class="container">
-    <nav class="navbar navbar-expand-lg bg-light rounded" aria-label="Eleventh navbar example">
+    <i class="fa-solid fa-arrow-trend-down"></i>
+    <nav class="navbar navbar-expand-lg bg-light rounded" style="margin-bottom: 0.75rem">
         <div class="container-fluid">
-            <div style="line-height: 90%">
+            <div style="line-height: 90%; font-size: 1.5rem" class="navbar-brand" >
+                <img src="static/logo.png" style="height: 3rem; float: left" alt="Logo">
                 <a class="navbar-brand" href="#"><b>Helm Dashboard</b></a><br/>
-                <span style="font-size: smaller">by <a href="https://komodor.io">komodor.io</a></span>
+                <span style="font-size: 0.8rem;">by <a href="https://komodor.io">komodor.io</a></span>
             </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample09"
-                    aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarsExample09">
+            <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Charts List</a>
@@ -33,20 +36,64 @@
                     </li>
                 </ul>
                 <form class="d-flex flex-nowrap text-nowrap">
-                    <label for="cluster" class="">K8s Context:</label>
+                    <label for="cluster" style="margin-top: 0.5rem">K8s Context:</label>
                     <select id="cluster" class="form-control"></select>
                 </form>
             </div>
         </div>
     </nav>
 
+    <div class="bg-light p-5 rounded" id="sectionDetails">
+        <h1>Chart Details: <span>chosen-one</span></h1>
+        <h2>Revisions</h2>
+        <div class="row">
+            <div class="col-md-2 rounded border border-secondary bg-white">
+                <i class="fa fa-sun-o rounded bg-white text-warning float-start" style="position: relative; left: -1.25rem;"></i>
+                <b>#1</b> - Installed<br/>
+                <span class="text-muted">Chart:</span> 15.11.0<br/>
+                <span class="text-muted">App:</span> 2.36.2<br/>
+                <span class="text-muted small">Wed Aug 24 13:44:32 2022</span><br/>
 
-    <div class="bg-light p-5 rounded">
+            </div>
+            <div class="col-md-2 rounded border border-secondary bg-white">
+                <i class="fa fa-level-up rounded bg-white text-success float-start" style="position: relative; left: -1.25rem; top: 1rem"></i>
+                #2
+            </div>
+            <div class="col-md-2 rounded border border-secondary bg-white">
+                <i class="fa fa-level-down rounded bg-white text-danger float-start" style="position: relative; left: -1.25rem; top: 1rem"></i>
+                #3
+            </div>
+            <div class="col-md-2 rounded border border-secondary bg-white">
+                <i class="fa fa-pencil rounded bg-white text-info float-start" style="position: relative; left: -1.25rem; top: 1rem"></i>
+                #4
+            </div>
+            <div class="col-md-2 rounded border border-primary bg-primary bg-gradient text-light">
+                <i class="fa fa-pencil rounded bg-white text-primary float-start" style="position: relative; left: -1.25rem; top: 1rem"></i>
+                #5 - Current
+            </div>
+            <div class="col-md-2 rounded border border-success bg-light text-muted" style="border-style: dashed!important;">
+                Upgrade/Downgrade
+            </div>
+        </div>
+        <div>
+            <h2>Resources</h2>
+            <h2>Versions</h2>
+            <h2>Status</h2>
+            <h2>Notes</h2>
+            <h2>Values</h2>
+            <h2>Manifests</h2>
+            <h2>Chart source</h2>
+            <h2>Dependencies</h2>
+        </div>
+    </div>
+
+    <div class="bg-light p-5 rounded" id="sectionList">
         <h1>Charts List</h1>
         <div id="charts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
         </div>
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
