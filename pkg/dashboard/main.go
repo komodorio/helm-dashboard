@@ -100,19 +100,22 @@ func (l *DataLayer) ListContexts() (res []KubeContext, err error) {
 	return res, nil
 }
 
-// unpleasant copy from Helm sources, where they have it non-public
-type releaseElement struct {
-	Name       string `json:"name"`
-	Namespace  string `json:"namespace"`
-	Revision   string `json:"revision"`
-	Updated    string `json:"updated"`
-	Status     string `json:"status"`
-	Chart      string `json:"chart"`
-	AppVersion string `json:"app_version"`
-}
-
 func (l *DataLayer) ListInstalled() (res []releaseElement, err error) {
 	out, err := l.runCommand("helm", "ls", "--all", "--all-namespaces", "--output", "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (l *DataLayer) ChartHistory(chartName string) (res []historyElement, err error) {
+	// TODO: there is `max` but there is no `offset`
+	out, err := l.runCommand("helm", "history", chartName, "--max", "5", "--output", "json")
 	if err != nil {
 		return nil, err
 	}
