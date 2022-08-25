@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"embed"
+	"errors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -21,6 +22,48 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 		api = gin.Default()
 	}
 
+	configureStatic(api)
+
+	// server shutdown handler
+	api.DELETE("/", func(c *gin.Context) {
+		abortWeb <- struct{}{}
+	})
+
+	api.GET("/api/helm/charts", func(c *gin.Context) {
+		res, err := data.ListInstalled()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.GET("/api/kube/contexts", func(c *gin.Context) {
+		res, err := data.ListContexts()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.GET("/api/helm/charts/history", func(c *gin.Context) {
+		if c.Query("chart") == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
+			return
+		}
+
+		res, err := data.ChartHistory(c.Query("chart"), "")
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+	return api
+}
+
+func configureStatic(api *gin.Engine) {
 	fs := http.FS(staticFS)
 
 	// local dev speed-up
@@ -48,29 +91,4 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 			c.FileFromFS(c.Request.URL.Path, fs)
 		})
 	}
-
-	// server shutdown handler
-	api.DELETE("/", func(c *gin.Context) {
-		abortWeb <- struct{}{}
-	})
-
-	api.GET("/api/helm/charts", func(c *gin.Context) {
-		res, err := data.ListInstalled()
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, res)
-	})
-
-	api.GET("/api/kube/contexts", func(c *gin.Context) {
-		res, err := data.ListContexts()
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, res)
-	})
-
-	return api
 }
