@@ -34,11 +34,11 @@ $(function () {
             const header = $("<div class='card-header'></div>")
             header.append($('<div class="float-end"><h5 class="float-end text-muted text-end">#' + elm.revision + '</h5><br/><div class="badge bg-info">' + elm.status + "</div>"))
             header.append($('<h5 class="card-title"></h5>').text(elm.name))
-            header.append($('<p class="card-text small text-muted"></p>').append("Version: " + elm.app_version))
+            header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
 
             const body = $("<div class='card-body'></div>")
             body.append($('<p class="card-text"></p>').append("Namespace: " + elm.namespace))
-            body.append($('<p class="card-text"></p>').append("Chart: " + elm.chart))
+            body.append($('<p class="card-text"></p>').append("Version: " + elm.app_version))
             body.append($('<p class="card-text"></p>').append("Updated: " + elm.updated))
 
             /*

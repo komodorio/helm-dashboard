@@ -163,3 +163,16 @@ func (l *DataLayer) ChartHistory(namespace string, chartName string) (res []hist
 	}
 	return res, nil
 }
+
+func (l *DataLayer) ChartRepoVersions(namespace string, chartName string) (res []repoChartElement, err error) {
+	out, err := l.runCommandHelm("search", "repo", "--regexp", "/"+chartName+"\v", "--namespace", namespace, "--versions", "--output", "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

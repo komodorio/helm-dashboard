@@ -1,11 +1,14 @@
 package dashboard
 
 import (
+	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/release"
 	"testing"
 )
 
 func TestFlow(t *testing.T) {
+	log.SetLevel(log.DebugLevel)
+
 	var _ release.Status
 	data := DataLayer{}
 	err := data.CheckConnectivity()
@@ -34,4 +37,10 @@ func TestFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = history
+
+	upgrade, err := data.ChartRepoVersions(installed[0].Namespace, installed[0].Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = upgrade
 }
