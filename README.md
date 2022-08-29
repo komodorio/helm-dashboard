@@ -62,3 +62,5 @@ Validate manifests before deploy and get better errors
 Switch clusters (?)
 Browsing repositories
 Adding new repository
+
+Recognise & show ArgoCD-originating charts/objects

@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"github.com/Masterminds/semver/v3"
 	"helm.sh/helm/v3/pkg/release"
 	helmtime "helm.sh/helm/v3/pkg/time"
 )
@@ -14,7 +13,7 @@ type releaseElement struct {
 	Updated    string         `json:"updated"`
 	Status     release.Status `json:"status"`
 	Chart      string         `json:"chart"`
-	AppVersion semver.Version `json:"app_version"`
+	AppVersion string         `json:"app_version"`
 }
 
 type historyElement struct {
@@ -22,8 +21,10 @@ type historyElement struct {
 	Updated     helmtime.Time  `json:"updated"`
 	Status      release.Status `json:"status"`
 	Chart       string         `json:"chart"`
-	AppVersion  semver.Version `json:"app_version"`
+	AppVersion  string         `json:"app_version"`
 	Description string         `json:"description"`
+	ChartName   string         `json:"chart_name"`
+	ChartVer    string         `json:"chart_ver"`
 }
 
 type repoChartElement struct {

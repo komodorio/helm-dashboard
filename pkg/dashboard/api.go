@@ -48,12 +48,14 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 	})
 
 	api.GET("/api/helm/charts/history", func(c *gin.Context) {
-		if c.Query("chart") == "" {
+		cName := c.Query("chart")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
 			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
 			return
 		}
 
-		res, err := data.ChartHistory(c.Query("chart"), "")
+		res, err := data.ChartHistory(cNamespace, cName)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return

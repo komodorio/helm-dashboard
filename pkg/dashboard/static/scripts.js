@@ -41,17 +41,46 @@ $(function () {
             body.append($('<p class="card-text"></p>').append("Version: " + elm.app_version))
             body.append($('<p class="card-text"></p>').append("Updated: " + elm.updated))
 
-            /*
-        "namespace": "default",
-            "revision": "4",
-            "updated": "2022-08-16 17:11:26.73393511 +0300 IDT",
-            "status": "deployed",
-            "chart": "k8s-watcher-0.17.1",
-            "app_version": "0.1.108"
-
-             */
-
             let card = $("<div class='card'></div>").append(header).append(body);
+
+            card.data("chart", elm)
+            card.click(function () {
+                const self = $(this)
+                $("#sectionList").hide()
+                $("#sectionDetails").show()
+
+                let chart = self.data("chart");
+                $("#sectionDetails h1 span").text(chart.name)
+                $.getJSON("/api/helm/charts/history?chart=" + chart.name + "&namespace=" + chart.namespace).fail(function () {
+                    reportError("Failed to get list of clusters")
+                }).done(function (data) {
+                    data.forEach(function (elm) {
+                        const rev = $(`            
+                            <div class="col-md-2 rounded border border-secondary bg-gradient bg-white">
+                                <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
+                                <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
+                                <span class="text-muted">App:</span> <span class="app-ver"></span><br/>
+                                <span class="text-muted small rev-date"></span><br/>                
+                            </div>`)
+                        rev.find(".rev-number").text("#" + elm.revision)
+                        rev.find(".app-ver").text(elm.app_version)
+                        rev.find(".chart-ver").text(elm.chart_ver)
+                        rev.find(".rev-date").text(elm.updated.replace("T", " "))
+                        rev.find(".rev-status").text(elm.status)
+
+                        if (elm.status === "failed") {
+                            rev.find(".rev-status").parent().addClass("text-danger")
+                        }
+
+                        if (elm.status === "deployed") {
+                            rev.removeClass("bg-white").addClass("text-light bg-primary")
+                        }
+
+                        $("#sectionDetails .row").append(rev)
+                    })
+                })
+            })
+
             chartsCards.append($("<div class='col'></div>").append(card))
         })
     })

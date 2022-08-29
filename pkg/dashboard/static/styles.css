@@ -1,3 +1,7 @@
 #charts .card {
     cursor: pointer;
 }
+
+.bg-primary .text-muted {
+    color: white!important;
+}
