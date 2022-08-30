@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Masterminds/semver/v3"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type DataLayer struct {
@@ -138,7 +140,7 @@ func (l *DataLayer) ListContexts() (res []KubeContext, err error) {
 }
 
 func (l *DataLayer) ListInstalled() (res []releaseElement, err error) {
-	out, err := l.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json")
+	out, err := l.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
 	if err != nil {
 		return nil, err
 	}
@@ -162,6 +164,8 @@ func (l *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 		return nil, err
 	}
 
+	var aprev *semver.Version
+	var cprev *semver.Version
 	for _, elm := range res {
 		chartRepoName, curVer, err := chartAndVersion(elm.Chart)
 		if err != nil {
@@ -169,6 +173,32 @@ func (l *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 		}
 		elm.ChartName = chartRepoName
 		elm.ChartVer = curVer
+		elm.Action = ""
+		elm.Updated.Time = elm.Updated.Time.Round(time.Second)
+
+		cver, err1 := semver.NewVersion(elm.ChartVer)
+		aver, err2 := semver.NewVersion(elm.AppVersion)
+		if err1 == nil && err2 == nil {
+			if aprev != nil && cprev != nil {
+				switch {
+				case aprev.LessThan(aver):
+					elm.Action = "app_upgrade"
+				case aprev.GreaterThan(aver):
+					elm.Action = "app_downgrade"
+				case cprev.LessThan(cver):
+					elm.Action = "chart_upgrade"
+				case cprev.GreaterThan(cver):
+					elm.Action = "chart_downgrade"
+				default:
+					elm.Action = "reconfigure"
+				}
+			}
+		} else {
+			log.Debugf("Semver parsing errors: %s=%s, %s=%s", elm.ChartVer, err1, elm.AppVersion, err2)
+		}
+
+		aprev = aver
+		cprev = cver
 	}
 
 	return res, nil
