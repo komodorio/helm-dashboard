@@ -32,7 +32,16 @@ $(function () {
         chartsCards.empty()
         data.forEach(function (elm) {
             const header = $("<div class='card-header'></div>")
-            header.append($('<div class="float-end"><h5 class="float-end text-muted text-end">#' + elm.revision + '</h5><br/><div class="badge bg-info">' + elm.status + "</div>"))
+            header.append($('<div class="float-end"><h5 class="float-end text-muted text-end">#' + elm.revision + '</h5><br/><div class="badge">' + elm.status + "</div>"))
+            // TODO: for pending- and uninstalling, add the spinner
+            if (elm.status === "failed") {
+                header.find(".badge").addClass("bg-danger text-light")
+            } else if (elm.status === "deployed" || elm.status === "superseded") {
+                header.find(".badge").addClass("bg-info")
+            } else {
+                header.find(".badge").addClass("bg-light text-dark")
+            }
+
             header.append($('<h5 class="card-title"></h5>').text(elm.name))
             header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
 
@@ -66,7 +75,7 @@ $(function () {
                         rev.find(".app-ver").text(elm.app_version)
                         rev.find(".chart-ver").text(elm.chart_ver)
                         rev.find(".rev-date").text(elm.updated.replace("T", " "))
-                        rev.find(".rev-status").text(elm.status)
+                        rev.find(".rev-status").text(elm.status).attr("title", elm.action)
 
                         if (elm.status === "failed") {
                             rev.find(".rev-status").parent().addClass("text-danger")
