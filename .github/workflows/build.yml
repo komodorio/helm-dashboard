@@ -16,10 +16,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test formatting
-        run: |
-          GO_FILES=$(find . -iname '*.go' -type f) # All the .go files, excluding vendor/
-          test -z $(gofmt -s -l $GO_FILES) # Fail if a .go file hasn't been formatted with gofmt
       - name: Unit tests
         run: |
           go test -v -race ./... # Run all the tests with the race detector enabled
