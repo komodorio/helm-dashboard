@@ -1,4 +1,4 @@
-#charts .card {
+#charts .card, #sectionDetails .row > div {
     cursor: pointer;
 }
 

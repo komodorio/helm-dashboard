@@ -8,12 +8,25 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 )
 
 //go:embed static/*
 var staticFS embed.FS
 
-func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
+func errorHandler(c *gin.Context) {
+	c.Next()
+
+	errs := ""
+	for _, err := range c.Errors {
+		log.Debugf("Error: %s", err)
+		errs += err.Error() + "\n"
+	}
+
+	c.String(http.StatusInternalServerError, errs)
+}
+
+func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -22,8 +35,14 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 		api = gin.Default()
 	}
 
+	api.Use(errorHandler)
 	configureStatic(api)
 
+	configureRoutes(abortWeb, data, api)
+	return api
+}
+
+func configureRoutes(abortWeb ControlChan, data DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -62,7 +81,29 @@ func newRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 		}
 		c.IndentedJSON(http.StatusOK, res)
 	})
-	return api
+
+	api.GET("/api/helm/charts/menifest", func(c *gin.Context) {
+		cName := c.Query("chart")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
+			return
+		}
+
+		cRev, err := strconv.Atoi(c.Query("revision"))
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		res, err := data.RevisionManifests(cNamespace, cName, cRev)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+
 }
 
 func configureStatic(api *gin.Engine) {

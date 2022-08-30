@@ -7,13 +7,13 @@ function reportError(err) {
 
 function fillChartDetails(namespace, name) {
     $("#sectionDetails").show()
-    $("#sectionDetails h1 span").text(name)
+    $("#sectionDetails h1 span.name").text(name)
     $.getJSON("/api/helm/charts/history?chart=" + name + "&namespace=" + namespace).fail(function () {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
+        let revRow = $("#sectionDetails .row");
         data.forEach(function (elm) {
-            const rev = $(`            
-                            <div class="col-md-2 rounded border border-secondary bg-gradient bg-white">
+            const rev = $(`<div class="col-md-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
                                 <span class="text-muted">App:</span> <span class="app-ver"></span><br/>
@@ -30,11 +30,29 @@ function fillChartDetails(namespace, name) {
             }
 
             if (elm.status === "deployed") {
-                rev.removeClass("bg-white").addClass("text-light bg-primary")
+                //rev.removeClass("bg-white").addClass("text-light bg-primary")
             }
 
-            $("#sectionDetails .row").append(rev)
+            rev.data("elm", elm)
+            rev.addClass("rev-" + elm.revision)
+            rev.click(function () {
+                const self = $(this)
+                console.log(self.data("elm"))
+                const parts = window.location.hash.split("&")
+                parts[2] = elm.revision
+                window.location.hash = parts.join("&")
+                $("#sectionDetails h1 span.rev").text(elm.revision)
+            })
+
+            revRow.append(rev)
         })
+
+        const parts = window.location.hash.split("&")
+        if (parts.length >= 3) {
+            revRow.find(".rev-" + parts[2]).click()
+        } else {
+            revRow.find("div.col-md-2:last-child").click()
+        }
     })
 
 }

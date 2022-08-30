@@ -32,13 +32,14 @@ func TestFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	history, err := data.ChartHistory(installed[0].Namespace, installed[0].Name)
+	chart := installed[1]
+	history, err := data.ChartHistory(chart.Namespace, chart.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
 	_ = history
 
-	chartRepoName, curVer, err := chartAndVersion(installed[0].Chart)
+	chartRepoName, curVer, err := chartAndVersion(chart.Chart)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,4 +50,16 @@ func TestFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = upgrade
+
+	manifests, err := data.RevisionManifests(chart.Namespace, chart.Name, history[len(history)-1].Revision)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = manifests
+
+	diff, err := data.RevisionManifestsDiff(chart.Namespace, chart.Name, history[len(history)-1].Revision, history[len(history)-2].Revision)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = diff
 }

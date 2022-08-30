@@ -44,7 +44,7 @@
     </nav>
 
     <div class="bg-light p-5 rounded" id="sectionDetails" style="display: none">
-        <h1><a href="/" class="text-reset" style="text-decoration: none">&lArr;</a> Chart Details: <span>chosen-one</span></h1>
+        <h1><a href="/" class="text-reset" style="text-decoration: none">&lArr;</a> Chart Details: <span class="name">chosen-one</span>, revision <span class="rev"></span></h1>
         <h2>Revisions</h2>
         <div class="row">
 
@@ -59,6 +59,17 @@
             <h2>Chart source</h2>
             <h2>Dependencies</h2>
         </div>
+        <pre>
+ helm get all loki --namespace loki
+ helm get all loki --namespace loki --revision X > curr.yaml
+ helm get all loki --namespace loki --revision x-1 > old.yaml
+
+Open diff tool between the two, understand find the change
+Revert/ fix current deploy:
+Helm rollback loki –namespace loki x-2
+Helm upgrade loki –namespace loki –reuse-values –set value_key=new_value
+
+        </pre>
     </div>
 
     <div class="bg-light p-5 rounded" id="sectionList" style="display: none">
@@ -69,11 +80,12 @@
     </div>
 
 </div>
-
+<script>var exports = {};</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.18/lib/diff2html.min.js"></script>
 <script src="static/scripts.js"></script>
 </body>
 </html>

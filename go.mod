@@ -3,14 +3,15 @@ module github.com/komodorio/helm-dashboard
 go 1.18
 
 require (
+	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/gin-gonic/gin v1.8.1
+	github.com/hexops/gotextdiff v1.0.3
 	github.com/sirupsen/logrus v1.8.1
 	github.com/toqueteos/webbrowser v1.2.0
 	helm.sh/helm/v3 v3.9.4
 )
 
 require (
-	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

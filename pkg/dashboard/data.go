@@ -6,10 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
+	"github.com/hexops/gotextdiff"
+	"github.com/hexops/gotextdiff/myers"
+	"github.com/hexops/gotextdiff/span"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -215,4 +219,29 @@ func (l *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement,
 		return nil, err
 	}
 	return res, nil
+}
+
+func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int) (res string, err error) {
+	out, err := l.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
+	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
+func (l *DataLayer) RevisionManifestsDiff(namespace string, name string, revision1 int, revision2 int) (string, error) {
+	manifest1, err := l.RevisionManifests(namespace, name, revision1)
+	if err != nil {
+		return "", nil
+	}
+
+	manifest2, err := l.RevisionManifests(namespace, name, revision2)
+	if err != nil {
+		return "", nil
+	}
+
+	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
+	unified := gotextdiff.ToUnified("a.txt", "b.txt", manifest1, edits)
+	diff := fmt.Sprint(unified)
+	return diff, nil
 }
