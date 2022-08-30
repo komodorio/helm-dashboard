@@ -13,7 +13,11 @@ func TestFlow(t *testing.T) {
 	data := DataLayer{}
 	err := data.CheckConnectivity()
 	if err != nil {
-		t.Fatal(err)
+		if err.Error() == "did not find any kubectl contexts configured" {
+			t.Skip()
+		} else {
+			t.Fatal(err)
+		}
 	}
 
 	ctxses, err := data.ListContexts()
