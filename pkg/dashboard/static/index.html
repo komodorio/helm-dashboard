@@ -1,58 +1,125 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <link rel="icon" href="https://komodor.com/wp-content/uploads/2021/05/favicon-50x50.png"/>
+    <link rel="icon" href="static/logo.png"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Helm Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
     <link href="static/styles.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="container">
-    <nav class="navbar navbar-expand-lg bg-light rounded" aria-label="Eleventh navbar example">
+    <i class="fa-solid fa-arrow-trend-down"></i>
+    <nav class="navbar navbar-expand-lg bg-light rounded" style="margin-bottom: 0.75rem">
         <div class="container-fluid">
-            <div style="line-height: 90%">
+            <div style="line-height: 90%; font-size: 1.5rem" class="navbar-brand">
+                <img src="static/logo.png" style="height: 3rem; float: left" alt="Logo">
                 <a class="navbar-brand" href="#"><b>Helm Dashboard</b></a><br/>
-                <span style="font-size: smaller">by <a href="https://komodor.io">komodor.io</a></span>
+                <span style="font-size: 0.8rem;">by <a href="https://komodor.io">komodor.io</a></span>
             </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample09"
-                    aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarsExample09">
+            <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Charts List</a>
+                        <a class="nav-link active" aria-current="page" href="/">Installed Charts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled">Provisional Charts</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link disabled">Repositories</a>
                     </li>
                 </ul>
                 <form class="d-flex flex-nowrap text-nowrap">
-                    <label for="cluster" class="">K8s Context:</label>
+                    <label for="cluster" style="margin-top: 0.5rem">K8s Context:</label>
                     <select id="cluster" class="form-control"></select>
                 </form>
             </div>
         </div>
     </nav>
 
+    <div class="bg-light p-5 pt-0 rounded" id="sectionDetails" style="display: none">
+        <span class="text-muted" style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
+        <div class="row mb-3">
 
-    <div class="bg-light p-5 rounded">
+        </div>
+        <h1><a href="/" class="text-reset" style="text-decoration: none">&lArr;</a> Chart Details: <span class="name">chosen-one</span>,
+            revision <span class="rev"></span></h1>
+
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-manifest-diff-tab" data-bs-toggle="tab" data-bs-target="#nav-manifest-diff"
+                        type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="true">Manifests
+                </button>
+                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Resources
+                </button>
+                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Parameterized Values
+                </button>
+                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Notes
+                </button>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-manifest-diff" role="tabpanel" aria-labelledby="nav-manifest-diff-tab"
+                 tabindex="0">
+                <nav class="navbar bg-light">
+                    <form class="container-fluid">
+                        <label class="form-check-label" for="diffModeNone">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone" disabled>
+                            View Manifests
+                        </label>
+                        <label class="form-check-label" for="diffModePrev">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev">
+                            Diff with previous
+                        </label>
+                        <label class="form-check-label" for="diffModeLatest">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeLatest" disabled>
+                            Diff with latest <span class="text-muted">(#5)</span>
+                        </label>
+                        <label class="form-check-label" for="diffModeRev">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" disabled>
+                            Diff with specific revision: <input class="form-input" size="3"  disabled>
+                        </label>
+                    </form>
+                </nav>
+
+                <div id="manifestText" class="mt-2"></div>
+            </div>
+            <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
+                 tabindex="0">...
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-light p-5 rounded" id="sectionList" style="display: none">
         <h1>Charts List</h1>
         <div id="charts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
         </div>
     </div>
+
 </div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"></script>
 <script src="static/scripts.js"></script>
 </body>
 </html>

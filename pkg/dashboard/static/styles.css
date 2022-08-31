@@ -1,3 +1,11 @@
-#charts .card {
+#charts .card, #sectionDetails .row > div {
     cursor: pointer;
+}
+
+.bg-primary .text-muted {
+    color: white!important;
+}
+
+.d2h-file-header {
+    display: none;
 }

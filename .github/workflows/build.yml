@@ -16,17 +16,16 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
-      - name: Series of tests
+      - name: Unit tests
         run: |
-          GO_FILES=$(find . -iname '*.go' -type f) # All the .go files, excluding vendor/
-          test -z $(gofmt -s -l $GO_FILES) # Fail if a .go file hasn't been formatted with gofmt
           go test -v -race ./... # Run all the tests with the race detector enabled
+      - name: Static analysis
+        run: |
           go vet ./... # go vet is the official Go static analyzer
+      - name: Cyclomatic complexity
+        run: |
           go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
-          /home/runner/go/bin/gocyclo -over 19 cmd pkg # forbid code with huge/complex functions
-          go build main.go
+          /home/runner/go/bin/gocyclo -over 19 main.go pkg # forbid code with huge/complex functions
       - name: Dry Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -34,3 +33,5 @@ jobs:
           args: release --snapshot --rm-dist
       - name: Test Binary is Runnable
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3

@@ -32,6 +32,9 @@ To uninstall, run:
 helm plugin uninstall dashboard
 ```
 
+## Support Channels
+
+We have two main channels for supporting the tool users: [Slack community](#TODO) for general conversations and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
 ## Roadmap
 
@@ -59,3 +62,6 @@ Validate manifests before deploy and get better errors
 Switch clusters (?)
 Browsing repositories
 Adding new repository
+
+Recognise & show ArgoCD-originating charts/objects
+Have cleaner idea on the web API structure
