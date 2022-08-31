@@ -246,7 +246,38 @@ func (l *DataLayer) RevisionManifestsDiff(namespace string, name string, revisio
 	}
 
 	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
-	unified := gotextdiff.ToUnified("a.txt", "b.txt", manifest1, edits)
+	unified := gotextdiff.ToUnified(strconv.Itoa(revision1), strconv.Itoa(revision2), manifest1, edits)
 	diff := fmt.Sprint(unified)
+	log.Debugf("The diff is: %s", diff)
+	return diff, nil
+}
+
+func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision int) (res string, err error) {
+	out, err := l.runCommandHelm("get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
+	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
+func (l *DataLayer) RevisionNotesDiff(namespace string, name string, revision1 int, revision2 int) (string, error) {
+	if revision1 == 0 || revision2 == 0 {
+		return "", nil
+	}
+
+	manifest1, err := l.RevisionNotes(namespace, name, revision1)
+	if err != nil {
+		return "", nil
+	}
+
+	manifest2, err := l.RevisionNotes(namespace, name, revision2)
+	if err != nil {
+		return "", nil
+	}
+
+	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
+	unified := gotextdiff.ToUnified(strconv.Itoa(revision1), strconv.Itoa(revision2), manifest1, edits)
+	diff := fmt.Sprint(unified)
+	log.Debugf("The diff is: %s", diff)
 	return diff, nil
 }

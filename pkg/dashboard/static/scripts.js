@@ -12,19 +12,18 @@ function revisionClicked(namespace, name, self) {
     revRow.find(".active").removeClass(active).addClass(inactive)
     self.removeClass(inactive).addClass(active)
     const elm = self.data("elm")
-    const parts = window.location.hash.split("&")
-    parts[2] = elm.revision
-    window.location.hash = parts.join("&")
+    setHashParam("revision", elm.revision)
     $("#sectionDetails h1 span.rev").text(elm.revision)
     let qstr = "chart=" + name + "&namespace=" + namespace + "&revision1=" + (elm.revision - 1) + "&revision2=" + elm.revision
     let url = "/api/helm/charts/manifest/diff?" + qstr;
-    $("#manifestText").empty().append("<i class='fa fa-spinner fa-spin fa-2x'></i>")
+    const diffDisplay = $("#manifestText");
+    diffDisplay.empty().append("<i class='fa fa-spinner fa-spin fa-2x'></i>")
     $.getJSON(url).fail(function () {
         reportError("Failed to get diff of manifests")
     }).done(function (data) {
-        $("#manifestText").empty();
+        diffDisplay.empty();
         if (data === "") {
-            $("#manifestText").text("No differences to display")
+            diffDisplay.text("No differences to display")
         } else {
             const targetElement = document.getElementById('manifestText');
             const configuration = {
@@ -68,10 +67,6 @@ function fillChartDetails(namespace, name) {
                 rev.find(".rev-status").parent().addClass("text-danger")
             }
 
-            if (elm.status === "deployed") {
-                //rev.removeClass("bg-white").addClass("text-light bg-primary")
-            }
-
             switch (elm.action) {
                 case "app_upgrade":
                     rev.find(".app-ver").append(" <i class='fa fa-angle-double-up text-success'></i>")
@@ -98,19 +93,29 @@ function fillChartDetails(namespace, name) {
             revRow.append(rev)
         }
 
-        const parts = window.location.hash.substring(1).split("&")
-        if (parts.length >= 3) {
-            revRow.find(".rev-" + parts[2]).click()
+        const rev = getHashParam("revision")
+        if (rev) {
+            revRow.find(".rev-" + rev).click()
         } else {
             revRow.find("div.col-md-2:last-child").click()
         }
     })
+}
 
+function getHashParam(name) {
+    const params = new URLSearchParams(window.location.hash.substring(1))
+    return params.get(name)
+}
+
+function setHashParam(name, val) {
+    const params = new URLSearchParams(window.location.hash.substring(1))
+    params.set(name, val)
+    window.location.hash = new URLSearchParams(params).toString()
 }
 
 function loadChartsList() {
     $("#sectionList").show()
-    chartsCards.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
+    chartsCards.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i> Loading...</div>")
     $.getJSON("/api/helm/charts").fail(function () {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
@@ -143,7 +148,8 @@ function loadChartsList() {
                 $("#sectionList").hide()
 
                 let chart = self.data("chart");
-                window.location.hash = chart.namespace + "&" + chart.name
+                setHashParam("namespace", chart.namespace)
+                setHashParam("chart", chart.name)
                 fillChartDetails(chart.namespace, chart.name)
             })
 
@@ -156,7 +162,7 @@ $(function () {
     // cluster list
     clusterSelect.change(function () {
         Cookies.set("context", clusterSelect.val())
-        window.location.href="/"
+        window.location.href = "/"
     })
 
     $.getJSON("/api/kube/contexts").fail(function () {
@@ -171,22 +177,23 @@ $(function () {
             let opt = $("<option></option>").val(elm.Name).text(label)
             if (elm.IsCurrent && !context) {
                 opt.attr("selected", "selected")
-            } else if (context && elm.Name===context) {
+            } else if (context && elm.Name === context) {
                 opt.attr("selected", "selected")
                 $.ajaxSetup({
-                    headers : {
-                        'x-kubecontext' : context
+                    headers: {
+                        'x-kubecontext': context
                     }
-                });            }
+                });
+            }
             clusterSelect.append(opt)
         })
 
-        const parts = window.location.hash.substring(1).split("&")
-        if (parts[0] === "") {
+        const namespace = getHashParam("namespace")
+        const chart = getHashParam("chart")
+        if (!chart) {
             loadChartsList()
         } else {
-            fillChartDetails(parts[0], parts[1])
+            fillChartDetails(namespace, chart)
         }
     })
-
 })

@@ -9,7 +9,7 @@
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"/>
     <link href="static/styles.css" rel="stylesheet">
 </head>
 <body>
@@ -49,7 +49,8 @@
     </nav>
 
     <div class="bg-light p-5 pt-0 rounded" id="sectionDetails" style="display: none">
-        <span class="text-muted" style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
+        <span class="text-muted"
+              style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
         <div class="row mb-3">
 
         </div>
@@ -58,22 +59,23 @@
 
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link active" id="nav-manifest-diff-tab" data-bs-toggle="tab" data-bs-target="#nav-manifest-diff"
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest"
                         type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="true">Manifests
                 </button>
-                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Resources
                 </button>
-                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
-                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Parameterized Values
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>
+                    Parameterized Values
                 </button>
-                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
-                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Notes
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest"
+                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">Notes
                 </button>
             </div>
         </nav>
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-manifest-diff" role="tabpanel" aria-labelledby="nav-manifest-diff-tab"
+            <div class="tab-pane fade" id="nav-manifest" role="tabpanel"
                  tabindex="0">
                 <nav class="navbar bg-light">
                     <form class="container-fluid">
@@ -85,13 +87,9 @@
                             <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev">
                             Diff with previous
                         </label>
-                        <label class="form-check-label" for="diffModeLatest">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeLatest" disabled>
-                            Diff with latest <span class="text-muted">(#5)</span>
-                        </label>
                         <label class="form-check-label" for="diffModeRev">
                             <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" disabled>
-                            Diff with specific revision: <input class="form-input" size="3"  disabled>
+                            Diff with specific revision: <input class="form-input" size="3" disabled>
                         </label>
                     </form>
                 </nav>
@@ -114,13 +112,13 @@
 </div>
 
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"
+        integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
 <script src="static/scripts.js"></script>
 </body>
 </html>
