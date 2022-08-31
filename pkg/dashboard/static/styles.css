@@ -5,3 +5,7 @@
 .bg-primary .text-muted {
     color: white!important;
 }
+
+.d2h-file-header {
+    display: none;
+}

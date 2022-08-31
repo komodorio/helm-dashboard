@@ -5,6 +5,35 @@ function reportError(err) {
     alert(err) // TODO: nice modal/baloon/etc
 }
 
+function revisionClicked(namespace, name, self) {
+    const elm = self.data("elm")
+    const parts = window.location.hash.split("&")
+    parts[2] = elm.revision
+    window.location.hash = parts.join("&")
+    $("#sectionDetails h1 span.rev").text(elm.revision)
+    let qstr = "chart=" + name + "&namespace=" + namespace + "&revision1=" + (elm.revision - 1) + "&revision2=" + elm.revision
+    let url = "/api/helm/charts/manifest/diff?" + qstr;
+    $.getJSON(url).fail(function () {
+        reportError("Failed to get diff of manifests")
+    }).done(function (data) {
+        if (data === "") {
+            $("#manifestText").text("No differences to display")
+        } else {
+            const targetElement = document.getElementById('manifestText');
+            const configuration = {
+                inputFormat: 'diff',
+                outputFormat: 'side-by-side',
+
+                drawFileList: false,
+                showFiles: false,
+                //matching: 'lines',
+            };
+            const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
+            diff2htmlUi.draw()
+        }
+    })
+}
+
 function fillChartDetails(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails h1 span.name").text(name)
@@ -12,7 +41,8 @@ function fillChartDetails(namespace, name) {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
         let revRow = $("#sectionDetails .row");
-        data.forEach(function (elm) {
+        for (let x = 0; x < data.length; x++) {
+            const elm = data[x]
             const rev = $(`<div class="col-md-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
@@ -36,18 +66,13 @@ function fillChartDetails(namespace, name) {
             rev.data("elm", elm)
             rev.addClass("rev-" + elm.revision)
             rev.click(function () {
-                const self = $(this)
-                console.log(self.data("elm"))
-                const parts = window.location.hash.split("&")
-                parts[2] = elm.revision
-                window.location.hash = parts.join("&")
-                $("#sectionDetails h1 span.rev").text(elm.revision)
+                revisionClicked(namespace, name, $(this))
             })
 
             revRow.append(rev)
-        })
+        }
 
-        const parts = window.location.hash.split("&")
+        const parts = window.location.hash.substring(1).split("&")
         if (parts.length >= 3) {
             revRow.find(".rev-" + parts[2]).click()
         } else {
@@ -120,7 +145,7 @@ $(function () {
         // TODO: remember it, respect it in the function above and in all other places
     })
 
-    const parts = window.location.hash.split("&")
+    const parts = window.location.hash.substring(1).split("&")
     if (parts[0] === "") {
         loadChartsList()
     } else {

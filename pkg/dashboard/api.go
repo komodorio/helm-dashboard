@@ -23,7 +23,9 @@ func errorHandler(c *gin.Context) {
 		errs += err.Error() + "\n"
 	}
 
-	c.String(http.StatusInternalServerError, errs)
+	if errs != "" {
+		c.String(http.StatusInternalServerError, errs)
+	}
 }
 
 func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
@@ -82,7 +84,7 @@ func configureRoutes(abortWeb ControlChan, data DataLayer, api *gin.Engine) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/helm/charts/menifest", func(c *gin.Context) {
+	api.GET("/api/helm/charts/manifest/diff", func(c *gin.Context) {
 		cName := c.Query("chart")
 		cNamespace := c.Query("namespace")
 		if cName == "" {
@@ -90,13 +92,19 @@ func configureRoutes(abortWeb ControlChan, data DataLayer, api *gin.Engine) {
 			return
 		}
 
-		cRev, err := strconv.Atoi(c.Query("revision"))
+		cRev1, err := strconv.Atoi(c.Query("revision1"))
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		res, err := data.RevisionManifests(cNamespace, cName, cRev)
+		cRev2, err := strconv.Atoi(c.Query("revision2"))
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		res, err := data.RevisionManifestsDiff(cNamespace, cName, cRev1, cRev2)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
