@@ -25,7 +25,6 @@ type DataLayer struct {
 }
 
 func (l *DataLayer) runCommand(cmd ...string) (string, error) {
-	// TODO: --kube-context=context-name to juggle clusters
 	log.Debugf("Starting command: %s", cmd)
 	prog := exec.Command(cmd[0], cmd[1:]...)
 	prog.Env = os.Environ()
@@ -44,7 +43,7 @@ func (l *DataLayer) runCommand(cmd ...string) (string, error) {
 			log.Warnf("STDERR:\n%s", serr)
 		}
 		if eerr, ok := err.(*exec.ExitError); ok {
-			return "", fmt.Errorf("failed to run command %s: %s", cmd, eerr)
+			return "", fmt.Errorf("failed to run command %s:\nError: %s\nSTDERR:%s", cmd, eerr, serr)
 		}
 		return "", err
 	}
@@ -93,10 +92,12 @@ func (l *DataLayer) CheckConnectivity() error {
 		return errors.New("did not find any kubectl contexts configured")
 	}
 
-	_, err = l.runCommandHelm("env")
-	if err != nil {
-		return err
-	}
+	/*
+		_, err = l.runCommandHelm("env") // no point in doing is, since the default context may be invalid
+		if err != nil {
+			return err
+		}
+	*/
 
 	return nil
 }
@@ -230,6 +231,10 @@ func (l *DataLayer) RevisionManifests(namespace string, chartName string, revisi
 }
 
 func (l *DataLayer) RevisionManifestsDiff(namespace string, name string, revision1 int, revision2 int) (string, error) {
+	if revision1 == 0 || revision2 == 0 {
+		return "", nil
+	}
+
 	manifest1, err := l.RevisionManifests(namespace, name, revision1)
 	if err != nil {
 		return "", nil

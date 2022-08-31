@@ -28,7 +28,7 @@ func StartServer() (string, ControlChan) {
 	}
 
 	abort := make(ControlChan)
-	api := NewRouter(abort, data)
+	api := NewRouter(abort, &data)
 	done := startBackgroundServer(address, api, abort)
 
 	return "http://" + address, done

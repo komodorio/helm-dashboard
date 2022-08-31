@@ -28,7 +28,7 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
+func NewRouter(abortWeb ControlChan, data *DataLayer) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -37,6 +37,7 @@ func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 		api = gin.Default()
 	}
 
+	api.Use(contextSetter(data))
 	api.Use(errorHandler)
 	configureStatic(api)
 
@@ -44,7 +45,7 @@ func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 	return api
 }
 
-func configureRoutes(abortWeb ControlChan, data DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -141,5 +142,15 @@ func configureStatic(api *gin.Engine) {
 		api.GET("/static/*filepath", func(c *gin.Context) {
 			c.FileFromFS(c.Request.URL.Path, fs)
 		})
+	}
+}
+
+func contextSetter(data *DataLayer) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
+			log.Debugf("Setting current context to: %s", context)
+			data.KubeContext = context[0]
+		}
+		c.Next()
 	}
 }

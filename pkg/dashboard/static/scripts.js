@@ -18,9 +18,11 @@ function revisionClicked(namespace, name, self) {
     $("#sectionDetails h1 span.rev").text(elm.revision)
     let qstr = "chart=" + name + "&namespace=" + namespace + "&revision1=" + (elm.revision - 1) + "&revision2=" + elm.revision
     let url = "/api/helm/charts/manifest/diff?" + qstr;
+    $("#manifestText").empty().append("<i class='fa fa-spinner fa-spin fa-2x'></i>")
     $.getJSON(url).fail(function () {
         reportError("Failed to get diff of manifests")
     }).done(function (data) {
+        $("#manifestText").empty();
         if (data === "") {
             $("#manifestText").text("No differences to display")
         } else {
@@ -42,9 +44,11 @@ function revisionClicked(namespace, name, self) {
 function fillChartDetails(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails h1 span.name").text(name)
+    revRow.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
     $.getJSON("/api/helm/charts/history?chart=" + name + "&namespace=" + namespace).fail(function () {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
+        revRow.empty()
         for (let x = 0; x < data.length; x++) {
             const elm = data[x]
             const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
@@ -106,6 +110,7 @@ function fillChartDetails(namespace, name) {
 
 function loadChartsList() {
     $("#sectionList").show()
+    chartsCards.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
     $.getJSON("/api/helm/charts").fail(function () {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
@@ -149,28 +154,39 @@ function loadChartsList() {
 
 $(function () {
     // cluster list
+    clusterSelect.change(function () {
+        Cookies.set("context", clusterSelect.val())
+        window.location.href="/"
+    })
+
     $.getJSON("/api/kube/contexts").fail(function () {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
+        const context = Cookies.get("context")
+
         data.forEach(function (elm) {
             // aws CLI uses complicated context names, the suffix does not work well
             // maybe we should have an `if` statement here
             let label = elm.Name //+ " (" + elm.Cluster + "/" + elm.AuthInfo + "/" + elm.Namespace + ")"
             let opt = $("<option></option>").val(elm.Name).text(label)
-            if (elm.IsCurrent) {
+            if (elm.IsCurrent && !context) {
                 opt.attr("selected", "selected")
-            }
+            } else if (context && elm.Name===context) {
+                opt.attr("selected", "selected")
+                $.ajaxSetup({
+                    headers : {
+                        'x-kubecontext' : context
+                    }
+                });            }
             clusterSelect.append(opt)
         })
-    })
-    clusterSelect.change(function () {
-        // TODO: remember it, respect it in the function above and in all other places
+
+        const parts = window.location.hash.substring(1).split("&")
+        if (parts[0] === "") {
+            loadChartsList()
+        } else {
+            fillChartDetails(parts[0], parts[1])
+        }
     })
 
-    const parts = window.location.hash.substring(1).split("&")
-    if (parts[0] === "") {
-        loadChartsList()
-    } else {
-        fillChartDetails(parts[0], parts[1])
-    }
 })

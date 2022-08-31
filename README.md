@@ -1,4 +1,4 @@
-# Helm Dashboard
+# <img src="pkg/dashboard/static/logo.png" height=30 style="height: 2rem"> Helm Dashboard
 
 A simplified way of working with Helm.
 
@@ -6,17 +6,17 @@ A simplified way of working with Helm.
 
 Until we make our repo public, we have to use a custom way to install the plugin.
 
-To install, checkout the source code and run from source dir:
-```shell
-helm plugin install .
-```
-
 There is a need to build binary for plugin to function, run:
 ```shell
 go build -o bin/dashboard .
 ```
 
-Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require reinstall of a plugin.
+To install, checkout the source code and run from source dir:
+```shell
+helm plugin install .
+```
+
+Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require to reinstall a plugin.
 
 To use the plugin, run in your terminal:
 ```shell
