@@ -158,7 +158,7 @@ func (l *DataLayer) ListInstalled() (res []releaseElement, err error) {
 
 func (l *DataLayer) ChartHistory(namespace string, chartName string) (res []*historyElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := l.runCommandHelm("history", chartName, "--namespace", namespace, "--max", "5", "--output", "json")
+	out, err := l.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
 	if err != nil {
 		return nil, err
 	}

@@ -1,11 +1,16 @@
 const clusterSelect = $("#cluster");
 const chartsCards = $("#charts");
+const revRow = $("#sectionDetails .row");
 
 function reportError(err) {
     alert(err) // TODO: nice modal/baloon/etc
 }
 
 function revisionClicked(namespace, name, self) {
+    let active = "active border-primary border-2 bg-opacity-25 bg-primary";
+    let inactive = "border-secondary bg-white";
+    revRow.find(".active").removeClass(active).addClass(inactive)
+    self.removeClass(inactive).addClass(active)
     const elm = self.data("elm")
     const parts = window.location.hash.split("&")
     parts[2] = elm.revision
@@ -40,10 +45,9 @@ function fillChartDetails(namespace, name) {
     $.getJSON("/api/helm/charts/history?chart=" + name + "&namespace=" + namespace).fail(function () {
         reportError("Failed to get list of clusters")
     }).done(function (data) {
-        let revRow = $("#sectionDetails .row");
         for (let x = 0; x < data.length; x++) {
             const elm = data[x]
-            const rev = $(`<div class="col-md-2 rounded border border-secondary bg-gradient bg-white">
+            const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
                                 <span class="text-muted">App:</span> <span class="app-ver"></span><br/>
@@ -53,7 +57,8 @@ function fillChartDetails(namespace, name) {
             rev.find(".app-ver").text(elm.app_version)
             rev.find(".chart-ver").text(elm.chart_ver)
             rev.find(".rev-date").text(elm.updated.replace("T", " "))
-            rev.find(".rev-status").text(elm.status).attr("title", elm.action)
+            rev.find(".rev-status").text(elm.status)
+            rev.find(".fa").attr("title", elm.action)
 
             if (elm.status === "failed") {
                 rev.find(".rev-status").parent().addClass("text-danger")
@@ -61,6 +66,23 @@ function fillChartDetails(namespace, name) {
 
             if (elm.status === "deployed") {
                 //rev.removeClass("bg-white").addClass("text-light bg-primary")
+            }
+
+            switch (elm.action) {
+                case "app_upgrade":
+                    rev.find(".app-ver").append(" <i class='fa fa-angle-double-up text-success'></i>")
+                    break
+                case "app_downgrade":
+                    rev.find(".app-ver").append(" <i class='fa fa-angle-double-down text-danger'></i>")
+                    break
+                case "chart_upgrade":
+                    rev.find(".chart-ver").append(" <i class='fa fa-angle-up text-success'></i>")
+                    break
+                case "chart_downgrade":
+                    rev.find(".chart-ver").append(" <i class='fa fa-angle-down text-danger'></i>")
+                    break
+                case "reconfigure": // ?
+                    break
             }
 
             rev.data("elm", elm)
