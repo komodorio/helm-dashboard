@@ -29,18 +29,18 @@ function revisionClicked(namespace, name, self) {
 
 $("#nav-tab [data-tab]").click(function () {
     const self = $(this)
-    self.addClass("active")
+    //self.addClass("active")
     setHashParam("tab", self.data("tab"))
 
     const mode = getHashParam("mode")
     if (!mode) {
-        $("#modePanel [data-mode=diff-prev]").click()
+        $("#modePanel [data-mode=diff-prev]").trigger('click')
     } else {
-        $("#modePanel [data-mode=" + mode + "]").click()
+        $("#modePanel [data-mode=" + mode + "]").trigger('click')
     }
 })
 
-$("#modePanel [data-mode]").click(function (evt) {
+$("#modePanel [data-mode]").click(function () {
     const self = $(this)
     const mode = self.data("mode")
     setHashParam("mode", mode)
