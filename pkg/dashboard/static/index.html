@@ -54,49 +54,50 @@
         <div class="row mb-3">
 
         </div>
-        <h1><a href="/" class="text-reset" style="text-decoration: none"><sup>&larr;</sup></a> <span class="name">chosen-one</span>,
+        <h1><span class="name"></span>,
             revision <span class="rev"></span></h1>
+        <i id="revDescr"></i>
 
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest"
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
                         type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="true">Manifests
                 </button>
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled" data-tab="resources"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Resources
                 </button>
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled" data-tab="values"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>
                     Parameterized Values
                 </button>
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest"
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="notes"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">Notes
                 </button>
             </div>
         </nav>
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade" id="nav-manifest" role="tabpanel"
+            <div class="tab-pane" id="nav-manifest" role="tabpanel"
                  tabindex="0">
                 <nav class="navbar bg-light">
-                    <form class="container-fluid">
+                    <form class="container-fluid" id="modePanel">
                         <label class="form-check-label" for="diffModeNone">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone" disabled>
-                            View Manifests
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone" data-mode="view">
+                            View Current
                         </label>
                         <label class="form-check-label" for="diffModePrev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev" data-mode="diff-prev">
                             Diff with previous
                         </label>
                         <label class="form-check-label" for="diffModeRev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" disabled>
-                            Diff with specific revision: <input class="form-input" size="3" disabled>
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" data-mode="diff-rev">
+                            Diff with specific revision: <input class="form-input" size="3">
                         </label>
                     </form>
                 </nav>
 
                 <div id="manifestText" class="mt-2"></div>
             </div>
-            <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
+            <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
                  tabindex="0">...
             </div>
         </div>

@@ -14,6 +14,11 @@ import (
 //go:embed static/*
 var staticFS embed.FS
 
+func noCache(c *gin.Context) {
+	c.Header("Cache-Control", "no-cache")
+	c.Next()
+}
+
 func errorHandler(c *gin.Context) {
 	c.Next()
 
@@ -37,6 +42,7 @@ func NewRouter(abortWeb ControlChan, data *DataLayer) *gin.Engine {
 		api = gin.Default()
 	}
 
+	api.Use(noCache)
 	api.Use(contextSetter(data))
 	api.Use(errorHandler)
 	configureStatic(api)
@@ -85,7 +91,7 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/helm/charts/manifest/diff", func(c *gin.Context) {
+	api.GET("/api/helm/charts/manifests", func(c *gin.Context) {
 		cName := c.Query("chart")
 		cNamespace := c.Query("namespace")
 		if cName == "" {
@@ -93,24 +99,34 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			return
 		}
 
-		cRev1, err := strconv.Atoi(c.Query("revision1"))
+		cRev, err := strconv.Atoi(c.Query("revision"))
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		cRev2, err := strconv.Atoi(c.Query("revision2"))
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
+		rDiff := c.Query("revisionDiff")
+		if rDiff != "" {
+			cRevDiff, err := strconv.Atoi(rDiff)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
 
-		res, err := data.RevisionManifestsDiff(cNamespace, cName, cRev1, cRev2)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
+			res, err := data.RevisionManifestsDiff(cNamespace, cName, cRevDiff, cRev)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, res)
+		} else {
+			res, err := data.RevisionManifests(cNamespace, cName, cRev)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, res)
 		}
-		c.IndentedJSON(http.StatusOK, res)
 	})
 
 }

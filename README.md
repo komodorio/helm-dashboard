@@ -2,6 +2,8 @@
 
 A simplified way of working with Helm.
 
+[<img src="screenshot.png" style="width: 100%; border: 1px solid silver">](screenshot.png)
+
 ## Local Testing
 
 Until we make our repo public, we have to use a custom way to install the plugin.

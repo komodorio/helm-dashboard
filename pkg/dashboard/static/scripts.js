@@ -14,12 +14,55 @@ function revisionClicked(namespace, name, self) {
     const elm = self.data("elm")
     setHashParam("revision", elm.revision)
     $("#sectionDetails h1 span.rev").text(elm.revision)
-    let qstr = "chart=" + name + "&namespace=" + namespace + "&revision1=" + (elm.revision - 1) + "&revision2=" + elm.revision
-    let url = "/api/helm/charts/manifest/diff?" + qstr;
+    $("#revDescr").text(elm.description).removeClass("text-danger")
+    if (elm.status === "failed") {
+        $("#revDescr").addClass("text-danger")
+    }
+
+    const tab = getHashParam("tab")
+    if (!tab) {
+        $("#nav-tab [data-tab=manifests]").click()
+    } else {
+        $("#nav-tab [data-tab=" + tab + "]").click()
+    }
+}
+
+$("#nav-tab [data-tab]").click(function () {
+    const self = $(this)
+    self.addClass("active")
+    setHashParam("tab", self.data("tab"))
+
+    const mode = getHashParam("mode")
+    if (!mode) {
+        $("#modePanel [data-mode=diff-prev]").click()
+    } else {
+        $("#modePanel [data-mode=" + mode + "]").click()
+    }
+})
+
+$("#modePanel [data-mode]").click(function (evt) {
+    const self = $(this)
+    const mode = self.data("mode")
+    setHashParam("mode", mode)
+    let revDiff = 0
+    const revision = parseInt(getHashParam("revision"));
+    if (mode === "diff-prev") {
+        revDiff = revision - 1
+    }
+    loadContent(getHashParam("tab"), getHashParam("namespace"), getHashParam("chart"), revision, revDiff)
+})
+
+function loadContent(mode, namespace, name, revision, revDiff) {
+    let qstr = "chart=" + name + "&namespace=" + namespace + "&revision=" + revision
+    if (revDiff) {
+        qstr += "&revisionDiff=" + revDiff
+    }
+    let url = "/api/helm/charts/" + mode
+    url += "?" + qstr
     const diffDisplay = $("#manifestText");
     diffDisplay.empty().append("<i class='fa fa-spinner fa-spin fa-2x'></i>")
-    $.getJSON(url).fail(function () {
-        reportError("Failed to get diff of manifests")
+    $.get(url).fail(function () {
+        reportError("Failed to get diff of " + mode)
     }).done(function (data) {
         diffDisplay.empty();
         if (data === "") {
@@ -157,6 +200,7 @@ function loadChartsList() {
         })
     })
 }
+
 
 $(function () {
     // cluster list
