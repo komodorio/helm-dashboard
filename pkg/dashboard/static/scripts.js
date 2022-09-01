@@ -68,17 +68,21 @@ function loadContent(mode, namespace, name, revision, revDiff) {
         if (data === "") {
             diffDisplay.text("No differences to display")
         } else {
-            const targetElement = document.getElementById('manifestText');
-            const configuration = {
-                inputFormat: 'diff',
-                outputFormat: 'side-by-side',
+            if (revDiff) {
+                const targetElement = document.getElementById('manifestText');
+                const configuration = {
+                    inputFormat: 'diff',
+                    outputFormat: 'side-by-side',
 
-                drawFileList: false,
-                showFiles: false,
-                //matching: 'lines',
-            };
-            const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
-            diff2htmlUi.draw()
+                    drawFileList: false,
+                    showFiles: false,
+                    //matching: 'lines',
+                };
+                const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
+                diff2htmlUi.draw()
+            } else {
+                $("#manifestText").empty().append("<pre></pre>").find("pre").text(data)
+            }
         }
     })
 }

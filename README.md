@@ -67,3 +67,4 @@ Adding new repository
 
 Recognise & show ArgoCD-originating charts/objects
 Have cleaner idea on the web API structure
+See if we can build in Chechov or Validkube validation

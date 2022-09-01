@@ -129,6 +129,43 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		}
 	})
 
+	api.GET("/api/helm/charts/notes", func(c *gin.Context) { // TODO: refactor duplicate code
+		cName := c.Query("chart")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
+			return
+		}
+
+		cRev, err := strconv.Atoi(c.Query("revision"))
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		rDiff := c.Query("revisionDiff")
+		if rDiff != "" {
+			cRevDiff, err := strconv.Atoi(rDiff)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+
+			res, err := data.RevisionNotesDiff(cNamespace, cName, cRevDiff, cRev)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, res)
+		} else {
+			res, err := data.RevisionNotes(cNamespace, cName, cRev)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, res)
+		}
+	})
 }
 
 func configureStatic(api *gin.Engine) {
