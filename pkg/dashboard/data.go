@@ -246,7 +246,7 @@ func (l *DataLayer) RevisionManifestsDiff(namespace string, name string, revisio
 	}
 
 	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
-	unified := gotextdiff.ToUnified(strconv.Itoa(revision1), strconv.Itoa(revision2), manifest1, edits)
+	unified := gotextdiff.ToUnified(strconv.Itoa(revision1)+".yaml", strconv.Itoa(revision2)+".yaml", manifest1, edits)
 	diff := fmt.Sprint(unified)
 	log.Debugf("The diff is: %s", diff)
 	return diff, nil
@@ -276,7 +276,7 @@ func (l *DataLayer) RevisionNotesDiff(namespace string, name string, revision1 i
 	}
 
 	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
-	unified := gotextdiff.ToUnified(strconv.Itoa(revision1), strconv.Itoa(revision2), manifest1, edits)
+	unified := gotextdiff.ToUnified(strconv.Itoa(revision1)+".txt", strconv.Itoa(revision2)+".txt", manifest1, edits)
 	diff := fmt.Sprint(unified)
 	log.Debugf("The diff is: %s", diff)
 	return diff, nil

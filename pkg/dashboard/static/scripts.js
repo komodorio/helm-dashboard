@@ -14,6 +14,7 @@ function revisionClicked(namespace, name, self) {
     const elm = self.data("elm")
     setHashParam("revision", elm.revision)
     $("#sectionDetails h1 span.rev").text(elm.revision)
+    $("#chartName").text(elm.chart)
     $("#revDescr").text(elm.description).removeClass("text-danger")
     if (elm.status === "failed") {
         $("#revDescr").addClass("text-danger")
@@ -76,12 +77,15 @@ function loadContent(mode, namespace, name, revision, revDiff) {
 
                     drawFileList: false,
                     showFiles: false,
+                    highlight: true,
                     //matching: 'lines',
                 };
                 const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
                 diff2htmlUi.draw()
             } else {
-                $("#manifestText").empty().append("<pre></pre>").find("pre").text(data)
+                data=hljs.highlight(data, {language: 'yaml'}).value
+                const code = $("#manifestText").empty().append("<pre class='bg-white rounded p-3'></pre>").find("pre");
+                code.html(data)
             }
         }
     })

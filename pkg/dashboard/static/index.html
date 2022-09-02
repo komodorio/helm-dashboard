@@ -9,6 +9,7 @@
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/lightfair.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"/>
     <link href="static/styles.css" rel="stylesheet">
 </head>
@@ -56,9 +57,9 @@
         </div>
         <h1><span class="name"></span>,
             revision <span class="rev"></span></h1>
-        <i id="revDescr"></i>
+        Chart <b id="chartName"></b>: <i id="revDescr"></i>
 
-        <nav>
+        <nav class="mt-2">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
                         type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false">Manifests
@@ -95,7 +96,7 @@
                     </form>
                 </nav>
 
-                <div id="manifestText" class="mt-2"></div>
+                <div id="manifestText" class="mt-2 bg-white"></div>
             </div>
             <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
                  tabindex="0">...
@@ -118,6 +119,7 @@
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js" integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"
         integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
 <script src="static/scripts.js"></script>
