@@ -14,6 +14,11 @@ import (
 //go:embed static/*
 var staticFS embed.FS
 
+func noCache(c *gin.Context) {
+	c.Header("Cache-Control", "no-cache")
+	c.Next()
+}
+
 func errorHandler(c *gin.Context) {
 	c.Next()
 
@@ -28,7 +33,7 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
+func NewRouter(abortWeb ControlChan, data *DataLayer) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -37,6 +42,8 @@ func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 		api = gin.Default()
 	}
 
+	api.Use(noCache)
+	api.Use(contextSetter(data))
 	api.Use(errorHandler)
 	configureStatic(api)
 
@@ -44,7 +51,7 @@ func NewRouter(abortWeb ControlChan, data DataLayer) *gin.Engine {
 	return api
 }
 
-func configureRoutes(abortWeb ControlChan, data DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -84,7 +91,19 @@ func configureRoutes(abortWeb ControlChan, data DataLayer, api *gin.Engine) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/helm/charts/manifest/diff", func(c *gin.Context) {
+	sections := map[string]SectionFn{
+		"manifests": data.RevisionManifests,
+		"values":    data.RevisionValues,
+		"notes":     data.RevisionNotes,
+	}
+
+	api.GET("/api/helm/charts/:section", func(c *gin.Context) {
+		functor, found := sections[c.Param("section")]
+		if !found {
+			_ = c.AbortWithError(http.StatusNotFound, errors.New("unsupported section: "+c.Param("section")))
+			return
+		}
+
 		cName := c.Query("chart")
 		cNamespace := c.Query("namespace")
 		if cName == "" {
@@ -92,26 +111,40 @@ func configureRoutes(abortWeb ControlChan, data DataLayer, api *gin.Engine) {
 			return
 		}
 
-		cRev1, err := strconv.Atoi(c.Query("revision1"))
+		cRev, err := strconv.Atoi(c.Query("revision"))
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
+		flag := c.Query("flag") == "true"
+		rDiff := c.Query("revisionDiff")
+		if rDiff != "" {
+			cRevDiff, err := strconv.Atoi(rDiff)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
 
-		cRev2, err := strconv.Atoi(c.Query("revision2"))
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
+			ext := ".yaml"
+			if c.Param("section") == "notes" {
+				ext = ".txt"
+			}
 
-		res, err := data.RevisionManifestsDiff(cNamespace, cName, cRev1, cRev2)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
+			res, err := RevisionDiff(functor, ext, cNamespace, cName, cRevDiff, cRev, flag)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, res)
+		} else {
+			res, err := functor(cNamespace, cName, cRev, flag)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, res)
 		}
-		c.IndentedJSON(http.StatusOK, res)
 	})
-
 }
 
 func configureStatic(api *gin.Engine) {
@@ -141,5 +174,15 @@ func configureStatic(api *gin.Engine) {
 		api.GET("/static/*filepath", func(c *gin.Context) {
 			c.FileFromFS(c.Request.URL.Path, fs)
 		})
+	}
+}
+
+func contextSetter(data *DataLayer) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
+			log.Debugf("Setting current context to: %s", context)
+			data.KubeContext = context[0]
+		}
+		c.Next()
 	}
 }

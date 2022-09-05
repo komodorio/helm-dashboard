@@ -25,7 +25,6 @@ type DataLayer struct {
 }
 
 func (l *DataLayer) runCommand(cmd ...string) (string, error) {
-	// TODO: --kube-context=context-name to juggle clusters
 	log.Debugf("Starting command: %s", cmd)
 	prog := exec.Command(cmd[0], cmd[1:]...)
 	prog.Env = os.Environ()
@@ -44,7 +43,7 @@ func (l *DataLayer) runCommand(cmd ...string) (string, error) {
 			log.Warnf("STDERR:\n%s", serr)
 		}
 		if eerr, ok := err.(*exec.ExitError); ok {
-			return "", fmt.Errorf("failed to run command %s: %s", cmd, eerr)
+			return "", fmt.Errorf("failed to run command %s:\nError: %s\nSTDERR:%s", cmd, eerr, serr)
 		}
 		return "", err
 	}
@@ -93,10 +92,12 @@ func (l *DataLayer) CheckConnectivity() error {
 		return errors.New("did not find any kubectl contexts configured")
 	}
 
-	_, err = l.runCommandHelm("env")
-	if err != nil {
-		return err
-	}
+	/*
+		_, err = l.runCommandHelm("env") // no point in doing is, since the default context may be invalid
+		if err != nil {
+			return err
+		}
+	*/
 
 	return nil
 }
@@ -158,7 +159,7 @@ func (l *DataLayer) ListInstalled() (res []releaseElement, err error) {
 
 func (l *DataLayer) ChartHistory(namespace string, chartName string) (res []*historyElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := l.runCommandHelm("history", chartName, "--namespace", namespace, "--max", "5", "--output", "json")
+	out, err := l.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +222,9 @@ func (l *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement,
 	return res, nil
 }
 
-func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int) (res string, err error) {
+type SectionFn = func(string, string, int, bool) (string, error)
+
+func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
 	out, err := l.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
 	if err != nil {
 		return "", err
@@ -229,19 +232,45 @@ func (l *DataLayer) RevisionManifests(namespace string, chartName string, revisi
 	return out, nil
 }
 
-func (l *DataLayer) RevisionManifestsDiff(namespace string, name string, revision1 int, revision2 int) (string, error) {
-	manifest1, err := l.RevisionManifests(namespace, name, revision1)
+func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
+	out, err := l.runCommandHelm("get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
 	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
+func (l *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
+	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision), "--output", "yaml"}
+	if !onlyUserDefined {
+		cmd = append(cmd, "--all")
+	}
+	out, err := l.runCommandHelm(cmd...)
+	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
+func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
+	if revision1 == 0 || revision2 == 0 {
+		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)
 		return "", nil
 	}
 
-	manifest2, err := l.RevisionManifests(namespace, name, revision2)
+	manifest1, err := functor(namespace, name, revision1, flag)
 	if err != nil {
-		return "", nil
+		return "", err
+	}
+
+	manifest2, err := functor(namespace, name, revision2, flag)
+	if err != nil {
+		return "", err
 	}
 
 	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
-	unified := gotextdiff.ToUnified("a.txt", "b.txt", manifest1, edits)
+	unified := gotextdiff.ToUnified(strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext, manifest1, edits)
 	diff := fmt.Sprint(unified)
+	log.Debugf("The diff is: %s", diff)
 	return diff, nil
 }

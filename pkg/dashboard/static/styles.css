@@ -6,6 +6,6 @@
     color: white!important;
 }
 
-.d2h-file-header {
-    display: none;
+.d2h-file-collapse, .d2h-tag {
+    opacity: 0; /* trollface */
 }

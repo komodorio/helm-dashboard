@@ -9,7 +9,8 @@
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/lightfair.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"/>
     <link href="static/styles.css" rel="stylesheet">
 </head>
 <body>
@@ -33,12 +34,14 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Installed Charts</a>
                     </li>
+                    <!-- TODO
                     <li class="nav-item">
                         <a class="nav-link disabled">Provisional Charts</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link disabled">Repositories</a>
                     </li>
+                    -->
                 </ul>
                 <form class="d-flex flex-nowrap text-nowrap">
                     <label for="cluster" style="margin-top: 0.5rem">K8s Context:</label>
@@ -49,56 +52,60 @@
     </nav>
 
     <div class="bg-light p-5 pt-0 rounded" id="sectionDetails" style="display: none">
-        <span class="text-muted" style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
+        <span class="text-muted"
+              style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
         <div class="row mb-3">
 
         </div>
-        <h1><a href="/" class="text-reset" style="text-decoration: none">&lArr;</a> Chart Details: <span class="name">chosen-one</span>,
+        <h1><span class="name"></span>,
             revision <span class="rev"></span></h1>
+        Chart <b id="chartName"></b>: <i id="revDescr"></i>
 
-        <nav>
+        <nav class="mt-2">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link active" id="nav-manifest-diff-tab" data-bs-toggle="tab" data-bs-target="#nav-manifest-diff"
-                        type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="true">Manifests
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
+                        type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false">Manifests
                 </button>
-                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
+                <!-- TODO
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled" data-tab="resources"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Resources
                 </button>
-                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
-                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Parameterized Values
+                -->
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="values"
+                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">
+                    Parameterized Values
                 </button>
-                <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled"
-                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Notes
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="notes"
+                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">Notes
                 </button>
             </div>
         </nav>
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-manifest-diff" role="tabpanel" aria-labelledby="nav-manifest-diff-tab"
+            <div class="tab-pane" id="nav-manifest" role="tabpanel"
                  tabindex="0">
                 <nav class="navbar bg-light">
-                    <form class="container-fluid">
+                    <form class="container-fluid" id="modePanel">
                         <label class="form-check-label" for="diffModeNone">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone" disabled>
-                            View Manifests
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone" data-mode="view">
+                            View Current
                         </label>
                         <label class="form-check-label" for="diffModePrev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev" data-mode="diff-prev">
                             Diff with previous
                         </label>
-                        <label class="form-check-label" for="diffModeLatest">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeLatest" disabled>
-                            Diff with latest <span class="text-muted">(#5)</span>
-                        </label>
                         <label class="form-check-label" for="diffModeRev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" disabled>
-                            Diff with specific revision: <input class="form-input" size="3"  disabled>
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" data-mode="diff-rev">
+                            Diff with specific revision: <input class="form-input" size="3" id="specRev">
+                        </label>
+                        <label class="form-check-label" for="userDefinedVals">
+                            <input class="form-check-input" type="checkbox" id="userDefinedVals"> User-defined only
                         </label>
                     </form>
                 </nav>
 
-                <div id="manifestText" class="mt-2"></div>
+                <div id="manifestText" class="mt-2 bg-white"></div>
             </div>
-            <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
+            <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
                  tabindex="0">...
             </div>
         </div>
@@ -114,12 +121,15 @@
 </div>
 
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js" integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"
+        integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3.0.3/build/global/luxon.min.js" integrity="sha256-RH4TKnKcKyde0s2jc5BW3pXZl/5annY3fcZI9VrV5WQ=" crossorigin="anonymous"></script>
 <script src="static/scripts.js"></script>
 </body>
 </html>

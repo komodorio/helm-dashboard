@@ -1,22 +1,26 @@
-# Helm Dashboard
+# <img src="pkg/dashboard/static/logo.png" height=30 style="height: 2rem"> Helm Dashboard
 
 A simplified way of working with Helm.
 
+[<img src="screenshot.png" style="width: 100%; border: 1px solid silver">](screenshot.png)
+
 ## Local Testing
 
-Until we make our repo public, we have to use a custom way to install the plugin.
+Prerequisites: `helm` and `kubectl` binaries installed and operational.
 
-To install, checkout the source code and run from source dir:
-```shell
-helm plugin install .
-```
+Until we make our repo public, we have to use a custom way to install the plugin.
 
 There is a need to build binary for plugin to function, run:
 ```shell
 go build -o bin/dashboard .
 ```
 
-Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require reinstall of a plugin.
+To install, checkout the source code and run from source dir:
+```shell
+helm plugin install .
+```
+
+Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require to reinstall a plugin.
 
 To use the plugin, run in your terminal:
 ```shell
@@ -65,3 +69,4 @@ Adding new repository
 
 Recognise & show ArgoCD-originating charts/objects
 Have cleaner idea on the web API structure
+See if we can build in Chechov or Validkube validation
