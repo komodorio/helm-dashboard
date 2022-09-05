@@ -69,6 +69,8 @@ function loadContentWrapper() {
     const revision = parseInt(getHashParam("revision"));
     if (getHashParam("mode") === "diff-prev") {
         revDiff = revision - 1
+    } else if (getHashParam("mode") === "diff-rev") {
+        revDiff = $("#specRev").val()
     }
     const flag = $("#userDefinedVals").prop("checked");
     loadContent(getHashParam("tab"), getHashParam("namespace"), getHashParam("chart"), revision, revDiff, flag)
@@ -113,6 +115,14 @@ function loadContent(mode, namespace, name, revision, revDiff, flag) {
     })
 }
 
+$('#specRev').keyup(function (event) {
+    let keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13') {
+        $("#diffModeRev").click()
+    }
+    event.preventDefault()
+});
+
 function loadChartHistory(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails h1 span.name").text(name)
@@ -123,6 +133,7 @@ function loadChartHistory(namespace, name) {
         revRow.empty()
         for (let x = 0; x < data.length; x++) {
             const elm = data[x]
+            $("#specRev").val(elm.revision)
             const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
