@@ -83,7 +83,7 @@ function loadContent(mode, namespace, name, revision, revDiff) {
                 const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
                 diff2htmlUi.draw()
             } else {
-                data=hljs.highlight(data, {language: 'yaml'}).value
+                data = hljs.highlight(data, {language: 'yaml'}).value
                 const code = $("#manifestText").empty().append("<pre class='bg-white rounded p-3'></pre>").find("pre");
                 code.html(data)
             }
@@ -91,7 +91,7 @@ function loadContent(mode, namespace, name, revision, revDiff) {
     })
 }
 
-function fillChartDetails(namespace, name) {
+function loadChartHistory(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails h1 span.name").text(name)
     revRow.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
@@ -104,13 +104,15 @@ function fillChartDetails(namespace, name) {
             const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
-                                <span class="text-muted">App:</span> <span class="app-ver"></span><br/>
+                                <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
+                                <span class="text-muted">Age:</span> <span class="rev-age"></span><br/>
                                 <span class="text-muted small rev-date"></span><br/>                
                             </div>`)
             rev.find(".rev-number").text("#" + elm.revision)
             rev.find(".app-ver").text(elm.app_version)
             rev.find(".chart-ver").text(elm.chart_ver)
             rev.find(".rev-date").text(elm.updated.replace("T", " "))
+            rev.find(".rev-age").text(getAge(elm, data[x + 1]))
             rev.find(".rev-status").text(elm.status)
             rev.find(".fa").attr("title", elm.action)
 
@@ -201,7 +203,7 @@ function loadChartsList() {
                 let chart = self.data("chart");
                 setHashParam("namespace", chart.namespace)
                 setHashParam("chart", chart.name)
-                fillChartDetails(chart.namespace, chart.name)
+                loadChartHistory(chart.namespace, chart.name)
             })
 
             chartsCards.append($("<div class='col'></div>").append(card))
@@ -245,7 +247,34 @@ $(function () {
         if (!chart) {
             loadChartsList()
         } else {
-            fillChartDetails(namespace, chart)
+            loadChartHistory(namespace, chart)
         }
     })
 })
+
+function getAge(obj1, obj2) {
+    const date = luxon.DateTime.fromISO(obj1.updated);
+    let dateNext = luxon.DateTime.now()
+    if (obj2) {
+        dateNext = luxon.DateTime.fromISO(obj2.updated);
+    }
+    const diff = dateNext.diff(date);
+
+    const map = {
+        "years": "yr",
+        "months": "mo",
+        "days": "d",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s",
+        "milliseconds": "ms"
+    }
+
+    for (let unit of ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"]) {
+        const val = diff.as(unit);
+        if (val >= 1) {
+            return Math.round(val) + map[unit]
+        }
+    }
+    return "n/a"
+}
