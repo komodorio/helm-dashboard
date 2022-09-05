@@ -61,13 +61,7 @@ func TestFlow(t *testing.T) {
 	}
 	_ = manifests
 
-	diff, err := data.RevisionManifestsDiff(chart.Namespace, chart.Name, history[len(history)-1].Revision, history[len(history)-2].Revision)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_ = diff
-
-	diff, err = data.RevisionNotesDiff(chart.Namespace, chart.Name, history[len(history)-1].Revision, history[len(history)-2].Revision)
+	diff, err := RevisionDiff(data.RevisionManifests, ".yaml", chart.Namespace, chart.Name, history[len(history)-1].Revision, history[len(history)-2].Revision)
 	if err != nil {
 		t.Fatal(err)
 	}
