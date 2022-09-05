@@ -222,34 +222,14 @@ func (l *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement,
 	return res, nil
 }
 
+type SectionFn = func(string, string, int) (string, error)
+
 func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int) (res string, err error) {
 	out, err := l.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
 	if err != nil {
 		return "", err
 	}
 	return out, nil
-}
-
-func (l *DataLayer) RevisionManifestsDiff(namespace string, name string, revision1 int, revision2 int) (string, error) {
-	if revision1 == 0 || revision2 == 0 {
-		return "", nil
-	}
-
-	manifest1, err := l.RevisionManifests(namespace, name, revision1)
-	if err != nil {
-		return "", nil
-	}
-
-	manifest2, err := l.RevisionManifests(namespace, name, revision2)
-	if err != nil {
-		return "", nil
-	}
-
-	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
-	unified := gotextdiff.ToUnified(strconv.Itoa(revision1)+".yaml", strconv.Itoa(revision2)+".yaml", manifest1, edits)
-	diff := fmt.Sprint(unified)
-	log.Debugf("The diff is: %s", diff)
-	return diff, nil
 }
 
 func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision int) (res string, err error) {
@@ -260,23 +240,33 @@ func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision i
 	return out, nil
 }
 
-func (l *DataLayer) RevisionNotesDiff(namespace string, name string, revision1 int, revision2 int) (string, error) {
+func (l *DataLayer) RevisionValues(namespace string, chartName string, revision int) (res string, err error) {
+	// TODO: conditional --all
+	out, err := l.runCommandHelm("get", "values", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision), "--all", "--output", "yaml")
+	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
+func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
+		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)
 		return "", nil
 	}
 
-	manifest1, err := l.RevisionNotes(namespace, name, revision1)
+	manifest1, err := functor(namespace, name, revision1)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
-	manifest2, err := l.RevisionNotes(namespace, name, revision2)
+	manifest2, err := functor(namespace, name, revision2)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
-	unified := gotextdiff.ToUnified(strconv.Itoa(revision1)+".txt", strconv.Itoa(revision2)+".txt", manifest1, edits)
+	unified := gotextdiff.ToUnified(strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext, manifest1, edits)
 	diff := fmt.Sprint(unified)
 	log.Debugf("The diff is: %s", diff)
 	return diff, nil

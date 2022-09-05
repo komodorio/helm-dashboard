@@ -91,7 +91,19 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/helm/charts/manifests", func(c *gin.Context) {
+	sections := map[string]SectionFn{
+		"manifests": data.RevisionManifests,
+		"values":    data.RevisionValues,
+		"notes":     data.RevisionNotes,
+	}
+
+	api.GET("/api/helm/charts/:section", func(c *gin.Context) {
+		functor, found := sections[c.Param("section")]
+		if !found {
+			_ = c.AbortWithError(http.StatusNotFound, errors.New("unsupported section: "+c.Param("section")))
+			return
+		}
+
 		cName := c.Query("chart")
 		cNamespace := c.Query("namespace")
 		if cName == "" {
@@ -104,7 +116,6 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-
 		rDiff := c.Query("revisionDiff")
 		if rDiff != "" {
 			cRevDiff, err := strconv.Atoi(rDiff)
@@ -113,52 +124,19 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 				return
 			}
 
-			res, err := data.RevisionManifestsDiff(cNamespace, cName, cRevDiff, cRev)
+			ext := ".yaml"
+			if c.Param("section") == "notes" {
+				ext = ".txt"
+			}
+
+			res, err := RevisionDiff(functor, ext, cNamespace, cName, cRevDiff, cRev)
 			if err != nil {
 				_ = c.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
 			c.String(http.StatusOK, res)
 		} else {
-			res, err := data.RevisionManifests(cNamespace, cName, cRev)
-			if err != nil {
-				_ = c.AbortWithError(http.StatusInternalServerError, err)
-				return
-			}
-			c.String(http.StatusOK, res)
-		}
-	})
-
-	api.GET("/api/helm/charts/notes", func(c *gin.Context) { // TODO: refactor duplicate code
-		cName := c.Query("chart")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
-			return
-		}
-
-		cRev, err := strconv.Atoi(c.Query("revision"))
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		rDiff := c.Query("revisionDiff")
-		if rDiff != "" {
-			cRevDiff, err := strconv.Atoi(rDiff)
-			if err != nil {
-				_ = c.AbortWithError(http.StatusInternalServerError, err)
-				return
-			}
-
-			res, err := data.RevisionNotesDiff(cNamespace, cName, cRevDiff, cRev)
-			if err != nil {
-				_ = c.AbortWithError(http.StatusInternalServerError, err)
-				return
-			}
-			c.String(http.StatusOK, res)
-		} else {
-			res, err := data.RevisionNotes(cNamespace, cName, cRev)
+			res, err := functor(cNamespace, cName, cRev)
 			if err != nil {
 				_ = c.AbortWithError(http.StatusInternalServerError, err)
 				return
