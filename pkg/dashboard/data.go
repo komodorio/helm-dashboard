@@ -222,9 +222,9 @@ func (l *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement,
 	return res, nil
 }
 
-type SectionFn = func(string, string, int) (string, error)
+type SectionFn = func(string, string, int, bool) (string, error)
 
-func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int) (res string, err error) {
+func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
 	out, err := l.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
 	if err != nil {
 		return "", err
@@ -232,7 +232,7 @@ func (l *DataLayer) RevisionManifests(namespace string, chartName string, revisi
 	return out, nil
 }
 
-func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision int) (res string, err error) {
+func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
 	out, err := l.runCommandHelm("get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
 	if err != nil {
 		return "", err
@@ -240,27 +240,30 @@ func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision i
 	return out, nil
 }
 
-func (l *DataLayer) RevisionValues(namespace string, chartName string, revision int) (res string, err error) {
-	// TODO: conditional --all
-	out, err := l.runCommandHelm("get", "values", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision), "--all", "--output", "yaml")
+func (l *DataLayer) RevisionValues(namespace string, chartName string, revision int, showAll bool) (res string, err error) {
+	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision), "--output", "yaml"}
+	if showAll {
+		cmd = append(cmd, "--all")
+	}
+	out, err := l.runCommandHelm(cmd...)
 	if err != nil {
 		return "", err
 	}
 	return out, nil
 }
 
-func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int) (string, error) {
+func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)
 		return "", nil
 	}
 
-	manifest1, err := functor(namespace, name, revision1)
+	manifest1, err := functor(namespace, name, revision1, flag)
 	if err != nil {
 		return "", err
 	}
 
-	manifest2, err := functor(namespace, name, revision2)
+	manifest2, err := functor(namespace, name, revision2, flag)
 	if err != nil {
 		return "", err
 	}

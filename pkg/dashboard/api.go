@@ -116,6 +116,7 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
+		flag := c.Query("revision") == "true"
 		rDiff := c.Query("revisionDiff")
 		if rDiff != "" {
 			cRevDiff, err := strconv.Atoi(rDiff)
@@ -129,14 +130,14 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 				ext = ".txt"
 			}
 
-			res, err := RevisionDiff(functor, ext, cNamespace, cName, cRevDiff, cRev)
+			res, err := RevisionDiff(functor, ext, cNamespace, cName, cRevDiff, cRev, flag)
 			if err != nil {
 				_ = c.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
 			c.String(http.StatusOK, res)
 		} else {
-			res, err := functor(cNamespace, cName, cRev)
+			res, err := functor(cNamespace, cName, cRev, flag)
 			if err != nil {
 				_ = c.AbortWithError(http.StatusInternalServerError, err)
 				return
