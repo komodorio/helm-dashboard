@@ -34,12 +34,14 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Installed Charts</a>
                     </li>
+                    <!-- TODO
                     <li class="nav-item">
                         <a class="nav-link disabled">Provisional Charts</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link disabled">Repositories</a>
                     </li>
+                    -->
                 </ul>
                 <form class="d-flex flex-nowrap text-nowrap">
                     <label for="cluster" style="margin-top: 0.5rem">K8s Context:</label>
@@ -64,9 +66,11 @@
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
                         type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false">Manifests
                 </button>
+                <!-- TODO
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled" data-tab="resources"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Resources
                 </button>
+                -->
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="values"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">
                     Parameterized Values
@@ -92,6 +96,9 @@
                         <label class="form-check-label" for="diffModeRev">
                             <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" data-mode="diff-rev">
                             Diff with specific revision: <input class="form-input" size="3">
+                        </label>
+                        <label class="form-check-label" for="userDefinedVals">
+                            <input class="form-check-input" type="checkbox" id="userDefinedVals"> User-defined only
                         </label>
                     </form>
                 </nav>

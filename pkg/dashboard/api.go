@@ -116,7 +116,7 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		flag := c.Query("revision") == "true"
+		flag := c.Query("flag") == "true"
 		rDiff := c.Query("revisionDiff")
 		if rDiff != "" {
 			cRevDiff, err := strconv.Atoi(rDiff)

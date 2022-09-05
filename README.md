@@ -6,6 +6,8 @@ A simplified way of working with Helm.
 
 ## Local Testing
 
+Prerequisites: `helm` and `kubectl` binaries installed and operational.
+
 Until we make our repo public, we have to use a custom way to install the plugin.
 
 There is a need to build binary for plugin to function, run:

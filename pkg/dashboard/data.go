@@ -240,9 +240,9 @@ func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision i
 	return out, nil
 }
 
-func (l *DataLayer) RevisionValues(namespace string, chartName string, revision int, showAll bool) (res string, err error) {
+func (l *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
 	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision), "--output", "yaml"}
-	if showAll {
+	if !onlyUserDefined {
 		cmd = append(cmd, "--all")
 	}
 	out, err := l.runCommandHelm(cmd...)

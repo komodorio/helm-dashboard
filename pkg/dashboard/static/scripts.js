@@ -30,8 +30,16 @@ function revisionClicked(namespace, name, self) {
 
 $("#nav-tab [data-tab]").click(function () {
     const self = $(this)
-    //self.addClass("active")
     setHashParam("tab", self.data("tab"))
+
+    if (self.data("tab") === "values") {
+        $("#userDefinedVals").parent().show()
+    } else {
+        $("#userDefinedVals").parent().hide()
+    }
+
+    const flag = getHashParam("udv") === "true";
+    $("#userDefinedVals").prop("checked", flag)
 
     const mode = getHashParam("mode")
     if (!mode) {
@@ -45,19 +53,37 @@ $("#modePanel [data-mode]").click(function () {
     const self = $(this)
     const mode = self.data("mode")
     setHashParam("mode", mode)
-    let revDiff = 0
-    const revision = parseInt(getHashParam("revision"));
-    if (mode === "diff-prev") {
-        revDiff = revision - 1
-    }
-    loadContent(getHashParam("tab"), getHashParam("namespace"), getHashParam("chart"), revision, revDiff)
+    loadContentWrapper()
 })
 
-function loadContent(mode, namespace, name, revision, revDiff) {
+
+$("#userDefinedVals").change(function () {
+    const self = $(this)
+    const flag = $("#userDefinedVals").prop("checked");
+    setHashParam("udv", flag)
+    loadContentWrapper()
+})
+
+function loadContentWrapper() {
+    let revDiff = 0
+    const revision = parseInt(getHashParam("revision"));
+    if (getHashParam("mode") === "diff-prev") {
+        revDiff = revision - 1
+    }
+    const flag = $("#userDefinedVals").prop("checked");
+    loadContent(getHashParam("tab"), getHashParam("namespace"), getHashParam("chart"), revision, revDiff, flag)
+}
+
+function loadContent(mode, namespace, name, revision, revDiff, flag) {
     let qstr = "chart=" + name + "&namespace=" + namespace + "&revision=" + revision
     if (revDiff) {
         qstr += "&revisionDiff=" + revDiff
     }
+
+    if (flag) {
+        qstr += "&flag=" + flag
+    }
+
     let url = "/api/helm/charts/" + mode
     url += "?" + qstr
     const diffDisplay = $("#manifestText");
@@ -72,13 +98,9 @@ function loadContent(mode, namespace, name, revision, revDiff) {
             if (revDiff) {
                 const targetElement = document.getElementById('manifestText');
                 const configuration = {
-                    inputFormat: 'diff',
-                    outputFormat: 'side-by-side',
+                    inputFormat: 'diff', outputFormat: 'side-by-side',
 
-                    drawFileList: false,
-                    showFiles: false,
-                    highlight: true,
-                    //matching: 'lines',
+                    drawFileList: false, showFiles: false, highlight: true, //matching: 'lines',
                 };
                 const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
                 diff2htmlUi.draw()
@@ -105,8 +127,8 @@ function loadChartHistory(namespace, name) {
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
                                 <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
-                                <span class="text-muted">Age:</span> <span class="rev-age"></span><br/>
-                                <span class="text-muted small rev-date"></span><br/>                
+                                <p class="small mt-3 mb-0"><span class="text-muted">Age:</span> <span class="rev-age"></span><br/>
+                                <span class="text-muted rev-date"></span><br/></p>                
                             </div>`)
             rev.find(".rev-number").text("#" + elm.revision)
             rev.find(".app-ver").text(elm.app_version)
@@ -261,13 +283,7 @@ function getAge(obj1, obj2) {
     const diff = dateNext.diff(date);
 
     const map = {
-        "years": "yr",
-        "months": "mo",
-        "days": "d",
-        "hours": "h",
-        "minutes": "m",
-        "seconds": "s",
-        "milliseconds": "ms"
+        "years": "yr", "months": "mo", "days": "d", "hours": "h", "minutes": "m", "seconds": "s", "milliseconds": "ms"
     }
 
     for (let unit of ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"]) {
