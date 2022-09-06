@@ -55,7 +55,7 @@ func TestFlow(t *testing.T) {
 	}
 	_ = upgrade
 
-	manifests, err := data.RevisionManifests(chart.Namespace, chart.Name, history[len(history)-1].Revision, true)
+	manifests, err := data.RevisionManifestsParsed(chart.Namespace, chart.Name, history[len(history)-1].Revision)
 	if err != nil {
 		t.Fatal(err)
 	}

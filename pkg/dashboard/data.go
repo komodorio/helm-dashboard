@@ -10,6 +10,8 @@ import (
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"os/exec"
 	"regexp"
@@ -69,6 +71,7 @@ func (l *DataLayer) runCommandHelm(cmd ...string) (string, error) {
 }
 
 func (l *DataLayer) runCommandKubectl(cmd ...string) (string, error) {
+	// TODO: migrate into using kubectl "k8s.io/kubectl/pkg/cmd" and kube API
 	if l.Kubectl == "" {
 		l.Kubectl = "kubectl"
 	}
@@ -222,7 +225,7 @@ func (l *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement,
 	return res, nil
 }
 
-type SectionFn = func(string, string, int, bool) (string, error)
+type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
 
 func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
 	out, err := l.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
@@ -230,6 +233,36 @@ func (l *DataLayer) RevisionManifests(namespace string, chartName string, revisi
 		return "", err
 	}
 	return out, nil
+}
+
+func (l *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*GenericResource, error) {
+	out, err := l.RevisionManifests(namespace, chartName, revision, false)
+	if err != nil {
+		return nil, err
+	}
+
+	dec := yaml.NewDecoder(bytes.NewReader([]byte(out)))
+
+	res := make([]*GenericResource, 0)
+	var tmp interface{}
+	for dec.Decode(&tmp) == nil {
+		// k8s libs uses only JSON tags defined, say hello to https://github.com/go-yaml/yaml/issues/424
+		// bug we can juggle it
+		jsoned, err := json.Marshal(tmp)
+		if err != nil {
+			return nil, err
+		}
+
+		var doc GenericResource
+		err = json.Unmarshal(jsoned, &doc)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &doc)
+	}
+
+	return res, nil
 }
 
 func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
@@ -273,4 +306,9 @@ func RevisionDiff(functor SectionFn, ext string, namespace string, name string, 
 	diff := fmt.Sprint(unified)
 	log.Debugf("The diff is: %s", diff)
 	return diff, nil
+}
+
+type GenericResource struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 }
