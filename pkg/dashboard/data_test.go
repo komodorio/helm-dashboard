@@ -3,6 +3,7 @@ package dashboard
 import (
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/release"
+	"sync"
 	"testing"
 )
 
@@ -55,11 +56,27 @@ func TestFlow(t *testing.T) {
 	}
 	_ = upgrade
 
-	manifests, err := data.RevisionManifests(chart.Namespace, chart.Name, history[len(history)-1].Revision, true)
+	manifests, err := data.RevisionManifestsParsed(chart.Namespace, chart.Name, history[len(history)-1].Revision)
 	if err != nil {
 		t.Fatal(err)
 	}
 	_ = manifests
+
+	var wg sync.WaitGroup
+	res := make([]*GenericResource, 0)
+	for _, m := range manifests {
+		wg.Add(1)
+		mc := m // fix the clojure
+		func() {
+			defer wg.Done()
+			lst, err := data.GetResource(chart.Namespace, mc)
+			if err != nil {
+				t.Fatal(err)
+			}
+			res = append(res, lst)
+		}()
+	}
+	wg.Wait()
 
 	diff, err := RevisionDiff(data.RevisionManifests, ".yaml", chart.Namespace, chart.Name, history[len(history)-1].Revision, history[len(history)-2].Revision, true)
 	if err != nil {

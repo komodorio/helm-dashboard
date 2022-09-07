@@ -22,7 +22,7 @@ function revisionClicked(namespace, name, self) {
 
     const tab = getHashParam("tab")
     if (!tab) {
-        $("#nav-tab [data-tab=manifests]").click()
+        $("#nav-tab [data-tab=resources]").click()
     } else {
         $("#nav-tab [data-tab=" + tab + "]").click()
     }
@@ -41,11 +41,15 @@ $("#nav-tab [data-tab]").click(function () {
     const flag = getHashParam("udv") === "true";
     $("#userDefinedVals").prop("checked", flag)
 
-    const mode = getHashParam("mode")
-    if (!mode) {
-        $("#modePanel [data-mode=diff-prev]").trigger('click')
+    if (self.data("tab") === "resources") {
+        showResources(getHashParam("namespace"), getHashParam("chart"), getHashParam("revision"))
     } else {
-        $("#modePanel [data-mode=" + mode + "]").trigger('click')
+        const mode = getHashParam("mode")
+        if (!mode) {
+            $("#modePanel [data-mode=diff-prev]").trigger('click')
+        } else {
+            $("#modePanel [data-mode=" + mode + "]").trigger('click')
+        }
     }
 })
 
@@ -128,7 +132,7 @@ function loadChartHistory(namespace, name) {
     $("#sectionDetails h1 span.name").text(name)
     revRow.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
     $.getJSON("/api/helm/charts/history?chart=" + name + "&namespace=" + namespace).fail(function () {
-        reportError("Failed to get list of clusters")
+        reportError("Failed to get chart details")
     }).done(function (data) {
         revRow.empty()
         for (let x = 0; x < data.length; x++) {
@@ -203,7 +207,7 @@ function loadChartsList() {
     $("#sectionList").show()
     chartsCards.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i> Loading...</div>")
     $.getJSON("/api/helm/charts").fail(function () {
-        reportError("Failed to get list of clusters")
+        reportError("Failed to get list of charts")
     }).done(function (data) {
         chartsCards.empty()
         data.forEach(function (elm) {
@@ -218,7 +222,7 @@ function loadChartsList() {
                 header.find(".badge").addClass("bg-light text-dark")
             }
 
-            header.append($('<h5 class="card-title"></h5>').text(elm.name))
+            header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&chart=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
             header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
 
             const body = $("<div class='card-body'></div>")
@@ -304,4 +308,42 @@ function getAge(obj1, obj2) {
         }
     }
     return "n/a"
+}
+
+function showResources(namespace, chart, revision) {
+    $("#nav-resources").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>");
+    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revision
+    let url = "/api/helm/charts/resources"
+    url += "?" + qstr
+    $.getJSON(url).fail(function () {
+        reportError("Failed to get list of resources")
+    }).done(function (data) {
+        $("#nav-resources").empty();
+        for (let i = 0; i < data.length; i++) {
+            const res = data[i]
+            const resBlock = $(` 
+                <div class="input-group row">
+                    <span class="input-group-text col-sm-2"><em class="text-muted small">` + res.kind + `</em></span>
+                    <span class="input-group-text col-sm-6">` + res.metadata.name + `</span>
+                    <span class="form-control col-sm-4"><i class="fa fa-spinner fa-spin"></i> <span class="text-muted small">Getting status...</span></span>
+                </div>`)
+            $("#nav-resources").append(resBlock)
+            let ns = res.metadata.namespace ? res.metadata.namespace : namespace
+            $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
+                //reportError("Failed to get list of resources")
+            }).done(function (data) {
+                const badge = $("<span class='badge me-2'></span>").text(data.status.phase);
+                if (["Available", "Active", "Established"].includes(data.status.phase)) {
+                    badge.addClass("bg-success")
+                } else if (["Exists"].includes(data.status.phase)) {
+                    badge.addClass("bg-success bg-opacity-50")
+                } else {
+                    badge.addClass("bg-danger")
+                }
+
+                resBlock.find(".form-control").empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
+            })
+
+        }
+    })
 }

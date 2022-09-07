@@ -9,7 +9,7 @@
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <!-- CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/lightfair.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/lightfair.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"/>
     <link href="static/styles.css" rel="stylesheet">
 </head>
@@ -63,14 +63,12 @@
 
         <nav class="mt-2">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-resources" data-tab="resources"
+                        type="button" role="tab" aria-controls="nav-resources" aria-selected="false">Resources
+                </button>
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
                         type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false">Manifests
                 </button>
-                <!-- TODO
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-disabled" data-tab="resources"
-                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Resources
-                </button>
-                -->
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="values"
                         type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">
                     Parameterized Values
@@ -80,21 +78,26 @@
                 </button>
             </div>
         </nav>
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane" id="nav-manifest" role="tabpanel"
-                 tabindex="0">
+        <div class="tab-content">
+            <div class="tab-pane p-3" id="nav-resources" role="tabpanel">
+
+            </div>
+            <div class="tab-pane" id="nav-manifest" role="tabpanel">
                 <nav class="navbar bg-light">
                     <form class="container-fluid" id="modePanel">
                         <label class="form-check-label" for="diffModeNone">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone" data-mode="view">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone"
+                                   data-mode="view">
                             View Current
                         </label>
                         <label class="form-check-label" for="diffModePrev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev" data-mode="diff-prev">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev"
+                                   data-mode="diff-prev">
                             Diff with previous
                         </label>
                         <label class="form-check-label" for="diffModeRev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev" data-mode="diff-rev">
+                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev"
+                                   data-mode="diff-rev">
                             Diff with specific revision: <input class="form-input" size="3" id="specRev">
                         </label>
                         <label class="form-check-label" for="userDefinedVals">
@@ -126,10 +129,13 @@
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js" integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"
+        integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"
         integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/luxon@3.0.3/build/global/luxon.min.js" integrity="sha256-RH4TKnKcKyde0s2jc5BW3pXZl/5annY3fcZI9VrV5WQ=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3.0.3/build/global/luxon.min.js"
+        integrity="sha256-RH4TKnKcKyde0s2jc5BW3pXZl/5annY3fcZI9VrV5WQ=" crossorigin="anonymous"></script>
 <script src="static/scripts.js"></script>
 </body>
 </html>
