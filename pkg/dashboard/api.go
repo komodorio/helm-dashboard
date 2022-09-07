@@ -5,6 +5,8 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
 	"os"
 	"path"
@@ -109,6 +111,35 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.GET("/api/kube/resources/:kind", func(c *gin.Context) {
+		cName := c.Query("name")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: name"))
+			return
+		}
+
+		res, err := data.GetResource(cNamespace, &GenericResource{
+			TypeMeta:   v1.TypeMeta{Kind: c.Param("kind")},
+			ObjectMeta: v1.ObjectMeta{Name: cName},
+		})
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		if res.Status.Phase == "Active" {
+
+		} else if len(res.Status.Conditions) > 0 {
+			res.Status.Phase = v12.CarpPhase(res.Status.Conditions[len(res.Status.Conditions)-1].Status)
+
+		} else {
+			res.Status.Phase = "Exists"
+		}
+
 		c.IndentedJSON(http.StatusOK, res)
 	})
 

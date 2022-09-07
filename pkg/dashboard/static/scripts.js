@@ -317,22 +317,20 @@ function showResources(namespace, chart, revision) {
     $.getJSON(url).fail(function () {
         reportError("Failed to get list of resources")
     }).done(function (data) {
+        $("#nav-resources").empty();
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
-            console.log(res)
             const resBlock = $(` 
                 <div class="input-group row">
-                    <span class="input-group-text col-sm-2"><em class="text-muted small">`+res.kind+`</em></span>
-                    <span class="input-group-text col-sm-6">`+res.metadata.name+`</span>
+                    <span class="input-group-text col-sm-2"><em class="text-muted small">` + res.kind + `</em></span>
+                    <span class="input-group-text col-sm-6">` + res.metadata.name + `</span>
                     <span class="form-control col-sm-4"><i class="fa fa-spinner fa-spin"></i> <span class="text-muted small">Getting status...</span></span>
                 </div>`)
             $("#nav-resources").append(resBlock)
-            $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name).fail(function () {
+            let ns = res.metadata.namespace ? res.metadata.namespace : namespace
+            $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
                 //reportError("Failed to get list of resources")
             }).done(function (data) {
-                for (let i = 0; i < data.length; i++) {
-
-                }
             })
 
         }
