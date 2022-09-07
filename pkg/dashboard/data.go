@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -291,7 +292,7 @@ func (d *DataLayer) GetResource(namespace string, def *GenericResource) (*Generi
 		if strings.HasSuffix(strings.TrimSpace(err.Error()), " not found") {
 			return &GenericResource{
 				Status: v1.CarpStatus{
-					Phase:   "get",
+					Phase:   "NotFound",
 					Message: err.Error(),
 					Reason:  "not found",
 				},
@@ -306,6 +307,12 @@ func (d *DataLayer) GetResource(namespace string, def *GenericResource) (*Generi
 	if err != nil {
 		return nil, err
 	}
+
+	sort.Slice(res.Status.Conditions, func(i, j int) bool {
+		t1 := res.Status.Conditions[i].LastTransitionTime
+		t2 := res.Status.Conditions[j].LastTransitionTime
+		return t1.Time.Before(t2.Time)
+	})
 
 	return &res, nil
 }

@@ -131,12 +131,16 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			return
 		}
 
-		if res.Status.Phase == "Active" {
-
-		} else if len(res.Status.Conditions) > 0 {
-			res.Status.Phase = v12.CarpPhase(res.Status.Conditions[len(res.Status.Conditions)-1].Status)
-
-		} else {
+		if res.Status.Phase == "Active" || res.Status.Phase == "Error" {
+			_ = res.Name + ""
+		} else if res.Status.Phase == "" && len(res.Status.Conditions) > 0 {
+			res.Status.Phase = v12.CarpPhase(res.Status.Conditions[len(res.Status.Conditions)-1].Type)
+			res.Status.Message = res.Status.Conditions[len(res.Status.Conditions)-1].Message
+			res.Status.Reason = res.Status.Conditions[len(res.Status.Conditions)-1].Reason
+			if res.Status.Conditions[len(res.Status.Conditions)-1].Status == "False" {
+				res.Status.Phase = "Not" + res.Status.Phase
+			}
+		} else if res.Status.Phase == "" {
 			res.Status.Phase = "Exists"
 		}
 
