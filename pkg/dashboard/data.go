@@ -26,11 +26,11 @@ type DataLayer struct {
 	Kubectl     string
 }
 
-func (l *DataLayer) runCommand(cmd ...string) (string, error) {
+func (d *DataLayer) runCommand(cmd ...string) (string, error) {
 	log.Debugf("Starting command: %s", cmd)
 	prog := exec.Command(cmd[0], cmd[1:]...)
 	prog.Env = os.Environ()
-	prog.Env = append(prog.Env, "HELM_KUBECONTEXT="+l.KubeContext)
+	prog.Env = append(prog.Env, "HELM_KUBECONTEXT="+d.KubeContext)
 
 	var stdout bytes.Buffer
 	prog.Stdout = &stdout
@@ -57,36 +57,36 @@ func (l *DataLayer) runCommand(cmd ...string) (string, error) {
 	return string(sout), nil
 }
 
-func (l *DataLayer) runCommandHelm(cmd ...string) (string, error) {
-	if l.Helm == "" {
-		l.Helm = "helm"
+func (d *DataLayer) runCommandHelm(cmd ...string) (string, error) {
+	if d.Helm == "" {
+		d.Helm = "helm"
 	}
 
-	cmd = append([]string{l.Helm}, cmd...)
-	if l.KubeContext != "" {
-		cmd = append(cmd, "--kube-context", l.KubeContext)
+	cmd = append([]string{d.Helm}, cmd...)
+	if d.KubeContext != "" {
+		cmd = append(cmd, "--kube-context", d.KubeContext)
 	}
 
-	return l.runCommand(cmd...)
+	return d.runCommand(cmd...)
 }
 
-func (l *DataLayer) runCommandKubectl(cmd ...string) (string, error) {
+func (d *DataLayer) runCommandKubectl(cmd ...string) (string, error) {
 	// TODO: migrate into using kubectl "k8s.io/kubectl/pkg/cmd" and kube API
-	if l.Kubectl == "" {
-		l.Kubectl = "kubectl"
+	if d.Kubectl == "" {
+		d.Kubectl = "kubectl"
 	}
 
-	cmd = append([]string{l.Kubectl}, cmd...)
+	cmd = append([]string{d.Kubectl}, cmd...)
 
-	if l.KubeContext != "" {
-		cmd = append(cmd, "--context", l.KubeContext)
+	if d.KubeContext != "" {
+		cmd = append(cmd, "--context", d.KubeContext)
 	}
 
-	return l.runCommand(cmd...)
+	return d.runCommand(cmd...)
 }
 
-func (l *DataLayer) CheckConnectivity() error {
-	contexts, err := l.ListContexts()
+func (d *DataLayer) CheckConnectivity() error {
+	contexts, err := d.ListContexts()
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (l *DataLayer) CheckConnectivity() error {
 	}
 
 	/*
-		_, err = l.runCommandHelm("env") // no point in doing is, since the default context may be invalid
+		_, err = d.runCommandHelm("env") // no point in doing is, since the default context may be invalid
 		if err != nil {
 			return err
 		}
@@ -113,8 +113,8 @@ type KubeContext struct {
 	Namespace string
 }
 
-func (l *DataLayer) ListContexts() (res []KubeContext, err error) {
-	out, err := l.runCommandKubectl("config", "get-contexts")
+func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
+	out, err := d.runCommandKubectl("config", "get-contexts")
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ func (l *DataLayer) ListContexts() (res []KubeContext, err error) {
 	return res, nil
 }
 
-func (l *DataLayer) ListInstalled() (res []releaseElement, err error) {
-	out, err := l.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
+func (d *DataLayer) ListInstalled() (res []releaseElement, err error) {
+	out, err := d.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
 	if err != nil {
 		return nil, err
 	}
@@ -160,9 +160,9 @@ func (l *DataLayer) ListInstalled() (res []releaseElement, err error) {
 	return res, nil
 }
 
-func (l *DataLayer) ChartHistory(namespace string, chartName string) (res []*historyElement, err error) {
+func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*historyElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := l.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
+	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
 	if err != nil {
 		return nil, err
 	}
@@ -212,8 +212,8 @@ func (l *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 	return res, nil
 }
 
-func (l *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement, err error) {
-	out, err := l.runCommandHelm("search", "repo", "--regexp", "/"+chartName+"\v", "--versions", "--output", "json")
+func (d *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement, err error) {
+	out, err := d.runCommandHelm("search", "repo", "--regexp", "/"+chartName+"\v", "--versions", "--output", "json")
 	if err != nil {
 		return nil, err
 	}
@@ -227,16 +227,16 @@ func (l *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement,
 
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
 
-func (l *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	out, err := l.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
+func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
+	out, err := d.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
 	if err != nil {
 		return "", err
 	}
 	return out, nil
 }
 
-func (l *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*GenericResource, error) {
-	out, err := l.RevisionManifests(namespace, chartName, revision, false)
+func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*GenericResource, error) {
+	out, err := d.RevisionManifests(namespace, chartName, revision, false)
 	if err != nil {
 		return nil, err
 	}
@@ -265,24 +265,39 @@ func (l *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 	return res, nil
 }
 
-func (l *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	out, err := l.runCommandHelm("get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
+func (d *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
+	out, err := d.runCommandHelm("get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
 	if err != nil {
 		return "", err
 	}
 	return out, nil
 }
 
-func (l *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
+func (d *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
 	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision), "--output", "yaml"}
 	if !onlyUserDefined {
 		cmd = append(cmd, "--all")
 	}
-	out, err := l.runCommandHelm(cmd...)
+	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
 		return "", err
 	}
 	return out, nil
+}
+
+func (d *DataLayer) GetResourcesOfKind(namespace string, kind string) ([]*GenericResource, error) {
+	out, err := d.runCommandKubectl("get", strings.ToLower(kind), "--output", "json", "-l", "app.kubernetes.io/managed-by=Helm", "--namespace", namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	var res EnvelopedResourceList
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Items, nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
@@ -311,4 +326,8 @@ func RevisionDiff(functor SectionFn, ext string, namespace string, name string, 
 type GenericResource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
+}
+
+type EnvelopedResourceList struct {
+	Items []*GenericResource `json:"items"`
 }
