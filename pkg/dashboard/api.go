@@ -68,15 +68,6 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/kube/contexts", func(c *gin.Context) {
-		res, err := data.ListContexts()
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, res)
-	})
-
 	api.GET("/api/helm/charts/history", func(c *gin.Context) {
 		cName := c.Query("chart")
 		cNamespace := c.Query("namespace")
@@ -114,38 +105,7 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/kube/resources/:kind", func(c *gin.Context) {
-		cName := c.Query("name")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: name"))
-			return
-		}
-
-		res, err := data.GetResource(cNamespace, &GenericResource{
-			TypeMeta:   v1.TypeMeta{Kind: c.Param("kind")},
-			ObjectMeta: v1.ObjectMeta{Name: cName},
-		})
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		if res.Status.Phase == "Active" || res.Status.Phase == "Error" {
-			_ = res.Name + ""
-		} else if res.Status.Phase == "" && len(res.Status.Conditions) > 0 {
-			res.Status.Phase = v12.CarpPhase(res.Status.Conditions[len(res.Status.Conditions)-1].Type)
-			res.Status.Message = res.Status.Conditions[len(res.Status.Conditions)-1].Message
-			res.Status.Reason = res.Status.Conditions[len(res.Status.Conditions)-1].Reason
-			if res.Status.Conditions[len(res.Status.Conditions)-1].Status == "False" {
-				res.Status.Phase = "Not" + res.Status.Phase
-			}
-		} else if res.Status.Phase == "" {
-			res.Status.Phase = "Exists"
-		}
-
-		c.IndentedJSON(http.StatusOK, res)
-	})
+	configureKubectls(api, data)
 
 	sections := map[string]SectionFn{
 		"manifests": data.RevisionManifests,
@@ -200,6 +160,50 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			}
 			c.String(http.StatusOK, res)
 		}
+	})
+}
+
+func configureKubectls(api *gin.Engine, data *DataLayer) {
+	api.GET("/api/kube/contexts", func(c *gin.Context) {
+		res, err := data.ListContexts()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.GET("/api/kube/resources/:kind", func(c *gin.Context) {
+		cName := c.Query("name")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: name"))
+			return
+		}
+
+		res, err := data.GetResource(cNamespace, &GenericResource{
+			TypeMeta:   v1.TypeMeta{Kind: c.Param("kind")},
+			ObjectMeta: v1.ObjectMeta{Name: cName},
+		})
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		if res.Status.Phase == "Active" || res.Status.Phase == "Error" {
+			_ = res.Name + ""
+		} else if res.Status.Phase == "" && len(res.Status.Conditions) > 0 {
+			res.Status.Phase = v12.CarpPhase(res.Status.Conditions[len(res.Status.Conditions)-1].Type)
+			res.Status.Message = res.Status.Conditions[len(res.Status.Conditions)-1].Message
+			res.Status.Reason = res.Status.Conditions[len(res.Status.Conditions)-1].Reason
+			if res.Status.Conditions[len(res.Status.Conditions)-1].Status == "False" {
+				res.Status.Phase = "Not" + res.Status.Phase
+			}
+		} else if res.Status.Phase == "" {
+			res.Status.Phase = "Exists"
+		}
+
+		c.IndentedJSON(http.StatusOK, res)
 	})
 }
 
