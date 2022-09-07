@@ -11,7 +11,7 @@ import (
 	"github.com/hexops/gotextdiff/span"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"os"
 	"os/exec"
 	"regexp"
@@ -285,19 +285,29 @@ func (d *DataLayer) RevisionValues(namespace string, chartName string, revision 
 	return out, nil
 }
 
-func (d *DataLayer) GetResourcesOfKind(namespace string, kind string) ([]*GenericResource, error) {
-	out, err := d.runCommandKubectl("get", strings.ToLower(kind), "--output", "json", "-l", "app.kubernetes.io/managed-by=Helm", "--namespace", namespace)
+func (d *DataLayer) GetResource(namespace string, def *GenericResource) (*GenericResource, error) {
+	out, err := d.runCommandKubectl("get", strings.ToLower(def.Kind), def.Name, "--namespace", namespace, "--output", "json")
 	if err != nil {
-		return nil, err
+		if strings.HasSuffix(strings.TrimSpace(err.Error()), " not found") {
+			return &GenericResource{
+				Status: v1.CarpStatus{
+					Phase:   "get",
+					Message: err.Error(),
+					Reason:  "not found",
+				},
+			}, nil
+		} else {
+			return nil, err
+		}
 	}
 
-	var res EnvelopedResourceList
+	var res GenericResource
 	err = json.Unmarshal([]byte(out), &res)
 	if err != nil {
 		return nil, err
 	}
 
-	return res.Items, nil
+	return &res, nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
@@ -323,11 +333,4 @@ func RevisionDiff(functor SectionFn, ext string, namespace string, name string, 
 	return diff, nil
 }
 
-type GenericResource struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-}
-
-type EnvelopedResourceList struct {
-	Items []*GenericResource `json:"items"`
-}
+type GenericResource = v1.Carp

@@ -22,7 +22,7 @@ function revisionClicked(namespace, name, self) {
 
     const tab = getHashParam("tab")
     if (!tab) {
-        $("#nav-tab [data-tab=manifests]").click()
+        $("#nav-tab [data-tab=resources]").click()
     } else {
         $("#nav-tab [data-tab=" + tab + "]").click()
     }
@@ -41,11 +41,15 @@ $("#nav-tab [data-tab]").click(function () {
     const flag = getHashParam("udv") === "true";
     $("#userDefinedVals").prop("checked", flag)
 
-    const mode = getHashParam("mode")
-    if (!mode) {
-        $("#modePanel [data-mode=diff-prev]").trigger('click')
+    if (self.data("tab") === "resources") {
+        showResources(getHashParam("namespace"), getHashParam("chart"), getHashParam("revision"))
     } else {
-        $("#modePanel [data-mode=" + mode + "]").trigger('click')
+        const mode = getHashParam("mode")
+        if (!mode) {
+            $("#modePanel [data-mode=diff-prev]").trigger('click')
+        } else {
+            $("#modePanel [data-mode=" + mode + "]").trigger('click')
+        }
     }
 })
 
@@ -304,4 +308,33 @@ function getAge(obj1, obj2) {
         }
     }
     return "n/a"
+}
+
+function showResources(namespace, chart, revision) {
+    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revision
+    let url = "/api/helm/charts/resources"
+    url += "?" + qstr
+    $.getJSON(url).fail(function () {
+        reportError("Failed to get list of resources")
+    }).done(function (data) {
+        for (let i = 0; i < data.length; i++) {
+            const res = data[i]
+            console.log(res)
+            const resBlock = $(` 
+                <div class="input-group row">
+                    <span class="input-group-text col-sm-2"><em class="text-muted small">`+res.kind+`</em></span>
+                    <span class="input-group-text col-sm-6">`+res.metadata.name+`</span>
+                    <span class="form-control col-sm-4"><i class="fa fa-spinner fa-spin"></i> <span class="text-muted small">Getting status...</span></span>
+                </div>`)
+            $("#nav-resources").append(resBlock)
+            $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name).fail(function () {
+                //reportError("Failed to get list of resources")
+            }).done(function (data) {
+                for (let i = 0; i < data.length; i++) {
+
+                }
+            })
+
+        }
+    })
 }
