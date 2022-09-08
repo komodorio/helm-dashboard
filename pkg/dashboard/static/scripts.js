@@ -349,6 +349,7 @@ function showResources(namespace, chart, revision) {
 }
 
 $(".fa-power-off").click(function () {
+    $(".fa-power-off").attr("disabled", "disabled").removeClass(".fa-power-off").addClass("fa-spin fa-spinner")
     $.ajax({
         url: "/",
         type: 'DELETE',
