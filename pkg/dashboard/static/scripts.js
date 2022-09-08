@@ -341,11 +341,15 @@ function showResources(namespace, chart, revision) {
                     badge.addClass("bg-danger")
                 }
 
-                resBlock.find(".form-control.col-sm-4").empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>").prepend("<i class=\"btn fa fa-search-plus float-end text-muted\"></i>")
+                const statusBlock = resBlock.find(".form-control.col-sm-4");
+                statusBlock.empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
 
-                resBlock.find(".fa-search-plus").click(function () {
-                    showDescribe(ns, res.kind, res.metadata.name)
-                })
+                if (badge.text()!=="NotFound") {
+                    statusBlock.prepend("<i class=\"btn fa fa-search-plus float-end text-muted\"></i>")
+                    statusBlock.find(".fa-search-plus").click(function () {
+                        showDescribe(ns, res.kind, res.metadata.name)
+                    })
+                }
             })
         }
     })
