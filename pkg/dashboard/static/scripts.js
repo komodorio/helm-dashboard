@@ -341,9 +341,12 @@ function showResources(namespace, chart, revision) {
                     badge.addClass("bg-danger")
                 }
 
-                resBlock.find(".form-control").empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
-            })
+                resBlock.find(".form-control.col-sm-4").empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>").prepend("<i class=\"btn fa fa-search-plus float-end text-muted\"></i>")
 
+                resBlock.find(".fa-search-plus").click(function () {
+                    showDescribe(ns, res.kind, res.metadata.name)
+                })
+            })
         }
     })
 }
@@ -357,3 +360,17 @@ $(".fa-power-off").click(function () {
         window.close();
     })
 })
+
+function showDescribe(ns, kind, name) {
+    $("#describeModalLabel").text("Describe " + kind + ": " + ns + " / " + name)
+    $("#describeModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
+
+    const myModal = new bootstrap.Modal(document.getElementById('describeModal'), {});
+    myModal.show()
+    $.get("/api/kube/describe/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function () {
+        reportError("Failed to describe resource")
+    }).done(function (data) {
+        data = hljs.highlight(data, {language: 'yaml'}).value
+        $("#describeModalBody").empty().append("<pre class='bg-white rounded p-3'></pre>").find("pre").html(data)
+    })
+}

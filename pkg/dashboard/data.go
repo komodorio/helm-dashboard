@@ -317,6 +317,14 @@ func (d *DataLayer) GetResource(namespace string, def *GenericResource) (*Generi
 	return &res, nil
 }
 
+func (d *DataLayer) DescribeResource(namespace string, kind string, name string) (string, error) {
+	out, err := d.runCommandKubectl("describe", strings.ToLower(kind), name, "--namespace", namespace)
+	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)

@@ -3,7 +3,7 @@
 builds:
   - main: ./main.go
     binary: helm-dashboard
-    ldflags: -s -w -X main.version={{.Version}} -X main.version={{.Version}} -X main.version={{.Version}} -X main.date={{.Date}}
+    ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
     goos:
       - windows
       - darwin

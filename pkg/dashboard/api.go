@@ -205,6 +205,23 @@ func configureKubectls(api *gin.Engine, data *DataLayer) {
 
 		c.IndentedJSON(http.StatusOK, res)
 	})
+
+	api.GET("/api/kube/describe/:kind", func(c *gin.Context) {
+		cName := c.Query("name")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: name"))
+			return
+		}
+
+		res, err := data.DescribeResource(cNamespace, c.Param("kind"), cName)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		c.String(http.StatusOK, res)
+	})
 }
 
 func configureStatic(api *gin.Engine) {
