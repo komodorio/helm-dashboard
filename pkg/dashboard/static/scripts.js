@@ -347,3 +347,12 @@ function showResources(namespace, chart, revision) {
         }
     })
 }
+
+$(".fa-power-off").click(function () {
+    $.ajax({
+        url: "/",
+        type: 'DELETE',
+    }).done(function () {
+        window.close();
+    })
+})
