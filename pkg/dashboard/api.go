@@ -59,6 +59,11 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		abortWeb <- struct{}{}
 	})
 
+	configureHelms(api, data)
+	configureKubectls(api, data)
+}
+
+func configureHelms(api *gin.Engine, data *DataLayer) {
 	api.GET("/api/helm/charts", func(c *gin.Context) {
 		res, err := data.ListInstalled()
 		if err != nil {
@@ -66,6 +71,21 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 			return
 		}
 		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.DELETE("/api/helm/charts", func(c *gin.Context) {
+		cName := c.Query("chart")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
+			return
+		}
+		err := data.UninstallChart(cNamespace, cName)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.Redirect(http.StatusFound, "/")
 	})
 
 	api.GET("/api/helm/charts/history", func(c *gin.Context) {
@@ -104,8 +124,6 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		}
 		c.IndentedJSON(http.StatusOK, res)
 	})
-
-	configureKubectls(api, data)
 
 	sections := map[string]SectionFn{
 		"manifests": data.RevisionManifests,
