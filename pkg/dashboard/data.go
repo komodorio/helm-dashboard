@@ -325,6 +325,14 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 	return out, nil
 }
 
+func (d *DataLayer) UninstallChart(namespace string, name string) error {
+	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)

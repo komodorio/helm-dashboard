@@ -46,7 +46,7 @@ $("#nav-tab [data-tab]").click(function () {
     } else {
         const mode = getHashParam("mode")
         if (!mode) {
-            $("#modePanel [data-mode=diff-prev]").trigger('click')
+            $("#modePanel [data-mode=view]").trigger('click')
         } else {
             $("#modePanel [data-mode=" + mode + "]").trigger('click')
         }
@@ -137,7 +137,7 @@ function loadChartHistory(namespace, name) {
         revRow.empty()
         for (let x = 0; x < data.length; x++) {
             const elm = data[x]
-            $("#specRev").val(elm.revision)
+            $("#specRev").val(elm.revision).data("last-rev", elm.revision)
             const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
@@ -203,6 +203,41 @@ function setHashParam(name, val) {
     window.location.hash = new URLSearchParams(params).toString()
 }
 
+function buildChartCard(elm) {
+    const header = $("<div class='card-header'></div>")
+    header.append($('<div class="float-end"><h5 class="float-end text-muted text-end">#' + elm.revision + '</h5><br/><div class="badge">' + elm.status + "</div>"))
+    // TODO: for pending- and uninstalling, add the spinner
+    if (elm.status === "failed") {
+        header.find(".badge").addClass("bg-danger text-light")
+    } else if (elm.status === "deployed" || elm.status === "superseded") {
+        header.find(".badge").addClass("bg-info")
+    } else {
+        header.find(".badge").addClass("bg-light text-dark")
+    }
+
+    header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&chart=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
+    header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
+
+    const body = $("<div class='card-body'></div>")
+    body.append($('<p class="card-text"></p>').append("Namespace: " + elm.namespace))
+    body.append($('<p class="card-text"></p>').append("Version: " + elm.app_version))
+    body.append($('<p class="card-text"></p>').append("Updated: " + elm.updated))
+
+    let card = $("<div class='card'></div>").append(header).append(body);
+
+    card.data("chart", elm)
+    card.click(function () {
+        const self = $(this)
+        $("#sectionList").hide()
+
+        let chart = self.data("chart");
+        setHashParam("namespace", chart.namespace)
+        setHashParam("chart", chart.name)
+        loadChartHistory(chart.namespace, chart.name)
+    })
+    return card;
+}
+
 function loadChartsList() {
     $("#sectionList").show()
     chartsCards.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i> Loading...</div>")
@@ -211,38 +246,7 @@ function loadChartsList() {
     }).done(function (data) {
         chartsCards.empty()
         data.forEach(function (elm) {
-            const header = $("<div class='card-header'></div>")
-            header.append($('<div class="float-end"><h5 class="float-end text-muted text-end">#' + elm.revision + '</h5><br/><div class="badge">' + elm.status + "</div>"))
-            // TODO: for pending- and uninstalling, add the spinner
-            if (elm.status === "failed") {
-                header.find(".badge").addClass("bg-danger text-light")
-            } else if (elm.status === "deployed" || elm.status === "superseded") {
-                header.find(".badge").addClass("bg-info")
-            } else {
-                header.find(".badge").addClass("bg-light text-dark")
-            }
-
-            header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&chart=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
-            header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
-
-            const body = $("<div class='card-body'></div>")
-            body.append($('<p class="card-text"></p>').append("Namespace: " + elm.namespace))
-            body.append($('<p class="card-text"></p>').append("Version: " + elm.app_version))
-            body.append($('<p class="card-text"></p>').append("Updated: " + elm.updated))
-
-            let card = $("<div class='card'></div>").append(header).append(body);
-
-            card.data("chart", elm)
-            card.click(function () {
-                const self = $(this)
-                $("#sectionList").hide()
-
-                let chart = self.data("chart");
-                setHashParam("namespace", chart.namespace)
-                setHashParam("chart", chart.name)
-                loadChartHistory(chart.namespace, chart.name)
-            })
-
+            let card = buildChartCard(elm);
             chartsCards.append($("<div class='col'></div>").append(card))
         })
     })
@@ -337,6 +341,8 @@ function showResources(namespace, chart, revision) {
                     badge.addClass("bg-success")
                 } else if (["Exists"].includes(data.status.phase)) {
                     badge.addClass("bg-success bg-opacity-50")
+                } else if (["Progressing"].includes(data.status.phase)) {
+                    badge.addClass("bg-warning")
                 } else {
                     badge.addClass("bg-danger")
                 }
@@ -344,7 +350,7 @@ function showResources(namespace, chart, revision) {
                 const statusBlock = resBlock.find(".form-control.col-sm-4");
                 statusBlock.empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
 
-                if (badge.text()!=="NotFound") {
+                if (badge.text() !== "NotFound") {
                     statusBlock.prepend("<i class=\"btn fa fa-search-plus float-end text-muted\"></i>")
                     statusBlock.find(".fa-search-plus").click(function () {
                         showDescribe(ns, res.kind, res.metadata.name)
@@ -378,3 +384,40 @@ function showDescribe(ns, kind, name) {
         $("#describeModalBody").empty().append("<pre class='bg-white rounded p-3'></pre>").find("pre").html(data)
     })
 }
+
+$("#btnUninstall").click(function () {
+    const chart = getHashParam('chart');
+    const namespace = getHashParam('namespace');
+    const revision = $("#specRev").data("last-rev")
+    $("#confirmModalLabel").html("Uninstall <b class='text-danger'>" + chart + "</b> from namespace <b class='text-danger'>" + namespace + "</b>")
+    $("#confirmModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
+    $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
+        $("#confirmModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
+        const url = "/api/helm/charts?namespace=" + namespace + "&chart=" + chart;
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+        }).fail(function () {
+            reportError("Failed to delete the chart")
+        }).done(function () {
+            window.location.href = "/"
+        })
+    })
+
+    const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
+    myModal.show()
+
+    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revision
+    let url = "/api/helm/charts/resources"
+    url += "?" + qstr
+    $.getJSON(url).fail(function () {
+        reportError("Failed to get list of resources")
+    }).done(function (data) {
+        $("#confirmModalBody").empty().append("<p>Following resources will be deleted from the cluster:</p>");
+        $("#confirmModal .btn-primary").prop("disabled", false)
+        for (let i = 0; i < data.length; i++) {
+            const res = data[i]
+            $("#confirmModalBody").append("<p class='row'><i class='col-sm-3 text-end'>" + res.kind + "</i><b class='col-sm-9'>" + res.metadata.name + "</b></p>")
+        }
+    })
+})
