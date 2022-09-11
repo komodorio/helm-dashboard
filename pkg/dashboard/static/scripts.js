@@ -88,7 +88,7 @@ function loadContentWrapper() {
 }
 
 function loadContent(mode, namespace, name, revision, revDiff, flag) {
-    let qstr = "chart=" + name + "&namespace=" + namespace + "&revision=" + revision
+    let qstr = "name=" + name + "&namespace=" + namespace + "&revision=" + revision
     if (revDiff) {
         qstr += "&revisionDiff=" + revDiff
     }
@@ -134,61 +134,67 @@ $('#specRev').keyup(function (event) {
     event.preventDefault()
 });
 
-function loadChartHistory(namespace, name) {
-    $("#sectionDetails").show()
-    $("#sectionDetails h1 span.name").text(name)
-    revRow.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
-    $.getJSON("/api/helm/charts/history?chart=" + name + "&namespace=" + namespace).fail(function () {
-        reportError("Failed to get chart details")
-    }).done(function (data) {
-        revRow.empty()
-        for (let x = 0; x < data.length; x++) {
-            const elm = data[x]
-            $("#specRev").val(elm.revision).data("last-rev", elm.revision)
-            const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
+function fillChartHistory(data, namespace, name) {
+    revRow.empty()
+    for (let x = 0; x < data.length; x++) {
+        const elm = data[x]
+        $("#specRev").val(elm.revision).data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
+        const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
                                 <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
                                 <p class="small mt-3 mb-0"><span class="text-muted">Age:</span> <span class="rev-age"></span><br/>
                                 <span class="text-muted rev-date"></span><br/></p>                
                             </div>`)
-            rev.find(".rev-number").text("#" + elm.revision)
-            rev.find(".app-ver").text(elm.app_version)
-            rev.find(".chart-ver").text(elm.chart_ver)
-            rev.find(".rev-date").text(elm.updated.replace("T", " "))
-            rev.find(".rev-age").text(getAge(elm, data[x + 1]))
-            rev.find(".rev-status").text(elm.status)
-            rev.find(".fa").attr("title", elm.action)
+        rev.find(".rev-number").text("#" + elm.revision)
+        rev.find(".app-ver").text(elm.app_version)
+        rev.find(".chart-ver").text(elm.chart_ver)
+        rev.find(".rev-date").text(elm.updated.replace("T", " "))
+        rev.find(".rev-age").text(getAge(elm, data[x + 1]))
+        rev.find(".rev-status").text(elm.status)
+        rev.find(".fa").attr("title", elm.action)
 
-            if (elm.status === "failed") {
-                rev.find(".rev-status").parent().addClass("text-danger")
-            }
-
-            switch (elm.action) {
-                case "app_upgrade":
-                    rev.find(".app-ver").append(" <i class='fa fa-angle-double-up text-success'></i>")
-                    break
-                case "app_downgrade":
-                    rev.find(".app-ver").append(" <i class='fa fa-angle-double-down text-danger'></i>")
-                    break
-                case "chart_upgrade":
-                    rev.find(".chart-ver").append(" <i class='fa fa-angle-up text-success'></i>")
-                    break
-                case "chart_downgrade":
-                    rev.find(".chart-ver").append(" <i class='fa fa-angle-down text-danger'></i>")
-                    break
-                case "reconfigure": // ?
-                    break
-            }
-
-            rev.data("elm", elm)
-            rev.addClass("rev-" + elm.revision)
-            rev.click(function () {
-                revisionClicked(namespace, name, $(this))
-            })
-
-            revRow.append(rev)
+        if (elm.status === "failed") {
+            rev.find(".rev-status").parent().addClass("text-danger")
         }
+
+        switch (elm.action) {
+            case "app_upgrade":
+                rev.find(".app-ver").append(" <i class='fa fa-angle-double-up text-success'></i>")
+                break
+            case "app_downgrade":
+                rev.find(".app-ver").append(" <i class='fa fa-angle-double-down text-danger'></i>")
+                break
+            case "chart_upgrade":
+                rev.find(".chart-ver").append(" <i class='fa fa-angle-up text-success'></i>")
+                break
+            case "chart_downgrade":
+                rev.find(".chart-ver").append(" <i class='fa fa-angle-down text-danger'></i>")
+                break
+            case "reconfigure": // ?
+                break
+        }
+
+        rev.data("elm", elm)
+        rev.addClass("rev-" + elm.revision)
+        rev.click(function () {
+            revisionClicked(namespace, name, $(this))
+        })
+
+        revRow.append(rev)
+    }
+}
+
+function loadChartHistory(namespace, name) {
+    $("#sectionDetails").show()
+    $("#sectionDetails h1 span.name").text(name)
+    revRow.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
+    $.getJSON("/api/helm/charts/history?name=" + name + "&namespace=" + namespace).fail(function () {
+        reportError("Failed to get chart details")
+    }).done(function (data) {
+        fillChartHistory(data, namespace, name);
+
+        addRepoBlock(data[data.length - 1].chart_name)
 
         const rev = getHashParam("revision")
         if (rev) {
@@ -196,6 +202,50 @@ function loadChartHistory(namespace, name) {
         } else {
             revRow.find("div.col-md-2:last-child").click()
         }
+    })
+}
+
+function addRepoBlock(name) {
+    $.getJSON("/api/helm/repo/search?name=" + name).fail(function () {
+        reportError("Failed to get chart repo details")
+    }).done(function (data) {
+        if (!data) {
+            return
+        }
+
+        const elm = data[0]
+        const rev = $(`<div class="col-md-2 p-2 rounded border bg-gradient bg-white bg-opacity-25" style="border-style: dashed!important;">
+                                <i class="fa fa-refresh float-end text-muted" title="Update repository info"></i>
+                                <span><i class="rev-status">Repo version:</i></span><br/>
+                                <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
+                                <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
+                                <p class="mt-3 mb-0"><i class="text-success">Up-to-date</i><button class="btn btn-sm btn-success float-end">Upgrade</button></p>                
+                            </div>`)
+        rev.find(".chart-ver").text(elm.version)
+        rev.find(".app-ver").text(elm.app_version)
+        const canUpgrade = isNewerVersion($("#specRev").data("last-chart-ver"), elm.version);
+        if (canUpgrade) {
+            rev.removeClass("text-muted border-secondary bg-white").addClass("border-success bg-success")
+            rev.find("p i").hide()
+            rev.find("p button").show()
+        } else {
+            rev.removeClass("border-success bg-success").addClass("text-muted border-secondary bg-white")
+            rev.find("p i").show()
+            rev.find("p button").hide()
+        }
+
+
+        rev.find(".fa-refresh").click(function () {
+            const self = $(this)
+            self.addClass("fa-spin")
+            $.getJSON("/api/helm/charts/repo-info?name=" + name).fail(function () {
+                reportError("Failed to update chart repo")
+            }).done(function (data) {
+
+            })
+        })
+
+        revRow.append(rev)
     })
 }
 
@@ -222,7 +272,7 @@ function buildChartCard(elm) {
         header.find(".badge").addClass("bg-light text-dark")
     }
 
-    header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&chart=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
+    header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&name=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
     header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
 
     const body = $("<div class='card-body'></div>")
@@ -240,7 +290,10 @@ function buildChartCard(elm) {
         let chart = self.data("chart");
         setHashParam("namespace", chart.namespace)
         setHashParam("chart", chart.name)
-        loadChartHistory(chart.namespace, chart.name)
+
+        console.log(elm)
+        console.log(chart)
+        loadChartHistory(chart.namespace, chart.name, elm.chart_name)
     })
     return card;
 }
@@ -323,7 +376,7 @@ function getAge(obj1, obj2) {
 
 function showResources(namespace, chart, revision) {
     $("#nav-resources").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>");
-    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revision
+    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
     url += "?" + qstr
     $.getJSON(url).fail(function () {
@@ -400,7 +453,7 @@ $("#btnUninstall").click(function () {
     $("#confirmModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
     $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
         $("#confirmModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
-        const url = "/api/helm/charts?namespace=" + namespace + "&chart=" + chart;
+        const url = "/api/helm/charts?namespace=" + namespace + "&name=" + chart;
         $.ajax({
             url: url,
             type: 'DELETE',
@@ -414,7 +467,7 @@ $("#btnUninstall").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
     myModal.show()
 
-    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revision
+    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
     url += "?" + qstr
     $.getJSON(url).fail(function () {
@@ -438,7 +491,7 @@ $("#btnRollback").click(function () {
     $("#confirmModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
     $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
         $("#confirmModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
-        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&chart=" + chart + "&revision=" + revisionNew;
+        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&name=" + chart + "&revision=" + revisionNew;
         $.ajax({
             url: url,
             type: 'POST',
@@ -452,7 +505,7 @@ $("#btnRollback").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
     myModal.show()
 
-    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
+    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
     let url = "/api/helm/charts/manifests"
     url += "?" + qstr
     $.get(url).fail(function () {
@@ -471,3 +524,15 @@ $("#btnRollback").click(function () {
         $("#confirmModalBody").prepend("<p>Following changes will happen to cluster:</p>")
     })
 })
+
+function isNewerVersion(oldVer, newVer) {
+    const oldParts = oldVer.split('.')
+    const newParts = newVer.split('.')
+    for (let i = 0; i < newParts.length; i++) {
+        const a = ~~newParts[i] // parse int
+        const b = ~~oldParts[i] // parse int
+        if (a > b) return true
+        if (a < b) return false
+    }
+    return false
+}

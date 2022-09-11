@@ -77,6 +77,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		qp, err := getQueryProps(c, false)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 		err = data.UninstallChart(qp.Namespace, qp.Name)
 		if err != nil {
@@ -90,6 +91,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		qp, err := getQueryProps(c, true)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 
 		err = data.Revert(qp.Namespace, qp.Name, qp.Revision)
@@ -104,6 +106,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		qp, err := getQueryProps(c, false)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 
 		res, err := data.ChartHistory(qp.Namespace, qp.Name)
@@ -118,9 +121,31 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		qp, err := getQueryProps(c, true)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 
 		res, err := data.RevisionManifestsParsed(qp.Namespace, qp.Name, qp.Revision)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.GET("/api/helm/repo/search", func(c *gin.Context) {
+		qp, err := getQueryProps(c, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+
+		limit, err := strconv.Atoi(c.Query("limit"))
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		res, err := data.ChartRepoVersions(qp.Name, limit)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -132,6 +157,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		qp, err := getQueryProps(c, true)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 
 		flag := c.Query("flag") == "true"
@@ -139,6 +165,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		res, err := handleGetSection(data, c.Param("section"), rDiff, qp, flag)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
 		}
 		c.String(http.StatusOK, res)
 	})
@@ -195,6 +222,7 @@ func configureKubectls(api *gin.Engine, data *DataLayer) {
 		qp, err := getQueryProps(c, false)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 
 		res, err := data.GetResource(qp.Namespace, &GenericResource{
@@ -226,6 +254,7 @@ func configureKubectls(api *gin.Engine, data *DataLayer) {
 		qp, err := getQueryProps(c, false)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 
 		res, err := data.DescribeResource(qp.Namespace, c.Param("kind"), qp.Name)

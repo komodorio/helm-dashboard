@@ -213,8 +213,12 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 	return res, nil
 }
 
-func (d *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement, err error) {
-	out, err := d.runCommandHelm("search", "repo", "--regexp", "/"+chartName+"\v", "--versions", "--output", "json")
+func (d *DataLayer) ChartRepoVersions(chartName string, limit int) (res []repoChartElement, err error) {
+	cmd := []string{"search", "repo", "--regexp", "/" + chartName + "\v", "--versions", "--output", "json"}
+	if limit > 0 {
+		cmd = append(cmd)
+	}
+	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
 		return nil, err
 	}
