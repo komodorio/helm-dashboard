@@ -128,19 +128,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	sections := map[string]SectionFn{
-		"manifests": data.RevisionManifests,
-		"values":    data.RevisionValues,
-		"notes":     data.RevisionNotes,
-	}
-
 	api.GET("/api/helm/charts/:section", func(c *gin.Context) {
-		functor, found := sections[c.Param("section")]
-		if !found {
-			_ = c.AbortWithError(http.StatusNotFound, errors.New("unsupported section: "+c.Param("section")))
-			return
-		}
-
 		qp, err := getQueryProps(c, true)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -148,33 +136,49 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 
 		flag := c.Query("flag") == "true"
 		rDiff := c.Query("revisionDiff")
-		if rDiff != "" {
-			cRevDiff, err := strconv.Atoi(rDiff)
-			if err != nil {
-				_ = c.AbortWithError(http.StatusInternalServerError, err)
-				return
-			}
-
-			ext := ".yaml"
-			if c.Param("section") == "notes" {
-				ext = ".txt"
-			}
-
-			res, err := RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Revision, flag)
-			if err != nil {
-				_ = c.AbortWithError(http.StatusInternalServerError, err)
-				return
-			}
-			c.String(http.StatusOK, res)
-		} else {
-			res, err := functor(qp.Namespace, qp.Name, qp.Revision, flag)
-			if err != nil {
-				_ = c.AbortWithError(http.StatusInternalServerError, err)
-				return
-			}
-			c.String(http.StatusOK, res)
+		res, err := handleGetSection(data, c.Param("section"), rDiff, qp, flag)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
+		c.String(http.StatusOK, res)
 	})
+}
+
+func handleGetSection(data *DataLayer, section string, rDiff string, qp *QueryProps, flag bool) (string, error) {
+	sections := map[string]SectionFn{
+		"manifests": data.RevisionManifests,
+		"values":    data.RevisionValues,
+		"notes":     data.RevisionNotes,
+	}
+
+	functor, found := sections[section]
+	if !found {
+		return "", errors.New("unsupported section: " + section)
+	}
+
+	if rDiff != "" {
+		cRevDiff, err := strconv.Atoi(rDiff)
+		if err != nil {
+			return "", err
+		}
+
+		ext := ".yaml"
+		if section == "notes" {
+			ext = ".txt"
+		}
+
+		res, err := RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Revision, flag)
+		if err != nil {
+			return "", err
+		}
+		return res, nil
+	} else {
+		res, err := functor(qp.Namespace, qp.Name, qp.Revision, flag)
+		if err != nil {
+			return "", err
+		}
+		return res, nil
+	}
 }
 
 func configureKubectls(api *gin.Engine, data *DataLayer) {
