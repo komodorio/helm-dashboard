@@ -74,13 +74,11 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 	})
 
 	api.DELETE("/api/helm/charts", func(c *gin.Context) {
-		cName := c.Query("chart")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
-			return
+		qp, err := getQueryProps(c, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		err := data.UninstallChart(cNamespace, cName)
+		err = data.UninstallChart(qp.Namespace, qp.Name)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -89,18 +87,12 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 	})
 
 	api.POST("/api/helm/charts/rollback", func(c *gin.Context) {
-		cName := c.Query("chart")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
-			return
-		}
-		cRev, err := strconv.Atoi(c.Query("revision"))
+		qp, err := getQueryProps(c, true)
 		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		err = data.Revert(cNamespace, cName, cRev)
+
+		err = data.Revert(qp.Namespace, qp.Name, qp.Revision)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -109,14 +101,12 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 	})
 
 	api.GET("/api/helm/charts/history", func(c *gin.Context) {
-		cName := c.Query("chart")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
-			return
+		qp, err := getQueryProps(c, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 
-		res, err := data.ChartHistory(cNamespace, cName)
+		res, err := data.ChartHistory(qp.Namespace, qp.Name)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -125,19 +115,12 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 	})
 
 	api.GET("/api/helm/charts/resources", func(c *gin.Context) {
-		cName := c.Query("chart")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
-			return
-		}
-		cRev, err := strconv.Atoi(c.Query("revision"))
+		qp, err := getQueryProps(c, true)
 		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 
-		res, err := data.RevisionManifestsParsed(cNamespace, cName, cRev)
+		res, err := data.RevisionManifestsParsed(qp.Namespace, qp.Name, qp.Revision)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -158,18 +141,11 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 			return
 		}
 
-		cName := c.Query("chart")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
-			return
+		qp, err := getQueryProps(c, true)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 
-		cRev, err := strconv.Atoi(c.Query("revision"))
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
 		flag := c.Query("flag") == "true"
 		rDiff := c.Query("revisionDiff")
 		if rDiff != "" {
@@ -184,14 +160,14 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 				ext = ".txt"
 			}
 
-			res, err := RevisionDiff(functor, ext, cNamespace, cName, cRevDiff, cRev, flag)
+			res, err := RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Revision, flag)
 			if err != nil {
 				_ = c.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
 			c.String(http.StatusOK, res)
 		} else {
-			res, err := functor(cNamespace, cName, cRev, flag)
+			res, err := functor(qp.Namespace, qp.Name, qp.Revision, flag)
 			if err != nil {
 				_ = c.AbortWithError(http.StatusInternalServerError, err)
 				return
@@ -212,16 +188,14 @@ func configureKubectls(api *gin.Engine, data *DataLayer) {
 	})
 
 	api.GET("/api/kube/resources/:kind", func(c *gin.Context) {
-		cName := c.Query("name")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: name"))
-			return
+		qp, err := getQueryProps(c, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 
-		res, err := data.GetResource(cNamespace, &GenericResource{
+		res, err := data.GetResource(qp.Namespace, &GenericResource{
 			TypeMeta:   v1.TypeMeta{Kind: c.Param("kind")},
-			ObjectMeta: v1.ObjectMeta{Name: cName},
+			ObjectMeta: v1.ObjectMeta{Name: qp.Name},
 		})
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
@@ -245,14 +219,12 @@ func configureKubectls(api *gin.Engine, data *DataLayer) {
 	})
 
 	api.GET("/api/kube/describe/:kind", func(c *gin.Context) {
-		cName := c.Query("name")
-		cNamespace := c.Query("namespace")
-		if cName == "" {
-			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: name"))
-			return
+		qp, err := getQueryProps(c, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 
-		res, err := data.DescribeResource(cNamespace, c.Param("kind"), cName)
+		res, err := data.DescribeResource(qp.Namespace, c.Param("kind"), qp.Name)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -300,4 +272,28 @@ func contextSetter(data *DataLayer) gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+type QueryProps struct {
+	Namespace string
+	Name      string
+	Revision  int
+}
+
+func getQueryProps(c *gin.Context, revRequired bool) (*QueryProps, error) {
+	qp := QueryProps{}
+
+	qp.Namespace = c.Query("namespace")
+	qp.Name = c.Query("name")
+	if qp.Name == "" {
+		return nil, errors.New("missing required query string parameter: name")
+	}
+
+	cRev, err := strconv.Atoi(c.Query("revision"))
+	if err != nil && revRequired {
+		return nil, err
+	}
+	qp.Revision = cRev
+
+	return &qp, nil
 }
