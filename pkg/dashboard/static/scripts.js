@@ -20,6 +20,13 @@ function revisionClicked(namespace, name, self) {
         $("#revDescr").addClass("text-danger")
     }
 
+    if (false) { // TODO: hide if only one revision
+        $("#btnRollback").hide()
+    } else {
+        const rev = $("#specRev").data("last-rev") == elm.revision ? elm.revision - 1 : elm.revision
+        $("#btnRollback").data("rev", rev).show().find("span").text("Rollback to #" + rev)
+    }
+
     const tab = getHashParam("tab")
     if (!tab) {
         $("#nav-tab [data-tab=resources]").click()
@@ -419,5 +426,48 @@ $("#btnUninstall").click(function () {
             const res = data[i]
             $("#confirmModalBody").append("<p class='row'><i class='col-sm-3 text-end'>" + res.kind + "</i><b class='col-sm-9'>" + res.metadata.name + "</b></p>")
         }
+    })
+})
+
+$("#btnRollback").click(function () {
+    const chart = getHashParam('chart');
+    const namespace = getHashParam('namespace');
+    const revisionNew = $("#btnRollback").data("rev")
+    const revisionCur = $("#specRev").data("last-rev")
+    $("#confirmModalLabel").html("Rollback <b class='text-danger'>" + chart + "</b> from revision " + revisionCur + " to " + revisionNew)
+    $("#confirmModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
+    $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
+        $("#confirmModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
+        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&chart=" + chart + "&revision=" + revisionNew;
+        $.ajax({
+            url: url,
+            type: 'POST',
+        }).fail(function () {
+            reportError("Failed to rollback the chart")
+        }).done(function () {
+            window.location.reload()
+        })
+    })
+
+    const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
+    myModal.show()
+
+    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
+    let url = "/api/helm/charts/manifests"
+    url += "?" + qstr
+    $.get(url).fail(function () {
+        reportError("Failed to get list of resources")
+    }).done(function (data) {
+        $("#confirmModalBody").empty();
+        $("#confirmModal .btn-primary").prop("disabled", false)
+
+        const targetElement = document.getElementById('confirmModalBody');
+        const configuration = {
+            inputFormat: 'diff', outputFormat: 'side-by-side',
+            drawFileList: false, showFiles: false, highlight: true,
+        };
+        const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
+        diff2htmlUi.draw()
+        $("#confirmModalBody").prepend("<p>Following changes will happen to cluster:</p>")
     })
 })
