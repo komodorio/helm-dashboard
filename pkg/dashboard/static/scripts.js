@@ -206,6 +206,14 @@ function loadChartHistory(namespace, name) {
 }
 
 function addRepoBlock(name) {
+    const rev = $(`<div class="col-md-2 p-2 rounded border bg-gradient bg-white bg-opacity-25" style="border-style: dashed!important;">
+                                <i class="fa fa-refresh float-end text-muted" title="Update repository info"></i>
+                                <span><i class="rev-status">Repo version:</i></span><br/>
+                                <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
+                                <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
+                                <p class="mt-3 mb-0"><i class="text-success">Up-to-date</i><button class="btn btn-sm btn-success float-end">Upgrade</button></p>                
+                            </div>`)
+
     $.getJSON("/api/helm/repo/search?name=" + name).fail(function () {
         reportError("Failed to get chart repo details")
     }).done(function (data) {
@@ -214,13 +222,6 @@ function addRepoBlock(name) {
         }
 
         const elm = data[0]
-        const rev = $(`<div class="col-md-2 p-2 rounded border bg-gradient bg-white bg-opacity-25" style="border-style: dashed!important;">
-                                <i class="fa fa-refresh float-end text-muted" title="Update repository info"></i>
-                                <span><i class="rev-status">Repo version:</i></span><br/>
-                                <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
-                                <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
-                                <p class="mt-3 mb-0"><i class="text-success">Up-to-date</i><button class="btn btn-sm btn-success float-end">Upgrade</button></p>                
-                            </div>`)
         rev.find(".chart-ver").text(elm.version)
         rev.find(".app-ver").text(elm.app_version)
         const canUpgrade = isNewerVersion($("#specRev").data("last-chart-ver"), elm.version);
@@ -238,15 +239,19 @@ function addRepoBlock(name) {
         rev.find(".fa-refresh").click(function () {
             const self = $(this)
             self.addClass("fa-spin")
-            $.getJSON("/api/helm/charts/repo-info?name=" + name).fail(function () {
+            const repoName = elm.name.split('/').shift()
+            $.getJSON("/api/helm/repo/update?name=" + repoName).fail(function () {
                 reportError("Failed to update chart repo")
-            }).done(function (data) {
-
+            }).done(function () {
+                rev.hide()
+                const rev2 = addRepoBlock(name)
+                rev2.find(".fa-refresh").hide()
             })
         })
 
         revRow.append(rev)
     })
+    return rev
 }
 
 function getHashParam(name) {

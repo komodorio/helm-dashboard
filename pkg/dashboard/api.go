@@ -139,18 +139,27 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 			return
 		}
 
-		limit, err := strconv.Atoi(c.Query("limit"))
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		res, err := data.ChartRepoVersions(qp.Name, limit)
+		res, err := data.ChartRepoVersions(qp.Name)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 		c.IndentedJSON(http.StatusOK, res)
+	})
+
+	api.GET("/api/helm/repo/update", func(c *gin.Context) {
+		qp, err := getQueryProps(c, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+
+		err = data.ChartRepoUpdate(qp.Name)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.Status(http.StatusNoContent)
 	})
 
 	api.GET("/api/helm/charts/:section", func(c *gin.Context) {

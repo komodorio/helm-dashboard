@@ -50,7 +50,7 @@ func TestFlow(t *testing.T) {
 	}
 	_ = curVer
 
-	upgrade, err := data.ChartRepoVersions(chartRepoName, 0)
+	upgrade, err := data.ChartRepoVersions(chartRepoName)
 	if err != nil {
 		t.Fatal(err)
 	}
