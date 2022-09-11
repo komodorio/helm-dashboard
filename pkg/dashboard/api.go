@@ -88,6 +88,26 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		c.Redirect(http.StatusFound, "/")
 	})
 
+	api.POST("/api/helm/charts/rollback", func(c *gin.Context) {
+		cName := c.Query("chart")
+		cNamespace := c.Query("namespace")
+		if cName == "" {
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("missing required query string parameter: chart"))
+			return
+		}
+		cRev, err := strconv.Atoi(c.Query("revision"))
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		err = data.Revert(cNamespace, cName, cRev)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.Redirect(http.StatusFound, "/")
+	})
+
 	api.GET("/api/helm/charts/history", func(c *gin.Context) {
 		cName := c.Query("chart")
 		cNamespace := c.Query("namespace")

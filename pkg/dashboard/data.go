@@ -333,6 +333,14 @@ func (d *DataLayer) UninstallChart(namespace string, name string) error {
 	return nil
 }
 
+func (d *DataLayer) Revert(namespace string, name string, rev int) error {
+	_, err := d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)

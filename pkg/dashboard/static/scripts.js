@@ -438,7 +438,7 @@ $("#btnRollback").click(function () {
     $("#confirmModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
     $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
         $("#confirmModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
-        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&chart=" + chart;
+        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&chart=" + chart + "&revision=" + revisionNew;
         $.ajax({
             url: url,
             type: 'POST',
@@ -464,8 +464,7 @@ $("#btnRollback").click(function () {
         const targetElement = document.getElementById('confirmModalBody');
         const configuration = {
             inputFormat: 'diff', outputFormat: 'side-by-side',
-
-            drawFileList: false, showFiles: false, highlight: true, //matching: 'lines',
+            drawFileList: false, showFiles: false, highlight: true,
         };
         const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
         diff2htmlUi.draw()
