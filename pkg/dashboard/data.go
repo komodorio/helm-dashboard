@@ -356,6 +356,22 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 	return nil
 }
 
+func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool) (string, error) {
+	cmd := []string{name, repoChart, "--version", version, "--reuse-values", "--namespace", namespace}
+	if justTemplate {
+		cmd = append([]string{"template"}, cmd...)
+	} else {
+		cmd = append([]string{"upgrade"}, cmd...)
+	}
+
+	out, err := d.runCommandHelm(cmd...)
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)

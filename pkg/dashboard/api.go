@@ -162,6 +162,24 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		c.Status(http.StatusNoContent)
 	})
 
+	api.GET("/api/helm/charts/install", func(c *gin.Context) {
+		out, err := chartInstall(c, data, true)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.String(http.StatusOK, out)
+	})
+
+	api.POST("/api/helm/charts/install", func(c *gin.Context) {
+		_, err := chartInstall(c, data, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.Status(http.StatusAccepted)
+	})
+
 	api.GET("/api/helm/charts/:section", func(c *gin.Context) {
 		qp, err := getQueryProps(c, true)
 		if err != nil {
@@ -178,6 +196,19 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 		}
 		c.String(http.StatusOK, res)
 	})
+}
+
+func chartInstall(c *gin.Context, data *DataLayer, justTemplate bool) (string, error) {
+	qp, err := getQueryProps(c, false)
+	if err != nil {
+		return "", err
+	}
+
+	out, err := data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate)
+	if err != nil {
+		return "", err
+	}
+	return out, nil
 }
 
 func handleGetSection(data *DataLayer, section string, rDiff string, qp *QueryProps, flag bool) (string, error) {
