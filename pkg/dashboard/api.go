@@ -44,12 +44,14 @@ func NewRouter(abortWeb ControlChan, data *DataLayer) *gin.Engine {
 		api = gin.Default()
 	}
 
-	api.Use(noCache)
 	api.Use(contextSetter(data))
-	api.Use(errorHandler)
-	configureStatic(api)
 
+	configureStatic(api)
 	configureRoutes(abortWeb, data, api)
+
+	api.Use(noCache)
+	api.Use(errorHandler)
+
 	return api
 }
 
@@ -84,7 +86,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		c.Redirect(http.StatusFound, "/")
+		c.Status(http.StatusAccepted)
 	})
 
 	api.POST("/api/helm/charts/rollback", func(c *gin.Context) {
