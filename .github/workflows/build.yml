@@ -35,3 +35,6 @@ jobs:
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.2.0
+        with:
+          version: latest
+          skip-go-installation: true
