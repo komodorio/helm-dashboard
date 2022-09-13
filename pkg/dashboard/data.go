@@ -389,6 +389,7 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		cmd = append([]string{"template"}, cmd...)
 	} else {
 		cmd = append([]string{"upgrade"}, cmd...)
+		cmd = append(cmd, "--output", "json")
 	}
 
 	out, err := d.runCommandHelm(cmd...)

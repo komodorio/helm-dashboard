@@ -255,7 +255,7 @@ $('#upgradeModalLabel select').change(function () {
 
     $("#upgradeModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
     $("#upgradeModal .btn-success").prop("disabled", true)
-    $.get(self.data("url")+ "&version=" + self.val()).fail(function () {
+    $.get(self.data("url") + "&version=" + self.val()).fail(function () {
         reportError("Failed to get upgrade")
     }).done(function (data) {
         $("#upgradeModalBody").empty();
@@ -289,28 +289,15 @@ function popUpUpgrade(self, verCur, elm) {
     const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
     myModal.show()
 
-
-    /*
-    // const self = $(this)
-    self.addClass("fa-spin")
-    const repoName = elm.name.split('/').shift()
-    $.post().fail(function () {
-        reportError("Failed to install chart")
-    }).done(function () {
-        rev.hide()
-        const rev2 = addRepoBlock(name)
-        rev2.find(".fa-refresh").hide()
-    })
-     */
-
-    $("#upgradeModal .btn-primary").prop("disabled", true).off('click').click(function () {
-        $("#upgradeModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
+    $("#upgradeModal .btn-success").prop("disabled", true).off('click').click(function () {
+        $("#upgradeModal .btn-success").prop("disabled", true).prepend("<i class='fa fa-spin fa-spinner'></i>")
         $.ajax({
-            url: url,
+            url: url + "&version=" + $('#upgradeModalLabel select').val(),
             type: 'POST',
         }).fail(function () {
-            reportError("Failed to rollback the chart")
-        }).done(function () {
+            reportError("Failed to upgrade the chart")
+        }).done(function (data) {
+            setHashParam("revision", data.version)
             window.location.reload()
         })
     })
@@ -379,7 +366,6 @@ function loadChartsList() {
 
 
 $(function () {
-    // cluster list
     clusterSelect.change(function () {
         Cookies.set("context", clusterSelect.val())
         window.location.href = "/"

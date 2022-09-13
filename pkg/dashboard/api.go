@@ -2,9 +2,11 @@ package dashboard
 
 import (
 	"embed"
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
@@ -101,7 +103,7 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		c.Redirect(http.StatusFound, "/")
+		c.Redirect(http.StatusOK, "/")
 	})
 
 	api.GET("/api/helm/charts/history", func(c *gin.Context) {
@@ -174,12 +176,20 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 	})
 
 	api.POST("/api/helm/charts/install", func(c *gin.Context) {
-		_, err := chartInstall(c, data, false)
+		out, err := chartInstall(c, data, false)
+
+		res := release.Release{}
+		err = json.Unmarshal([]byte(out), &res)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		c.Status(http.StatusAccepted)
+
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusAccepted, res)
 	})
 
 	api.GET("/api/helm/charts/:section", func(c *gin.Context) {
