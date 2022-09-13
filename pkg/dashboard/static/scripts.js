@@ -275,6 +275,13 @@ $('#upgradeModalLabel select').change(function () {
     })
 })
 
+$("#upgradeModal .btn-secondary").click(function () {
+    const self=$(this)
+    self.find(".fa").removeClass("fa-cloud-download").addClass("fa-spin fa-spinner").prop("disabled", true)
+    $("#btnUpgradeCheck").click()
+    $("#upgradeModal .btn-close").click()
+})
+
 function popUpUpgrade(self, verCur, elm) {
     const name = getHashParam("chart");
     let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
