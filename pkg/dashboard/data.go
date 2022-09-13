@@ -11,6 +11,7 @@ import (
 	"github.com/hexops/gotextdiff/span"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
+	"io/ioutil"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"os"
 	"os/exec"
@@ -230,7 +231,12 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement,
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
 
 func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	out, err := d.runCommandHelm("get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
+	cmd := []string{"get", "manifest", chartName, "--namespace", namespace}
+	if revision > 0 {
+		cmd = append(cmd, "--revision", strconv.Itoa(revision))
+	}
+
+	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
 		return "", err
 	}
@@ -276,7 +282,12 @@ func (d *DataLayer) RevisionNotes(namespace string, chartName string, revision i
 }
 
 func (d *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
-	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision), "--output", "yaml"}
+	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--output", "yaml"}
+
+	if revision > 0 {
+		cmd = append(cmd, "--revision", strconv.Itoa(revision))
+	}
+
 	if !onlyUserDefined {
 		cmd = append(cmd, "--all")
 	}
@@ -357,7 +368,23 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 }
 
 func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool) (string, error) {
-	cmd := []string{name, repoChart, "--version", version, "--reuse-values", "--namespace", namespace}
+	oldVals, err := d.RevisionValues(namespace, name, 0, false)
+	if err != nil {
+		return "", err
+	}
+
+	file, err := ioutil.TempFile("", "helm_vals_")
+	if err != nil {
+		return "", err
+	}
+	defer os.Remove(file.Name())
+
+	err = ioutil.WriteFile(file.Name(), []byte(oldVals), 0600)
+	if err != nil {
+		return "", err
+	}
+
+	cmd := []string{name, repoChart, "--version", version, "--namespace", namespace, "--values", file.Name()}
 	if justTemplate {
 		cmd = append([]string{"template"}, cmd...)
 	} else {
@@ -367,6 +394,14 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
 		return "", err
+	}
+
+	if justTemplate {
+		manifests, err := d.RevisionManifests(namespace, name, 0, false)
+		if err != nil {
+			return "", err
+		}
+		out = getDiff(manifests, out, "current.yaml", "upgraded.yaml")
 	}
 
 	return out, nil
@@ -388,11 +423,16 @@ func RevisionDiff(functor SectionFn, ext string, namespace string, name string, 
 		return "", err
 	}
 
-	edits := myers.ComputeEdits(span.URIFromPath(""), manifest1, manifest2)
-	unified := gotextdiff.ToUnified(strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext, manifest1, edits)
+	diff := getDiff(manifest1, manifest2, strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext)
+	return diff, nil
+}
+
+func getDiff(text1 string, text2 string, name1 string, name2 string) string {
+	edits := myers.ComputeEdits(span.URIFromPath(""), text1, text2)
+	unified := gotextdiff.ToUnified(name1, name2, text1, edits)
 	diff := fmt.Sprint(unified)
 	log.Debugf("The diff is: %s", diff)
-	return diff, nil
+	return diff
 }
 
 type GenericResource = v1.Carp
