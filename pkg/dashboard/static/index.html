@@ -17,7 +17,7 @@
 
 <div class="container">
     <i class="fa-solid fa-arrow-trend-down"></i>
-    <nav class="navbar navbar-expand-lg bg-light rounded" style="margin-bottom: 0.75rem">
+    <nav class="navbar navbar-expand-lg bg-light rounded mb-2 mt-2">
         <div class="container-fluid">
             <div style="line-height: 90%; font-size: 1.5rem" class="navbar-brand">
                 <img src="static/logo.png" style="height: 3rem; float: left" alt="Logo">
@@ -59,7 +59,9 @@
 
         </div>
         <h1><span class="name"></span>, revision <span class="rev"></span>
-            <span class="float-end">
+            <span class="float-end" id="actionButtons">
+                <a id="btnUpgrade" style="display: none" class="btn btn-sm bg-success border border-secondary text-light" title="Upgrade the chart"><i class="fa fa-rocket"></i> Upgrade to <span></span></a>
+                <a id="btnUpgradeCheck" style="display: none" class="btn btn-sm btn-secondary border border-secondary text-light" title="Check for chart updates"><i class="fa fa-cloud-download"></i> Check Updates</a>
                 <a id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light" title="Rollback to this revision"><i class="fa fa-backward"></i> <span>Rollback</span></a>
                 <a id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light" title="Uninstall the chart"><i class="fa fa-trash"></i> Uninstall</a>
             </span>
@@ -159,6 +161,28 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal" id="upgradeModal"
+     tabindex="-1" aria-labelledby="describeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="upgradeModalLabel">
+                    Upgrade <b class='text-success name'></b> from version <b class='text-success ver-old'></b> to <select class='fw-bold text-success ver-new'></select>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="upgradeModalBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success">Confirm Upgrade</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"

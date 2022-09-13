@@ -194,7 +194,7 @@ function loadChartHistory(namespace, name) {
     }).done(function (data) {
         fillChartHistory(data, namespace, name);
 
-        addRepoBlock(data[data.length - 1].chart_name)
+        addUpgradeBtn(data[data.length - 1].chart_name)
 
         const rev = getHashParam("revision")
         if (rev) {
@@ -205,15 +205,7 @@ function loadChartHistory(namespace, name) {
     })
 }
 
-function addRepoBlock(name) {
-    const rev = $(`<div class="col-md-2 p-2 rounded border bg-gradient bg-white bg-opacity-25" style="border-style: dashed!important;">
-                                <i class="fa fa-refresh float-end text-muted" title="Update repository info"></i>
-                                <span><i class="rev-status">Repo version:</i></span><br/>
-                                <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
-                                <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
-                                <p class="mt-3 mb-0"><i class="text-success">Up-to-date</i><button class="btn btn-sm btn-success float-end">Upgrade</button></p>                
-                            </div>`)
-
+function addUpgradeBtn(name) {
     $.getJSON("/api/helm/repo/search?name=" + name).fail(function () {
         reportError("Failed to get chart repo details")
     }).done(function (data) {
@@ -221,37 +213,107 @@ function addRepoBlock(name) {
             return
         }
 
-        const elm = data[0]
-        rev.find(".chart-ver").text(elm.version)
-        rev.find(".app-ver").text(elm.app_version)
-        const canUpgrade = isNewerVersion($("#specRev").data("last-chart-ver"), elm.version);
-        if (canUpgrade) {
-            rev.removeClass("text-muted border-secondary bg-white").addClass("border-success bg-success")
-            rev.find("p i").hide()
-            rev.find("p button").show()
-        } else {
-            rev.removeClass("border-success bg-success").addClass("text-muted border-secondary bg-white")
-            rev.find("p i").show()
-            rev.find("p button").hide()
+        $('#upgradeModalLabel select').empty()
+        for (let i = 0; i < data.length; i++) {
+            $('#upgradeModalLabel select').append("<option value='" + data[i].version + "'>" + data[i].version + "</option>")
         }
 
+        const elm = data[0]
+        //rev.find(".chart-ver").text(elm.version)
+        //rev.find(".app-ver").text(elm.app_version)
+        const verCur = $("#specRev").data("last-chart-ver");
+        const canUpgrade = isNewerVersion(verCur, elm.version);
+        $("#btnUpgradeCheck").prop("disabled", false)
+        if (canUpgrade) {
+            $("#btnUpgradeCheck").hide()
+            $("#btnUpgrade").show().find("span").text(elm.version)
+        } else {
+            $("#btnUpgrade").hide()
+            $("#btnUpgradeCheck").show()
+        }
 
-        rev.find(".fa-refresh").click(function () {
+        $("#btnUpgradeCheck").off("click").click(function () {
             const self = $(this)
-            self.addClass("fa-spin")
+            self.find(".fa").removeClass("fa-cloud-download").addClass("fa-spinner fa-spin")
             const repoName = elm.name.split('/').shift()
             $.getJSON("/api/helm/repo/update?name=" + repoName).fail(function () {
                 reportError("Failed to update chart repo")
             }).done(function () {
-                rev.hide()
-                const rev2 = addRepoBlock(name)
-                rev2.find(".fa-refresh").hide()
+                addUpgradeBtn(name)
+                $("#btnUpgradeCheck").prop("disabled", true).find(".fa").removeClass("fa-spin fa-spinner").addClass("fa-times")
             })
         })
 
-        revRow.append(rev)
+        $("#btnUpgrade").off("click").click(function () {
+            popUpUpgrade($(this), verCur, elm)
+        })
     })
-    return rev
+}
+
+$('#upgradeModalLabel select').change(function () {
+    const self = $(this)
+
+    $("#upgradeModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
+    $("#upgradeModal .btn-success").prop("disabled", true)
+    $.get(self.data("url")+ "&version=" + self.val()).fail(function () {
+        reportError("Failed to get upgrade")
+    }).done(function (data) {
+        $("#upgradeModalBody").empty();
+        $("#upgradeModal .btn-success").prop("disabled", false)
+
+        const targetElement = document.getElementById('upgradeModalBody');
+        const configuration = {
+            inputFormat: 'diff', outputFormat: 'side-by-side',
+            drawFileList: false, showFiles: false, highlight: true,
+        };
+        const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
+        diff2htmlUi.draw()
+        $("#upgradeModalBody").prepend("<p>Following changes will happen to cluster:</p>")
+        if (!data) {
+            $("#upgradeModalBody").html("No changes will happen to cluster")
+        }
+    })
+})
+
+function popUpUpgrade(self, verCur, elm) {
+    const name = getHashParam("chart");
+    let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
+    $('#upgradeModalLabel select').data("url", url)
+
+    self.prop("disabled", true)
+    $("#upgradeModalLabel .name").text(name)
+    $("#upgradeModalLabel .ver-old").text(verCur)
+
+    $('#upgradeModalLabel select').val(elm.version).trigger("change")
+
+    const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
+    myModal.show()
+
+
+    /*
+    // const self = $(this)
+    self.addClass("fa-spin")
+    const repoName = elm.name.split('/').shift()
+    $.post().fail(function () {
+        reportError("Failed to install chart")
+    }).done(function () {
+        rev.hide()
+        const rev2 = addRepoBlock(name)
+        rev2.find(".fa-refresh").hide()
+    })
+     */
+
+    $("#upgradeModal .btn-primary").prop("disabled", true).off('click').click(function () {
+        $("#upgradeModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
+        $.ajax({
+            url: url,
+            type: 'POST',
+        }).fail(function () {
+            reportError("Failed to rollback the chart")
+        }).done(function () {
+            window.location.reload()
+        })
+    })
 }
 
 function getHashParam(name) {
@@ -296,8 +358,6 @@ function buildChartCard(elm) {
         setHashParam("namespace", chart.namespace)
         setHashParam("chart", chart.name)
 
-        console.log(elm)
-        console.log(chart)
         loadChartHistory(chart.namespace, chart.name, elm.chart_name)
     })
     return card;

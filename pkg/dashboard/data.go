@@ -401,7 +401,7 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		if err != nil {
 			return "", err
 		}
-		out = getDiff(manifests, out, "current.yaml", "upgraded.yaml")
+		out = getDiff(strings.TrimSpace(manifests), strings.TrimSpace(out), "current.yaml", "upgraded.yaml")
 	}
 
 	return out, nil
