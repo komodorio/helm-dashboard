@@ -236,7 +236,7 @@ function addUpgradeBtn(name) {
             const self = $(this)
             self.find(".fa").removeClass("fa-cloud-download").addClass("fa-spinner fa-spin")
             const repoName = elm.name.split('/').shift()
-            $.getJSON("/api/helm/repo/update?name=" + repoName).fail(function () {
+            $.post("/api/helm/repo/update?name=" + repoName).fail(function () {
                 reportError("Failed to update chart repo")
             }).done(function () {
                 addUpgradeBtn(name)

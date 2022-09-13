@@ -2,11 +2,9 @@ package dashboard
 
 import (
 	"embed"
-	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
@@ -63,209 +61,26 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
 		abortWeb <- struct{}{}
 	})
 
-	configureHelms(api, data)
-	configureKubectls(api, data)
+	configureHelms(api.Group("/api/helm"), data)
+	configureKubectls(api.Group("/api/kube"), data)
 }
 
-func configureHelms(api *gin.Engine, data *DataLayer) {
-	api.GET("/api/helm/charts", func(c *gin.Context) {
-		res, err := data.ListInstalled()
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, res)
-	})
-
-	api.DELETE("/api/helm/charts", func(c *gin.Context) {
-		qp, err := getQueryProps(c, false)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		err = data.UninstallChart(qp.Namespace, qp.Name)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.Status(http.StatusAccepted)
-	})
-
-	api.POST("/api/helm/charts/rollback", func(c *gin.Context) {
-		qp, err := getQueryProps(c, true)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		err = data.Revert(qp.Namespace, qp.Name, qp.Revision)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.Redirect(http.StatusOK, "/")
-	})
-
-	api.GET("/api/helm/charts/history", func(c *gin.Context) {
-		qp, err := getQueryProps(c, false)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		res, err := data.ChartHistory(qp.Namespace, qp.Name)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, res)
-	})
-
-	api.GET("/api/helm/charts/resources", func(c *gin.Context) {
-		qp, err := getQueryProps(c, true)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		res, err := data.RevisionManifestsParsed(qp.Namespace, qp.Name, qp.Revision)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, res)
-	})
-
-	api.GET("/api/helm/repo/search", func(c *gin.Context) {
-		qp, err := getQueryProps(c, false)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		res, err := data.ChartRepoVersions(qp.Name)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, res)
-	})
-
-	api.GET("/api/helm/repo/update", func(c *gin.Context) {
-		qp, err := getQueryProps(c, false)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		err = data.ChartRepoUpdate(qp.Name)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.Status(http.StatusNoContent)
-	})
-
-	api.GET("/api/helm/charts/install", func(c *gin.Context) {
-		out, err := chartInstall(c, data, true)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.String(http.StatusOK, out)
-	})
-
-	api.POST("/api/helm/charts/install", func(c *gin.Context) {
-		out, err := chartInstall(c, data, false)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		res := release.Release{}
-		err = json.Unmarshal([]byte(out), &res)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.IndentedJSON(http.StatusAccepted, res)
-	})
-
-	api.GET("/api/helm/charts/:section", func(c *gin.Context) {
-		qp, err := getQueryProps(c, true)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
-		flag := c.Query("flag") == "true"
-		rDiff := c.Query("revisionDiff")
-		res, err := handleGetSection(data, c.Param("section"), rDiff, qp, flag)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.String(http.StatusOK, res)
-	})
+func configureHelms(api *gin.RouterGroup, data *DataLayer) {
+	h := HelmHandler{Data: data}
+	api.GET("/charts", h.GetCharts)
+	api.DELETE("/charts", h.Uninstall)
+	api.POST("/charts/rollback", h.Rollback)
+	api.GET("/charts/history", h.History)
+	api.GET("/charts/resources", h.Resources)
+	api.GET("/repo/search", h.RepoSearch)
+	api.POST("/repo/update", h.RepoUpdate)
+	api.GET("/charts/install", h.InstallPreview)
+	api.POST("/charts/install", h.Install)
+	api.GET("/charts/:section", h.GetInfoSection)
 }
 
-func chartInstall(c *gin.Context, data *DataLayer, justTemplate bool) (string, error) {
-	qp, err := getQueryProps(c, false)
-	if err != nil {
-		return "", err
-	}
-
-	out, err := data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
-}
-
-func handleGetSection(data *DataLayer, section string, rDiff string, qp *QueryProps, flag bool) (string, error) {
-	sections := map[string]SectionFn{
-		"manifests": data.RevisionManifests,
-		"values":    data.RevisionValues,
-		"notes":     data.RevisionNotes,
-	}
-
-	functor, found := sections[section]
-	if !found {
-		return "", errors.New("unsupported section: " + section)
-	}
-
-	if rDiff != "" {
-		cRevDiff, err := strconv.Atoi(rDiff)
-		if err != nil {
-			return "", err
-		}
-
-		ext := ".yaml"
-		if section == "notes" {
-			ext = ".txt"
-		}
-
-		res, err := RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Revision, flag)
-		if err != nil {
-			return "", err
-		}
-		return res, nil
-	} else {
-		res, err := functor(qp.Namespace, qp.Name, qp.Revision, flag)
-		if err != nil {
-			return "", err
-		}
-		return res, nil
-	}
-}
-
-func configureKubectls(api *gin.Engine, data *DataLayer) {
-	api.GET("/api/kube/contexts", func(c *gin.Context) {
+func configureKubectls(api *gin.RouterGroup, data *DataLayer) {
+	api.GET("/contexts", func(c *gin.Context) {
 		res, err := data.ListContexts()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
@@ -274,7 +89,7 @@ func configureKubectls(api *gin.Engine, data *DataLayer) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/kube/resources/:kind", func(c *gin.Context) {
+	api.GET("/resources/:kind", func(c *gin.Context) {
 		qp, err := getQueryProps(c, false)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -306,7 +121,7 @@ func configureKubectls(api *gin.Engine, data *DataLayer) {
 		c.IndentedJSON(http.StatusOK, res)
 	})
 
-	api.GET("/api/kube/describe/:kind", func(c *gin.Context) {
+	api.GET("/describe/:kind", func(c *gin.Context) {
 		qp, err := getQueryProps(c, false)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
