@@ -177,6 +177,10 @@ func configureHelms(api *gin.Engine, data *DataLayer) {
 
 	api.POST("/api/helm/charts/install", func(c *gin.Context) {
 		out, err := chartInstall(c, data, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 
 		res := release.Release{}
 		err = json.Unmarshal([]byte(out), &res)
