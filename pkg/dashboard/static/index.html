@@ -49,8 +49,7 @@
             </div>
         </div>
     </nav>
-
-    <div class="bg-light p-5 pt-0 rounded" id="sectionDetails" style="display: none">
+    <div class="bg-light p-5 pt-0 rounded display-none" id="sectionDetails">
         <span class="text-muted"
               style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
         <div class="row mb-3">
@@ -58,7 +57,7 @@
         </div>
         <h1><span class="name"></span>, revision <span class="rev"></span>
             <span class="float-end" id="actionButtons">
-                <a id="btnUpgrade" class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">No upgrades</a><a id="btnUpgradeCheck" class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0" title="Check for newer chart version from repo"><i class="bi-repeat"></i></a>
+                <a id="btnUpgrade" class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">Checking...</a><a id="btnUpgradeCheck" class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0" title="Check for newer chart version from repo"><i class="bi-repeat"></i><span class="spinner-border spinner-border-sm" style="display: none" role="status" aria-hidden="true"></span></a>
 
                 <a id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light" title="Rollback to this revision"><i class="bi-rewind-fill"></i> <span>Rollback</span></a>
                 <a id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light" title="Uninstall the chart"><i class="bi-trash-fill"></i> Uninstall</a>
@@ -119,7 +118,7 @@
         </div>
     </div>
 
-    <div class="bg-light p-5 rounded" id="sectionList" style="display: none">
+    <div class="bg-light p-5 rounded display-none" id="sectionList">
         <h1>Charts List</h1>
         <div id="charts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
@@ -175,7 +174,6 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary">Check for Newer Version</button>
                 <button type="button" class="btn btn-success">Confirm Upgrade</button>
             </div>
         </div>

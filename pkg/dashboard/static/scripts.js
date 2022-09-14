@@ -194,7 +194,7 @@ function loadChartHistory(namespace, name) {
     }).done(function (data) {
         fillChartHistory(data, namespace, name);
 
-        addUpgradeBtn(data[data.length - 1].chart_name)
+        checkUpgradeable(data[data.length - 1].chart_name)
 
         const rev = getHashParam("revision")
         if (rev) {
@@ -205,9 +205,27 @@ function loadChartHistory(namespace, name) {
     })
 }
 
-function addUpgradeBtn(name) {
+$("#btnUpgradeCheck").click(function () {
+    const self = $(this)
+    self.find(".bi-repeat").hide()
+    self.find(".spinner-border").show()
+    const repoName = self.data("repo")
+    $.post("/api/helm/repo/update?name=" + repoName).fail(function () {
+        reportError("Failed to update chart repo")
+    }).done(function () {
+        self.find(".spinner-border").hide()
+        self.find(".bi-repeat").show()
+
+        checkUpgradeable(self.data("chart"))
+        $("#btnUpgradeCheck").prop("disabled", true).find(".fa").removeClass("fa-spin fa-spinner").addClass("fa-times")
+    })
+})
+
+
+function checkUpgradeable(name) {
+    $("#btnUpgrade").text("Checking...")
     $.getJSON("/api/helm/repo/search?name=" + name).fail(function () {
-        reportError("Failed to get chart repo details")
+        reportError("Failed to find chart in repo")
     }).done(function (data) {
         if (!data) {
             return
@@ -219,30 +237,17 @@ function addUpgradeBtn(name) {
         }
 
         const elm = data[0]
-        //rev.find(".chart-ver").text(elm.version)
-        //rev.find(".app-ver").text(elm.app_version)
+        $("#btnUpgradeCheck").data("repo", elm.name.split('/').shift())
+        $("#btnUpgradeCheck").data("chart", elm.name.split('/').pop())
+
         const verCur = $("#specRev").data("last-chart-ver");
         const canUpgrade = isNewerVersion(verCur, elm.version);
         $("#btnUpgradeCheck").prop("disabled", false)
         if (canUpgrade) {
-            //$("#btnUpgradeCheck").hide()
-            //$("#btnUpgrade").show().find("span").text(elm.version)
+            $("#btnUpgrade").removeClass("bg-secondary bg-opacity-50").addClass("bg-success").text("Upgrade to "+elm.version)
         } else {
-            //$("#btnUpgrade").hide()
-            //$("#btnUpgradeCheck").show()
+            $("#btnUpgrade").removeClass("bg-success").addClass("bg-secondary bg-opacity-50").text("No upgrades")
         }
-
-        $("#btnUpgradeCheck").off("click").click(function () {
-            const self = $(this)
-            self.find(".fa").removeClass("fa-cloud-download").addClass("fa-spinner fa-spin")
-            const repoName = elm.name.split('/').shift()
-            $.post("/api/helm/repo/update?name=" + repoName).fail(function () {
-                reportError("Failed to update chart repo")
-            }).done(function () {
-                addUpgradeBtn(name)
-                $("#btnUpgradeCheck").prop("disabled", true).find(".fa").removeClass("fa-spin fa-spinner").addClass("fa-times")
-            })
-        })
 
         $("#btnUpgrade").off("click").click(function () {
             popUpUpgrade($(this), verCur, elm)
