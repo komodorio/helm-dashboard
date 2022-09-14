@@ -596,7 +596,7 @@ $("#btnRollback").click(function () {
         if (data) {
             $("#confirmModalBody").prepend("<p>Following changes will happen to cluster:</p>")
         } else {
-            $("#confirmModalBody").prepend("<p>No changes will happen to cluster</p>")
+            $("#confirmModalBody").html("<p>No changes will happen to cluster</p>")
         }
     })
 })
