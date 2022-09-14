@@ -7,8 +7,7 @@
     <title>Helm Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
-    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/lightfair.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"/>
     <link href="static/styles.css" rel="stylesheet">
@@ -16,8 +15,7 @@
 <body>
 
 <div class="container">
-    <i class="fa-solid fa-arrow-trend-down"></i>
-    <nav class="navbar navbar-expand-lg bg-light rounded" style="margin-bottom: 0.75rem">
+    <nav class="navbar navbar-expand-lg bg-light rounded mb-2 mt-2">
         <div class="container-fluid">
             <div style="line-height: 90%; font-size: 1.5rem" class="navbar-brand">
                 <img src="static/logo.png" style="height: 3rem; float: left" alt="Logo">
@@ -47,21 +45,22 @@
                     <label for="cluster" style="margin-top: 0.5rem">K8s Context:</label>
                     <select id="cluster" class="form-control"></select>
                 </form>
-                <i class="btn fa fa-power-off text-muted" title="Shut down the Helm Dashboard application"></i>
+                <i class="btn bi-power text-muted" title="Shut down the Helm Dashboard application"></i>
             </div>
         </div>
     </nav>
-
-    <div class="bg-light p-5 pt-0 rounded" id="sectionDetails" style="display: none">
+    <div class="bg-light p-5 pt-0 rounded display-none" id="sectionDetails">
         <span class="text-muted"
               style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
         <div class="row mb-3">
 
         </div>
         <h1><span class="name"></span>, revision <span class="rev"></span>
-            <span class="float-end">
-                <a id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light" title="Rollback to this revision"><i class="fa fa-backward"></i> <span>Rollback</span></a>
-                <a id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light" title="Uninstall the chart"><i class="fa fa-trash"></i> Uninstall</a>
+            <span class="float-end" id="actionButtons">
+                <a id="btnUpgrade" class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">Checking...</a><a id="btnUpgradeCheck" class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0" title="Check for newer chart version from repo"><i class="bi-repeat"></i><span class="spinner-border spinner-border-sm" style="display: none" role="status" aria-hidden="true"></span></a>
+
+                <a id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light" title="Rollback to this revision"><i class="bi-rewind-fill"></i> <span>Rollback</span></a>
+                <a id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light" title="Uninstall the chart"><i class="bi-trash-fill"></i> Uninstall</a>
             </span>
         </h1>
         Chart <b id="chartName"></b>: <i id="revDescr"></i>
@@ -119,7 +118,7 @@
         </div>
     </div>
 
-    <div class="bg-light p-5 rounded" id="sectionList" style="display: none">
+    <div class="bg-light p-5 rounded display-none" id="sectionList">
         <h1>Charts List</h1>
         <div id="charts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
@@ -159,6 +158,33 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal" id="upgradeModal"
+     tabindex="-1" aria-labelledby="describeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="upgradeModalLabel">
+                    Upgrade <b class='text-success name'></b> from version <b class='text-success ver-old'></b> to <select class='fw-bold text-success ver-new'></select>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="upgradeModalBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success">Confirm Upgrade</button>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="text-center small mt-3">
+    Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png" style="height: 1rem"> <a href="https://komodor.io">Komodor.io</a> |
+    <i class="bi-github"></i>
+    <a href="https://github.com/komodorio/helm-dashboard">Project page on GitHub</a>
+</footer>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
