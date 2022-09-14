@@ -88,7 +88,7 @@ function loadContentWrapper() {
 }
 
 function loadContent(mode, namespace, name, revision, revDiff, flag) {
-    let qstr = "chart=" + name + "&namespace=" + namespace + "&revision=" + revision
+    let qstr = "name=" + name + "&namespace=" + namespace + "&revision=" + revision
     if (revDiff) {
         qstr += "&revisionDiff=" + revDiff
     }
@@ -138,7 +138,7 @@ function loadChartHistory(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails h1 span.name").text(name)
     revRow.empty().append("<div><i class='fa fa-spinner fa-spin fa-2x'></i></div>")
-    $.getJSON("/api/helm/charts/history?chart=" + name + "&namespace=" + namespace).fail(function () {
+    $.getJSON("/api/helm/charts/history?name=" + name + "&namespace=" + namespace).fail(function () {
         reportError("Failed to get chart details")
     }).done(function (data) {
         revRow.empty()
@@ -222,7 +222,7 @@ function buildChartCard(elm) {
         header.find(".badge").addClass("bg-light text-dark")
     }
 
-    header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&chart=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
+    header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&name=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
     header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
 
     const body = $("<div class='card-body'></div>")
@@ -323,7 +323,7 @@ function getAge(obj1, obj2) {
 
 function showResources(namespace, chart, revision) {
     $("#nav-resources").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>");
-    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revision
+    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
     url += "?" + qstr
     $.getJSON(url).fail(function () {
@@ -400,7 +400,7 @@ $("#btnUninstall").click(function () {
     $("#confirmModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
     $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
         $("#confirmModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
-        const url = "/api/helm/charts?namespace=" + namespace + "&chart=" + chart;
+        const url = "/api/helm/charts?namespace=" + namespace + "&name=" + chart;
         $.ajax({
             url: url,
             type: 'DELETE',
@@ -414,7 +414,7 @@ $("#btnUninstall").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
     myModal.show()
 
-    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revision
+    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
     url += "?" + qstr
     $.getJSON(url).fail(function () {
@@ -438,7 +438,7 @@ $("#btnRollback").click(function () {
     $("#confirmModalBody").empty().append("<i class='fa fa-spin fa-spinner fa-2x'></i>")
     $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
         $("#confirmModal .btn-primary").prop("disabled", true).append("<i class='fa fa-spin fa-spinner'></i>")
-        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&chart=" + chart + "&revision=" + revisionNew;
+        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&name=" + chart + "&revision=" + revisionNew;
         $.ajax({
             url: url,
             type: 'POST',
@@ -452,7 +452,7 @@ $("#btnRollback").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
     myModal.show()
 
-    let qstr = "chart=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
+    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
     let url = "/api/helm/charts/manifests"
     url += "?" + qstr
     $.get(url).fail(function () {
