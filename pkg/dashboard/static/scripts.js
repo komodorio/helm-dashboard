@@ -20,10 +20,10 @@ function revisionClicked(namespace, name, self) {
         $("#revDescr").addClass("text-danger")
     }
 
-    if (false) { // TODO: hide if only one revision
+    const rev = $("#specRev").data("last-rev") == elm.revision ? elm.revision - 1 : elm.revision
+    if (!rev || rev === $("#specRev").data("first-rev")) { // TODO: hide if only one revision
         $("#btnRollback").hide()
     } else {
-        const rev = $("#specRev").data("last-rev") == elm.revision ? elm.revision - 1 : elm.revision
         $("#btnRollback").data("rev", rev).show().find("span").text("Rollback to #" + rev)
     }
 
@@ -78,11 +78,14 @@ $("#userDefinedVals").change(function () {
 function loadContentWrapper() {
     let revDiff = 0
     const revision = parseInt(getHashParam("revision"));
-    if (getHashParam("mode") === "diff-prev") {
+    if (revision === $("#specRev").data("first-rev")) {
+        revDiff = 0
+    } else if (getHashParam("mode") === "diff-prev") {
         revDiff = revision - 1
     } else if (getHashParam("mode") === "diff-rev") {
         revDiff = $("#specRev").val()
     }
+
     const flag = $("#userDefinedVals").prop("checked");
     loadContent(getHashParam("tab"), getHashParam("namespace"), getHashParam("chart"), revision, revDiff, flag)
 }
@@ -139,6 +142,11 @@ function fillChartHistory(data, namespace, name) {
     for (let x = 0; x < data.length; x++) {
         const elm = data[x]
         $("#specRev").val(elm.revision).data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
+
+        if (!x) {
+            $("#specRev").data("first-rev", elm.revision)
+        }
+
         const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
                                 <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
@@ -244,7 +252,7 @@ function checkUpgradeable(name) {
         const canUpgrade = isNewerVersion(verCur, elm.version);
         $("#btnUpgradeCheck").prop("disabled", false)
         if (canUpgrade) {
-            $("#btnUpgrade").removeClass("bg-secondary bg-opacity-50").addClass("bg-success").text("Upgrade to "+elm.version)
+            $("#btnUpgrade").removeClass("bg-secondary bg-opacity-50").addClass("bg-success").text("Upgrade to " + elm.version)
         } else {
             $("#btnUpgrade").removeClass("bg-success").addClass("bg-secondary bg-opacity-50").text("No upgrades")
         }
@@ -281,7 +289,7 @@ $('#upgradeModalLabel select').change(function () {
 })
 
 $("#upgradeModal .btn-secondary").click(function () {
-    const self=$(this)
+    const self = $(this)
     self.find(".fa").removeClass("fa-cloud-download").addClass("fa-spin fa-spinner").prop("disabled", true)
     $("#btnUpgradeCheck").click()
     $("#upgradeModal .btn-close").click()
