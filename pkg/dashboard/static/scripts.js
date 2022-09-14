@@ -21,10 +21,11 @@ function revisionClicked(namespace, name, self) {
     }
 
     const rev = $("#specRev").data("last-rev") == elm.revision ? elm.revision - 1 : elm.revision
-    if (!rev || rev === $("#specRev").data("first-rev")) { // TODO: hide if only one revision
+    console.log(rev, $("#specRev").data("first-rev"))
+    if (!rev || getHashParam("revision") === $("#specRev").data("first-rev")) {
         $("#btnRollback").hide()
     } else {
-        $("#btnRollback").data("rev", rev).show().find("span").text("Rollback to #" + rev)
+        $("#btnRollback").show().data("rev", rev).find("span").text("Rollback to #" + rev)
     }
 
     const tab = getHashParam("tab")
@@ -592,7 +593,11 @@ $("#btnRollback").click(function () {
         };
         const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
         diff2htmlUi.draw()
-        $("#confirmModalBody").prepend("<p>Following changes will happen to cluster:</p>")
+        if (data) {
+            $("#confirmModalBody").prepend("<p>Following changes will happen to cluster:</p>")
+        } else {
+            $("#confirmModalBody").prepend("<p>No changes will happen to cluster</p>")
+        }
     })
 })
 
