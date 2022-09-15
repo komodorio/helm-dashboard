@@ -221,6 +221,7 @@ $("#btnUpgradeCheck").click(function () {
     self.find(".bi-repeat").hide()
     self.find(".spinner-border").show()
     const repoName = self.data("repo")
+    $("#btnUpgrade").text("Checking...")
     $.post("/api/helm/repo/update?name=" + repoName).fail(function () {
         reportError("Failed to update chart repo")
     }).done(function () {
@@ -234,7 +235,6 @@ $("#btnUpgradeCheck").click(function () {
 
 
 function checkUpgradeable(name) {
-    $("#btnUpgrade").text("Checking...")
     $.getJSON("/api/helm/repo/search?name=" + name).fail(function () {
         reportError("Failed to find chart in repo")
     }).done(function (data) {
