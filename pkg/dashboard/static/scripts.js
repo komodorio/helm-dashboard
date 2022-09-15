@@ -4,7 +4,9 @@ const revRow = $("#sectionDetails .row");
 
 function reportError(err, xhr) {
     $("#errorAlert h4 span").text(err)
-    $("#errorAlert p").text(xhr.responseText)
+    if (xhr) {
+        $("#errorAlert p").text(xhr.responseText)
+    }
     $("#errorAlert").show()
 }
 
@@ -107,8 +109,8 @@ function loadContent(mode, namespace, name, revision, revDiff, flag) {
     url += "?" + qstr
     const diffDisplay = $("#manifestText");
     diffDisplay.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    $.get(url).fail(function () {
-        reportError("Failed to get diff of " + mode)
+    $.get(url).fail(function (xhr) {
+        reportError("Failed to get diff of " + mode, xhr)
     }).done(function (data) {
         diffDisplay.empty();
         if (data === "") {
@@ -200,8 +202,8 @@ function loadChartHistory(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails h1 span.name").text(name)
     revRow.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span></div>")
-    $.getJSON("/api/helm/charts/history?name=" + name + "&namespace=" + namespace).fail(function () {
-        reportError("Failed to get chart details")
+    $.getJSON("/api/helm/charts/history?name=" + name + "&namespace=" + namespace).fail(function (xhr) {
+        reportError("Failed to get chart details", xhr)
     }).done(function (data) {
         fillChartHistory(data, namespace, name);
 
@@ -222,8 +224,8 @@ $("#btnUpgradeCheck").click(function () {
     self.find(".spinner-border").show()
     const repoName = self.data("repo")
     $("#btnUpgrade").text("Checking...")
-    $.post("/api/helm/repo/update?name=" + repoName).fail(function () {
-        reportError("Failed to update chart repo")
+    $.post("/api/helm/repo/update?name=" + repoName).fail(function (xhr) {
+        reportError("Failed to update chart repo", xhr)
     }).done(function () {
         self.find(".spinner-border").hide()
         self.find(".bi-repeat").show()
@@ -235,8 +237,8 @@ $("#btnUpgradeCheck").click(function () {
 
 
 function checkUpgradeable(name) {
-    $.getJSON("/api/helm/repo/search?name=" + name).fail(function () {
-        reportError("Failed to find chart in repo")
+    $.getJSON("/api/helm/repo/search?name=" + name).fail(function (xhr) {
+        reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
         if (!data) {
             return
@@ -271,8 +273,8 @@ $('#upgradeModalLabel select').change(function () {
 
     $("#upgradeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $("#upgradeModal .btn-success").prop("disabled", true)
-    $.get(self.data("url") + "&version=" + self.val()).fail(function () {
-        reportError("Failed to get upgrade")
+    $.get(self.data("url") + "&version=" + self.val()).fail(function (xhr) {
+        reportError("Failed to get upgrade", xhr)
     }).done(function (data) {
         $("#upgradeModalBody").empty();
         $("#upgradeModal .btn-success").prop("disabled", false)
@@ -317,8 +319,8 @@ function popUpUpgrade(self, verCur, elm) {
         $.ajax({
             url: url + "&version=" + $('#upgradeModalLabel select').val(),
             type: 'POST',
-        }).fail(function () {
-            reportError("Failed to upgrade the chart")
+        }).fail(function (xhr) {
+            reportError("Failed to upgrade the chart", xhr)
         }).done(function (data) {
             setHashParam("revision", data.version)
             window.location.reload()
@@ -394,8 +396,8 @@ $(function () {
         window.location.href = "/"
     })
 
-    $.getJSON("/api/kube/contexts").fail(function () {
-        reportError("Failed to get list of clusters")
+    $.getJSON("/api/kube/contexts").fail(function (xhr) {
+        reportError("Failed to get list of clusters", xhr)
     }).done(function (data) {
         const context = Cookies.get("context")
 
@@ -453,8 +455,8 @@ function showResources(namespace, chart, revision) {
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
     url += "?" + qstr
-    $.getJSON(url).fail(function () {
-        reportError("Failed to get list of resources")
+    $.getJSON(url).fail(function (xhr) {
+        reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
         $("#nav-resources").empty();
         for (let i = 0; i < data.length; i++) {
@@ -511,8 +513,8 @@ function showDescribe(ns, kind, name) {
 
     const myModal = new bootstrap.Modal(document.getElementById('describeModal'), {});
     myModal.show()
-    $.get("/api/kube/describe/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function () {
-        reportError("Failed to describe resource")
+    $.get("/api/kube/describe/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
+        reportError("Failed to describe resource", xhr)
     }).done(function (data) {
         data = hljs.highlight(data, {language: 'yaml'}).value
         $("#describeModalBody").empty().append("<pre class='bg-white rounded p-3'></pre>").find("pre").html(data)
@@ -531,8 +533,8 @@ $("#btnUninstall").click(function () {
         $.ajax({
             url: url,
             type: 'DELETE',
-        }).fail(function () {
-            reportError("Failed to delete the chart")
+        }).fail(function (xhr) {
+            reportError("Failed to delete the chart", xhr)
         }).done(function () {
             window.location.href = "/"
         })
@@ -544,8 +546,8 @@ $("#btnUninstall").click(function () {
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
     url += "?" + qstr
-    $.getJSON(url).fail(function () {
-        reportError("Failed to get list of resources")
+    $.getJSON(url).fail(function (xhr) {
+        reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
         $("#confirmModalBody").empty().append("<p>Following resources will be deleted from the cluster:</p>");
         $("#confirmModal .btn-primary").prop("disabled", false)
@@ -582,8 +584,8 @@ $("#btnRollback").click(function () {
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
     let url = "/api/helm/charts/manifests"
     url += "?" + qstr
-    $.get(url).fail(function () {
-        reportError("Failed to get list of resources")
+    $.get(url).fail(function (xhr) {
+        reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
         $("#confirmModalBody").empty();
         $("#confirmModal .btn-primary").prop("disabled", false)
