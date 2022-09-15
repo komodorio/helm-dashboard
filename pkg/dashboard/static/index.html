@@ -57,10 +57,10 @@
         </div>
         <h1><span class="name"></span>, revision <span class="rev"></span>
             <span class="float-end" id="actionButtons">
-                <a id="btnUpgrade" class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">Checking...</a><a id="btnUpgradeCheck" class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0" title="Check for newer chart version from repo"><i class="bi-repeat"></i><span class="spinner-border spinner-border-sm" style="display: none" role="status" aria-hidden="true"></span></a>
+                <button id="btnUpgrade" class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">Checking...</button><button id="btnUpgradeCheck" class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0" title="Check for newer chart version from repo"><i class="bi-repeat"></i><span class="spinner-border spinner-border-sm" style="display: none" role="status" aria-hidden="true"></span></button>
 
-                <a id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light" title="Rollback to this revision"><i class="bi-rewind-fill"></i> <span>Rollback</span></a>
-                <a id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light" title="Uninstall the chart"><i class="bi-trash-fill"></i> Uninstall</a>
+                <button id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light" title="Rollback to this revision"><i class="bi-rewind-fill"></i> <span>Rollback</span></button>
+                <button id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light" title="Uninstall the chart"><i class="bi-trash-fill"></i> Uninstall</button>
             </span>
         </h1>
         Chart <b id="chartName"></b>: <i id="revDescr"></i>
@@ -124,6 +124,13 @@
 
         </div>
     </div>
+
+    <div id="errorAlert" class="display-none alert alert-sm alert-danger alert-dismissible position-absolute position-absolute top-0 start-50 translate-middle-x mt-3 border-danger" role="alert">
+        <h4 class="alert-heading"><i class="bi-exclamation-triangle-fill"></i> <span></span></h4>
+        <hr>
+        <p style="white-space: pre-wrap"></p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 </div>
 
 <div class="modal" id="describeModal"
@@ -179,6 +186,8 @@
         </div>
     </div>
 </div>
+
+
 <footer class="text-center small mt-3">
     Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png" style="height: 1rem"> <a href="https://komodor.io">Komodor.io</a> |
     <i class="bi-github"></i>

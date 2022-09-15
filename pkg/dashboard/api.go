@@ -43,12 +43,11 @@ func NewRouter(abortWeb ControlChan, data *DataLayer) *gin.Engine {
 	}
 
 	api.Use(contextSetter(data))
+	api.Use(noCache)
+	api.Use(errorHandler)
 
 	configureStatic(api)
 	configureRoutes(abortWeb, data, api)
-
-	api.Use(noCache)
-	api.Use(errorHandler)
 
 	return api
 }

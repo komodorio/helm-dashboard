@@ -48,7 +48,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.Redirect(http.StatusOK, "/")
+	c.Status(http.StatusAccepted)
 }
 
 func (h *HelmHandler) History(c *gin.Context) {
