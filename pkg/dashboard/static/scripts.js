@@ -2,8 +2,10 @@ const clusterSelect = $("#cluster");
 const chartsCards = $("#charts");
 const revRow = $("#sectionDetails .row");
 
-function reportError(err) {
-    alert(err) // TODO: nice modal/baloon/etc
+function reportError(err, xhr) {
+    $("#errorAlert h4 span").text(err)
+    $("#errorAlert p").text(xhr.responseText)
+    $("#errorAlert").show()
 }
 
 function revisionClicked(namespace, name, self) {
@@ -374,8 +376,8 @@ function buildChartCard(elm) {
 function loadChartsList() {
     $("#sectionList").show()
     chartsCards.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Loading...</div>")
-    $.getJSON("/api/helm/charts").fail(function () {
-        reportError("Failed to get list of charts")
+    $.getJSON("/api/helm/charts").fail(function (xhr) {
+        reportError("Failed to get list of charts", xhr)
     }).done(function (data) {
         chartsCards.empty()
         data.forEach(function (elm) {
@@ -567,8 +569,8 @@ $("#btnRollback").click(function () {
         $.ajax({
             url: url,
             type: 'POST',
-        }).fail(function () {
-            reportError("Failed to rollback the chart")
+        }).fail(function (xhr) {
+            reportError("Failed to rollback the chart", xhr)
         }).done(function () {
             window.location.reload()
         })
