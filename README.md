@@ -50,7 +50,6 @@ and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real
 
 ### First Public Version
 
-- Helm Plugin Packaging
 - CLI launcher
 - Web Server with REST API
 - Listing the installed applications
@@ -63,6 +62,9 @@ and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real
 - Uninstalling the app completely
 - Switch clusters
 - Show manifest/describe upon clicking on resource
+
+- Helm Plugin Packaging
+- Styled properly
 
 ### Further Ideas
 - Have cleaner idea on the web API structure
