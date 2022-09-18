@@ -12,6 +12,10 @@ body > .container-fluid {
     min-height: 100% !important;
 }
 
+.navbar {
+    box-shadow: 0 1px 4px rgba(22, 24, 31, 0.1);
+}
+
 .navbar-brand > div {
     display: inline-block;
     vertical-align: top;
@@ -61,6 +65,10 @@ body > .container-fluid {
     margin-left: 0.25rem;
 }
 
+.navbar i.btn {
+    font-size: 1.5rem;
+}
+
 #charts .card, #sectionDetails .row > div {
     cursor: pointer;
 }
@@ -75,4 +83,10 @@ body > .container-fluid {
 
 .display-none {
     display: none;
+}
+
+.separator-vertical span {
+    font-size: 2rem;
+    border-left: 1px solid #DCDDDF;
+    margin: 0.25rem 0;
 }
