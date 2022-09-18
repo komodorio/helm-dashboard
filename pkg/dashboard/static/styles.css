@@ -90,3 +90,13 @@ body > .container-fluid {
     border-left: 1px solid #DCDDDF;
     margin: 0.25rem 0;
 }
+
+.nav-link {
+    color: #3B3D45!important;
+}
+
+.nav-link.active {
+    background: #EBEFFF;
+    border-radius: 2px;
+    color: #1347FF!important;
+}

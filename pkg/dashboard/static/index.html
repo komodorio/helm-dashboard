@@ -17,33 +17,35 @@
 <body>
 
 <div class="container-fluid gx-0">
-    <nav class="navbar bg-white mb-2 p-0">
-        <div class="navbar-brand">
-            <a href="/"><img src="static/logo.png" alt="Logo"></a>
-            <div>
-                <h1><a href="#">Helm Dashboard</a></h1>
-                <p><span class="mr-1">by</span><a href="https://komodor.io"><img src="static/komodor-logo.svg"
-                                                                                 alt="komodor.io"></a></p>
+    <nav class="navbar navbar-expand bg-white mb-2 p-0">
+        <div class="container-fluid m-0 p-0">
+            <div class="navbar-brand">
+                <a href="/"><img src="static/logo.png" alt="Logo"></a>
+                <div>
+                    <h1><a href="#">Helm Dashboard</a></h1>
+                    <p><span class="mr-1">by</span><a href="https://komodor.io"><img src="static/komodor-logo.svg"
+                                                                                     alt="komodor.io"></a></p>
+                </div>
             </div>
+
+            <div class="separator-vertical mx-3"><span></span></div>
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item mx-2">
+                    <a class="nav-link px-3 active" aria-current="page" href="/">Installed</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a href="#" class="nav-link px-3">Repository</a>
+                </li>
+                <!-- TODO
+                <li class="nav-item">
+                    <a class="nav-link disabled">Provisional Charts</a>
+                </li>
+                -->
+            </ul>
+            <div class="separator-vertical"><span></span></div>
+            <i class="btn bi-power text-muted p-2 m-1 mx-2" title="Shut down the Helm Dashboard application"></i>
         </div>
-
-        <div class="separator-vertical mx-3"><span></span></div>
-
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/">Installed</a>
-            </li>
-            <!-- TODO
-            <li class="nav-item">
-                <a class="nav-link disabled">Provisional Charts</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled">Repositories</a>
-            </li>
-            -->
-        </ul>
-        <div class="separator-vertical"><span></span></div>
-        <i class="btn bi-power text-muted p-2 m-1 mx-2" title="Shut down the Helm Dashboard application"></i>
     </nav>
 
 
@@ -211,7 +213,7 @@
 </footer>
 
 
-<img src="static/overlay.png" style="position: absolute; top: 0; left: 0; z-index: 100; opacity: 10%" alt=""/>
+<img src="static/overlay.png" style="position: absolute; top: 0; left: 0; z-index: 100; opacity: 25%" alt=""/>
 
 <img src="static/topographic.svg" style="position: absolute; bottom: 0; left: 0; z-index: -100" alt=""/>
 
