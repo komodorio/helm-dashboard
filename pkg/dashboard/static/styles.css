@@ -1,9 +1,72 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 50rem;
+    font-size: 14px;
+
+    background-color: #F4F7FA;
+}
+
+body > .container-fluid {
+    min-height: 100% !important;
+}
+
+.navbar-brand > div {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.navbar-brand > div p span {
+    vertical-align: baseline;
+}
+
+.navbar-brand {
+    font-family: Poppins, serif;
+    font-size: 0.6rem !important;
+    color: #707583;
+    font-weight: 500;
+}
+
+.navbar-brand h1 {
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    line-height: 50%;
+}
+
+.navbar-brand h1 a {
+    font-size: 1.1rem !important;
+    color: #0023A3 !important;
+    text-decoration: none;
+}
+
+.navbar-brand > a > img {
+    vertical-align: middle;
+    height: 2.5rem;
+    display: inline-block;
+    margin: 0.5rem 0.8rem
+}
+
+.navbar-brand p {
+    margin-bottom: 0;
+}
+
+.navbar-brand p a {
+    vertical-align: text-bottom;
+}
+
+.navbar-brand p img {
+    height: 1.25rem;
+    margin-left: 0.25rem;
+}
+
 #charts .card, #sectionDetails .row > div {
     cursor: pointer;
 }
 
 .bg-primary .text-muted {
-    color: white!important;
+    color: white !important;
 }
 
 .d2h-file-collapse, .d2h-tag {

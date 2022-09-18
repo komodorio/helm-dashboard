@@ -22,6 +22,8 @@ func (h *HelmHandler) GetCharts(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
+// TODO: helm show chart komodorio/k8s-watcher to get the icon URL
+
 func (h *HelmHandler) Uninstall(c *gin.Context) {
 	qp, err := getQueryProps(c, false)
 	if err != nil {
