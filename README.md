@@ -43,7 +43,7 @@ helm plugin uninstall dashboard
 
 ## Support Channels
 
-We have two main channels for supporting the Helm Dashboard users: [Slack community](#TODO) for general conversations
+We have two main channels for supporting the Helm Dashboard users: [Slack community](https://komodorkommunity.slack.com/x-p3820586794880-3937175868755-4092688791734/archives/C042U85BD45/p1663573506220839) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
 ## Roadmap

@@ -392,7 +392,7 @@ function loadChartsList() {
 
 $(function () {
     clusterSelect.change(function () {
-        Cookies.set("context", clusterSelect.val())
+        Cookies.set("context", clusterSelect.find("input:radio:checked").val())
         window.location.href = "/"
     })
 
@@ -405,11 +405,14 @@ $(function () {
             // aws CLI uses complicated context names, the suffix does not work well
             // maybe we should have an `if` statement here
             let label = elm.Name //+ " (" + elm.Cluster + "/" + elm.AuthInfo + "/" + elm.Namespace + ")"
-            let opt = $("<option></option>").val(elm.Name).text(label)
+            let opt = $('<li><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
+            opt.attr('title', label)
+            opt.find("input").val(elm.Name).text(label)
+            opt.find("span").text(label)
             if (elm.IsCurrent && !context) {
-                opt.attr("selected", "selected")
+                opt.find("input").prop("checked", true)
             } else if (context && elm.Name === context) {
-                opt.attr("selected", "selected")
+                opt.find("input").prop("checked", true)
                 $.ajaxSetup({
                     headers: {
                         'x-kubecontext': context

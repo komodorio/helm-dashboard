@@ -6,6 +6,7 @@ body {
     font-size: 14px;
 
     background-color: #F4F7FA;
+    font-family: Roboto, serif;
 }
 
 body > .container-fluid {
@@ -99,4 +100,40 @@ body > .container-fluid {
     background: #EBEFFF;
     border-radius: 2px;
     color: #1347FF!important;
+}
+
+.b-shadow {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+}
+
+#filters h4 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 0;
+}
+
+#filters {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+    line-height: 175%;
+}
+
+#cluster input, #cluster span {
+    vertical-align: middle;
+}
+
+#installedList > div {
+    margin-bottom: 0.75rem;
+}
+
+#installedList h2 {
+    font-family: Inter, serif;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+#installedList .bg-secondary {
+    background: #ECEFF2!important;
 }
