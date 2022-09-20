@@ -304,7 +304,6 @@ function popUpUpgrade(self, verCur, elm) {
     let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
     $('#upgradeModalLabel select').data("url", url)
 
-    self.prop("disabled", true)
     $("#upgradeModalLabel .name").text(name)
     $("#upgradeModalLabel .ver-old").text(verCur)
 
