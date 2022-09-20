@@ -386,7 +386,7 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 
 	cmd := []string{name, repoChart, "--version", version, "--namespace", namespace, "--values", file.Name()}
 	if justTemplate {
-		cmd = append([]string{"template"}, cmd...)
+		cmd = append([]string{"template", "--skip-tests"}, cmd...)
 	} else {
 		cmd = append([]string{"upgrade"}, cmd...)
 		cmd = append(cmd, "--output", "json")
