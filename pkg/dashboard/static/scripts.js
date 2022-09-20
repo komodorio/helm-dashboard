@@ -339,7 +339,7 @@ function setHashParam(name, val) {
 
 function buildChartCard(elm) {
     const card = $(`<div class="row m-0 py-3 bg-white rounded-1 b-shadow border-4 border-start">
-            <div class="col-4 rel-name"><span>release-name</span><div></div></div>
+            <div class="col-4 rel-name"><span class="link">release-name</span><div></div></div>
             <div class="col-3 rel-status"><span></span><div></div></div>
             <div class="col-2 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
             <div class="col-1 rel-rev"><span>#0</span><div>Revision</div></div>
@@ -361,18 +361,20 @@ function buildChartCard(elm) {
     } else if (elm.status === "deployed" || elm.status === "superseded") {
         card.addClass("border-deployed")
         card.find(".rel-status span").addClass("text-deployed")
+        card.find(".rel-status div").hide()
     } else if (elm.status.startsWith("pending-")) {
         card.addClass("border-pending")
         card.find(".rel-status span").addClass("text-pending")
+        card.find(".rel-status div").hide()
     } else {
         card.addClass("border-other")
         card.find(".rel-status span").addClass("text-other")
+        card.find(".rel-status div").hide()
     }
 
     card.find("a").attr("href", '#namespace=' + elm.namespace + '&name=' + elm.name)
 
-    card.data("chart", elm)
-    card.click(function () {
+    card.find(".rel-name span").data("chart", elm).click(function () {
         const self = $(this)
         $("#sectionList").hide()
 
@@ -393,6 +395,7 @@ function loadChartsList() {
         reportError("Failed to get list of charts", xhr)
     }).done(function (data) {
         chartsCards.empty()
+        $("#installedList .header h2 span").text(data.length)
         data.forEach(function (elm) {
             let card = buildChartCard(elm);
             chartsCards.append(card)

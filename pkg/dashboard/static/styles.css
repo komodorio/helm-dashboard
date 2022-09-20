@@ -162,6 +162,14 @@ body > .container-fluid {
     margin-top: 0.75rem;
 }
 
+span.link {
+    cursor: pointer;
+}
+
+#installedList .body .row:hover span.link {
+    text-decoration: underline;
+}
+
 #installedList .rel-name {
     padding-left: 5.5rem;
     background-image: url("helm-gray-50.svg");
