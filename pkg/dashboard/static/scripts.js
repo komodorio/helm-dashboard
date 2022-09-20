@@ -1,5 +1,4 @@
 const clusterSelect = $("#cluster");
-const chartsCards = $("#charts");
 const revRow = $("#sectionDetails .row");
 
 function reportError(err, xhr) {
@@ -340,26 +339,38 @@ function setHashParam(name, val) {
 }
 
 function buildChartCard(elm) {
-    const header = $("<div class='card-header'></div>")
-    header.append($('<div class="float-end"><h5 class="float-end text-muted text-end">#' + elm.revision + '</h5><br/><div class="badge">' + elm.status + "</div>"))
-    // TODO: for pending- and uninstalling, add the spinner
+    const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start border-failed">
+            <div class="col-4 rel-name"><span>release-name</span><div>description<br/>&nbsp;</div></div>
+            <div class="col-3 rel-status"><span></span><div></div></div>
+            <div class="col-2 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
+            <div class="col-1 rel-rev"><span>#0</span><div>Revision</div></div>
+            <div class="col-1 rel-ns text-nowrap"><span>default</span><div>Namespace</div></div>
+            <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
+        </div>`)
+
+    card.find(".rel-name span").text(elm.name)
+    card.find(".rel-rev span").text("#" + elm.revision)
+    card.find(".rel-ns span").text(elm.namespace)
+    card.find(".rel-chart span").text(elm.chart)
+    card.find(".rel-date span").text(elm.updated)
+
+    card.find(".rel-status span").html("<span class='fs-6'>●</span> " + elm.status)
     if (elm.status === "failed") {
-        header.find(".badge").addClass("bg-danger text-light")
+        card.addClass("border-failed")
+        card.find(".rel-status span").addClass("text-failed")
+        // TODO: add failure description here
     } else if (elm.status === "deployed" || elm.status === "superseded") {
-        header.find(".badge").addClass("bg-info")
+        card.addClass("border-deployed")
+        card.find(".rel-status span").addClass("text-deployed")
+    } else if (elm.status.startsWith("pending-")) {
+        card.addClass("border-pending")
+        card.find(".rel-status span").addClass("text-pending")
     } else {
-        header.find(".badge").addClass("bg-light text-dark")
+        card.addClass("border-other")
+        card.find(".rel-status span").addClass("text-other")
     }
 
-    header.append($('<h5 class="card-title"><a href="#namespace=' + elm.namespace + '&name=' + elm.name + '" class="link-dark" style="text-decoration: none">' + elm.name + '</a></h5>'))
-    header.append($('<p class="card-text small text-muted"></p>').append("Chart: " + elm.chart))
-
-    const body = $("<div class='card-body'></div>")
-    body.append($('<p class="card-text"></p>').append("Namespace: " + elm.namespace))
-    body.append($('<p class="card-text"></p>').append("Version: " + elm.app_version))
-    body.append($('<p class="card-text"></p>').append("Updated: " + elm.updated))
-
-    let card = $("<div class='card'></div>").append(header).append(body);
+    card.find("a").attr("href", '#namespace=' + elm.namespace + '&name=' + elm.name)
 
     card.data("chart", elm)
     card.click(function () {
@@ -377,6 +388,7 @@ function buildChartCard(elm) {
 
 function loadChartsList() {
     $("#sectionList").show()
+    const chartsCards = $("#installedList .body")
     chartsCards.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Loading...</div>")
     $.getJSON("/api/helm/charts").fail(function (xhr) {
         reportError("Failed to get list of charts", xhr)
@@ -384,7 +396,7 @@ function loadChartsList() {
         chartsCards.empty()
         data.forEach(function (elm) {
             let card = buildChartCard(elm);
-            chartsCards.append($("<div class='col'></div>").append(card))
+            chartsCards.append(card)
         })
     })
 }

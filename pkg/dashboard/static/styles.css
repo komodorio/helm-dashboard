@@ -7,6 +7,7 @@ body {
 
     background-color: #F4F7FA;
     font-family: Roboto, serif;
+    color: #3D4048;
 }
 
 body > .container-fluid {
@@ -93,13 +94,13 @@ body > .container-fluid {
 }
 
 .nav-link {
-    color: #3B3D45!important;
+    color: #3B3D45 !important;
 }
 
 .nav-link.active {
     background: #EBEFFF;
     border-radius: 2px;
-    color: #1347FF!important;
+    color: #1347FF !important;
 }
 
 .b-shadow {
@@ -124,8 +125,8 @@ body > .container-fluid {
     vertical-align: middle;
 }
 
-#installedList > div {
-    margin-bottom: 0.75rem;
+#installedList > div, #installedList .body > div {
+    margin-bottom: 0.75rem !important;
 }
 
 #installedList h2 {
@@ -135,5 +136,95 @@ body > .container-fluid {
 }
 
 #installedList .bg-secondary {
-    background: #ECEFF2!important;
+    background: #ECEFF2 !important;
+}
+
+#installedList .header {
+    font-family: Roboto, serif;
+    font-weight: 600;
+    font-size: 0.6rem;
+    color: #3B3D45;
+}
+
+#installedList .header .row {
+    text-transform: uppercase;
+}
+
+#installedList .hdr-name {
+    padding-left: 5.5rem
+}
+
+#installedList .body {
+    font-size: 0.75rem;
+}
+
+#installedList .body .row div div {
+    margin-top: 0.75rem;
+}
+
+#installedList .rel-name {
+    padding-left: 5.5rem;
+    background-image: url("helm-gray-50.svg");
+    background-repeat: no-repeat;
+    background-position-x: 1.1rem;
+    background-position-y: 0.5rem;
+    background-size: 3rem;
+}
+
+#installedList .rel-name span {
+    font-family: Roboto Slab, sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+#installedList .rel-name span {
+    height: 2rem;
+    min-height: 2rem;
+    max-height: 2rem;
+}
+
+#installedList .rel-status span {
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+#installedList .rel-chart span, #installedList .rel-rev span, #installedList .rel-ns span, #installedList .rel-date span {
+    font-weight: 700;
+}
+
+#installedList .rel-chart div, #installedList .rel-rev div, #installedList .rel-ns div, #installedList .rel-date div {
+    text-transform: uppercase;
+    color: #707583;
+}
+
+.border-other {
+    border-color: #707583 !important;
+}
+
+.text-other {
+    color: #707583 !important;
+}
+
+.border-failed {
+    border-color: #FC1683 !important;
+}
+
+.text-failed {
+    color: #FC1683 !important;
+}
+
+.border-deployed {
+    border-color: #1BE99A !important;
+}
+
+.text-deployed {
+    color: #1FA470 !important;
+}
+
+.border-pending {
+    border-color: #5AB0FF !important;
+}
+
+.text-pending {
+    color: #5AB0FF !important;
 }
