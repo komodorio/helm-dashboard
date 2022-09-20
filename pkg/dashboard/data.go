@@ -321,6 +321,15 @@ func (d *DataLayer) GetResource(namespace string, def *GenericResource) (*Generi
 	}
 
 	sort.Slice(res.Status.Conditions, func(i, j int) bool {
+		// some condition types always bubble up
+		if res.Status.Conditions[i].Type == "Available" {
+			return false
+		}
+
+		if res.Status.Conditions[j].Type == "Available" {
+			return true
+		}
+
 		t1 := res.Status.Conditions[i].LastTransitionTime
 		t2 := res.Status.Conditions[j].LastTransitionTime
 		return t1.Time.Before(t2.Time)
