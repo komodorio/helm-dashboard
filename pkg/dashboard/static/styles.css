@@ -166,8 +166,8 @@ body > .container-fluid {
     padding-left: 5.5rem;
     background-image: url("helm-gray-50.svg");
     background-repeat: no-repeat;
+    background-position: center left;
     background-position-x: 1.1rem;
-    background-position-y: 0.5rem;
     background-size: 3rem;
 }
 

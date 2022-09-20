@@ -339,7 +339,7 @@ function setHashParam(name, val) {
 }
 
 function buildChartCard(elm) {
-    const card = $(`<div class="row m-0 py-3 bg-white rounded-1 b-shadow border-4 border-start border-failed">
+    const card = $(`<div class="row m-0 py-3 bg-white rounded-1 b-shadow border-4 border-start">
             <div class="col-4 rel-name"><span>release-name</span><div></div></div>
             <div class="col-3 rel-status"><span></span><div></div></div>
             <div class="col-2 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
