@@ -177,7 +177,7 @@ body > .container-fluid {
     font-size: 1.25rem;
 }
 
-#installedList .rel-name span {
+#installedList .rel-name div {
     height: 2rem;
     min-height: 2rem;
     max-height: 2rem;

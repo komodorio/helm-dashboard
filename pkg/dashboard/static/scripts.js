@@ -339,8 +339,8 @@ function setHashParam(name, val) {
 }
 
 function buildChartCard(elm) {
-    const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start border-failed">
-            <div class="col-4 rel-name"><span>release-name</span><div>description<br/>&nbsp;</div></div>
+    const card = $(`<div class="row m-0 py-3 bg-white rounded-1 b-shadow border-4 border-start border-failed">
+            <div class="col-4 rel-name"><span>release-name</span><div></div></div>
             <div class="col-3 rel-status"><span></span><div></div></div>
             <div class="col-2 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
             <div class="col-1 rel-rev"><span>#0</span><div>Revision</div></div>
@@ -352,7 +352,7 @@ function buildChartCard(elm) {
     card.find(".rel-rev span").text("#" + elm.revision)
     card.find(".rel-ns span").text(elm.namespace)
     card.find(".rel-chart span").text(elm.chart)
-    card.find(".rel-date span").text(elm.updated)
+    card.find(".rel-date span").text(getAge(elm))
 
     card.find(".rel-status span").html("<span class='fs-6'>●</span> " + elm.status)
     if (elm.status === "failed") {
