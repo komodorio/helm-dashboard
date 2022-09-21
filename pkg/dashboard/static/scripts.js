@@ -1,5 +1,5 @@
 const clusterSelect = $("#cluster");
-const revRow = $("#sectionDetails .row");
+const revRow = $("#sectionDetails .rev-list ul");
 
 function reportError(err, xhr) {
     $("#errorAlert h4 span").text(err)
@@ -10,8 +10,8 @@ function reportError(err, xhr) {
 }
 
 function revisionClicked(namespace, name, self) {
-    let active = "active border-primary border-2 bg-opacity-25 bg-primary";
-    let inactive = "border-secondary bg-white";
+    let active = "active border-primary border-1 bg-white";
+    let inactive = "border-secondary bg-secondary";
     revRow.find(".active").removeClass(active).addClass(inactive)
     self.removeClass(inactive).addClass(active)
     const elm = self.data("elm")
@@ -143,6 +143,7 @@ $('#specRev').keyup(function (event) {
 
 function fillChartHistory(data, namespace, name) {
     revRow.empty()
+    data.reverse()
     for (let x = 0; x < data.length; x++) {
         const elm = data[x]
         $("#specRev").val(elm.revision).data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
@@ -151,24 +152,22 @@ function fillChartHistory(data, namespace, name) {
             $("#specRev").data("first-rev", elm.revision)
         }
 
-        const rev = $(`<div class="col-md-2 p-2 rounded border border-secondary bg-gradient bg-white">
-                                <span><b class="rev-number"></b> - <span class="rev-status"></span></span><br/>
+        const rev = $(`<li class="p-2 mb-2 rounded border border-secondary bg-secondary">
+                                <div class="rev-number float-end fw-bold fs-6"></div>
+                                <div class="rev-status float-start fw-bold"></div>
+                                <span><span class=""></span></span><br/>
                                 <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
                                 <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
                                 <p class="small mt-3 mb-0"><span class="text-muted">Age:</span> <span class="rev-age"></span><br/>
                                 <span class="text-muted rev-date"></span><br/></p>                
-                            </div>`)
+                            </li>`)
         rev.find(".rev-number").text("#" + elm.revision)
         rev.find(".app-ver").text(elm.app_version)
         rev.find(".chart-ver").text(elm.chart_ver)
         rev.find(".rev-date").text(elm.updated.replace("T", " "))
         rev.find(".rev-age").text(getAge(elm, data[x + 1]))
-        rev.find(".rev-status").text(elm.status)
+        statusStyle(elm.status, rev.find(".rev-status"), rev.find(".rev-status"))
         rev.find(".fa").attr("title", elm.action)
-
-        if (elm.status === "failed") {
-            rev.find(".rev-status").parent().addClass("text-danger")
-        }
 
         switch (elm.action) {
             case "app_upgrade":
@@ -200,7 +199,7 @@ function fillChartHistory(data, namespace, name) {
 function loadChartHistory(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails h1 span.name").text(name)
-    revRow.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span></div>")
+    revRow.empty().append("<li><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span></li>")
     $.getJSON("/api/helm/charts/history?name=" + name + "&namespace=" + namespace).fail(function (xhr) {
         reportError("Failed to get chart details", xhr)
     }).done(function (data) {
@@ -212,7 +211,7 @@ function loadChartHistory(namespace, name) {
         if (rev) {
             revRow.find(".rev-" + rev).click()
         } else {
-            revRow.find("div.col-md-2:last-child").click()
+            revRow.find("li:first-child").click()
         }
     })
 }
@@ -353,24 +352,7 @@ function buildChartCard(elm) {
     card.find(".rel-chart span").text(elm.chart)
     card.find(".rel-date span").text(getAge(elm))
 
-    card.find(".rel-status span").html("<span class='fs-6'>●</span> " + elm.status)
-    if (elm.status === "failed") {
-        card.addClass("border-failed")
-        card.find(".rel-status span").addClass("text-failed")
-        // TODO: add failure description here
-    } else if (elm.status === "deployed" || elm.status === "superseded") {
-        card.addClass("border-deployed")
-        card.find(".rel-status span").addClass("text-deployed")
-        card.find(".rel-status div").hide()
-    } else if (elm.status.startsWith("pending-")) {
-        card.addClass("border-pending")
-        card.find(".rel-status span").addClass("text-pending")
-        card.find(".rel-status div").hide()
-    } else {
-        card.addClass("border-other")
-        card.find(".rel-status span").addClass("text-other")
-        card.find(".rel-status div").hide()
-    }
+    statusStyle(elm.status, card, card.find(".rel-status span"))
 
     card.find("a").attr("href", '#namespace=' + elm.namespace + '&name=' + elm.name)
 
@@ -385,6 +367,25 @@ function buildChartCard(elm) {
         loadChartHistory(chart.namespace, chart.name, elm.chart_name)
     })
     return card;
+}
+
+function statusStyle(status, card, txt) {
+    txt.addClass("text-uppercase")
+    txt.html("<span class='fs-6'>●</span> " + status)
+    if (status === "failed") {
+        card.addClass("border-failed")
+        txt.addClass("text-failed")
+        // TODO: add failure description here
+    } else if (status === "deployed") {
+        card.addClass("border-deployed")
+        txt.addClass("text-deployed")
+    } else if (status.startsWith("pending-")) {
+        card.addClass("border-pending")
+        txt.addClass("text-pending")
+    } else {
+        card.addClass("border-other")
+        txt.addClass("text-other")
+    }
 }
 
 function loadChartsList() {

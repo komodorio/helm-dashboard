@@ -135,8 +135,12 @@ body > .container-fluid {
     font-size: 1rem;
 }
 
-#installedList .bg-secondary {
+.bg-secondary {
     background: #ECEFF2 !important;
+}
+
+.border-secondary {
+    border-color: #DCDDDF !important;
 }
 
 #installedList .header {
@@ -235,4 +239,12 @@ span.link {
 
 .text-pending {
     color: #5AB0FF !important;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+.rev-details {
+
 }
