@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Helm Dashboard</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&family=Inter&family=Poppins:wght@600&family=Inter:wght@500&family=Roboto+Slab:wght@700&family=Roboto:wght@700"/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Roboto&family=Inter&family=Poppins:wght@600&family=Inter:wght@500&family=Roboto+Slab:wght@700&family=Roboto:wght@700"/>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
@@ -70,7 +71,8 @@
 
             <footer class="text-center small mt-3 bg-white p-2 px-3 rounded b-shadow">
                 <span class="">
-                    Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png" style="height: 1rem"> <a
+                    Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png"
+                                           style="height: 1rem"> <a
                         href="https://komodor.io">Komodor.io</a> <br/>
                     <i class="bi-github"></i>
                     <a href="https://github.com/komodorio/helm-dashboard">Project page on GitHub</a>
@@ -82,7 +84,8 @@
         <div class="col ms-2" id="installedList">
             <div class="col rounded rounded-1 b-shadow header">
                 <div class="bg-white rounded-top m-0">
-                    <h2 class="m-0 p-1"><img class="m-2 mx-3 me-2" src="static/helm-gray.svg" alt="Installed Charts">Installed Charts (<span></span>)</h2>
+                    <h2 class="m-0 p-1"><img class="m-2 mx-3 me-2" src="static/helm-gray.svg" alt="Installed Charts">Installed
+                        Charts (<span></span>)</h2>
                 </div>
                 <div class="bg-secondary rounded-bottom m-0 row p-2">
                     <div class="col-4 hdr-name">Name</div>
@@ -100,95 +103,99 @@
     </div>
 
 
-    <div class="bg-light p-5 pt-0 rounded display-none" id="sectionDetails">
-        <span class="text-muted"
-              style="transform: rotate(270deg); z-index: 100; display: inline-block; position: relative; left:-4rem; top: 4rem; color: #BBB!important; text-transform: uppercase">Revisions</span>
-        <div class="row mb-3">
-
+    <div class="row mt-3 pt-3 mx-0 me-5" id="sectionDetails" style="display: none">
+        <div class="col-2 ms-3">
+            <h3>Revisions</h3>
+            <ul class="list-unstyled">
+            </ul>
         </div>
-        <h1><span class="name"></span>, revision <span class="rev"></span>
-            <span class="float-end" id="actionButtons">
+        <div class="col ms-2">
+
+            <h1><span class="name"></span>, revision <span class="rev"></span>
+                <span class="float-end" id="actionButtons">
                 <button id="btnUpgrade"
                         class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">Checking...</button><button
-                    id="btnUpgradeCheck"
-                    class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0"
-                    title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
-                    class="spinner-border spinner-border-sm" style="display: none" role="status"
-                    aria-hidden="true"></span></button>
+                        id="btnUpgradeCheck"
+                        class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0"
+                        title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
+                        class="spinner-border spinner-border-sm" style="display: none" role="status"
+                        aria-hidden="true"></span></button>
 
                 <button id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light"
                         title="Rollback to this revision"><i class="bi-rewind-fill"></i> <span>Rollback</span></button>
                 <button id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light"
                         title="Uninstall the chart"><i class="bi-trash-fill"></i> Uninstall</button>
             </span>
-        </h1>
-        Chart <b id="chartName"></b>: <i id="revDescr"></i>
+            </h1>
+            Chart <b id="chartName"></b>: <i id="revDescr"></i>
 
-        <nav class="mt-2">
-            <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-resources" data-tab="resources"
-                        type="button" role="tab" aria-controls="nav-resources" aria-selected="false">Resources
-                </button>
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
-                        type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false">Manifests
-                </button>
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="values"
-                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">
-                    Parameterized Values
-                </button>
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="notes"
-                        type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">Notes
-                </button>
-            </div>
-        </nav>
-        <div class="tab-content">
-            <div class="tab-pane p-3" id="nav-resources" role="tabpanel">
+            <nav class="mt-2">
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-resources" data-tab="resources"
+                            type="button" role="tab" aria-controls="nav-resources" aria-selected="false">Resources
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
+                            type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false">Manifests
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="values"
+                            type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">
+                        Parameterized Values
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="notes"
+                            type="button" role="tab" aria-controls="nav-disabled" aria-selected="false">Notes
+                    </button>
+                </div>
+            </nav>
+            <div class="tab-content">
+                <div class="tab-pane p-3" id="nav-resources" role="tabpanel">
 
-            </div>
-            <div class="tab-pane" id="nav-manifest" role="tabpanel">
-                <nav class="navbar bg-light">
-                    <form class="container-fluid" id="modePanel">
-                        <label class="form-check-label" for="diffModeNone">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone"
-                                   data-mode="view">
-                            View Current
-                        </label>
-                        <label class="form-check-label" for="diffModePrev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev"
-                                   data-mode="diff-prev">
-                            Diff with previous
-                        </label>
-                        <label class="form-check-label" for="diffModeRev">
-                            <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev"
-                                   data-mode="diff-rev">
-                            Diff with specific revision: <input class="form-input" size="3" id="specRev">
-                        </label>
-                        <label class="form-check-label" for="userDefinedVals">
-                            <input class="form-check-input" type="checkbox" id="userDefinedVals"> User-defined only
-                        </label>
-                    </form>
-                </nav>
+                </div>
+                <div class="tab-pane" id="nav-manifest" role="tabpanel">
+                    <nav class="navbar bg-light">
+                        <form class="container-fluid" id="modePanel">
+                            <label class="form-check-label" for="diffModeNone">
+                                <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone"
+                                       data-mode="view">
+                                View Current
+                            </label>
+                            <label class="form-check-label" for="diffModePrev">
+                                <input class="form-check-input" type="radio" name="diffMode" id="diffModePrev"
+                                       data-mode="diff-prev">
+                                Diff with previous
+                            </label>
+                            <label class="form-check-label" for="diffModeRev">
+                                <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev"
+                                       data-mode="diff-rev">
+                                Diff with specific revision: <input class="form-input" size="3" id="specRev">
+                            </label>
+                            <label class="form-check-label" for="userDefinedVals">
+                                <input class="form-check-input" type="checkbox" id="userDefinedVals"> User-defined only
+                            </label>
+                        </form>
+                    </nav>
 
-                <div id="manifestText" class="mt-2 bg-white"></div>
-            </div>
-            <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
-                 tabindex="0">...
+                    <div id="manifestText" class="mt-2 bg-white"></div>
+                </div>
+                <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
+                     tabindex="0">...
+                </div>
             </div>
         </div>
     </div>
 
-
-    <div id="errorAlert"
-         class="display-none alert alert-sm alert-danger alert-dismissible position-absolute position-absolute top-0 start-50 translate-middle-x mt-3 border-danger"
-         role="alert">
-        <h4 class="alert-heading"><i class="bi-exclamation-triangle-fill"></i> <span></span></h4>
-        <hr>
-        <p style="white-space: pre-wrap"></p>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
 </div>
 
+
 <!-- Modals -->
+<div id="errorAlert"
+     class="display-none alert alert-sm alert-danger alert-dismissible position-absolute position-absolute top-0 start-50 translate-middle-x mt-3 border-danger"
+     role="alert">
+    <h4 class="alert-heading"><i class="bi-exclamation-triangle-fill"></i> <span></span></h4>
+    <hr>
+    <p style="white-space: pre-wrap"></p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 <div class="modal" id="describeModal"
      tabindex="-1" aria-labelledby="describeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
