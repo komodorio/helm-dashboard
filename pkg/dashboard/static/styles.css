@@ -214,6 +214,10 @@ span.link {
     color: #707583;
 }
 
+.strike {
+    text-decoration: line-through;
+}
+
 .text-muted {
     color: #707583 !important;
 }
