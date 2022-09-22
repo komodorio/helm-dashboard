@@ -254,10 +254,14 @@ span.link {
     color: #5AB0FF !important;
 }
 
-.text-uppercase {
-    text-transform: uppercase;
+.bg-tag {
+    background-color: #D6EFFE;
 }
 
-.rev-details {
+.bg-tag.text-dark {
+    color: #333333!important;
+}
 
+.text-uppercase {
+    text-transform: uppercase;
 }

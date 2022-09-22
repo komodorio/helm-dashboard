@@ -7,9 +7,12 @@ function revisionClicked(namespace, name, self) {
     console.log(elm)
     setHashParam("revision", elm.revision)
     $("#sectionDetails span.rev").text("#"+elm.revision)
-    statusStyle(rev.status, )
-    $("#sectionDetails .rev-status").text("#"+elm.revision)
-    $("#chartName").text(elm.chart)
+    statusStyle(elm.status, $("#none"), $("#sectionDetails .rev-details .rev-status"))
+
+    $("#sectionDetails .rev-tags .rev-chart").text(elm.chart)
+    $("#sectionDetails .rev-tags .rev-app").text(elm.app_version)
+    $("#sectionDetails .rev-tags .rev-ns").text(getHashParam("namespace"))
+
     $("#revDescr").text(elm.description).removeClass("text-danger")
     if (elm.status === "failed") {
         $("#revDescr").addClass("text-danger")

@@ -112,14 +112,15 @@
             </ul>
         </div>
         <div class="col ms-2 rev-details bg-white b-shadow pt-4 px-5">
-            <div class="rev-status">status</div>
+            <div><span class="rev-status fw-bold me-3"></span> <i id="revDescr"></i></div>
             <div>
                 <h1 class="name float-start">Name</h1>
                 <div id="actionButtons" class="float-end">
                     <button id="btnUpgrade"
                             class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">
                         Checking...
-                    </button><button
+                    </button>
+                    <button
                             id="btnUpgradeCheck"
                             class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0 me-2"
                             title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
@@ -133,36 +134,38 @@
                             title="Uninstall the chart"><i class="bi-trash-fill"></i> Uninstall
                     </button>
                 </div>
-                <div class="fs-1">&nbsp;</div>
+                <div class="fs-2">&nbsp;</div>
             </div>
 
             <div>
-                Revision <span class="rev"></span>
+                Revision <span class="rev fw-bold me-4"></span>
                 Updated <span class="date"></span> ago
             </div>
 
-            <div>
-                <span id="chartName" class="badge bg-info">namespace: <span></span></span>
-                <span id="chartName" class="badge bg-info">chart version: <span></span></span>
-                <span id="chartName" class="badge bg-info">app version: <span></span></span>
+            <div class="rev-tags mt-3 mb-5">
+                <span class="rounded rounded-1 me-2 p-1 bg-tag text-dark">namespace: <span class="rev-ns fw-bold"></span></span>
+                <span class="rounded rounded-1 me-2 p-1 bg-tag text-dark">chart version: <span class="rev-chart  fw-bold"></span></span>
+                <span class="rounded rounded-1 me-2 p-1 bg-tag text-dark">app version: <span class="rev-app fw-bold"></span></span>
             </div>
 
-            <i id="revDescr"></i>
 
             <nav class="mt-2">
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-resources" data-tab="resources"
-                            type="button" role="tab" aria-controls="nav-resources" aria-selected="false" tabindex="-1">Resources
+                            type="button" role="tab" aria-controls="nav-resources" aria-selected="false" tabindex="-1">
+                        Resources
                     </button>
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
-                            type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false" tabindex="-1">Manifests
+                            type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false"
+                            tabindex="-1">Manifests
                     </button>
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="values"
                             type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" tabindex="-1">
                         Parameterized Values
                     </button>
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="notes"
-                            type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" tabindex="-1">Notes
+                            type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" tabindex="-1">
+                        Notes
                     </button>
                 </div>
             </nav>
