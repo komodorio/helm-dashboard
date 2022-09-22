@@ -76,10 +76,6 @@ body > .container-fluid {
 }
 
 
-.bg-primary .text-muted {
-    color: white !important;
-}
-
 .d2h-file-collapse, .d2h-tag {
     opacity: 0; /* trollface */
 }
@@ -216,6 +212,10 @@ span.link {
 #installedList .rel-chart div, #installedList .rel-rev div, #installedList .rel-ns div, #installedList .rel-date div {
     text-transform: uppercase;
     color: #707583;
+}
+
+.text-muted {
+    color: #707583 !important;
 }
 
 .border-other {

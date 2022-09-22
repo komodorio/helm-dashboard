@@ -31,20 +31,17 @@ function fillChartHistory(data, namespace, name) {
             $("#specRev").data("first-rev", elm.revision)
         }
 
-        const rev = $(`<li class="p-2 mb-2 rounded border border-secondary bg-secondary">
-                                <div class="rev-number float-end fw-bold fs-6"></div>
-                                <div class="rev-status float-start fw-bold"></div>
-                                <span><span class=""></span></span><br/>
-                                <span class="text-muted">Chart:</span> <span class="chart-ver"></span><br/>
-                                <span class="text-muted">App ver:</span> <span class="app-ver"></span><br/>
-                                <p class="small mt-3 mb-0"><span class="text-muted">Age:</span> <span class="rev-age"></span><br/>
-                                <span class="text-muted rev-date"></span><br/></p>                
+        const rev = $(`<li class="px-2 pt-5 pb-4 mb-2 rounded border border-secondary bg-secondary position-relative">
+                                <div class="rev-status position-absolute top-0 m-2 mb-5 stat-0 fw-bold"></div>
+                                <div class="rev-number position-absolute top-0 m-2 mb-5 end-0 fw-bold fs-6"></div>
+                                <div class="position-absolute bottom-0 end-0 m-2 text-muted small">AGE: <span class="rev-age"></span></div>
                             </li>`)
         rev.find(".rev-number").text("#" + elm.revision)
         rev.find(".app-ver").text(elm.app_version)
         rev.find(".chart-ver").text(elm.chart_ver)
         rev.find(".rev-date").text(elm.updated.replace("T", " "))
-        rev.find(".rev-age").text(getAge(elm, data[x + 1]))
+
+        rev.find(".rev-age").text(getAge( elm, data[x - 1])).attr("title", elm.updated)
         statusStyle(elm.status, rev.find(".rev-status"), rev.find(".rev-status"))
         rev.find(".fa").attr("title", elm.action)
 
@@ -90,7 +87,6 @@ function revisionClicked(namespace, name, self) {
     }
 
     const rev = $("#specRev").data("last-rev") == elm.revision ? elm.revision - 1 : elm.revision
-    console.log(rev, $("#specRev").data("first-rev"))
     if (!rev || getHashParam("revision") === $("#specRev").data("first-rev")) {
         $("#btnRollback").hide()
     } else {
