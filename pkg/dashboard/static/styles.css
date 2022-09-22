@@ -75,6 +75,7 @@ body > .container-fluid {
     cursor: pointer;
 }
 
+
 .bg-primary .text-muted {
     color: white !important;
 }
@@ -131,9 +132,10 @@ body > .container-fluid {
 
 #installedList h2 {
     font-family: Inter, serif;
-    font-weight: 500;
+    font-weight: 700;
     font-size: 1rem;
 }
+
 
 .bg-secondary {
     background: #ECEFF2 !important;
@@ -188,6 +190,13 @@ span.link {
     font-weight: 700;
     font-size: 1.25rem;
 }
+
+#sectionDetails h1 {
+    font-family: Roboto Slab, sans-serif;
+    font-weight: 400;
+    font-size: 2rem;
+}
+
 
 #installedList .rel-name div {
     height: 2rem;

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Helm Dashboard</title>
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Roboto&family=Inter&family=Poppins:wght@600&family=Inter:wght@500&family=Roboto+Slab:wght@700&family=Roboto:wght@700"/>
+          href="https://fonts.googleapis.com/css2?family=Roboto&family=Inter&family=Poppins:wght@600&family=Inter:wght@500&family=Roboto+Slab:wght@400&family=Roboto+Slab:wght@700&family=Roboto:wght@700"/>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
@@ -52,7 +52,8 @@
     <!-- /TOP BAR -->
 
     <div class="row mt-3 pt-3 mx-0 me-5" id="sectionList" style="display: none">
-        <img src="static/topographic.svg" style="position: absolute; bottom: 0; left: 0; z-index: -100; height: 100%;" alt=""/>
+        <img src="static/topographic.svg" style="position: absolute; bottom: 0; left: 0; z-index: -100; height: 100%;"
+             alt=""/>
         <div class="col-2 ms-3">
             <!-- FILTER BLOCK -->
             <div class="p-2 ps-2 bg-white rounded-1 b-shadow" id="filters">
@@ -110,7 +111,7 @@
             <ul class="list-unstyled">
             </ul>
         </div>
-        <div class="col ms-2 rev-details bg-white b-shadow pt-4">
+        <div class="col ms-2 rev-details bg-white b-shadow pt-4 px-5">
             <div class="rev-status">status</div>
             <div>
                 <h1 class="name float-start">Name</h1>
@@ -118,15 +119,14 @@
                     <button id="btnUpgrade"
                             class="opacity-10 btn btn-sm bg-secondary text-light bg-opacity-50 rounded-0 me-0 rounded-start ">
                         Checking...
-                    </button>
-                    <button
+                    </button><button
                             id="btnUpgradeCheck"
-                            class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0"
+                            class="btn btn-sm text-muted btn-light border-secondary rounded-0 rounded-end ms-0 me-2"
                             title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
                             class="spinner-border spinner-border-sm" style="display: none" role="status"
                             aria-hidden="true"></span></button>
 
-                    <button id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light"
+                    <button id="btnRollback" class="btn btn-sm bg-primary border border-secondary text-light me-2"
                             title="Rollback to this revision"><i class="bi-rewind-fill"></i> <span>Rollback</span>
                     </button>
                     <button id="btnUninstall" class="btn btn-sm bg-danger border border-secondary text-light"
@@ -134,7 +134,7 @@
                     </button>
                 </div>
                 <div class="fs-1">&nbsp;</div>
-                </div>
+            </div>
 
             <div>
                 Revision <span class="rev"></span>
@@ -144,6 +144,7 @@
             <div>
                 <span id="chartName" class="badge bg-info">namespace: <span></span></span>
                 <span id="chartName" class="badge bg-info">chart version: <span></span></span>
+                <span id="chartName" class="badge bg-info">app version: <span></span></span>
             </div>
 
             <i id="revDescr"></i>
@@ -271,9 +272,6 @@
 </div>
 
 
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
@@ -286,6 +284,9 @@
         integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.3/build/global/luxon.min.js"
         integrity="sha256-RH4TKnKcKyde0s2jc5BW3pXZl/5annY3fcZI9VrV5WQ=" crossorigin="anonymous"></script>
+<script src="static/list-view.js"></script>
+<script src="static/revisions-view.js"></script>
+<script src="static/details-view.js"></script>
 <script src="static/scripts.js"></script>
 
 <img1 src="static/overlay2.png" style="position: absolute; top: 0; left: 0; z-index: 100; opacity: 25%" alt=""/>
