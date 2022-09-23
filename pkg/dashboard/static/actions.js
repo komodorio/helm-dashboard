@@ -125,7 +125,7 @@ $("#btnUninstall").click(function () {
         })
     })
 
-    const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
+    const myModal = new bootstrap.Offcanvas(document.getElementById('confirmModal'));
     myModal.show()
 
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
@@ -163,7 +163,7 @@ $("#btnRollback").click(function () {
         })
     })
 
-    const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
+    const myModal = new bootstrap.Offcanvas(document.getElementById('confirmModal'), {});
     myModal.show()
 
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
