@@ -46,6 +46,7 @@ function setHashParam(name, val) {
 function statusStyle(status, card, txt) {
     txt.addClass("text-uppercase")
     txt.html("<span class='fs-6'>●</span> " + status)
+    txt.removeClass("text-failed text-deployed text-pending text-other")
     if (status === "failed") {
         card.addClass("border-failed")
         txt.addClass("text-failed")
