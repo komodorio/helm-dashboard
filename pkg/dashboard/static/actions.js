@@ -1,44 +1,15 @@
-
 $("#upgradeModal .btn-secondary").click(function () {
     const self = $(this)
-    self.find(".fa").removeClass("fa-cloud-download").addClass("fa-spin fa-spinner").prop("disabled", true)
     $("#btnUpgradeCheck").click()
     $("#upgradeModal .btn-close").click()
 })
-
-function popUpUpgrade(self, verCur, elm) {
-    const name = getHashParam("chart");
-    let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
-    $('#upgradeModalLabel select').data("url", url)
-
-    $("#upgradeModalLabel .name").text(name)
-    $("#upgradeModalLabel .ver-old").text(verCur)
-
-    $('#upgradeModalLabel select').val(elm.version).trigger("change")
-
-    const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
-    myModal.show()
-
-    $("#upgradeModal .btn-success").prop("disabled", true).off('click').click(function () {
-        $("#upgradeModal .btn-success").prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        $.ajax({
-            url: url + "&version=" + $('#upgradeModalLabel select').val(),
-            type: 'POST',
-        }).fail(function (xhr) {
-            reportError("Failed to upgrade the chart", xhr)
-        }).done(function (data) {
-            setHashParam("revision", data.version)
-            window.location.reload()
-        })
-    })
-}
 
 $("#btnUpgradeCheck").click(function () {
     const self = $(this)
     self.find(".bi-repeat").hide()
     self.find(".spinner-border").show()
     const repoName = self.data("repo")
-    $("#btnUpgrade").text("Checking...")
+    $("#btnUpgrade span").text("Checking...")
     $.post("/api/helm/repo/update?name=" + repoName).fail(function (xhr) {
         reportError("Failed to update chart repo", xhr)
     }).done(function () {
@@ -46,7 +17,7 @@ $("#btnUpgradeCheck").click(function () {
         self.find(".bi-repeat").show()
 
         checkUpgradeable(self.data("chart"))
-        $("#btnUpgradeCheck").prop("disabled", true).find(".fa").removeClass("fa-spin fa-spinner").addClass("fa-times")
+        $("#btnUpgradeCheck").prop("disabled", true)
     })
 })
 
@@ -72,13 +43,40 @@ function checkUpgradeable(name) {
         const canUpgrade = isNewerVersion(verCur, elm.version);
         $("#btnUpgradeCheck").prop("disabled", false)
         if (canUpgrade) {
-            $("#btnUpgrade").removeClass("bg-secondary bg-opacity-50").addClass("bg-success").text("Upgrade to " + elm.version)
+            $("#btnUpgrade span").text("Upgrade to " + elm.version)
         } else {
-            $("#btnUpgrade").removeClass("bg-success").addClass("bg-secondary bg-opacity-50").text("No upgrades")
+            $("#btnUpgrade span").text("No upgrades")
         }
 
         $("#btnUpgrade").off("click").click(function () {
             popUpUpgrade($(this), verCur, elm)
+        })
+    })
+}
+
+function popUpUpgrade(self, verCur, elm) {
+    const name = getHashParam("chart");
+    let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
+    $('#upgradeModalLabel select').data("url", url)
+
+    $("#upgradeModalLabel .name").text(name)
+    $("#upgradeModalLabel .ver-old").text(verCur)
+
+    $('#upgradeModalLabel select').val(elm.version).trigger("change")
+
+    const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
+    myModal.show()
+
+    $("#upgradeModal .btn-success").prop("disabled", true).off('click').click(function () {
+        $("#upgradeModal .btn-success").prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+        $.ajax({
+            url: url + "&version=" + $('#upgradeModalLabel select').val(),
+            type: 'POST',
+        }).fail(function (xhr) {
+            reportError("Failed to upgrade the chart", xhr)
+        }).done(function (data) {
+            setHashParam("revision", data.version)
+            window.location.reload()
         })
     })
 }

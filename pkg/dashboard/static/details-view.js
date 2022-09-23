@@ -9,6 +9,7 @@ function revisionClicked(namespace, name, self) {
     $("#sectionDetails span.rev").text("#"+elm.revision)
     statusStyle(elm.status, $("#none"), $("#sectionDetails .rev-details .rev-status"))
 
+    $("#sectionDetails .rev-date").text(elm.updated.replace("T", " "))
     $("#sectionDetails .rev-tags .rev-chart").text(elm.chart)
     $("#sectionDetails .rev-tags .rev-app").text(elm.app_version)
     $("#sectionDetails .rev-tags .rev-ns").text(getHashParam("namespace"))

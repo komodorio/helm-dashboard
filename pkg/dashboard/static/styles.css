@@ -1,3 +1,56 @@
+
+.strike {
+    text-decoration: line-through;
+}
+
+.text-muted {
+    color: #707583 !important;
+}
+
+.border-other {
+    border-color: #9195A1 !important;
+}
+
+.text-other {
+    color: #9195A1 !important;
+}
+
+.border-failed {
+    border-color: #FC1683 !important;
+}
+
+.text-failed {
+    color: #FC1683 !important;
+}
+
+.border-deployed {
+    border-color: #1BE99A !important;
+}
+
+.text-deployed {
+    color: #1FA470 !important;
+}
+
+.border-pending {
+    border-color: #5AB0FF !important;
+}
+
+.text-pending {
+    color: #5AB0FF !important;
+}
+
+.bg-tag {
+    background-color: #D6EFFE;
+}
+
+.bg-tag.text-dark {
+    color: #333333 !important;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -214,54 +267,6 @@ span.link {
     color: #707583;
 }
 
-.strike {
-    text-decoration: line-through;
-}
-
-.text-muted {
-    color: #707583 !important;
-}
-
-.border-other {
-    border-color: #9195A1 !important;
-}
-
-.text-other {
-    color: #9195A1 !important;
-}
-
-.border-failed {
-    border-color: #FC1683 !important;
-}
-
-.text-failed {
-    color: #FC1683 !important;
-}
-
-.border-deployed {
-    border-color: #1BE99A !important;
-}
-
-.text-deployed {
-    color: #1FA470 !important;
-}
-
-.border-pending {
-    border-color: #5AB0FF !important;
-}
-
-.text-pending {
-    color: #5AB0FF !important;
-}
-
-.bg-tag {
-    background-color: #D6EFFE;
-}
-
-.bg-tag.text-dark {
-    color: #333333!important;
-}
-
-.text-uppercase {
-    text-transform: uppercase;
+#actionButtons button > * {
+    vertical-align: bottom;
 }
