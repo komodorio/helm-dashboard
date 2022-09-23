@@ -25,10 +25,10 @@ function fillChartHistory(data, namespace, name) {
     data.reverse()
     for (let x = 0; x < data.length; x++) {
         const elm = data[x]
-        $("#specRev").val(elm.revision).data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
+        $("#specRev").val(elm.revision).data("first-rev", elm.revision)
 
         if (!x) {
-            $("#specRev").data("first-rev", elm.revision)
+            $("#specRev").data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
         }
 
         const rev = $(`<li class="px-2 pt-5 pb-4 mb-2 rounded border border-secondary bg-secondary position-relative">
@@ -49,7 +49,7 @@ function fillChartHistory(data, namespace, name) {
         if (nxt && isNewerVersion(elm.chart_ver, nxt.chart_ver)) {
             rev.find(".rev-changes").html("<span class='strike'>" + nxt.chart_ver + "</span> <i class='text-danger bi-arrow-down-right'></i> " + elm.chart_ver)
         } else if (nxt && isNewerVersion(nxt.chart_ver, elm.chart_ver)) {
-            rev.find(".rev-changes").html("<span class='strike'>" +nxt.chart_ver + "</span> <i class='text-success bi-arrow-up-right'></i> " + elm.chart_ver)
+            rev.find(".rev-changes").html("<span class='strike'>" + nxt.chart_ver + "</span> <i class='text-success bi-arrow-up-right'></i> " + elm.chart_ver)
         }
 
         rev.data("elm", elm)

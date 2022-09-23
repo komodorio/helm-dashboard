@@ -64,7 +64,7 @@ function popUpUpgrade(self, verCur, elm) {
 
     $('#upgradeModalLabel select').val(elm.version).trigger("change")
 
-    const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
+    const myModal = new bootstrap.Offcanvas(document.getElementById('upgradeModal'), {});
     myModal.show()
 
     $("#upgradeModal .btn-success").prop("disabled", true).off('click').click(function () {

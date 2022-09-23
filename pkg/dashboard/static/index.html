@@ -244,24 +244,18 @@
 </div>
 
 
-<div class="modal" id="upgradeModal"
-     tabindex="-1" aria-labelledby="describeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="upgradeModalLabel">
-                    Upgrade <b class='text-success name'></b> from version <b class='text-success ver-old'></b> to
-                    <select class='fw-bold text-success ver-new'></select>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="upgradeModalBody">
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success">Confirm Upgrade</button>
-            </div>
-        </div>
+<div class="offcanvas offcanvas-end rounded-start" tabindex="-1" id="upgradeModal" aria-labelledby="upgradeModalLabel">
+    <div class="offcanvas-header">
+        <h5 id="upgradeModalLabel">
+            Upgrade <b class='text-success name'></b> from version <b class='text-success ver-old'></b> to
+            <select class='fw-bold text-success ver-new'></select>
+        </h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body" id="upgradeModalBody">
+    </div>
+    <div class="offcanvas-footer p-3">
+        <button type="button" class="btn btn-primary float-end">Confirm Upgrade</button>
     </div>
 </div>
 
