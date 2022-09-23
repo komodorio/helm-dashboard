@@ -1,9 +1,3 @@
-$("#upgradeModal .btn-secondary").click(function () {
-    const self = $(this)
-    $("#btnUpgradeCheck").click()
-    $("#upgradeModal .btn-close").click()
-})
-
 $("#btnUpgradeCheck").click(function () {
     const self = $(this)
     self.find(".bi-repeat").hide()
@@ -67,8 +61,10 @@ function popUpUpgrade(self, verCur, elm) {
     const myModal = new bootstrap.Offcanvas(document.getElementById('upgradeModal'), {});
     myModal.show()
 
-    $("#upgradeModal .btn-success").prop("disabled", true).off('click').click(function () {
-        $("#upgradeModal .btn-success").prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    const btnConfirm = $("#upgradeModal .btn-confirm");
+    btnConfirm.prop("disabled", true).off('click').click(function () {
+        console.log("working")
+        btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         $.ajax({
             url: url + "&version=" + $('#upgradeModalLabel select').val(),
             type: 'POST',
@@ -85,12 +81,12 @@ $('#upgradeModalLabel select').change(function () {
     const self = $(this)
 
     $("#upgradeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    $("#upgradeModal .btn-success").prop("disabled", true)
+    $("#upgradeModal .btn-confirm").prop("disabled", true)
     $.get(self.data("url") + "&version=" + self.val()).fail(function (xhr) {
-        reportError("Failed to get upgrade", xhr)
+        reportError("Failed to get upgrade info", xhr)
     }).done(function (data) {
         $("#upgradeModalBody").empty();
-        $("#upgradeModal .btn-success").prop("disabled", false)
+        $("#upgradeModal .btn-confirm").prop("disabled", false)
 
         const targetElement = document.getElementById('upgradeModalBody');
         const configuration = {
@@ -106,14 +102,15 @@ $('#upgradeModalLabel select').change(function () {
     })
 })
 
+const btnConfirm = $("#confirmModal .btn-confirm");
 $("#btnUninstall").click(function () {
     const chart = getHashParam('chart');
     const namespace = getHashParam('namespace');
     const revision = $("#specRev").data("last-rev")
     $("#confirmModalLabel").html("Uninstall <b class='text-danger'>" + chart + "</b> from namespace <b class='text-danger'>" + namespace + "</b>")
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
-        $("#confirmModal .btn-primary").prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    btnConfirm.prop("disabled", true).off('click').click(function () {
+        btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         const url = "/api/helm/charts?namespace=" + namespace + "&name=" + chart;
         $.ajax({
             url: url,
@@ -135,7 +132,7 @@ $("#btnUninstall").click(function () {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
         $("#confirmModalBody").empty().append("<p>Following resources will be deleted from the cluster:</p>");
-        $("#confirmModal .btn-primary").prop("disabled", false)
+        btnConfirm.prop("disabled", false)
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
             $("#confirmModalBody").append("<p class='row'><i class='col-sm-3 text-end'>" + res.kind + "</i><b class='col-sm-9'>" + res.metadata.name + "</b></p>")
@@ -150,8 +147,8 @@ $("#btnRollback").click(function () {
     const revisionCur = $("#specRev").data("last-rev")
     $("#confirmModalLabel").html("Rollback <b class='text-danger'>" + chart + "</b> from revision " + revisionCur + " to " + revisionNew)
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    $("#confirmModal .btn-primary").prop("disabled", true).off('click').click(function () {
-        $("#confirmModal .btn-primary").prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    btnConfirm.prop("disabled", true).off('click').click(function () {
+        btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         const url = "/api/helm/charts/rollback?namespace=" + namespace + "&name=" + chart + "&revision=" + revisionNew;
         $.ajax({
             url: url,
@@ -173,7 +170,7 @@ $("#btnRollback").click(function () {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
         $("#confirmModalBody").empty();
-        $("#confirmModal .btn-primary").prop("disabled", false)
+        $("#confirmModal .btn-confirm").prop("disabled", false)
 
         const targetElement = document.getElementById('confirmModalBody');
         const configuration = {

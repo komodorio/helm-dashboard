@@ -275,3 +275,7 @@ span.link {
 #actionButtons button > * {
     vertical-align: bottom;
 }
+
+.d2h-code-side-linenumber {
+    position: static;
+}
