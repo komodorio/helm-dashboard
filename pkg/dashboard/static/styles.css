@@ -1,4 +1,3 @@
-
 .strike {
     text-decoration: line-through;
 }
@@ -49,6 +48,12 @@
 
 .text-uppercase {
     text-transform: uppercase;
+}
+
+.offcanvas {
+    width: auto!important;
+    max-width: 90%;
+    min-width: 60%;
 }
 
 body {

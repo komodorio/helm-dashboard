@@ -188,7 +188,7 @@ function showDescribe(ns, kind, name) {
     $("#describeModalLabel").text("Describe " + kind + ": " + ns + " / " + name)
     $("#describeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
 
-    const myModal = new bootstrap.Modal(document.getElementById('describeModal'), {});
+    const myModal = new bootstrap.Offcanvas(document.getElementById('describeModal'));
     myModal.show()
     $.get("/api/kube/describe/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
         reportError("Failed to describe resource", xhr)
