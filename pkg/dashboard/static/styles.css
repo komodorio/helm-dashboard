@@ -1,9 +1,132 @@
-#charts .card, #sectionDetails .row > div {
-    cursor: pointer;
+.strike {
+    text-decoration: line-through;
 }
 
-.bg-primary .text-muted {
-    color: white!important;
+.text-muted {
+    color: #707583 !important;
+}
+
+.border-other {
+    border-color: #9195A1 !important;
+}
+
+.text-other {
+    color: #9195A1 !important;
+}
+
+.border-failed {
+    border-color: #FC1683 !important;
+}
+
+.text-failed {
+    color: #FC1683 !important;
+}
+
+.border-deployed {
+    border-color: #1BE99A !important;
+}
+
+.text-deployed {
+    color: #1FA470 !important;
+}
+
+.border-pending {
+    border-color: #5AB0FF !important;
+}
+
+.text-pending {
+    color: #5AB0FF !important;
+}
+
+.bg-tag {
+    background-color: #D6EFFE;
+}
+
+.bg-tag.text-dark {
+    color: #333333 !important;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+.offcanvas {
+    width: auto!important;
+    max-width: 90%;
+    min-width: 60%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 50rem;
+    font-size: 14px;
+
+    background-color: #F4F7FA;
+    font-family: Roboto, serif;
+    color: #3D4048;
+}
+
+body > .container-fluid {
+    min-height: 100% !important;
+}
+
+#topNav.navbar {
+    box-shadow: 0 1px 4px rgba(22, 24, 31, 0.1);
+}
+
+.navbar-brand > div {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.navbar-brand > div p span {
+    vertical-align: baseline;
+}
+
+.navbar-brand {
+    font-family: Poppins, serif;
+    font-size: 0.6rem !important;
+    color: #707583;
+    font-weight: 500;
+}
+
+.navbar-brand h1 {
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    line-height: 50%;
+}
+
+.navbar-brand h1 a {
+    font-size: 1.1rem !important;
+    color: #0023A3 !important;
+    text-decoration: none;
+}
+
+.navbar-brand > a > img {
+    vertical-align: middle;
+    height: 2.5rem;
+    display: inline-block;
+    margin: 0.5rem 0.8rem
+}
+
+.navbar-brand p {
+    margin-bottom: 0;
+}
+
+.navbar-brand p a {
+    vertical-align: text-bottom;
+}
+
+.navbar-brand p img {
+    height: 1.25rem;
+    margin-left: 0.25rem;
+}
+
+#topNav .navbar i.btn {
+    font-size: 1.5rem;
 }
 
 .d2h-file-collapse, .d2h-tag {
@@ -12,4 +135,156 @@
 
 .display-none {
     display: none;
+}
+
+.separator-vertical span {
+    font-size: 2rem;
+    border-left: 1px solid #DCDDDF;
+    margin: 0.25rem 0;
+}
+
+#topNav .nav-link {
+    color: #3B3D45 !important;
+}
+
+#topNav .nav-link.active {
+    background: #EBEFFF;
+    border-radius: 2px;
+    color: #1347FF !important;
+}
+
+.b-shadow {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+}
+
+#filters h4 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 0;
+}
+
+#filters {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+    line-height: 175%;
+}
+
+#cluster input, #cluster span {
+    vertical-align: middle;
+}
+
+#installedList > div, #installedList .body > div {
+    margin-bottom: 0.75rem !important;
+}
+
+#installedList h2 {
+    font-family: Inter, serif;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+
+.bg-secondary {
+    background: #ECEFF2 !important;
+}
+
+.border-secondary {
+    border-color: #DCDDDF !important;
+}
+
+#installedList .header {
+    font-family: Roboto, serif;
+    font-weight: 600;
+    font-size: 0.6rem;
+    color: #3B3D45;
+}
+
+#installedList .header .row {
+    text-transform: uppercase;
+}
+
+#installedList .hdr-name {
+    padding-left: 5.5rem
+}
+
+#installedList .body {
+    font-size: 0.75rem;
+}
+
+#installedList .body .row div div {
+    margin-top: 0.75rem;
+}
+
+span.link {
+    cursor: pointer;
+}
+
+#installedList .body .row:hover span.link {
+    text-decoration: underline;
+}
+
+#installedList .rel-name {
+    padding-left: 5.5rem;
+    background-image: url("helm-gray-50.svg");
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-position-x: 1.1rem;
+    background-size: 3rem;
+}
+
+#installedList .rel-name span {
+    font-family: Roboto Slab, sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+#sectionDetails h1 {
+    font-family: Roboto Slab, sans-serif;
+    font-weight: 400;
+    font-size: 2rem;
+}
+
+
+#installedList .rel-name div {
+    height: 2rem;
+    min-height: 2rem;
+    max-height: 2rem;
+}
+
+#installedList .rel-status span {
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+#installedList .rel-chart span, #installedList .rel-rev span, #installedList .rel-ns span, #installedList .rel-date span {
+    font-weight: 700;
+}
+
+#installedList .rel-chart div, #installedList .rel-rev div, #installedList .rel-ns div, #installedList .rel-date div {
+    text-transform: uppercase;
+    color: #707583;
+}
+
+#actionButtons button > * {
+    vertical-align: bottom;
+}
+
+.d2h-code-side-linenumber {
+    position: static;
+}
+
+.nav-tabs {
+    border: none;
+    margin-bottom: 1rem;
+}
+
+.nav-tabs .nav-link {
+    padding-bottom: 0.25rem;
+}
+
+.nav-tabs .nav-link.active {
+    border: none;
+    border-bottom: 3px solid #3B3D45;
 }

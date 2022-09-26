@@ -43,14 +43,13 @@ helm plugin uninstall dashboard
 
 ## Support Channels
 
-We have two main channels for supporting the Helm Dashboard users: [Slack community](#TODO) for general conversations
+We have two main channels for supporting the Helm Dashboard users: [Slack community](https://komodorkommunity.slack.com/x-p3820586794880-3937175868755-4092688791734/archives/C042U85BD45/p1663573506220839) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
 ## Roadmap
 
 ### First Public Version
 
-- Helm Plugin Packaging
 - CLI launcher
 - Web Server with REST API
 - Listing the installed applications
@@ -64,7 +63,12 @@ and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real
 - Switch clusters
 - Show manifest/describe upon clicking on resource
 
+- Helm Plugin Packaging
+- Styled properly
+
 ### Further Ideas
+- solve umbrella-chart case
+- use `--dry-run` instead of `template`
 - Have cleaner idea on the web API structure
 - Recognise & show ArgoCD-originating charts/objects, those `helm ls` does not show
 - Recognise the revisions that are rollbacks by their description and mark in timeline

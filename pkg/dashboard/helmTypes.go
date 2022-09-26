@@ -25,7 +25,6 @@ type historyElement struct {
 	Description string         `json:"description"`
 	ChartName   string         `json:"chart_name"`
 	ChartVer    string         `json:"chart_ver"`
-	Action      string         `json:"action"`
 }
 
 type repoChartElement struct {
