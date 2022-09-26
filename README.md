@@ -2,7 +2,7 @@
 
 A simplified way of working with Helm.
 
-[<img src="screenshot.png" style="width: 100%; border: 1px solid silver;" border="1" alt="Screenshot">](screenshot.png)
+<kbd>[<img src="screenshot.png" style="width: 100%; border: 1px solid silver;" border="1" alt="Screenshot">](screenshot.png)</kbd>
 
 ## What it Does?
 
