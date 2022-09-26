@@ -72,7 +72,7 @@ body > .container-fluid {
     min-height: 100% !important;
 }
 
-.navbar {
+#topNav.navbar {
     box-shadow: 0 1px 4px rgba(22, 24, 31, 0.1);
 }
 
@@ -125,14 +125,9 @@ body > .container-fluid {
     margin-left: 0.25rem;
 }
 
-.navbar i.btn {
+#topNav .navbar i.btn {
     font-size: 1.5rem;
 }
-
-#charts .card, #sectionDetails .row > div {
-    cursor: pointer;
-}
-
 
 .d2h-file-collapse, .d2h-tag {
     opacity: 0; /* trollface */
@@ -148,11 +143,11 @@ body > .container-fluid {
     margin: 0.25rem 0;
 }
 
-.nav-link {
+#topNav .nav-link {
     color: #3B3D45 !important;
 }
 
-.nav-link.active {
+#topNav .nav-link.active {
     background: #EBEFFF;
     border-radius: 2px;
     color: #1347FF !important;
@@ -278,4 +273,18 @@ span.link {
 
 .d2h-code-side-linenumber {
     position: static;
+}
+
+.nav-tabs {
+    border: none;
+    margin-bottom: 1rem;
+}
+
+.nav-tabs .nav-link {
+    padding-bottom: 0.25rem;
+}
+
+.nav-tabs .nav-link.active {
+    border: none;
+    border-bottom: 3px solid #3B3D45;
 }

@@ -138,23 +138,30 @@ $("#nav-tab [data-tab]").click(function () {
 })
 
 function showResources(namespace, chart, revision) {
-    $("#nav-resources").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+    const resBody = $("#nav-resources .body");
+    resBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
     url += "?" + qstr
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
-        $("#nav-resources").empty();
+        resBody.empty();
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
-            const resBlock = $(` 
-                <div class="input-group row">
-                    <span class="input-group-text col-sm-2"><em class="text-muted small">` + res.kind + `</em></span>
-                    <span class="input-group-text col-sm-6">` + res.metadata.name + `</span>
-                    <span class="form-control col-sm-4"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> <span class="text-muted small">Getting status...</span></span>
-                </div>`)
-            $("#nav-resources").append(resBlock)
+            const resBlock = $(`
+                    <div class="row px-3 py-2 mb-2">
+                        <div class="col-2 res-kind"></div>
+                        <div class="col-4 res-name"></div>
+                        <div class="col-5 res-status"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> <span class="text-muted small">Getting status...</span></div>
+                        <div class="col-1 res-actions"></div>
+                    </div>
+            `)
+
+            resBlock.find(".res-kind").text(res.kind)
+            resBlock.find(".res-name").text(res.metadata.name)
+
+            resBody.append(resBlock)
             let ns = res.metadata.namespace ? res.metadata.namespace : namespace
             $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
                 //reportError("Failed to get list of resources")
@@ -170,11 +177,12 @@ function showResources(namespace, chart, revision) {
                     badge.addClass("bg-danger")
                 }
 
-                const statusBlock = resBlock.find(".form-control.col-sm-4");
+                const statusBlock = resBlock.find(".res-status");
                 statusBlock.empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
 
                 if (badge.text() !== "NotFound") {
-                    statusBlock.prepend("<i class=\"btn bi-zoom-in float-end text-muted\"></i>")
+                    resBlock.find(".res-actions")
+                    resBlock.find(".res-actions").append("<i class=\"btn bi-zoom-in float-end text-muted\"></i>")
                     statusBlock.find(".bi-zoom-in").click(function () {
                         showDescribe(ns, res.kind, res.metadata.name)
                     })

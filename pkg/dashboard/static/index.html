@@ -19,7 +19,7 @@
 
 <div class="container-fluid gx-0">
     <!-- TOP BAR -->
-    <nav class="navbar navbar-expand bg-white mb-0 p-0">
+    <nav class="navbar navbar-expand bg-white mb-0 p-0" id="topNav">
         <div class="container-fluid m-0 p-0">
             <div class="navbar-brand">
                 <a href="/"><img src="static/logo.png" alt="Logo"></a>
@@ -36,9 +36,11 @@
                 <li class="nav-item mx-2">
                     <a class="nav-link px-3 active" aria-current="page" href="/">Installed</a>
                 </li>
+                <!-- TODO
                 <li class="nav-item mx-2">
                     <a href="#" class="nav-link px-3">Repository</a>
                 </li>
+                -->
                 <!-- TODO
                 <li class="nav-item">
                     <a class="nav-link disabled">Provisional Charts</a>
@@ -52,8 +54,6 @@
     <!-- /TOP BAR -->
 
     <div class="row mt-3 pt-3 mx-0 me-5" id="sectionList" style="display: none">
-        <img src="static/topographic.svg" style="position: absolute; bottom: 0; left: 0; z-index: -100; height: 100%;"
-             alt=""/>
         <div class="col-2 ms-3">
             <!-- FILTER BLOCK -->
             <div class="p-2 ps-2 bg-white rounded-1 b-shadow" id="filters">
@@ -71,15 +71,6 @@
             </div>
             <!-- /FILTER BLOCK -->
 
-            <footer class="text-center small mt-3 bg-white p-2 px-3 rounded b-shadow">
-                <span class="">
-                    Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png"
-                                           style="height: 1rem"> <a
-                        href="https://komodor.io">Komodor.io</a> <br/>
-                    <i class="bi-github"></i>
-                    <a href="https://github.com/komodorio/helm-dashboard">Project page on GitHub</a>
-                </span>
-            </footer>
         </div>
 
         <!-- INSTALLED LIST -->
@@ -119,7 +110,8 @@
                     <button id="btnUpgrade"
                             class="opacity-10 btn btn-sm btn-light bg-white rounded-0 me-0 rounded-start border-secondary">
                         <img src="static/action.svg"> <span>Checking...</span>
-                    </button><button
+                    </button>
+                    <button
                             id="btnUpgradeCheck"
                             class="btn btn-sm text-muted btn-light bg-white border-secondary rounded-0 rounded-end ms-0 me-2"
                             title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
@@ -173,8 +165,15 @@
                 </div>
             </nav>
             <div class="tab-content">
-                <div class="tab-pane p-3" id="nav-resources" role="tabpanel">
-
+                <div class="tab-pane p-3 container-fluid" id="nav-resources" role="tabpanel">
+                    <div class="row bg-secondary rounded px-3 py-2 mb-2 fw-bold small"
+                         style="text-transform: uppercase">
+                        <div class="col-2">Kind</div>
+                        <div class="col-4">Name</div>
+                        <div class="col-5">Status</div>
+                        <div class="col-1">Describe</div>
+                    </div>
+                    <div class="body"></div>
                 </div>
                 <div class="tab-pane" id="nav-manifest" role="tabpanel">
                     <nav class="navbar bg-light">
@@ -221,7 +220,8 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
-<div class="offcanvas offcanvas-end rounded-start" tabindex="-1" id="describeModal" aria-labelledby="describeModalLabel">
+<div class="offcanvas offcanvas-end rounded-start" tabindex="-1" id="describeModal"
+     aria-labelledby="describeModalLabel">
     <div class="offcanvas-header">
         <h5 id="describeModalLabel"></h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -259,6 +259,21 @@
     </div>
 </div>
 
+<footer class="container-fluid small mt-3" style="z-index: -50">
+    <div class="row align-items-end justify-content-end">
+        <div class="col-3"></div>
+        <div class="col-4 text-center bg-white bg-opacity-50 p-2 px-3 rounded b-shadow">
+                    Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png"
+                                           style="height: 1rem"> <a class="me-4"
+                        href="https://komodor.io">Komodor.io</a>
+                    <i class="bi-github"></i>
+                    <a href="https://github.com/komodorio/helm-dashboard">Project page on GitHub</a>
+            </div>
+        <div class="col-3"></div>
+    </div>
+</footer>
+
+<img src="static/topographic.svg" class="position-absolute bottom-0 left-0" style="z-index: -100; height: 100%;"/>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
@@ -278,6 +293,5 @@
 <script src="static/actions.js"></script>
 <script src="static/scripts.js"></script>
 
-<img1 src="static/overlay2.png" style="position: absolute; top: 0; left: 0; z-index: 100; opacity: 25%" alt=""/>
 </body>
 </html>
