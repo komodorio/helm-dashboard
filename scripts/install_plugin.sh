@@ -41,9 +41,9 @@ esac
 
 
 if [ "$(uname)" = "Darwin" ]; then
-    url="${repo}/releases/download/v${version}/${name}_${version}_darwin_${arch}.tar.gz"
+    url="${repo}/releases/download/v${version}/${name}_${version}_Darwin_${arch}.tar.gz"
 elif [ "$(uname)" = "Linux" ] ; then
-    url="${repo}/releases/download/v${version}/${name}_${version}_linux_${arch}.tar.gz"
+    url="${repo}/releases/download/v${version}/${name}_${version}_Linux_${arch}.tar.gz"
 else
     url="${repo}/releases/download/v${version}/${name}_${version}_windows_${arch}.tar.gz"
 fi
@@ -55,7 +55,7 @@ mkdir -p "releases/v${version}"
 
 # Download with curl if possible.
 if [ -x "$(which curl 2>/dev/null)" ]; then
-    curl -sSL "${url}" -o "releases/v${version}.tar.gz"
+    curl --fail -sSL "${url}" -o "releases/v${version}.tar.gz"
 else
     wget -q "${url}" -O "releases/v${version}.tar.gz"
 fi
