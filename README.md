@@ -18,6 +18,11 @@ To install it, simply run Helm command:
 helm plugin install https://github.com/komodorio/helm-dashboard.git
 ```
 
+To update the plugin to the latest version, run:
+```shell
+helm plugin update dashboard
+```
+
 To uninstall, run:
 
 ```shell
@@ -108,7 +113,7 @@ To install, checkout the source code and run from source dir:
 helm plugin install .
 ```
 
-Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require to
+Local installation of plugin just creates a symlink, so making the changes and rebuilding the binary would not require to
 reinstall a plugin.
 
 To use the plugin, run in your terminal:
