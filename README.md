@@ -2,38 +2,21 @@
 
 A simplified way of working with Helm.
 
-[<img src="screenshot.png" style="width: 100%; border: 1px solid silver">](screenshot.png)
+[<img src="screenshot.png" style="width: 100%; border: 1px solid silver;" border="1" alt="Screenshot">](screenshot.png)
 
-## Local Testing
+## What it Does?
 
-Prerequisites: `helm` and `kubectl` binaries installed and operational.
+The _Helm Dashboard_ plugin offers a UI-driven way to view the installed Helm charts, see their revision history and corresponding k8s resources. Also, you can perform simple actions like roll back to a revision or upgrade to newer version.
 
-Until we make our repo public, we have to use a custom way to install the plugin.
+This project is part of [Komodor's](https://komodor.io) vision of helping Kubernetes users to navigate and troubleshoot their clusters.
 
-There is a need to build binary for plugin to function, run:
+## Installing 
 
-```shell
-go build -o bin/dashboard .
-```
-
-To install, checkout the source code and run from source dir:
+To install it, simply run Helm command:
 
 ```shell
-helm plugin install .
+helm plugin install https://github.com/komodorio/helm-dashboard.git
 ```
-
-Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require to
-reinstall a plugin.
-
-To use the plugin, run in your terminal:
-
-```shell
-helm dashboard
-```
-
-Then, use the web UI.
-
-## Uninstalling
 
 To uninstall, run:
 
@@ -41,12 +24,32 @@ To uninstall, run:
 helm plugin uninstall dashboard
 ```
 
+## Running
+
+To use the plugin, your machine needs to have working `helm` and also `kubectl` commands.
+
+After installing, start the UI by running:
+```shell
+helm dashboard
+```
+
+The command above will launch the local Web server and will open the UI in new browser tab. The command will hang waiting for you to terminate it in command-line or web UI.
+
+By default, the web server is only available locally. You can change that by specifying `HD_BIND` environment variable to the desired value. For example, `0.0.0.0` would bind to all IPv4 addresses or `[::0]` would be all IPv6 addresses.
+
+If your port 8080 is busy, you can specify a different port to use via `HD_PORT` environment variable.
+
+If you don't want browser tab to automatically open, set `HD_NOBROWSER=1` in your environment variables.
+
+If you want to increase the logging verbosity and see all the debug info, set `DEBUG=1` environment variable.
+
 ## Support Channels
 
 We have two main channels for supporting the Helm Dashboard users: [Slack community](https://komodorkommunity.slack.com/x-p3820586794880-3937175868755-4092688791734/archives/C042U85BD45/p1663573506220839) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
-## Roadmap
+
+## Roadmap & Ideas
 
 ### First Public Version
 
@@ -88,3 +91,30 @@ and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real
 - Browsing repositories
 - Adding new repository
 - Installing new app from repo
+
+## Local Dev Testing
+
+Prerequisites: `helm` and `kubectl` binaries installed and operational.
+
+There is a need to build binary for plugin to function, run:
+
+```shell
+go build -o bin/dashboard .
+```
+
+To install, checkout the source code and run from source dir:
+
+```shell
+helm plugin install .
+```
+
+Local install of plugin just creates a symlink, so making the changes and rebuilding the binary would not require to
+reinstall a plugin.
+
+To use the plugin, run in your terminal:
+
+```shell
+helm dashboard
+```
+
+Then, use the web UI.
