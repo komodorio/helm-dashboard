@@ -107,16 +107,15 @@
             <div>
                 <h1 class="name float-start">Name</h1>
                 <div id="actionButtons" class="float-end">
-                    <button id="btnUpgrade"
-                            class="opacity-10 btn btn-sm btn-light bg-white rounded-0 me-0 rounded-start border-secondary">
+                    <span><button id="btnUpgrade"
+                                  class="opacity-10 btn btn-sm btn-light bg-white rounded-0 me-0 rounded-start border-secondary">
                         <img src="static/action.svg"> <span>Checking...</span>
-                    </button>
-                    <button
-                            id="btnUpgradeCheck"
-                            class="btn btn-sm text-muted btn-light bg-white border-secondary rounded-0 rounded-end ms-0 me-2"
-                            title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
-                            class="spinner-border spinner-border-sm" style="display: none" role="status"
-                            aria-hidden="true"></span></button>
+                    </button></span><span><button
+                        id="btnUpgradeCheck"
+                        class="btn btn-sm text-muted btn-light bg-white border-secondary rounded-0 rounded-end ms-0 me-2"
+                        title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
+                        class="spinner-border spinner-border-sm" style="display: none" role="status"
+                        aria-hidden="true"></span></button></span>
 
                     <button id="btnRollback" class="btn btn-sm  btn-light bg-white border border-secondary me-2"
                             title="Rollback to this revision"><img src="static/action.svg"> <span>Rollback</span>
@@ -263,12 +262,12 @@
     <div class="row align-items-end justify-content-end">
         <div class="col-3"></div>
         <div class="col-4 text-center bg-white bg-opacity-50 p-2 px-3 rounded b-shadow">
-                    Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png"
-                                           style="height: 1rem"> <a class="me-4"
-                        href="https://komodor.io">Komodor.io</a>
-                    <i class="bi-github"></i>
-                    <a href="https://github.com/komodorio/helm-dashboard">Project page on GitHub</a>
-            </div>
+            Brought to you by <img src="https://komodor.com/wp-content/uploads/2021/05/favicon.png"
+                                   style="height: 1rem"> <a class="me-4"
+                                                            href="https://komodor.io">Komodor.io</a>
+            <i class="bi-github"></i>
+            <a href="https://github.com/komodorio/helm-dashboard">Project page on GitHub</a>
+        </div>
         <div class="col-3"></div>
     </div>
 </footer>

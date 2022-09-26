@@ -42,7 +42,7 @@ function fillChartHistory(data, namespace, name) {
         //rev.find(".chart-ver").text(elm.chart_ver)
         rev.find(".rev-date").text(elm.updated.replace("T", " "))
 
-        rev.find(".rev-age").text(getAge(elm, data[x - 1])).attr("title", elm.updated)
+        rev.find(".rev-age").text(getAge(elm, data[x - 1])).parent().attr("title", elm.updated)
         statusStyle(elm.status, rev.find(".rev-status"), rev.find(".rev-status"))
 
         const nxt = data[x + 1];
