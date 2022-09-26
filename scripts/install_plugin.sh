@@ -2,7 +2,7 @@
 
 # Copied w/ love from the chartmuseum/helm-push :)
 
-name="helm-push"
+name="helm-dashboard"
 repo="https://github.com/komodorio/${name}"
 
 if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
