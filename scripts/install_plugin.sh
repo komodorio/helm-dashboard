@@ -60,5 +60,5 @@ else
     wget -q "${url}" -O "releases/v${version}.tar.gz"
 fi
 tar xzf "releases/v${version}.tar.gz" -C "releases/v${version}"
-mv "releases/v${version}/bin/${name}" "bin/${name}" || \
-    mv "releases/v${version}/bin/${name}.exe" "bin/${name}"
+mv "releases/v${version}/${name}" "bin/${name}" || \
+    mv "releases/v${version}/${name}.exe" "bin/${name}"
