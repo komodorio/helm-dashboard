@@ -87,7 +87,7 @@ function setCurrentContext(ctx) {
     setHashParam("context", ctx)
     $.ajaxSetup({
         headers: {
-            'x-kubecontext': context
+            'x-kubecontext': ctx
         }
     });
 }
