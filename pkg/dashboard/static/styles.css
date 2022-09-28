@@ -57,8 +57,6 @@
 }
 
 body {
-    margin: 0;
-    padding: 0;
     height: 100%;
     min-height: 50rem;
     font-size: 14px;
@@ -73,7 +71,6 @@ body > .container-fluid {
 }
 
 #topNav.navbar {
-    box-shadow: 0 1px 4px rgba(22, 24, 31, 0.1);
 }
 
 .navbar-brand > div {
