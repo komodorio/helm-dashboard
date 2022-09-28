@@ -1,14 +1,14 @@
 $(function () {
     const clusterSelect = $("#cluster");
     clusterSelect.change(function () {
-        Cookies.set("context", clusterSelect.find("input:radio:checked").val())
-        window.location.href = "/"
+        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val()
+        window.location.reload()
     })
 
     $.getJSON("/api/kube/contexts").fail(function (xhr) {
         reportError("Failed to get list of clusters", xhr)
     }).done(function (data) {
-        const context = Cookies.get("context")
+        const context = getHashParam("context")
         fillClusterList(data, context);
 
         const namespace = getHashParam("namespace")
@@ -29,7 +29,6 @@ function reportError(err, xhr) {
     }
     $("#errorAlert").show()
 }
-
 
 
 function getHashParam(name) {
@@ -75,16 +74,22 @@ function fillClusterList(data, context) {
         opt.find("span").text(label)
         if (elm.IsCurrent && !context) {
             opt.find("input").prop("checked", true)
+            setCurrentContext(elm.Name)
         } else if (context && elm.Name === context) {
             opt.find("input").prop("checked", true)
-            $.ajaxSetup({
-                headers: {
-                    'x-kubecontext': context
-                }
-            });
+            setCurrentContext(elm.Name)
         }
         $("#cluster").append(opt)
     })
+}
+
+function setCurrentContext(ctx) {
+    setHashParam("context", ctx)
+    $.ajaxSetup({
+        headers: {
+            'x-kubecontext': context
+        }
+    });
 }
 
 function getAge(obj1, obj2) {

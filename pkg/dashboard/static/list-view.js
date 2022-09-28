@@ -33,7 +33,7 @@ function buildChartCard(elm) {
 
     statusStyle(elm.status, card, card.find(".rel-status span"))
 
-    card.find("a").attr("href", '#namespace=' + elm.namespace + '&name=' + elm.name)
+    card.find("a").attr("href", '#context=' + getHashParam('context') + '&namespace=' + elm.namespace + '&name=' + elm.name)
 
     card.find(".rel-name span").data("chart", elm).click(function () {
         const self = $(this)
