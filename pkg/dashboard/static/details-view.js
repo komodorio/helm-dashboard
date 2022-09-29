@@ -4,7 +4,6 @@ function revisionClicked(namespace, name, self) {
     revRow.find(".active").removeClass(active).addClass(inactive)
     self.removeClass(inactive).addClass(active)
     const elm = self.data("elm")
-    console.log(elm)
     setHashParam("revision", elm.revision)
     $("#sectionDetails span.rev").text("#"+elm.revision)
     statusStyle(elm.status, $("#none"), $("#sectionDetails .rev-details .rev-status"))
@@ -13,6 +12,7 @@ function revisionClicked(namespace, name, self) {
     $("#sectionDetails .rev-tags .rev-chart").text(elm.chart)
     $("#sectionDetails .rev-tags .rev-app").text(elm.app_version)
     $("#sectionDetails .rev-tags .rev-ns").text(getHashParam("namespace"))
+    $("#sectionDetails .rev-tags .rev-cluster").text(getHashParam("context"))
 
     $("#revDescr").text(elm.description).removeClass("text-danger")
     if (elm.status === "failed") {
