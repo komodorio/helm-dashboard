@@ -25,8 +25,10 @@
                 <a href="/"><img src="static/logo.png" alt="Logo"></a>
                 <div>
                     <h1><a href="/">Helm Dashboard</a></h1>
-                    <p><span class="mr-1">by</span><a href="https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash"><img src="static/komodor-logo.svg"
-                                                                                     alt="komodor.io"></a></p>
+                    <p><span class="mr-1">by</span><a
+                            href="https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash"><img
+                            src="static/komodor-logo.svg"
+                            alt="komodor.io"></a></p>
                 </div>
             </div>
 
@@ -108,14 +110,9 @@
                 <h1 class="name float-start">Name</h1>
                 <div id="actionButtons" class="float-end">
                     <span><button id="btnUpgrade"
-                                  class="opacity-10 btn btn-sm btn-light bg-white rounded-0 me-0 rounded-start border-secondary">
-                        <i class="bi-arrow-up"></i> <span>Checking...</span>
-                    </button></span><span><button
-                        id="btnUpgradeCheck"
-                        class="btn btn-sm text-muted btn-light bg-white border-secondary rounded-0 rounded-end ms-0 me-2"
-                        title="Check for newer chart version from repo"><i class="bi-repeat"></i><span
-                        class="spinner-border spinner-border-sm" style="display: none" role="status"
-                        aria-hidden="true"></span></button></span>
+                                  class="opacity-10 btn btn-sm btn-light bg-white me-2 border-secondary">
+                        <i class="icon bi-arrow-up"></i> <span>Checking...</span>
+                    </button></span>
 
                     <button id="btnRollback" class="btn btn-sm  btn-light bg-white border border-secondary me-2"
                             title="Rollback to this revision"><i class="bi-arrow-repeat"></i> <span>Rollback</span>
@@ -123,6 +120,11 @@
                     <button id="btnUninstall" class="btn btn-sm btn-light bg-white  border border-secondary"
                             title="Uninstall the chart"><i class="bi-trash3"></i> Uninstall
                     </button>
+                    <br/>
+                    <a class="link small" id="btnUpgradeCheck">Check for new version
+                        <span class="spinner-border spinner-border-sm" style="display: none" role="status"
+                              aria-hidden="true"></span>
+                    </a>
                 </div>
                 <div class="fs-2">&nbsp;</div>
             </div>

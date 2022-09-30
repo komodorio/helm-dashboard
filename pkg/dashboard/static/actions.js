@@ -66,7 +66,6 @@ function popUpUpgrade(self, verCur, elm) {
 
     const btnConfirm = $("#upgradeModal .btn-confirm");
     btnConfirm.prop("disabled", true).off('click').click(function () {
-        console.log("working")
         btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         $.ajax({
             url: url + "&version=" + $('#upgradeModalLabel select').val(),
@@ -150,7 +149,6 @@ $("#btnRollback").click(function () {
     const revisionCur = $("#specRev").data("last-rev")
     $("#confirmModalLabel").html("Rollback <b class='text-danger'>" + chart + "</b> from revision " + revisionCur + " to " + revisionNew)
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    console.log(btnConfirm)
     btnConfirm.prop("disabled", true).off('click').click(function () {
         btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         const url = "/api/helm/charts/rollback?namespace=" + namespace + "&name=" + chart + "&revision=" + revisionNew;
