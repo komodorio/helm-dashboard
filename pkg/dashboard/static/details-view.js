@@ -5,10 +5,11 @@ function revisionClicked(namespace, name, self) {
     self.removeClass(inactive).addClass(active)
     const elm = self.data("elm")
     setHashParam("revision", elm.revision)
-    $("#sectionDetails span.rev").text("#"+elm.revision)
+    $("#sectionDetails span.rev").text("#" + elm.revision)
     statusStyle(elm.status, $("#none"), $("#sectionDetails .rev-details .rev-status"))
 
-    $("#sectionDetails .rev-date").text(elm.updated.replace("T", " ").replace("+", " +"))
+    const rdate = luxon.DateTime.fromISO(elm.updated);
+    $("#sectionDetails .rev-date").text(rdate.toJSDate().toLocaleString())
     $("#sectionDetails .rev-tags .rev-chart").text(elm.chart)
     $("#sectionDetails .rev-tags .rev-app").text(elm.app_version)
     $("#sectionDetails .rev-tags .rev-ns").text(getHashParam("namespace"))
@@ -151,8 +152,8 @@ function showResources(namespace, chart, revision) {
             const res = data[i]
             const resBlock = $(`
                     <div class="row px-3 py-2 mb-2">
-                        <div class="col-2 res-kind"></div>
-                        <div class="col-4 res-name"></div>
+                        <div class="col-2 res-kind text-break"></div>
+                        <div class="col-4 res-name text-break"></div>
                         <div class="col-5 res-status"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> <span class="text-muted small">Getting status...</span></div>
                         <div class="col-1 res-actions"></div>
                     </div>

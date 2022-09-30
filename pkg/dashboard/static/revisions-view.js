@@ -45,6 +45,12 @@ function fillChartHistory(data, namespace, name) {
         rev.find(".rev-age").text(getAge(elm, data[x - 1])).parent().attr("title", elm.updated)
         statusStyle(elm.status, rev.find(".rev-status"), rev.find(".rev-status"))
 
+        console.log(1, elm)
+        if (elm.description.startsWith("Rollback to ")) {
+            //rev.find(".rev-status").append(" <span class='small fw-normal text-lowercase'>(rollback)</span>")
+            rev.find(".rev-status").append(" <i class='bi-arrow-counterclockwise text-muted' title='"+elm.description+"'></i>")
+        }
+
         const nxt = data[x + 1];
         if (nxt && isNewerVersion(elm.chart_ver, nxt.chart_ver)) {
             rev.find(".rev-changes").html("<span class='strike'>" + nxt.chart_ver + "</span> <i class='text-danger bi-arrow-down-right'></i> " + elm.chart_ver)

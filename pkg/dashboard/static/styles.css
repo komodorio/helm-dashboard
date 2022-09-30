@@ -46,6 +46,22 @@
     color: #333333 !important;
 }
 
+.bg-danger {
+    background-color: #FC1683!important;
+}
+
+.bg-success {
+    background-color: #A4F8D7!important;
+}
+
+.btn {
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #1347FF;
+}
+
 .text-uppercase {
     text-transform: uppercase;
 }
@@ -279,6 +295,7 @@ span.link {
 
 .nav-tabs .nav-link {
     padding-bottom: 0.25rem;
+    color: #3B3D45;
 }
 
 .nav-tabs .nav-link.active {

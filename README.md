@@ -8,7 +8,7 @@ A simplified way of working with Helm.
 
 The _Helm Dashboard_ plugin offers a UI-driven way to view the installed Helm charts, see their revision history and corresponding k8s resources. Also, you can perform simple actions like roll back to a revision or upgrade to newer version.
 
-This project is part of [Komodor's](https://komodor.io) vision of helping Kubernetes users to navigate and troubleshoot their clusters.
+This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision of helping Kubernetes users to navigate and troubleshoot their clusters.
 
 ## Installing 
 
@@ -50,7 +50,7 @@ If you want to increase the logging verbosity and see all the debug info, set `D
 
 ## Support Channels
 
-We have two main channels for supporting the Helm Dashboard users: [Slack community](https://komodorkommunity.slack.com/x-p3820586794880-3937175868755-4092688791734/archives/C042U85BD45/p1663573506220839) for general conversations
+We have two main channels for supporting the Helm Dashboard users: [Slack community](https://komodorkommunity.slack.com/archives/C044U1B0265) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
 

@@ -20,7 +20,10 @@ function checkUpgradeable(name) {
     $.getJSON("/api/helm/repo/search?name=" + name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
-        if (!data) {
+        if (!data || !data.length) {
+            $("#btnUpgrade span").text("No upgrades")
+            $("#btnUpgrade").prop("disabled", true)
+            $("#btnUpgradeCheck").prop("disabled", true)
             return
         }
 
@@ -39,7 +42,7 @@ function checkUpgradeable(name) {
         if (canUpgrade) {
             $("#btnUpgrade span").text("Upgrade to " + elm.version)
         } else {
-            $("#btnUpgrade span").text("No upgrades")
+            $("#btnUpgrade span").text("Up-to-date")
         }
 
         $("#btnUpgrade").off("click").click(function () {
@@ -58,7 +61,7 @@ function popUpUpgrade(self, verCur, elm) {
 
     $('#upgradeModalLabel select').val(elm.version).trigger("change")
 
-    const myModal = new bootstrap.Offcanvas(document.getElementById('upgradeModal'), {});
+    const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
     myModal.show()
 
     const btnConfirm = $("#upgradeModal .btn-confirm");
@@ -122,7 +125,7 @@ $("#btnUninstall").click(function () {
         })
     })
 
-    const myModal = new bootstrap.Offcanvas(document.getElementById('confirmModal'));
+    const myModal = new bootstrap.Modal(document.getElementById('confirmModal'));
     myModal.show()
 
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
@@ -147,6 +150,7 @@ $("#btnRollback").click(function () {
     const revisionCur = $("#specRev").data("last-rev")
     $("#confirmModalLabel").html("Rollback <b class='text-danger'>" + chart + "</b> from revision " + revisionCur + " to " + revisionNew)
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    console.log(btnConfirm)
     btnConfirm.prop("disabled", true).off('click').click(function () {
         btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         const url = "/api/helm/charts/rollback?namespace=" + namespace + "&name=" + chart + "&revision=" + revisionNew;
@@ -160,7 +164,7 @@ $("#btnRollback").click(function () {
         })
     })
 
-    const myModal = new bootstrap.Offcanvas(document.getElementById('confirmModal'), {});
+    const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
     myModal.show()
 
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
