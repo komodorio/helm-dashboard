@@ -151,10 +151,11 @@ function showResources(namespace, chart, revision) {
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
             const resBlock = $(`
-                    <div class="row px-3 py-2 mb-2">
+                    <div class="row px-3 py-2 mb-3 bg-white rounded">
                         <div class="col-2 res-kind text-break"></div>
-                        <div class="col-4 res-name text-break"></div>
-                        <div class="col-5 res-status"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> <span class="text-muted small">Getting status...</span></div>
+                        <div class="col-3 res-name text-break fw-bold"></div>
+                        <div class="col-1 res-status"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
+                        <div class="col-5 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
                         <div class="col-1 res-actions"></div>
                     </div>
             `)
@@ -179,12 +180,14 @@ function showResources(namespace, chart, revision) {
                 }
 
                 const statusBlock = resBlock.find(".res-status");
-                statusBlock.empty().append(badge).append("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
+                statusBlock.empty().append(badge)
+                resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
 
                 if (badge.text() !== "NotFound") {
                     resBlock.find(".res-actions")
-                    resBlock.find(".res-actions").append("<i class=\"btn bi-zoom-in float-end text-muted\"></i>")
-                    statusBlock.find(".bi-zoom-in").click(function () {
+                    const btn = $("<button class=\"btn btn-sm btn-white border-secondary\">Describe</button>");
+                    resBlock.find(".res-actions").append(btn)
+                    btn.click(function () {
                         showDescribe(ns, res.kind, res.metadata.name)
                     })
                 }

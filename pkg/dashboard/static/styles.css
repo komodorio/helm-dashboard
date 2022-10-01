@@ -47,11 +47,11 @@
 }
 
 .bg-danger {
-    background-color: #FC1683!important;
+    background-color: #FC1683 !important;
 }
 
 .bg-success {
-    background-color: #A4F8D7!important;
+    background-color: #A4F8D7 !important;
 }
 
 .btn {
@@ -67,9 +67,13 @@
 }
 
 .offcanvas {
-    width: auto!important;
+    width: auto !important;
     max-width: 90%;
     min-width: 60%;
+}
+
+html {
+    min-height: 100%;
 }
 
 body {
@@ -80,6 +84,18 @@ body {
     background-color: #F4F7FA;
     font-family: Roboto, serif;
     color: #3D4048;
+}
+
+body.bg-variant1 {
+    background-color: #F4F7FA;
+    background-image: url("topographic.svg");
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    background-size: auto 100%;
+}
+
+body.bg-variant2 {
+    background-color: #E8EDF2;
 }
 
 body > .container-fluid {
@@ -313,4 +329,20 @@ span.link {
 
 #btnUpgrade {
     min-width: 9rem;
+}
+
+#sectionDetails > .bg-white {
+    background-color: #F4F7FA !important;
+}
+
+#sectionDetails .list-unstyled .bg-secondary {
+    background-color: #F4F7FA !important;
+}
+
+#nav-resources .badge {
+    font-size: inherit;
+}
+
+#nav-resources .bg-secondary {
+    background-color: #E6E7EB!important;
 }

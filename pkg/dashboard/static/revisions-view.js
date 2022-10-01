@@ -1,6 +1,7 @@
 const revRow = $("#sectionDetails .rev-list ul");
 
 function loadChartHistory(namespace, name) {
+    $("body").removeClass("bg-variant1 bg-variant2").addClass("bg-variant2")
     $("#sectionDetails").show()
     $("#sectionDetails .name").text(name)
     revRow.empty().append("<li><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span></li>")
