@@ -95,9 +95,11 @@ $('#specRev').keyup(function (event) {
     if (keycode == '13') {
         $("#diffModeRev").click()
     }
-    event.preventDefault()
 });
 
+$("form").submit(function(e){
+    e.preventDefault();
+});
 
 $("#userDefinedVals").change(function () {
     const self = $(this)

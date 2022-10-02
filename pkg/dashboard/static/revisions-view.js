@@ -26,10 +26,10 @@ function fillChartHistory(data, namespace, name) {
     data.reverse()
     for (let x = 0; x < data.length; x++) {
         const elm = data[x]
-        $("#specRev").val(elm.revision).data("first-rev", elm.revision)
+        $("#specRev").data("first-rev", elm.revision)
 
         if (!x) {
-            $("#specRev").data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
+            $("#specRev").val(elm.revision).data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
         }
 
         const rev = $(`<li class="px-2 pt-5 pb-4 mb-2 rounded border border-secondary bg-secondary position-relative">
