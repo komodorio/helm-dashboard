@@ -346,3 +346,26 @@ span.link {
 #nav-resources .bg-secondary {
     background-color: #E6E7EB!important;
 }
+
+.res-actions .btn-sm {
+    font-size: 0.75rem;
+}
+
+.offcanvas-header h5 {
+    font-family: Poppins, serif;
+    font-weight: 500;
+}
+
+.offcanvas-header h5 .badge {
+    font-family: Roboto, serif;
+    font-weight: normal;
+    font-size: 0.8rem;
+}
+
+.offcanvas-header p {
+    font-family: Inter, serif;
+}
+
+#describeModalBody pre {
+    font-size: 1rem;
+}

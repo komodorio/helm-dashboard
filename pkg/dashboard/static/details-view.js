@@ -188,7 +188,7 @@ function showResources(namespace, chart, revision) {
                     const btn = $("<button class=\"btn btn-sm btn-white border-secondary\">Describe</button>");
                     resBlock.find(".res-actions").append(btn)
                     btn.click(function () {
-                        showDescribe(ns, res.kind, res.metadata.name)
+                        showDescribe(ns, res.kind, res.metadata.name, badge.clone())
                     })
                 }
             })
@@ -196,8 +196,9 @@ function showResources(namespace, chart, revision) {
     })
 }
 
-function showDescribe(ns, kind, name) {
-    $("#describeModalLabel").text("Describe " + kind + ": " + ns + " / " + name)
+function showDescribe(ns, kind, name, badge) {
+    $("#describeModal .offcanvas-header p").text(kind)
+    $("#describeModalLabel").text(name).append(badge.addClass("ms-3 small fw-normal"))
     $("#describeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
 
     const myModal = new bootstrap.Offcanvas(document.getElementById('describeModal'));
