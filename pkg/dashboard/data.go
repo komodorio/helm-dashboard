@@ -10,6 +10,7 @@ import (
 	"github.com/hexops/gotextdiff/span"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
+	"helm.sh/helm/v3/pkg/release"
 	"io/ioutil"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"os"
@@ -116,12 +117,10 @@ func (d *DataLayer) CheckConnectivity() error {
 		return errors.New("did not find any kubectl contexts configured")
 	}
 
-	/*
-		_, err = d.runCommandHelm("env") // no point in doing is, since the default context may be invalid
-		if err != nil {
-			return err
-		}
-	*/
+	_, err = d.runCommandHelm("--help") // no point in doing is, since the default context may be invalid
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -385,12 +384,9 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		return "", err
 	}
 
-	cmd := []string{name, repoChart, "--version", version, "--namespace", namespace, "--values", file.Name()}
+	cmd := []string{"upgrade", name, repoChart, "--version", version, "--namespace", namespace, "--values", file.Name(), "--output", "json"}
 	if justTemplate {
-		cmd = append([]string{"template", "--skip-tests"}, cmd...)
-	} else {
-		cmd = append([]string{"upgrade"}, cmd...)
-		cmd = append(cmd, "--output", "json")
+		cmd = append(cmd, "--dry-run")
 	}
 
 	out, err := d.runCommandHelm(cmd...)
@@ -399,11 +395,17 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 	}
 
 	if justTemplate {
+		res := release.Release{}
+		err = json.Unmarshal([]byte(out), &res)
+		if err != nil {
+			return "", err
+		}
+
 		manifests, err := d.RevisionManifests(namespace, name, 0, false)
 		if err != nil {
 			return "", err
 		}
-		out = getDiff(strings.TrimSpace(manifests), strings.TrimSpace(out), "current.yaml", "upgraded.yaml")
+		out = getDiff(strings.TrimSpace(manifests), strings.TrimSpace(res.Manifest), "current.yaml", "upgraded.yaml")
 	}
 
 	return out, nil

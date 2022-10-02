@@ -272,6 +272,10 @@ span.link {
     color: #707583;
 }
 
+#actionButtons .link {
+    cursor: pointer;
+}
+
 #actionButtons button > * {
     vertical-align: bottom;
 }
