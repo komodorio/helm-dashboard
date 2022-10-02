@@ -1,4 +1,5 @@
 function loadChartsList() {
+    $("body").removeClass("bg-variant1 bg-variant2").addClass("bg-variant1")
     $("#sectionList").show()
     const chartsCards = $("#installedList .body")
     chartsCards.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Loading...</div>")

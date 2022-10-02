@@ -21,6 +21,17 @@ import (
 	"time"
 )
 
+type CmdError struct {
+	Command   []string
+	OrigError error
+	StdErr    []byte
+}
+
+func (e CmdError) Error() string {
+	//return fmt.Sprintf("failed to run command %s:\nError: %s\nSTDERR:%s", e.Command, e.OrigError, e.StdErr)
+	return string(e.StdErr)
+}
+
 type DataLayer struct {
 	KubeContext string
 	Helm        string
@@ -46,9 +57,18 @@ func (d *DataLayer) runCommand(cmd ...string) (string, error) {
 			log.Warnf("STDERR:\n%s", serr)
 		}
 		if eerr, ok := err.(*exec.ExitError); ok {
-			return "", fmt.Errorf("failed to run command %s:\nError: %s\nSTDERR:%s", cmd, eerr, serr)
+			return "", CmdError{
+				Command:   cmd,
+				StdErr:    serr,
+				OrigError: eerr,
+			}
 		}
-		return "", err
+
+		return "", CmdError{
+			Command:   cmd,
+			StdErr:    serr,
+			OrigError: err,
+		}
 	}
 
 	sout := stdout.Bytes()

@@ -46,24 +46,54 @@
     color: #333333 !important;
 }
 
+.bg-danger {
+    background-color: #FC1683 !important;
+}
+
+.bg-success {
+    background-color: #A4F8D7 !important;
+}
+
+.btn {
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #1347FF;
+}
+
 .text-uppercase {
     text-transform: uppercase;
 }
 
 .offcanvas {
-    width: auto!important;
+    width: auto !important;
     max-width: 90%;
     min-width: 60%;
 }
 
+html {
+    min-height: 100%;
+}
+
 body {
-    height: 100%;
-    min-height: 50rem;
     font-size: 14px;
 
     background-color: #F4F7FA;
     font-family: Roboto, serif;
     color: #3D4048;
+}
+
+body.bg-variant1 {
+    background-color: #F4F7FA;
+    background-image: url("topographic.svg");
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    background-size: auto 100%;
+}
+
+body.bg-variant2 {
+    background-color: #E8EDF2;
 }
 
 body > .container-fluid {
@@ -73,32 +103,11 @@ body > .container-fluid {
 #topNav.navbar {
 }
 
-.navbar-brand > div {
-    display: inline-block;
-    vertical-align: top;
-}
-
-.navbar-brand > div p span {
-    vertical-align: baseline;
-}
-
 .navbar-brand {
     font-family: Poppins, serif;
     font-size: 0.6rem !important;
     color: #707583;
     font-weight: 500;
-}
-
-.navbar-brand h1 {
-    font-weight: 600;
-    margin: 0;
-    padding: 0;
-    line-height: 50%;
-}
-
-.navbar-brand h1 a {
-    font-size: 1.1rem !important;
-    color: #0023A3 !important;
     text-decoration: none;
 }
 
@@ -109,17 +118,16 @@ body > .container-fluid {
     margin: 0.5rem 0.8rem
 }
 
-.navbar-brand p {
-    margin-bottom: 0;
+.navbar-brand > div {
+    display: inline-block;
+    vertical-align: top;
 }
 
-.navbar-brand p a {
-    vertical-align: text-bottom;
-}
-
-.navbar-brand p img {
-    height: 1.25rem;
-    margin-left: 0.25rem;
+.navbar-brand h1 a {
+    font-size: 1.2rem !important;
+    color: #0023A3 !important;
+    text-decoration: none;
+    vertical-align: middle;
 }
 
 #topNav .navbar i.btn {
@@ -279,9 +287,62 @@ span.link {
 
 .nav-tabs .nav-link {
     padding-bottom: 0.25rem;
+    color: #3B3D45;
 }
 
 .nav-tabs .nav-link.active {
     border: none;
     border-bottom: 3px solid #3B3D45;
+    background-color: transparent;
+}
+
+#installedList .b-shadow:hover {
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.18);
+}
+
+#btnUpgradeCheck {
+    color: #3B3D45;
+}
+
+#btnUpgrade {
+    min-width: 9rem;
+}
+
+#sectionDetails > .bg-white {
+    background-color: #F4F7FA !important;
+}
+
+#sectionDetails .list-unstyled .bg-secondary {
+    background-color: #F4F7FA !important;
+}
+
+#nav-resources .badge {
+    font-size: inherit;
+}
+
+#nav-resources .bg-secondary {
+    background-color: #E6E7EB!important;
+}
+
+.res-actions .btn-sm {
+    font-size: 0.75rem;
+}
+
+.offcanvas-header h5 {
+    font-family: Poppins, serif;
+    font-weight: 500;
+}
+
+.offcanvas-header h5 .badge {
+    font-family: Roboto, serif;
+    font-weight: normal;
+    font-size: 0.8rem;
+}
+
+.offcanvas-header p {
+    font-family: Inter, serif;
+}
+
+#describeModalBody pre {
+    font-size: 1rem;
 }
