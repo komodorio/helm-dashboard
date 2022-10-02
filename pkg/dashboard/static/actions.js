@@ -4,6 +4,7 @@ $("#btnUpgradeCheck").click(function () {
     self.find(".spinner-border").show()
     const repoName = self.data("repo")
     $("#btnUpgrade span").text("Checking...")
+    $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-check-circle").addClass("bi-hourglass-split")
     $.post("/api/helm/repo/update?name=" + repoName).fail(function (xhr) {
         reportError("Failed to update chart repo", xhr)
     }).done(function () {
@@ -22,6 +23,7 @@ function checkUpgradeable(name) {
     }).done(function (data) {
         if (!data || !data.length) {
             $("#btnUpgrade span").text("No upgrades")
+            $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-x-octagon")
             $("#btnUpgrade").prop("disabled", true)
             $("#btnUpgradeCheck").prop("disabled", true)
             return
@@ -41,8 +43,10 @@ function checkUpgradeable(name) {
         $("#btnUpgradeCheck").prop("disabled", false)
         if (canUpgrade) {
             $("#btnUpgrade span").text("Upgrade to " + elm.version)
+            $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-arrow-up")
         } else {
             $("#btnUpgrade span").text("Up-to-date")
+            $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-check-circle")
         }
 
         $("#btnUpgrade").off("click").click(function () {
