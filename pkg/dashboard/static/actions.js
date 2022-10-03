@@ -86,7 +86,7 @@ function popUpUpgrade(self, verCur, elm) {
 $('#upgradeModalLabel select').change(function () {
     const self = $(this)
 
-    $("#upgradeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    $("#upgradeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating diff...')
     $("#upgradeModal .btn-confirm").prop("disabled", true)
     $.get(self.data("url") + "&version=" + self.val()).fail(function (xhr) {
         reportError("Failed to get upgrade info", xhr)
