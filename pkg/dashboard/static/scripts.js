@@ -81,8 +81,6 @@ function fillClusterList(data, context) {
     data.forEach(function (elm) {
         // aws CLI uses complicated context names, the suffix does not work well
         // maybe we should have an `if` statement here
-        console.log(elm)
-        console.log(data)
         let label = elm.Name //+ " (" + elm.Cluster + "/" + elm.AuthInfo + "/" + elm.Namespace + ")"
         let opt = $('<li><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
         opt.attr('title', label)
