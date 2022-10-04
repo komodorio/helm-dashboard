@@ -19,6 +19,12 @@ jobs:
           go-version: 1.18
       - name: git cleanup
         run: git clean -f
+      - name: Inject version
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'v0.0.0'
+          replace: ${{ github.ref_name }}
+          include: "pkg/dashboard/static/datadog.js"
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:

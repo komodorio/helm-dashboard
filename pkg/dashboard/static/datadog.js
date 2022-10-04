@@ -9,7 +9,7 @@
         applicationId: 'e75439e5-e1b3-46ba-a9e9-a2e58579a2e2',
         site: 'datadoghq.com',
         service: 'helm-dashboard',
-        version: '0.0.6',
+        version: 'v0.0.0',
         trackInteractions: true,
         trackResources: true,
         trackLongTasks: true,
