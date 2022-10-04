@@ -26,18 +26,6 @@ jobs:
         run: |
           go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
           /home/runner/go/bin/gocyclo -over 19 main.go pkg # forbid code with huge/complex functions
-      - name: Inject version
-        uses: jacobtomlinson/gha-find-replace@v2
-        with:
-          find: 'v0.0.0'
-          replace: ${{ github.ref_name }}
-          include: "pkg/dashboard/static/datadog.js"
-      - name: Calm down GoReleaser
-        run: |
-          git config --global user.email "gh@komodor.com"
-          git config --global user.name "GH Internal"
-          git add pkg/dashboard/static/datadog.js
-          git commit -m "temporary"
       - name: Dry Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
