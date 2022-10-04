@@ -62,6 +62,20 @@ function statusStyle(status, card, txt) {
     }
 }
 
+function getCleanClusterName(rawClusterName) {
+    if (rawClusterName.indexOf('arn')==0) {
+        // AWS cluster
+        clusterSplit = rawClusterName.split(':')
+        clusterName = clusterSplit.at(-1).split("/").at(-1)
+        region = clusterSplit.at(-3)
+        return region + "/" + clusterName + ' [AWS]'
+    }
+    if (rawClusterName.indexOf('gke')==0) {
+        // GKE cluster
+        return rawClusterName.split('_').at(-2) + '/' + rawClusterName.split('_').at(-1) + ' [GKE]'
+    }
+    return rawClusterName
+}
 
 function fillClusterList(data, context) {
     data.forEach(function (elm) {
@@ -71,7 +85,7 @@ function fillClusterList(data, context) {
         let opt = $('<li><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
         opt.attr('title', label)
         opt.find("input").val(elm.Name).text(label)
-        opt.find("span").text(label)
+        opt.find("span").text(getCleanClusterName(label))
         if (elm.IsCurrent && !context) {
             opt.find("input").prop("checked", true)
             setCurrentContext(elm.Name)
