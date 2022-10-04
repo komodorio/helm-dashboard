@@ -33,7 +33,11 @@ jobs:
           replace: ${{ github.ref_name }}
           include: "pkg/dashboard/static/datadog.js"
       - name: Calm down GoReleaser
-        run: git add pkg/dashboard/static/datadog.js && git commit -m "temporary"
+        run: |
+          git config --global user.email "gh@komodor.com"
+          git config --global user.name "GH Internal"
+          git add pkg/dashboard/static/datadog.js
+          git commit -m "temporary"
       - name: Dry Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
