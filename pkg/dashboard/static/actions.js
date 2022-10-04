@@ -29,9 +29,9 @@ function checkUpgradeable(name) {
             return
         }
 
-        $('#upgradeModalLabel select').empty()
+        $('#upgradeModal select').empty()
         for (let i = 0; i < data.length; i++) {
-            $('#upgradeModalLabel select').append("<option value='" + data[i].version + "'>" + data[i].version + "</option>")
+            $('#upgradeModal select').append("<option value='" + data[i].version + "'>" + data[i].version + "</option>")
         }
 
         const elm = data[0]
@@ -58,12 +58,12 @@ function checkUpgradeable(name) {
 function popUpUpgrade(self, verCur, elm) {
     const name = getHashParam("chart");
     let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
-    $('#upgradeModalLabel select').data("url", url)
+    $('#upgradeModal select').data("url", url)
 
     $("#upgradeModalLabel .name").text(name)
-    $("#upgradeModalLabel .ver-old").text(verCur)
+    $("#upgradeModal .ver-old").text(verCur)
 
-    $('#upgradeModalLabel select').val(elm.version).trigger("change")
+    $('#upgradeModal select').val(elm.version).trigger("change")
 
     const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
     myModal.show()
@@ -72,7 +72,7 @@ function popUpUpgrade(self, verCur, elm) {
     btnConfirm.prop("disabled", true).off('click').click(function () {
         btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         $.ajax({
-            url: url + "&version=" + $('#upgradeModalLabel select').val(),
+            url: url + "&version=" + $('#upgradeModal select').val(),
             type: 'POST',
         }).fail(function (xhr) {
             reportError("Failed to upgrade the chart", xhr)
@@ -83,15 +83,16 @@ function popUpUpgrade(self, verCur, elm) {
     })
 }
 
-$('#upgradeModalLabel select').change(function () {
+$('#upgradeModal select').change(function () {
     const self = $(this)
 
-    $("#upgradeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating diff...')
+    const diffBody = $("#upgradeModalBody");
+    diffBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating diff...')
     $("#upgradeModal .btn-confirm").prop("disabled", true)
     $.get(self.data("url") + "&version=" + self.val()).fail(function (xhr) {
         reportError("Failed to get upgrade info", xhr)
     }).done(function (data) {
-        $("#upgradeModalBody").empty();
+        diffBody.empty();
         $("#upgradeModal .btn-confirm").prop("disabled", false)
 
         const targetElement = document.getElementById('upgradeModalBody');
@@ -101,9 +102,8 @@ $('#upgradeModalLabel select').change(function () {
         };
         const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
         diff2htmlUi.draw()
-        $("#upgradeModalBody").prepend("<p>Following changes will happen to cluster:</p>")
         if (!data) {
-            $("#upgradeModalBody").html("No changes will happen to cluster")
+            diffBody.html("No changes will happen to cluster")
         }
     })
 })
