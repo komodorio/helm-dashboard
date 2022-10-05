@@ -411,6 +411,10 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 	return out, nil
 }
 
+func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
+	return d.runCommandHelm("show", "values", chart, "--version", ver)
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)

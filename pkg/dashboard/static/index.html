@@ -235,7 +235,7 @@
 
 
 <!-- Modals -->
-<div id="errorAlert"
+<div id="errorAlert" style="z-index: 2000"
      class="display-none alert alert-sm alert-danger alert-dismissible position-absolute position-absolute top-0 start-50 translate-middle-x mt-3 border-danger"
      role="alert">
     <h4 class="alert-heading"><i class="bi-exclamation-triangle-fill"></i> <span></span></h4>
@@ -289,12 +289,28 @@
             <form class="modal-body border-bottom fs-5">
                 <div class="input-group mb-3 text-muted">
                     <label class="form-label me-4 text-dark">Version to install: <select
-                            class='fw-bold text-success ver-new'></select></label> (current version is <span class='text-success ver-old ms-1'>0.0.0</span>)
+                            class='fw-bold text-success ver-new'></select></label> (current version is <span
+                        class='text-success ver-old ms-1'>0.0.0</span>)
                 </div>
-                <label class="form-label w-100"> Values<span class="invalid-feedback"> (wrong YAML)</span>:
-                    <textarea class="form-control w-100" rows="5"></textarea>
-                </label>
-                <label class="form-label mt-5">Planned manifest changes:</label>
+                <div class="row">
+                    <div class="col-6 pe-3">
+                        <label class="form-label">User-Defined Values<span
+                                class="invalid-feedback"> (wrong YAML)</span>:</label>
+                    </div>
+                    <div class="col-6 ps-3">
+                        <label class="form-label">Chart Values Reference:</label>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="col-6 pe-3">
+                        <textarea class="form-control w-100 h-100" rows="5"></textarea>
+                    </div>
+                    <div class="col-6 ps-3" >
+                        <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>
+                    </div>
+                </div>
+
+                <label class="form-label mt-5">Manifest changes:</label>
                 <div id="upgradeModalBody" class="small"></div>
             </form>
             <div class="modal-footer">

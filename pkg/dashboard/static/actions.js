@@ -29,16 +29,22 @@ function checkUpgradeable(name) {
             return
         }
 
+        const verCur = $("#specRev").data("last-chart-ver");
         $('#upgradeModal select').empty()
         for (let i = 0; i < data.length; i++) {
-            $('#upgradeModal select').append("<option value='" + data[i].version + "'>" + data[i].version + "</option>")
+            const opt = $("<option value='" + data[i].version + "'></option>");
+            if (data[i].version === verCur) {
+                opt.html(data[i].version + " &middot;")
+            } else {
+                opt.html(data[i].version)
+            }
+            $('#upgradeModal select').append(opt)
         }
 
         const elm = data[0]
         $("#btnUpgradeCheck").data("repo", elm.name.split('/').shift())
         $("#btnUpgradeCheck").data("chart", elm.name.split('/').pop())
 
-        const verCur = $("#specRev").data("last-chart-ver");
         const canUpgrade = isNewerVersion(verCur, elm.version);
         $("#btnUpgradeCheck").prop("disabled", false)
         if (canUpgrade) {
@@ -58,7 +64,7 @@ function checkUpgradeable(name) {
 function popUpUpgrade(self, verCur, elm) {
     const name = getHashParam("chart");
     let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
-    $('#upgradeModal select').data("url", url)
+    $('#upgradeModal select').data("url", url).data("chart", elm.name)
 
     $("#upgradeModalLabel .name").text(name)
     $("#upgradeModal .ver-old").text(verCur)
@@ -80,6 +86,13 @@ function popUpUpgrade(self, verCur, elm) {
             setHashParam("revision", data.version)
             window.location.reload()
         })
+    })
+
+    // fill current values
+    $.get("/api/helm/charts/values?namespace=" + getHashParam("namespace") + "&revision=" + getHashParam("revision") + "&name=" + getHashParam("chart") + "&flag=true").fail(function (xhr) {
+        reportError("Failed to get charts values info", xhr)
+    }).done(function (data) {
+        $("#upgradeModal textarea").val(data)
     })
 }
 
@@ -103,8 +116,17 @@ $('#upgradeModal select').change(function () {
         const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
         diff2htmlUi.draw()
         if (!data) {
-            diffBody.html("No changes will happen to cluster")
+            diffBody.html("No changes will happen to the cluster")
         }
+    })
+
+    // fill reference values
+    $("#upgradeModal .ref-vals").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    $.get("/api/helm/repo/values?chart=" + self.data("chart") + "&version=" + self.val()).fail(function (xhr) {
+        reportError("Failed to get upgrade info", xhr)
+    }).done(function (data) {
+        data = hljs.highlight(data, {language: 'yaml'}).value
+        $("#upgradeModal .ref-vals").html(data)
     })
 })
 

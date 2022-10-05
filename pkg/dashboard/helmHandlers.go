@@ -156,6 +156,15 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 	c.String(http.StatusOK, res)
 }
 
+func (h *HelmHandler) RepoValues(c *gin.Context) {
+	out, err := h.Data.ShowValues(c.Query("chart"), c.Query("version"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.String(http.StatusOK, out)
+}
+
 func chartInstall(c *gin.Context, data *DataLayer, justTemplate bool) (string, error) {
 	qp, err := getQueryProps(c, false)
 	if err != nil {
