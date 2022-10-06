@@ -72,7 +72,6 @@ func configureHelms(api *gin.RouterGroup, data *DataLayer) {
 	api.GET("/repo/search", h.RepoSearch)
 	api.POST("/repo/update", h.RepoUpdate)
 	api.GET("/repo/values", h.RepoValues)
-	api.GET("/charts/install", h.InstallPreview)
 	api.POST("/charts/install", h.Install)
 	api.GET("/charts/:section", h.GetInfoSection)
 }

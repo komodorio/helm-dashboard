@@ -2,6 +2,8 @@ package dashboard
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -14,4 +16,18 @@ func chartAndVersion(x string) (string, string, error) {
 	}
 
 	return x[:lastInd], x[lastInd+1:], nil
+}
+
+func tempFile(txt string) (string, func(), error) {
+	file, err := ioutil.TempFile("", "helm_vals_")
+	if err != nil {
+		return "", nil, err
+	}
+
+	err = ioutil.WriteFile(file.Name(), []byte(txt), 0600)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return file.Name(), func() { os.Remove(file.Name()) }, nil
 }

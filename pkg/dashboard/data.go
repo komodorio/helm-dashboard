@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
-	"io/ioutil"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"os"
 	"os/exec"
@@ -367,24 +366,22 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 	return nil
 }
 
-func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool) (string, error) {
-	oldVals, err := d.RevisionValues(namespace, name, 0, true)
+func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool, values string) (string, error) {
+	if values == "" {
+		oldVals, err := d.RevisionValues(namespace, name, 0, true)
+		if err != nil {
+			return "", err
+		}
+		values = oldVals
+	}
+
+	oldValsFile, close1, err := tempFile(values)
+	defer close1()
 	if err != nil {
 		return "", err
 	}
 
-	file, err := ioutil.TempFile("", "helm_vals_")
-	if err != nil {
-		return "", err
-	}
-	defer os.Remove(file.Name())
-
-	err = ioutil.WriteFile(file.Name(), []byte(oldVals), 0600)
-	if err != nil {
-		return "", err
-	}
-
-	cmd := []string{"upgrade", name, repoChart, "--version", version, "--namespace", namespace, "--values", file.Name(), "--output", "json"}
+	cmd := []string{"upgrade", name, repoChart, "--version", version, "--namespace", namespace, "--values", oldValsFile, "--output", "json"}
 	if justTemplate {
 		cmd = append(cmd, "--dry-run")
 	}
@@ -406,6 +403,13 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 			return "", err
 		}
 		out = getDiff(strings.TrimSpace(manifests), strings.TrimSpace(res.Manifest), "current.yaml", "upgraded.yaml")
+	} else {
+		res := release.Release{}
+		err = json.Unmarshal([]byte(out), &res)
+		if err != nil {
+			return "", err
+		}
+		_ = res
 	}
 
 	return out, nil

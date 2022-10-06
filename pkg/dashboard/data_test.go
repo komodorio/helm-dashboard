@@ -3,6 +3,7 @@ package dashboard
 import (
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/release"
+	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"sync"
 	"testing"
 )
@@ -63,7 +64,7 @@ func TestFlow(t *testing.T) {
 	_ = manifests
 
 	var wg sync.WaitGroup
-	res := make([]*GenericResource, 0)
+	res := make([]*v1.Carp, 0)
 	for _, m := range manifests {
 		wg.Add(1)
 		mc := m // fix the clojure

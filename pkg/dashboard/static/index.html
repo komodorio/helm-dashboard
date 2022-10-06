@@ -286,7 +286,7 @@
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form class="modal-body border-bottom fs-5">
+            <form class="modal-body border-bottom fs-5" enctype="multipart/form-data">
                 <div class="input-group mb-3 text-muted">
                     <label class="form-label me-4 text-dark">Version to install: <select
                             class='fw-bold text-success ver-new'></select></label> (current version is <span
@@ -294,8 +294,7 @@
                 </div>
                 <div class="row">
                     <div class="col-6 pe-3">
-                        <label class="form-label">User-Defined Values<span
-                                class="invalid-feedback"> (wrong YAML)</span>:</label>
+                        <label class="form-label">User-Defined Values:</label>
                     </div>
                     <div class="col-6 ps-3">
                         <label class="form-label">Chart Values Reference:</label>
@@ -303,7 +302,8 @@
                 </div>
                 <div class="row" >
                     <div class="col-6 pe-3">
-                        <textarea class="form-control w-100 h-100" rows="5"></textarea>
+                        <textarea name="values" class="form-control w-100 h-100" rows="5"></textarea>
+                        <span class="invalid-feedback"> (wrong YAML)</span>
                     </div>
                     <div class="col-6 ps-3" >
                         <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>
