@@ -1,10 +1,8 @@
 package dashboard
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"helm.sh/helm/v3/pkg/release"
 	"net/http"
 	"strconv"
 )
@@ -113,30 +111,25 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (h *HelmHandler) InstallPreview(c *gin.Context) {
-	out, err := chartInstall(c, h.Data, true)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	c.String(http.StatusOK, out)
-}
-
 func (h *HelmHandler) Install(c *gin.Context) {
-	out, err := chartInstall(c, h.Data, false)
+	qp, err := getQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	justTemplate := c.Query("flag") != "true"
+	out, err := h.Data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, c.PostForm("values"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	res := release.Release{}
-	err = json.Unmarshal([]byte(out), &res)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
+	if !justTemplate {
+		c.Header("Content-Type", "application/json")
 	}
 
-	c.IndentedJSON(http.StatusAccepted, res)
+	c.String(http.StatusAccepted, out)
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
@@ -156,17 +149,13 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 	c.String(http.StatusOK, res)
 }
 
-func chartInstall(c *gin.Context, data *DataLayer, justTemplate bool) (string, error) {
-	qp, err := getQueryProps(c, false)
+func (h *HelmHandler) RepoValues(c *gin.Context) {
+	out, err := h.Data.ShowValues(c.Query("chart"), c.Query("version"))
 	if err != nil {
-		return "", err
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
-
-	out, err := data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+	c.String(http.StatusOK, out)
 }
 
 func handleGetSection(data *DataLayer, section string, rDiff string, qp *QueryProps, flag bool) (string, error) {

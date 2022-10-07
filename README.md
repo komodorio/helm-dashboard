@@ -76,10 +76,8 @@ and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real
 
 ### Further Ideas
 - solve umbrella-chart case
-- use `--dry-run` instead of `template`
 - Have cleaner idea on the web API structure
 - Recognise & show ArgoCD-originating charts/objects, those `helm ls` does not show
-- Recognise the revisions that are rollbacks by their description and mark in timeline
 
 #### Topic "Validating Manifests"
 

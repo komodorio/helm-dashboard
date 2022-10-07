@@ -16,7 +16,18 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"/>
     <link href="static/styles.css" rel="stylesheet">
     <script type="text/javascript">
-        window.heap=window.heap||[],heap.load=function(e,t){window.heap.appid=e,window.heap.config=t=t||{};var r=document.createElement("script");r.type="text/javascript",r.async=!0,r.src="https://cdn.heapanalytics.com/js/heap-"+e+".js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(r,a);for(var n=function(e){return function(){heap.push([e].concat(Array.prototype.slice.call(arguments,0)))}},p=["addEventProperties","addUserProperties","clearEventProperties","identify","resetIdentity","removeEventProperty","setEventProperties","track","unsetEventProperty"],o=0;o<p.length;o++)heap[p[o]]=n(p[o])};
+        window.heap = window.heap || [], heap.load = function (e, t) {
+            window.heap.appid = e, window.heap.config = t = t || {};
+            var r = document.createElement("script");
+            r.type = "text/javascript", r.async = !0, r.src = "https://cdn.heapanalytics.com/js/heap-" + e + ".js";
+            var a = document.getElementsByTagName("script")[0];
+            a.parentNode.insertBefore(r, a);
+            for (var n = function (e) {
+                return function () {
+                    heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+                }
+            }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], o = 0; o < p.length; o++) heap[p[o]] = n(p[o])
+        };
         heap.load("3615793373");
     </script>
 </head>
@@ -52,9 +63,11 @@
             </ul>
             <div>
                 <a class="btn" href="https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash"><img
-                        src="https://komodor.com/wp-content/uploads/2021/05/favicon.png" alt="komodor.io" style="height: 1.2rem; vertical-align: text-bottom; filter: grayscale(00%);"></a>
+                        src="https://komodor.com/wp-content/uploads/2021/05/favicon.png" alt="komodor.io"
+                        style="height: 1.2rem; vertical-align: text-bottom; filter: grayscale(00%);"></a>
 
-                <a class="btn me-2 text-muted" href="https://github.com/komodorio/helm-dashboard" title="Project page on GitHub"><i class="bi-github"></i></a>
+                <a class="btn me-2 text-muted" href="https://github.com/komodorio/helm-dashboard"
+                   title="Project page on GitHub"><i class="bi-github"></i></a>
             </div>
             <div class="separator-vertical"><span></span></div>
             <i class="btn bi-power text-muted p-2 m-1 mx-2" title="Shut down the Helm Dashboard application"></i>
@@ -222,7 +235,7 @@
 
 
 <!-- Modals -->
-<div id="errorAlert"
+<div id="errorAlert" style="z-index: 2000"
      class="display-none alert alert-sm alert-danger alert-dismissible position-absolute position-absolute top-0 start-50 translate-middle-x mt-3 border-danger"
      role="alert">
     <h4 class="alert-heading"><i class="bi-exclamation-triangle-fill"></i> <span></span></h4>
@@ -268,15 +281,42 @@
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="upgradeModalLabel">
-                    Upgrade <b class='text-success name'></b> from version <b class='text-success ver-old'></b> to
-                    <select class='fw-bold text-success ver-new'></select>
-                </h5>
+                <h4 class="modal-title" id="upgradeModalLabel">
+                    Upgrade <b class='text-success name'></b>
+                </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="upgradeModalBody">
+            <form class="modal-body border-bottom fs-5" enctype="multipart/form-data">
+                <div class="input-group mb-3 text-muted">
+                    <label class="form-label me-4 text-dark">Version to install: <select
+                            class='fw-bold text-success ver-new'></select></label> (current version is <span
+                        class='text-success ver-old ms-1'>0.0.0</span>)
+                </div>
+                <div class="row">
+                    <div class="col-6 pe-3">
+                        <label class="form-label">User-Defined Values:</label>
+                    </div>
+                    <div class="col-6 ps-3">
+                        <label class="form-label">Chart Values Reference:</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 pe-3">
+                        <textarea name="values" class="form-control w-100 h-100" rows="5"></textarea>
+                    </div>
+                    <div class="col-6 ps-3">
+                        <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>
+                    </div>
+                </div>
 
-            </div>
+                <div class="row">
+                    <div class="col-6 pe-3">
+                        <span class="invalid-feedback small mb-3"> (wrong YAML)</span>
+                    </div>
+                </div>
+                <label class="form-label mt-5">Manifest changes:</label>
+                <div id="upgradeModalBody" class="small"></div>
+            </form>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary btn-confirm">Confirm Upgrade</button>
             </div>
@@ -293,6 +333,9 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.3/build/global/luxon.min.js"
         integrity="sha256-RH4TKnKcKyde0s2jc5BW3pXZl/5annY3fcZI9VrV5WQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"
+        integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="static/list-view.js"></script>
 <script src="static/revisions-view.js"></script>
 <script src="static/details-view.js"></script>

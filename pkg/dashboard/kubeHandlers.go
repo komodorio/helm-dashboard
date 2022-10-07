@@ -27,7 +27,7 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.GetResource(qp.Namespace, &GenericResource{
+	res, err := h.Data.GetResource(qp.Namespace, &v12.Carp{
 		TypeMeta:   v1.TypeMeta{Kind: c.Param("kind")},
 		ObjectMeta: v1.ObjectMeta{Name: qp.Name},
 	})

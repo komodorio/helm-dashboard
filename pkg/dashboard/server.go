@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func StartServer() (string, ControlChan) {
+func StartServer(version string) (string, ControlChan) {
 	data := DataLayer{}
 	err := data.CheckConnectivity()
 	if err != nil {
@@ -28,7 +28,7 @@ func StartServer() (string, ControlChan) {
 	}
 
 	abort := make(ControlChan)
-	api := NewRouter(abort, &data)
+	api := NewRouter(abort, &data, version)
 	done := startBackgroundServer(address, api, abort)
 
 	return "http://" + address, done

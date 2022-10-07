@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
-	"io/ioutil"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"os"
 	"os/exec"
@@ -234,7 +233,7 @@ func (d *DataLayer) RevisionManifests(namespace string, chartName string, revisi
 	return out, nil
 }
 
-func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*GenericResource, error) {
+func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*v1.Carp, error) {
 	out, err := d.RevisionManifests(namespace, chartName, revision, false)
 	if err != nil {
 		return nil, err
@@ -242,7 +241,7 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 
 	dec := yaml.NewDecoder(bytes.NewReader([]byte(out)))
 
-	res := make([]*GenericResource, 0)
+	res := make([]*v1.Carp, 0)
 	var tmp interface{}
 	for dec.Decode(&tmp) == nil {
 		// k8s libs uses only JSON tags defined, say hello to https://github.com/go-yaml/yaml/issues/424
@@ -252,7 +251,7 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 			return nil, err
 		}
 
-		var doc GenericResource
+		var doc v1.Carp
 		err = json.Unmarshal(jsoned, &doc)
 		if err != nil {
 			return nil, err
@@ -289,11 +288,11 @@ func (d *DataLayer) RevisionValues(namespace string, chartName string, revision 
 	return out, nil
 }
 
-func (d *DataLayer) GetResource(namespace string, def *GenericResource) (*GenericResource, error) {
+func (d *DataLayer) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error) {
 	out, err := d.runCommandKubectl("get", strings.ToLower(def.Kind), def.Name, "--namespace", namespace, "--output", "json")
 	if err != nil {
 		if strings.HasSuffix(strings.TrimSpace(err.Error()), " not found") {
-			return &GenericResource{
+			return &v1.Carp{
 				Status: v1.CarpStatus{
 					Phase:   "NotFound",
 					Message: err.Error(),
@@ -305,7 +304,7 @@ func (d *DataLayer) GetResource(namespace string, def *GenericResource) (*Generi
 		}
 	}
 
-	var res GenericResource
+	var res v1.Carp
 	err = json.Unmarshal([]byte(out), &res)
 	if err != nil {
 		return nil, err
@@ -367,24 +366,22 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 	return nil
 }
 
-func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool) (string, error) {
-	oldVals, err := d.RevisionValues(namespace, name, 0, false)
+func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool, values string) (string, error) {
+	if values == "" {
+		oldVals, err := d.RevisionValues(namespace, name, 0, true)
+		if err != nil {
+			return "", err
+		}
+		values = oldVals
+	}
+
+	oldValsFile, close1, err := tempFile(values)
+	defer close1()
 	if err != nil {
 		return "", err
 	}
 
-	file, err := ioutil.TempFile("", "helm_vals_")
-	if err != nil {
-		return "", err
-	}
-	defer os.Remove(file.Name())
-
-	err = ioutil.WriteFile(file.Name(), []byte(oldVals), 0600)
-	if err != nil {
-		return "", err
-	}
-
-	cmd := []string{"upgrade", name, repoChart, "--version", version, "--namespace", namespace, "--values", file.Name(), "--output", "json"}
+	cmd := []string{"upgrade", name, repoChart, "--version", version, "--namespace", namespace, "--values", oldValsFile, "--output", "json"}
 	if justTemplate {
 		cmd = append(cmd, "--dry-run")
 	}
@@ -406,9 +403,20 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 			return "", err
 		}
 		out = getDiff(strings.TrimSpace(manifests), strings.TrimSpace(res.Manifest), "current.yaml", "upgraded.yaml")
+	} else {
+		res := release.Release{}
+		err = json.Unmarshal([]byte(out), &res)
+		if err != nil {
+			return "", err
+		}
+		_ = res
 	}
 
 	return out, nil
+}
+
+func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
+	return d.runCommandHelm("show", "values", chart, "--version", ver)
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
@@ -438,5 +446,3 @@ func getDiff(text1 string, text2 string, name1 string, name2 string) string {
 	log.Debugf("The diff is: %s", diff)
 	return diff
 }
-
-type GenericResource = v1.Carp
