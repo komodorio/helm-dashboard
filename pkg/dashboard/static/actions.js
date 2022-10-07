@@ -136,12 +136,26 @@ function requestChangeDiff() {
     diffBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating diff...')
     $("#upgradeModal .btn-confirm").prop("disabled", true)
 
+    let values = null;
+    if ($("#upgradeModal textarea").data("dirty")) {
+        $("#upgradeModal .invalid-feedback").hide()
+        values = $("#upgradeModal form").serialize()
+        
+        try {
+            jsyaml.load($("#upgradeModal textarea").val())
+        } catch (e) {
+            $("#upgradeModal .invalid-feedback").text("YAML parse error: "+e.message).show()
+            $("#upgradeModalBody").html("Invalid values YAML")
+            return
+        }
+    }
+
     $.ajax({
         type: "POST",
         url: self.data("url") + "&version=" + self.val(),
-        data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
+        data: values,
     }).fail(function (xhr) {
-        reportError("Failed to get upgrade info", xhr)
+        $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info:     "+ xhr.responseText+"</p>")
     }).done(function (data) {
         diffBody.empty();
         $("#upgradeModal .btn-confirm").prop("disabled", false)

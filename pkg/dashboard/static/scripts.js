@@ -22,6 +22,12 @@ $(function () {
 })
 
 
+const myAlert = document.getElementById('errorAlert')
+myAlert.addEventListener('close.bs.alert', event => {
+    event.preventDefault()
+    $("#errorAlert").hide()
+})
+
 function reportError(err, xhr) {
     $("#errorAlert h4 span").text(err)
     if (xhr) {

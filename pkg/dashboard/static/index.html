@@ -300,16 +300,20 @@
                         <label class="form-label">Chart Values Reference:</label>
                     </div>
                 </div>
-                <div class="row" >
+                <div class="row">
                     <div class="col-6 pe-3">
                         <textarea name="values" class="form-control w-100 h-100" rows="5"></textarea>
-                        <span class="invalid-feedback"> (wrong YAML)</span>
                     </div>
-                    <div class="col-6 ps-3" >
+                    <div class="col-6 ps-3">
                         <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-6 pe-3">
+                        <span class="invalid-feedback small mb-3"> (wrong YAML)</span>
+                    </div>
+                </div>
                 <label class="form-label mt-5">Manifest changes:</label>
                 <div id="upgradeModalBody" class="small"></div>
             </form>
@@ -329,6 +333,9 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.3/build/global/luxon.min.js"
         integrity="sha256-RH4TKnKcKyde0s2jc5BW3pXZl/5annY3fcZI9VrV5WQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"
+        integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="static/list-view.js"></script>
 <script src="static/revisions-view.js"></script>
 <script src="static/details-view.js"></script>
