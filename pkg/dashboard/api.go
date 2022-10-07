@@ -33,7 +33,7 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func NewRouter(abortWeb ControlChan, data *DataLayer) *gin.Engine {
+func NewRouter(abortWeb ControlChan, data *DataLayer, version string) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -47,15 +47,20 @@ func NewRouter(abortWeb ControlChan, data *DataLayer) *gin.Engine {
 	api.Use(errorHandler)
 
 	configureStatic(api)
-	configureRoutes(abortWeb, data, api)
+	configureRoutes(abortWeb, data, api, version)
 
 	return api
 }
 
-func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine, version string) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
+		c.Status(http.StatusAccepted)
+	})
+
+	api.GET("/status", func(c *gin.Context) {
+		c.String(http.StatusOK, version)
 	})
 
 	configureHelms(api.Group("/api/helm"), data)

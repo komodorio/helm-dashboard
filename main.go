@@ -22,7 +22,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	address, webServerDone := dashboard.StartServer()
+	address, webServerDone := dashboard.StartServer(version)
 
 	if os.Getenv("HD_NOBROWSER") == "" {
 		log.Infof("Opening web UI: %s", address)
