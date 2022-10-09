@@ -1,4 +1,4 @@
-package dashboard
+package handlers
 
 import (
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"

@@ -1,4 +1,4 @@
-package dashboard
+package handlers
 
 import (
 	"helm.sh/helm/v3/pkg/release"

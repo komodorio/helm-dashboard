@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -34,7 +35,7 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *DataLayer, version string) *gin.Engine {
+func NewRouter(abortWeb utils.ControlChan, data *handlers.DataLayer, version string) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -53,7 +54,7 @@ func NewRouter(abortWeb utils.ControlChan, data *DataLayer, version string) *gin
 	return api
 }
 
-func configureRoutes(abortWeb utils.ControlChan, data *DataLayer, api *gin.Engine, version string) {
+func configureRoutes(abortWeb utils.ControlChan, data *handlers.DataLayer, api *gin.Engine, version string) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -69,8 +70,8 @@ func configureRoutes(abortWeb utils.ControlChan, data *DataLayer, api *gin.Engin
 	configureScanners(api.Group("/api/scanners"), data)
 }
 
-func configureHelms(api *gin.RouterGroup, data *DataLayer) {
-	h := HelmHandler{Data: data}
+func configureHelms(api *gin.RouterGroup, data *handlers.DataLayer) {
+	h := handlers.HelmHandler{Data: data}
 	api.GET("/charts", h.GetCharts)
 	api.DELETE("/charts", h.Uninstall)
 	api.POST("/charts/rollback", h.Rollback)
@@ -83,8 +84,8 @@ func configureHelms(api *gin.RouterGroup, data *DataLayer) {
 	api.GET("/charts/:section", h.GetInfoSection)
 }
 
-func configureKubectls(api *gin.RouterGroup, data *DataLayer) {
-	h := KubeHandler{Data: data}
+func configureKubectls(api *gin.RouterGroup, data *handlers.DataLayer) {
+	h := handlers.KubeHandler{Data: data}
 	api.GET("/contexts", h.GetContexts)
 	api.GET("/resources/:kind", h.GetResourceInfo)
 	api.GET("/describe/:kind", h.Describe)
@@ -120,13 +121,13 @@ func configureStatic(api *gin.Engine) {
 	}
 }
 
-func configureScanners(api *gin.RouterGroup, data *DataLayer) {
+func configureScanners(api *gin.RouterGroup, data *handlers.DataLayer) {
 	api.GET("", func(context *gin.Context) {
 		context.JSON(http.StatusOK, data.Scanners)
 	})
 }
 
-func contextSetter(data *DataLayer) gin.HandlerFunc {
+func contextSetter(data *handlers.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
 			log.Debugf("Setting current context to: %s", context)

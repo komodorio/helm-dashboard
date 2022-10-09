@@ -2,5 +2,5 @@ package scanners
 
 type Scanner interface {
 	Test() bool
-	Run()
+	Run(manifests string) error
 }
