@@ -3,12 +3,14 @@ package dashboard
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 )
 
-func StartServer(version string) (string, ControlChan) {
+func StartServer(version string) (string, utils.ControlChan) {
 	data := DataLayer{}
 	err := data.CheckConnectivity()
 	if err != nil {
@@ -27,15 +29,16 @@ func StartServer(version string) (string, ControlChan) {
 		address += ":" + os.Getenv("HD_PORT")
 	}
 
-	abort := make(ControlChan)
+	abort := make(utils.ControlChan)
 	api := NewRouter(abort, &data, version)
 	done := startBackgroundServer(address, api, abort)
+	go discoverScanners(&data)
 
 	return "http://" + address, done
 }
 
-func startBackgroundServer(addr string, routes *gin.Engine, abort ControlChan) ControlChan {
-	done := make(ControlChan)
+func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {
+	done := make(utils.ControlChan)
 	server := &http.Server{Addr: addr, Handler: routes}
 
 	go func() {
@@ -55,4 +58,17 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort ControlChan) C
 	}()
 
 	return done
+}
+
+func discoverScanners(data *DataLayer) {
+	potential := []scanners.Scanner{
+		&scanners.Checkov{},
+	}
+
+	data.Scanners = []scanners.Scanner{}
+	for _, scanner := range potential {
+		if scanner.Test() {
+			data.Scanners = append(data.Scanners, scanner)
+		}
+	}
 }

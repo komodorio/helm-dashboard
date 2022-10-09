@@ -8,12 +8,12 @@ import (
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"os"
-	"os/exec"
 	"regexp"
 	"sort"
 	"strconv"
@@ -21,61 +21,17 @@ import (
 	"time"
 )
 
-type CmdError struct {
-	Command   []string
-	OrigError error
-	StdErr    []byte
-}
-
-func (e CmdError) Error() string {
-	//return fmt.Sprintf("failed to run command %s:\nError: %s\nSTDERR:%s", e.Command, e.OrigError, e.StdErr)
-	return string(e.StdErr)
-}
-
 type DataLayer struct {
 	KubeContext string
 	Helm        string
 	Kubectl     string
+	Scanners    []scanners.Scanner
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
 	log.Debugf("Starting command: %s", cmd)
-	prog := exec.Command(cmd[0], cmd[1:]...)
-	prog.Env = os.Environ()
-	prog.Env = append(prog.Env, "HELM_KUBECONTEXT="+d.KubeContext)
 
-	var stdout bytes.Buffer
-	prog.Stdout = &stdout
-
-	var stderr bytes.Buffer
-	prog.Stderr = &stderr
-
-	if err := prog.Run(); err != nil {
-		log.Warnf("Failed command: %s", cmd)
-		serr := stderr.Bytes()
-		if serr != nil {
-			log.Warnf("STDERR:\n%s", serr)
-		}
-		if eerr, ok := err.(*exec.ExitError); ok {
-			return "", CmdError{
-				Command:   cmd,
-				StdErr:    serr,
-				OrigError: eerr,
-			}
-		}
-
-		return "", CmdError{
-			Command:   cmd,
-			StdErr:    serr,
-			OrigError: err,
-		}
-	}
-
-	sout := stdout.Bytes()
-	serr := stderr.Bytes()
-	log.Debugf("Command STDOUT:\n%s", sout)
-	log.Debugf("Command STDERR:\n%s", serr)
-	return string(sout), nil
+	return utils.RunCommand(cmd, map[string]string{"HELM_KUBECONTEXT": d.KubeContext})
 }
 
 func (d *DataLayer) runCommandHelm(cmd ...string) (string, error) {
@@ -192,7 +148,7 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 	}
 
 	for _, elm := range res {
-		chartRepoName, curVer, err := chartAndVersion(elm.Chart)
+		chartRepoName, curVer, err := utils.ChartAndVersion(elm.Chart)
 		if err != nil {
 			return nil, err
 		}
@@ -375,7 +331,7 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		values = oldVals
 	}
 
-	oldValsFile, close1, err := tempFile(values)
+	oldValsFile, close1, err := utils.TempFile(values)
 	defer close1()
 	if err != nil {
 		return "", err

@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
@@ -33,7 +34,7 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func NewRouter(abortWeb ControlChan, data *DataLayer, version string) *gin.Engine {
+func NewRouter(abortWeb utils.ControlChan, data *DataLayer, version string) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -52,7 +53,7 @@ func NewRouter(abortWeb ControlChan, data *DataLayer, version string) *gin.Engin
 	return api
 }
 
-func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine, version string) {
+func configureRoutes(abortWeb utils.ControlChan, data *DataLayer, api *gin.Engine, version string) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -65,6 +66,7 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine, ver
 
 	configureHelms(api.Group("/api/helm"), data)
 	configureKubectls(api.Group("/api/kube"), data)
+	configureScanners(api.Group("/api/scanners"), data)
 }
 
 func configureHelms(api *gin.RouterGroup, data *DataLayer) {
@@ -116,6 +118,12 @@ func configureStatic(api *gin.Engine) {
 			c.FileFromFS(c.Request.URL.Path, fs)
 		})
 	}
+}
+
+func configureScanners(api *gin.RouterGroup, data *DataLayer) {
+	api.GET("", func(context *gin.Context) {
+		context.JSON(http.StatusOK, data.Scanners)
+	})
 }
 
 func contextSetter(data *DataLayer) gin.HandlerFunc {

@@ -79,11 +79,6 @@ and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real
 - Have cleaner idea on the web API structure
 - Recognise & show ArgoCD-originating charts/objects, those `helm ls` does not show
 
-#### Topic "Validating Manifests"
-
-- Validate manifests before deploy and get better errors
-- See if we can build in Chechov or Validkube validation
-
 #### Iteration "Value Setting"
 
 - Setting parameter values and installing

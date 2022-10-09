@@ -302,7 +302,7 @@
                 </div>
                 <div class="row">
                     <div class="col-6 pe-3">
-                        <textarea name="values" class="form-control w-100 h-100" rows="5"></textarea>
+                        <textarea name="values" class="form-control w-100 h-100" rows="5" style="font-family: monospace"></textarea>
                     </div>
                     <div class="col-6 ps-3">
                         <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>
@@ -317,7 +317,8 @@
                 <label class="form-label mt-5">Manifest changes:</label>
                 <div id="upgradeModalBody" class="small"></div>
             </form>
-            <div class="modal-footer">
+            <div class="modal-footer" style="justify-content: space-between">
+                <button type="button" class="btn btn-light border-secondary float-start btn-scanners">Run Scanners</button>
                 <button type="button" class="btn btn-primary btn-confirm">Confirm Upgrade</button>
             </div>
         </div>

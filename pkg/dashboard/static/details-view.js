@@ -156,7 +156,7 @@ function showResources(namespace, chart, revision) {
                     <div class="row px-3 py-2 mb-3 bg-white rounded">
                         <div class="col-2 res-kind text-break"></div>
                         <div class="col-3 res-name text-break fw-bold"></div>
-                        <div class="col-1 res-status"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
+                        <div class="col-1 res-status overflow-hidden"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
                         <div class="col-5 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
                         <div class="col-1 res-actions"></div>
                     </div>
@@ -182,7 +182,7 @@ function showResources(namespace, chart, revision) {
                 }
 
                 const statusBlock = resBlock.find(".res-status");
-                statusBlock.empty().append(badge)
+                statusBlock.empty().append(badge).attr("title", data.status.phase)
                 resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
 
                 if (badge.text() !== "NotFound") {
