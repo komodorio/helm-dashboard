@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"net/http"
 	"strconv"
 )
@@ -24,7 +24,7 @@ func (h *HelmHandler) GetCharts(c *gin.Context) {
 // TODO: helm show chart komodorio/k8s-watcher to get the icon URL
 
 func (h *HelmHandler) Uninstall(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -38,7 +38,7 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 }
 
 func (h *HelmHandler) Rollback(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, true)
+	qp, err := utils.GetQueryProps(c, true)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -53,7 +53,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 }
 
 func (h *HelmHandler) History(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -68,7 +68,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 }
 
 func (h *HelmHandler) Resources(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, true)
+	qp, err := utils.GetQueryProps(c, true)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -83,7 +83,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoSearch(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -98,7 +98,7 @@ func (h *HelmHandler) RepoSearch(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -113,7 +113,7 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 }
 
 func (h *HelmHandler) Install(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -134,7 +134,7 @@ func (h *HelmHandler) Install(c *gin.Context) {
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, true)
+	qp, err := utils.GetQueryProps(c, true)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -159,7 +159,7 @@ func (h *HelmHandler) RepoValues(c *gin.Context) {
 	c.String(http.StatusOK, out)
 }
 
-func handleGetSection(data *DataLayer, section string, rDiff string, qp *dashboard.QueryProps, flag bool) (string, error) {
+func handleGetSection(data *DataLayer, section string, rDiff string, qp *utils.QueryProps, flag bool) (string, error) {
 	sections := map[string]SectionFn{
 		"manifests": data.RevisionManifests,
 		"values":    data.RevisionValues,

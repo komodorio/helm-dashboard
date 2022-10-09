@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
@@ -22,7 +22,7 @@ func (h *KubeHandler) GetContexts(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -54,7 +54,7 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 }
 
 func (h *KubeHandler) Describe(c *gin.Context) {
-	qp, err := dashboard.getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return

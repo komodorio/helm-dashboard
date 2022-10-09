@@ -1,6 +1,7 @@
 package scanners
 
 type Scanner interface {
-	Test() bool
-	Run(manifests string) error
+	Name() string               // returns string label for the scanner
+	Test() bool                 // test if the scanner is available
+	Run(manifests string) error // run the scanner
 }

@@ -3,10 +3,12 @@ package utils
 import (
 	"bytes"
 	"errors"
+	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -86,4 +88,28 @@ func RunCommand(cmd []string, env map[string]string) (string, error) {
 	log.Debugf("Command STDOUT:\n%s", sout)
 	log.Debugf("Command STDERR:\n%s", serr)
 	return string(sout), nil
+}
+
+type QueryProps struct {
+	Namespace string
+	Name      string
+	Revision  int
+}
+
+func GetQueryProps(c *gin.Context, revRequired bool) (*QueryProps, error) {
+	qp := QueryProps{}
+
+	qp.Namespace = c.Query("namespace")
+	qp.Name = c.Query("name")
+	if qp.Name == "" {
+		return nil, errors.New("missing required query string parameter: name")
+	}
+
+	cRev, err := strconv.Atoi(c.Query("revision"))
+	if err != nil && revRequired {
+		return nil, err
+	}
+	qp.Revision = cRev
+
+	return &qp, nil
 }

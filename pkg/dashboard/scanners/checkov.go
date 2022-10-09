@@ -9,6 +9,10 @@ import (
 type Checkov struct {
 }
 
+func (c *Checkov) Name() string {
+	return "Checkov"
+}
+
 func (c *Checkov) Test() bool {
 	res, err := utils.RunCommand([]string{"checkov", "--version"}, nil)
 	if err != nil {

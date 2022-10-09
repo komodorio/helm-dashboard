@@ -46,7 +46,7 @@ func TestFlow(t *testing.T) {
 	}
 	_ = history
 
-	chartRepoName, curVer, err := utils.chartAndVersion(chart.Chart)
+	chartRepoName, curVer, err := utils.ChartAndVersion(chart.Chart)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,7 +2,6 @@ package dashboard
 
 import (
 	"embed"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
@@ -10,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strconv"
 )
 
 //go:embed static/*
@@ -32,6 +30,16 @@ func errorHandler(c *gin.Context) {
 
 	if errs != "" {
 		c.String(http.StatusInternalServerError, errs)
+	}
+}
+
+func contextSetter(data *handlers.DataLayer) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
+			log.Debugf("Setting current context to: %s", context)
+			data.KubeContext = context[0]
+		}
+		c.Next()
 	}
 }
 
@@ -122,41 +130,6 @@ func configureStatic(api *gin.Engine) {
 }
 
 func configureScanners(api *gin.RouterGroup, data *handlers.DataLayer) {
-	api.GET("", func(context *gin.Context) {
-		context.JSON(http.StatusOK, data.Scanners)
-	})
-}
-
-func contextSetter(data *handlers.DataLayer) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
-			log.Debugf("Setting current context to: %s", context)
-			data.KubeContext = context[0]
-		}
-		c.Next()
-	}
-}
-
-type QueryProps struct {
-	Namespace string
-	Name      string
-	Revision  int
-}
-
-func getQueryProps(c *gin.Context, revRequired bool) (*QueryProps, error) {
-	qp := QueryProps{}
-
-	qp.Namespace = c.Query("namespace")
-	qp.Name = c.Query("name")
-	if qp.Name == "" {
-		return nil, errors.New("missing required query string parameter: name")
-	}
-
-	cRev, err := strconv.Atoi(c.Query("revision"))
-	if err != nil && revRequired {
-		return nil, err
-	}
-	qp.Revision = cRev
-
-	return &qp, nil
+	h := handlers.ScannersHandler{Data: data}
+	api.GET("", h.List)
 }
