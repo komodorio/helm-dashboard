@@ -94,20 +94,7 @@ function popUpUpgrade(self, verCur, elm) {
         })
     })
 
-    const btnScan = $("#upgradeModal .btn-scanners");
-    btnScan.off('click').click(function () {
-        btnScan.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        $.ajax({
-            type: 'POST',
-            url: "/api/scanners/run" + qstr + "&version=" + $('#upgradeModal select').val() ,
-            data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
-        }).fail(function (xhr) {
-            reportError("Failed to run scanners", xhr)
-        }).done(function (data) {
-            btnScan.prop("disabled", false).find("span").hide()
-            console.log(data)
-        })
-    })
+
 
     // fill current values
     const lastRev = $("#specRev").data("last-rev")

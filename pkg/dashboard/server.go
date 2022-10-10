@@ -19,6 +19,8 @@ func StartServer(version string) (string, utils.ControlChan) {
 		os.Exit(1) // TODO: propagate error instead?
 	}
 
+	discoverScanners(&data)
+
 	address := os.Getenv("HD_BIND")
 	if address == "" {
 		address = "localhost"
@@ -33,7 +35,6 @@ func StartServer(version string) (string, utils.ControlChan) {
 	abort := make(utils.ControlChan)
 	api := NewRouter(abort, &data, version)
 	done := startBackgroundServer(address, api, abort)
-	go discoverScanners(&data)
 
 	return "http://" + address, done
 }
@@ -64,6 +65,7 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlC
 func discoverScanners(data *handlers.DataLayer) {
 	potential := []scanners.Scanner{
 		&scanners.Checkov{},
+		&scanners.Trivy{Data: data},
 	}
 
 	data.Scanners = []scanners.Scanner{}

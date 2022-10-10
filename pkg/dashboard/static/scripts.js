@@ -19,6 +19,18 @@ $(function () {
             loadChartHistory(namespace, chart)
         }
     })
+
+    $.getJSON("/api/scanners").fail(function (xhr) {
+        reportError("Failed to get list of scanners", xhr)
+    }).done(function (data) {
+        for(let n=0; n<data.length; n++) {
+            const item=$(`<label class="form-check-label">
+                                <input class="form-check-input me-1" type="checkbox" checked name="scanner" value="`+data[n]+`"> `+data[n]+`
+                            </label>`)
+
+            $("#nav-scanners form").prepend(item)
+        }
+    })
 })
 
 
