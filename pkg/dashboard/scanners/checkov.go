@@ -34,11 +34,26 @@ func (c *Checkov) Run(manifests string) (*ScanResults, error) {
 	}
 
 	res := &ScanResults{}
+	res.O
 
 	err = json.Unmarshal([]byte(out), &res.OrigReport)
 	if err != nil {
 		return nil, err
 	}
 
+	(res.OrigReport).(map[string]interface{})
+
 	return res, nil
+}
+
+type CheckovResults struct {
+	Summary CheckovSummary
+}
+
+type CheckovSummary struct {
+	Failed        int `json:"failed"`
+	Passed        int `json:"passed"`
+	ResourceCount int `json:"resource_count"`
+	// parsing errors?
+	// skipped ?
 }

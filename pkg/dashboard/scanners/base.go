@@ -7,6 +7,7 @@ type Scanner interface {
 }
 
 type ScanResults struct {
-	OrigReport interface{}
-	Error      error
+	FailedCount int
+	OrigReport  interface{}
+	Error       error
 }
