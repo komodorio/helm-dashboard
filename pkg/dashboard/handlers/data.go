@@ -346,26 +346,13 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 	if err != nil {
 		return "", err
 	}
-
+	res := release.Release{}
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return "", err
+	}
 	if justTemplate {
-		res := release.Release{}
-		err = json.Unmarshal([]byte(out), &res)
-		if err != nil {
-			return "", err
-		}
-
-		manifests, err := d.RevisionManifests(namespace, name, 0, false)
-		if err != nil {
-			return "", err
-		}
-		out = getDiff(strings.TrimSpace(manifests), strings.TrimSpace(res.Manifest), "current.yaml", "upgraded.yaml")
-	} else {
-		res := release.Release{}
-		err = json.Unmarshal([]byte(out), &res)
-		if err != nil {
-			return "", err
-		}
-		_ = res
+		out = strings.TrimSpace(res.Manifest)
 	}
 
 	return out, nil

@@ -24,7 +24,7 @@ func ChartAndVersion(x string) (string, string, error) {
 }
 
 func TempFile(txt string) (string, func(), error) {
-	file, err := ioutil.TempFile("", "helm_dahsboard_")
+	file, err := ioutil.TempFile("", "helm_dahsboard_*.yaml")
 	if err != nil {
 		return "", nil, err
 	}

@@ -132,4 +132,5 @@ func configureStatic(api *gin.Engine) {
 func configureScanners(api *gin.RouterGroup, data *handlers.DataLayer) {
 	h := handlers.ScannersHandler{Data: data}
 	api.GET("", h.List)
+	api.POST("/run", h.Run)
 }

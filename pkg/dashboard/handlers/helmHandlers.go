@@ -6,6 +6,7 @@ import (
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type HelmHandler struct {
@@ -128,6 +129,13 @@ func (h *HelmHandler) Install(c *gin.Context) {
 
 	if !justTemplate {
 		c.Header("Content-Type", "application/json")
+	} else {
+		manifests, err := h.Data.RevisionManifests(qp.Namespace, qp.Name, 0, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		out = getDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
 	}
 
 	c.String(http.StatusAccepted, out)

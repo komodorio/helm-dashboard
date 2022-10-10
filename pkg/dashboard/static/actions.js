@@ -4,7 +4,7 @@ $("#btnUpgradeCheck").click(function () {
     self.find(".spinner-border").show()
     const repoName = self.data("repo")
     $("#btnUpgrade span").text("Checking...")
-    $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass")
+    $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
     $.post("/api/helm/repo/update?name=" + repoName).fail(function (xhr) {
         reportError("Failed to update chart repo", xhr)
     }).done(function () {
@@ -63,7 +63,8 @@ function checkUpgradeable(name) {
 
 function popUpUpgrade(self, verCur, elm) {
     const name = getHashParam("chart");
-    let url = "/api/helm/charts/install?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
+    const qstr = "?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
+    let url = "/api/helm/charts/install" + qstr
     $('#upgradeModal select').data("url", url).data("chart", elm.name)
 
     $("#upgradeModalLabel .name").text(name)
@@ -84,13 +85,27 @@ function popUpUpgrade(self, verCur, elm) {
         }).fail(function (xhr) {
             reportError("Failed to upgrade the chart", xhr)
         }).done(function (data) {
-            console.log(data)
             if (data.version) {
                 setHashParam("revision", data.version)
                 window.location.reload()
             } else {
                 reportError("Failed to get new revision number")
             }
+        })
+    })
+
+    const btnScan = $("#upgradeModal .btn-scanners");
+    btnScan.off('click').click(function () {
+        btnScan.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+        $.ajax({
+            type: 'POST',
+            url: "/api/scanners/run" + qstr + "&version=" + $('#upgradeModal select').val() ,
+            data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
+        }).fail(function (xhr) {
+            reportError("Failed to run scanners", xhr)
+        }).done(function (data) {
+            btnScan.prop("disabled", false).find("span").hide()
+            console.log(data)
         })
     })
 
@@ -140,11 +155,11 @@ function requestChangeDiff() {
     if ($("#upgradeModal textarea").data("dirty")) {
         $("#upgradeModal .invalid-feedback").hide()
         values = $("#upgradeModal form").serialize()
-        
+
         try {
             jsyaml.load($("#upgradeModal textarea").val())
         } catch (e) {
-            $("#upgradeModal .invalid-feedback").text("YAML parse error: "+e.message).show()
+            $("#upgradeModal .invalid-feedback").text("YAML parse error: " + e.message).show()
             $("#upgradeModalBody").html("Invalid values YAML")
             return
         }
@@ -155,7 +170,7 @@ function requestChangeDiff() {
         url: self.data("url") + "&version=" + self.val(),
         data: values,
     }).fail(function (xhr) {
-        $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info:     "+ xhr.responseText+"</p>")
+        $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info:     " + xhr.responseText + "</p>")
     }).done(function (data) {
         diffBody.empty();
         $("#upgradeModal .btn-confirm").prop("disabled", false)

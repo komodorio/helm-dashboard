@@ -1,6 +1,7 @@
 package scanners
 
 import (
+	"encoding/json"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -22,16 +23,22 @@ func (c *Checkov) Test() bool {
 	return true
 }
 
-func (c *Checkov) Run(manifests string) error {
+func (c *Checkov) Run(manifests string) (*ScanResults, error) {
 	fname, fclose, err := utils.TempFile(manifests)
 	defer fclose()
 
-	res, err := utils.RunCommand([]string{"checkov", "--quiet", "--output", "json", "--file", fname}, nil)
+	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "json", "--file", fname}
+	out, err := utils.RunCommand(cmd, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_ = res
+	res := &ScanResults{}
 
-	return nil
+	err = json.Unmarshal([]byte(out), &res.OrigReport)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
