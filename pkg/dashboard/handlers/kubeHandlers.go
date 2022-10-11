@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
@@ -9,7 +10,7 @@ import (
 )
 
 type KubeHandler struct {
-	Data *DataLayer
+	Data *subproc.DataLayer
 }
 
 func (h *KubeHandler) GetContexts(c *gin.Context) {

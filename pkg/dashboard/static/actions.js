@@ -94,8 +94,6 @@ function popUpUpgrade(self, verCur, elm) {
         })
     })
 
-
-
     // fill current values
     const lastRev = $("#specRev").data("last-rev")
     $.get("/api/helm/charts/values?namespace=" + getHashParam("namespace") + "&revision=" + lastRev + "&name=" + getHashParam("chart") + "&flag=true").fail(function (xhr) {

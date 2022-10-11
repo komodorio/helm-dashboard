@@ -1,7 +1,7 @@
 package scanners
 
 import (
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"strings"
 )
@@ -12,7 +12,7 @@ import (
 )
 
 type Trivy struct {
-	Data *handlers.DataLayer
+	Data *subproc.DataLayer
 }
 
 func (c *Trivy) Name() string {
@@ -29,7 +29,7 @@ func (c *Trivy) Test() bool {
 	return true
 }
 
-func (c *Trivy) Run(manifests string) (*ScanResults, error) {
+func (c *Trivy) Run(manifests string) (*subproc.ScanResults, error) {
 	fname, fclose, err := utils.TempFile(manifests)
 	defer fclose()
 
@@ -39,7 +39,7 @@ func (c *Trivy) Run(manifests string) (*ScanResults, error) {
 		return nil, err
 	}
 
-	res := &ScanResults{}
+	res := &subproc.ScanResults{}
 
 	err = json.Unmarshal([]byte(out), &res.OrigReport)
 	if err != nil {

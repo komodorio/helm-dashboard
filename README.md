@@ -78,6 +78,7 @@ and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real
 - solve umbrella-chart case
 - Have cleaner idea on the web API structure
 - Recognise & show ArgoCD-originating charts/objects, those `helm ls` does not show
+- loki example - DaemonSet and StatefulSet better status display
 
 #### Iteration "Value Setting"
 

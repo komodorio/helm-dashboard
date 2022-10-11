@@ -3,8 +3,8 @@ package dashboard
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -12,7 +12,7 @@ import (
 )
 
 func StartServer(version string) (string, utils.ControlChan) {
-	data := handlers.DataLayer{}
+	data := subproc.DataLayer{}
 	err := data.CheckConnectivity()
 	if err != nil {
 		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
@@ -62,13 +62,13 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlC
 	return done
 }
 
-func discoverScanners(data *handlers.DataLayer) {
-	potential := []scanners.Scanner{
+func discoverScanners(data *subproc.DataLayer) {
+	potential := []subproc.Scanner{
 		&scanners.Checkov{},
 		&scanners.Trivy{Data: data},
 	}
 
-	data.Scanners = []scanners.Scanner{}
+	data.Scanners = []subproc.Scanner{}
 	for _, scanner := range potential {
 		if scanner.Test() {
 			data.Scanners = append(data.Scanners, scanner)

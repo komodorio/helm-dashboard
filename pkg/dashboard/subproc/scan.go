@@ -1,4 +1,4 @@
-package scanners
+package subproc
 
 type Scanner interface {
 	Name() string                               // returns string label for the scanner

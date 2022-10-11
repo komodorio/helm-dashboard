@@ -2,6 +2,7 @@ package scanners
 
 import (
 	"encoding/json"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -23,7 +24,7 @@ func (c *Checkov) Test() bool {
 	return true
 }
 
-func (c *Checkov) Run(manifests string) (*ScanResults, error) {
+func (c *Checkov) Run(manifests string) (*subproc.ScanResults, error) {
 	fname, fclose, err := utils.TempFile(manifests)
 	defer fclose()
 
@@ -33,7 +34,7 @@ func (c *Checkov) Run(manifests string) (*ScanResults, error) {
 		return nil, err
 	}
 
-	res := &ScanResults{}
+	res := &subproc.ScanResults{}
 
 	err = json.Unmarshal([]byte(out), &res.OrigReport)
 	if err != nil {

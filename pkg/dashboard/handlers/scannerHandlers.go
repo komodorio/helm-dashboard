@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"net/http"
 )
 
 type ScannersHandler struct {
-	Data *DataLayer
+	Data *subproc.DataLayer
 }
 
 func (h *ScannersHandler) List(c *gin.Context) {
@@ -26,22 +26,25 @@ func (h *ScannersHandler) Run(c *gin.Context) {
 		return
 	}
 
-	res := map[string]*scanners.ScanResults{}
 	for _, scanner := range h.Data.Scanners {
-		mnf, err := h.Data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, c.PostForm("values"))
-		if err != nil {
-			res[scanner.Name()] = &scanners.ScanResults{Error: err}
+		if scanner.Name() != c.Param("scanner") {
 			continue
+		}
+
+		mnf, err := h.Data.RevisionManifests(qp.Namespace, qp.Name, qp.Revision, false)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, &subproc.ScanResults{Error: err})
+			return
 		}
 
 		sr, err := scanner.Run(mnf)
 		if err != nil {
-			res[scanner.Name()] = &scanners.ScanResults{Error: err}
-			continue
+			c.JSON(http.StatusInternalServerError, &subproc.ScanResults{Error: err})
+			return
 		}
 
-		res[scanner.Name()] = sr
+		c.JSON(http.StatusOK, sr)
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.String(http.StatusNotFound, "Scanner with this name is not found")
 }

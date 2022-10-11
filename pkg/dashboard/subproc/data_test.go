@@ -1,4 +1,4 @@
-package handlers
+package subproc
 
 import (
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"

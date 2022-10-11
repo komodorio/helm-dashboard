@@ -97,7 +97,7 @@ $('#specRev').keyup(function (event) {
     }
 });
 
-$("form").submit(function(e){
+$("form").submit(function (e) {
     e.preventDefault();
 });
 
@@ -150,7 +150,7 @@ function handleScanners() {
         btnScan.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
         $.ajax({
             type: 'POST',
-            url: "/api/scanners/run" + qstr + "&version=" + $('#upgradeModal select').val() ,
+            url: "/api/scanners/run" + qstr + "&version=" + $('#upgradeModal select').val(),
             data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
         }).fail(function (xhr) {
             reportError("Failed to run scanners", xhr)
@@ -233,3 +233,19 @@ function showDescribe(ns, kind, name, badge) {
         $("#describeModalBody").empty().append("<pre class='bg-white rounded p-3'></pre>").find("pre").html(data)
     })
 }
+
+
+const btnRunScans = $("#nav-scanners form .btn-primary");
+btnRunScans.click(function () {
+    btnRunScans.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>')
+    $("#nav-scanners form span input").each(function (idx, obj) {
+        $.ajax({
+            type: 'POST',
+            url: "/api/scanners/" + $(obj).val() + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart") + "&revision=" + getHashParam("revision"),
+        }).fail(function (xhr) {
+            reportError("Failed to run scanners", xhr)
+        }).done(function (data) {
+            console.log(data)
+        })
+    })
+})

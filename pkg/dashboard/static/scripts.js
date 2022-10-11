@@ -23,12 +23,13 @@ $(function () {
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
     }).done(function (data) {
-        for(let n=0; n<data.length; n++) {
-            const item=$(`<label class="form-check-label">
-                                <input class="form-check-input me-1" type="checkbox" checked name="scanner" value="`+data[n]+`"> `+data[n]+`
-                            </label>`)
+        for (let n = 0; n < data.length; n++) {
+            const item = $(`
+                <label class="form-check-label me-4">
+                    <input class="form-check-input me-1" type="checkbox" checked name="scanner" value="` + data[n] + `"> ` + data[n] + `
+                </label>`)
 
-            $("#nav-scanners form").prepend(item)
+            $("#nav-scanners form span").prepend(item)
         }
     })
 })
@@ -81,14 +82,14 @@ function statusStyle(status, card, txt) {
 }
 
 function getCleanClusterName(rawClusterName) {
-    if (rawClusterName.indexOf('arn')==0) {
+    if (rawClusterName.indexOf('arn') == 0) {
         // AWS cluster
         clusterSplit = rawClusterName.split(':')
         clusterName = clusterSplit.at(-1).split("/").at(-1)
         region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
-    if (rawClusterName.indexOf('gke')==0) {
+    if (rawClusterName.indexOf('gke') == 0) {
         // GKE cluster
         return rawClusterName.split('_').at(-2) + '/' + rawClusterName.split('_').at(-1) + ' [GKE]'
     }

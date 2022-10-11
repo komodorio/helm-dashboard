@@ -1,4 +1,4 @@
-package handlers
+package subproc
 
 import (
 	"bytes"
@@ -8,7 +8,6 @@ import (
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -25,7 +24,7 @@ type DataLayer struct {
 	KubeContext string
 	Helm        string
 	Kubectl     string
-	Scanners    []scanners.Scanner
+	Scanners    []Scanner
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
@@ -122,7 +121,7 @@ func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
 	return res, nil
 }
 
-func (d *DataLayer) ListInstalled() (res []releaseElement, err error) {
+func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 	out, err := d.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
 	if err != nil {
 		return nil, err
@@ -135,7 +134,7 @@ func (d *DataLayer) ListInstalled() (res []releaseElement, err error) {
 	return res, nil
 }
 
-func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*historyElement, err error) {
+func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
 	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
 	if err != nil {
@@ -160,7 +159,7 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 	return res, nil
 }
 
-func (d *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement, err error) {
+func (d *DataLayer) ChartRepoVersions(chartName string) (res []RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "/" + chartName + "\v", "--versions", "--output", "json"}
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
@@ -378,11 +377,11 @@ func RevisionDiff(functor SectionFn, ext string, namespace string, name string, 
 		return "", err
 	}
 
-	diff := getDiff(manifest1, manifest2, strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext)
+	diff := GetDiff(manifest1, manifest2, strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext)
 	return diff, nil
 }
 
-func getDiff(text1 string, text2 string, name1 string, name2 string) string {
+func GetDiff(text1 string, text2 string, name1 string, name2 string) string {
 	edits := myers.ComputeEdits(span.URIFromPath(""), text1, text2)
 	unified := gotextdiff.ToUnified(name1, name2, text1, edits)
 	diff := fmt.Sprint(unified)
