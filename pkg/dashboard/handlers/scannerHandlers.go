@@ -31,19 +31,14 @@ func (h *ScannersHandler) Run(c *gin.Context) {
 			continue
 		}
 
-		mnf, err := h.Data.RevisionManifests(qp.Namespace, qp.Name, qp.Revision, false)
+		sr, err := scanner.Run(qp)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, &subproc.ScanResults{Error: err})
-			return
-		}
-
-		sr, err := scanner.Run(mnf)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, &subproc.ScanResults{Error: err})
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
 		c.JSON(http.StatusOK, sr)
+		return
 	}
 
 	c.String(http.StatusNotFound, "Scanner with this name is not found")

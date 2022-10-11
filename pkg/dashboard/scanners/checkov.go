@@ -9,6 +9,7 @@ import (
 )
 
 type Checkov struct {
+	Data *subproc.DataLayer
 }
 
 func (c *Checkov) Name() string {
@@ -24,8 +25,14 @@ func (c *Checkov) Test() bool {
 	return true
 }
 
-func (c *Checkov) Run(manifests string) (*subproc.ScanResults, error) {
-	fname, fclose, err := utils.TempFile(manifests)
+func (c *Checkov) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
+	mnf, err := c.Data.RevisionManifests(qp.Namespace, qp.Name, qp.Revision, false)
+	if err != nil {
+
+		return nil, err
+	}
+
+	fname, fclose, err := utils.TempFile(mnf)
 	defer fclose()
 
 	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "json", "--file", fname}

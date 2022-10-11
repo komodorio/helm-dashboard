@@ -40,7 +40,7 @@ func TempFile(txt string) (string, func(), error) {
 type CmdError struct {
 	Command   []string
 	OrigError error
-	StdErr    []byte
+	StdErr    string
 }
 
 func (e CmdError) Error() string {
@@ -71,14 +71,14 @@ func RunCommand(cmd []string, env map[string]string) (string, error) {
 		if eerr, ok := err.(*exec.ExitError); ok {
 			return "", CmdError{
 				Command:   cmd,
-				StdErr:    serr,
+				StdErr:    string(serr),
 				OrigError: eerr,
 			}
 		}
 
 		return "", CmdError{
 			Command:   cmd,
-			StdErr:    serr,
+			StdErr:    string(serr),
 			OrigError: err,
 		}
 	}

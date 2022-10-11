@@ -29,22 +29,30 @@ func (c *Trivy) Test() bool {
 	return true
 }
 
-func (c *Trivy) Run(manifests string) (*subproc.ScanResults, error) {
-	fname, fclose, err := utils.TempFile(manifests)
-	defer fclose()
-
-	cmd := []string{"trivy", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "json", "--file", fname}
-	out, err := utils.RunCommand(cmd, nil)
+func (c *Trivy) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
+	resources, err := c.Data.RevisionManifestsParsed(qp.Namespace, qp.Name, qp.Revision)
 	if err != nil {
 		return nil, err
 	}
 
 	res := &subproc.ScanResults{}
 
-	err = json.Unmarshal([]byte(out), &res.OrigReport)
-	if err != nil {
-		return nil, err
+	for _, res := range resources {
+		cmd := []string{"trivy", "kubernetes", "--format", "json", "--report", "all", "--no-progress", "--context", c.Data.KubeContext, "--namespace", qp.Namespace, res.Kind + "/" + res.Name}
+		out, err := utils.RunCommand(cmd, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		rep := TrivyReport{}
+		err = json.Unmarshal([]byte(out), &rep)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return res, nil
+}
+
+type TrivyReport struct {
 }

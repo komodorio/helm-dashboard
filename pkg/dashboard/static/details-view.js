@@ -238,13 +238,30 @@ function showDescribe(ns, kind, name, badge) {
 const btnRunScans = $("#nav-scanners form .btn-primary");
 btnRunScans.click(function () {
     btnRunScans.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>')
-    $("#nav-scanners form span input").each(function (idx, obj) {
+    const body = $("#nav-scanners .body").empty();
+    $("#nav-scanners form span input:checked").each(function (idx, obj) {
+        const scanner = $(obj).val();
+
+        const block = $(`
+            <div class="row mb-3 bg-white p-2">
+                <h5 class="col-2 fw-bold"><span class="spinner-border spinner-border-sm me-1 " role="status" aria-hidden="true"></span> ` + scanner + `</h5>
+                <div class="col"></div>
+            </div>
+        `)
+
+        body.append(block)
+
         $.ajax({
             type: 'POST',
-            url: "/api/scanners/" + $(obj).val() + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart") + "&revision=" + getHashParam("revision"),
+            url: "/api/scanners/" + scanner + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart") + "&revision=" + getHashParam("revision"),
+            dataType: "json",
         }).fail(function (xhr) {
-            reportError("Failed to run scanners", xhr)
+            console.log("failed")
+            block.find(".spinner-border").hide()
+            block.find(".col").append("<span class='text-danger'><i class='bi-x-octagon m-1'></i> " + xhr.responseText + "</span>")
+            //reportError("Failed to run scanner " + scanner, xhr)
         }).done(function (data) {
+            block.find(".spinner-border").hide()
             console.log(data)
         })
     })

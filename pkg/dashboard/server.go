@@ -64,7 +64,7 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlC
 
 func discoverScanners(data *subproc.DataLayer) {
 	potential := []subproc.Scanner{
-		&scanners.Checkov{},
+		&scanners.Checkov{Data: data},
 		&scanners.Trivy{Data: data},
 	}
 
