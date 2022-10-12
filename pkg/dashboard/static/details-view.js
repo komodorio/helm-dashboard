@@ -178,8 +178,8 @@ function showResources(namespace, chart, revision) {
                         <div class="col-2 res-kind text-break"></div>
                         <div class="col-3 res-name text-break fw-bold"></div>
                         <div class="col-1 res-status overflow-hidden"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
-                        <div class="col-5 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
-                        <div class="col-1 res-actions"></div>
+                        <div class="col-4 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
+                        <div class="col-2 res-actions"></div>
                     </div>
             `)
 
@@ -208,9 +208,16 @@ function showResources(namespace, chart, revision) {
 
                 if (badge.text() !== "NotFound") {
                     resBlock.find(".res-actions")
+
                     const btn = $("<button class=\"btn btn-sm btn-white border-secondary\">Describe</button>");
                     resBlock.find(".res-actions").append(btn)
                     btn.click(function () {
+                        showDescribe(ns, res.kind, res.metadata.name, badge.clone())
+                    })
+
+                    const btn2 = $("<button class=\"btn btn-sm btn-white border-secondary ms-2\">Scan</button>");
+                    resBlock.find(".res-actions").append(btn2)
+                    btn2.click(function () {
                         showDescribe(ns, res.kind, res.metadata.name, badge.clone())
                     })
                 }
