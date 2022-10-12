@@ -6,13 +6,14 @@
     DD_RUM.onReady(function() {
         const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
+            const version = xhr.responseText;
+            if (xhr.readyState === XMLHttpRequest.DONE && version!=="dev") {
                 DD_RUM.init({
                     clientToken: 'pub16d64cd1c00cf073ce85af914333bf72',
                     applicationId: 'e75439e5-e1b3-46ba-a9e9-a2e58579a2e2',
                     site: 'datadoghq.com',
                     service: 'helm-dashboard',
-                    version: xhr.responseText,
+                    version: version,
                     trackInteractions: true,
                     trackResources: true,
                     trackLongTasks: true,
