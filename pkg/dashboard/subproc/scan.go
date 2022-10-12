@@ -9,6 +9,7 @@ type Scanner interface {
 }
 
 type ScanResults struct {
+	PassedCount int
 	FailedCount int
 	OrigReport  interface{}
 	Error       error

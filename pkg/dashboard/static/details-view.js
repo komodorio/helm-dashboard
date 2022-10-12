@@ -245,7 +245,8 @@ btnRunScans.click(function () {
         const block = $(`
             <div class="row mb-3 bg-white p-2">
                 <h5 class="col-2 fw-bold"><span class="spinner-border spinner-border-sm me-1 " role="status" aria-hidden="true"></span> ` + scanner + `</h5>
-                <div class="col"></div>
+                <div class="col descr"></div>
+                <div class="col text-end"><button class="btn btn-sm btn-light btn-outline-secondary" disabled>View Report</button></div>
             </div>
         `)
 
@@ -256,13 +257,17 @@ btnRunScans.click(function () {
             url: "/api/scanners/" + scanner + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart") + "&revision=" + getHashParam("revision"),
             dataType: "json",
         }).fail(function (xhr) {
-            console.log("failed")
             block.find(".spinner-border").hide()
-            block.find(".col").append("<span class='text-danger'><i class='bi-x-octagon m-1'></i> " + xhr.responseText + "</span>")
+            block.find(".descr").append("<span class='text-danger'><i class='bi-x-octagon m-1'></i> " + xhr.responseText + "</span>")
             //reportError("Failed to run scanner " + scanner, xhr)
         }).done(function (data) {
-            block.find(".spinner-border").hide()
             console.log(data)
+            block.find(".spinner-border").hide()
+            if (data.FailedCount) {
+                block.find(".descr").append("<span class='fs-6 badge bg-light text-danger'>" + data.FailedCount + " problems</span>")
+            }
+            block.find(".descr").append("<span class='fs-6 badge bg-light text-success'>" + data.PassedCount + " passed</span>")
+            block.find("button").prop("disabled", false)
         })
     })
 })

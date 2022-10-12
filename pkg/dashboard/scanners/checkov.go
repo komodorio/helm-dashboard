@@ -48,6 +48,15 @@ func (c *Checkov) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
 		return nil, err
 	}
 
+	sum := CheckovResults{}
+	err = json.Unmarshal([]byte(out), &sum)
+	if err != nil {
+		return nil, err
+	}
+
+	res.PassedCount = sum.Summary.Passed
+	res.FailedCount = sum.Summary.Failed
+
 	return res, nil
 }
 
