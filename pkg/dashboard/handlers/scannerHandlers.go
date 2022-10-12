@@ -64,5 +64,9 @@ func (h *ScannersHandler) ScanResource(c *gin.Context) {
 		}
 	}
 
+	if reps == "" {
+		reps = "No information from scanners"
+	}
+
 	c.String(http.StatusOK, reps)
 }

@@ -283,6 +283,15 @@ func (d *DataLayer) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error
 	return &res, nil
 }
 
+func (d *DataLayer) GetResourceYAML(namespace string, def *v1.Carp) (string, error) {
+	out, err := d.runCommandKubectl("get", strings.ToLower(def.Kind), def.Name, "--namespace", namespace, "--output", "yaml")
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
+}
+
 func (d *DataLayer) DescribeResource(namespace string, kind string, name string) (string, error) {
 	out, err := d.runCommandKubectl("describe", strings.ToLower(kind), name, "--namespace", namespace)
 	if err != nil {
