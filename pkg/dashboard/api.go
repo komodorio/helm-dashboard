@@ -134,4 +134,5 @@ func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
 	h := handlers.ScannersHandler{Data: data}
 	api.GET("", h.List)
 	api.POST("/:scanner", h.Run)
+	api.GET("/resource/:kind", h.ScanResource)
 }

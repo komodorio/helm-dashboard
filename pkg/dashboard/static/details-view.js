@@ -215,10 +215,10 @@ function showResources(namespace, chart, revision) {
                         showDescribe(ns, res.kind, res.metadata.name, badge.clone())
                     })
 
-                    const btn2 = $("<button class=\"btn btn-sm btn-white border-secondary ms-2\">Scan</button>");
+                    const btn2 = $("<button class='btn btn-sm btn-white border-secondary ms-2'>Scan</button>");
                     resBlock.find(".res-actions").append(btn2)
                     btn2.click(function () {
-                        showDescribe(ns, res.kind, res.metadata.name, badge.clone())
+                        scanResource(ns, res.kind, res.metadata.name, badge.clone())
                     })
                 }
             })
@@ -241,6 +241,21 @@ function showDescribe(ns, kind, name, badge) {
     })
 }
 
+function scanResource(ns, kind, name, badge) {
+    $("#describeModal .offcanvas-header p").text(kind)
+    $("#describeModalLabel").text(name).append(badge.addClass("ms-3 small fw-normal"))
+    $("#describeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Scanning...')
+
+    const myModal = new bootstrap.Offcanvas(document.getElementById('describeModal'));
+    myModal.show()
+    $.get("/api/scanners/resource/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
+        reportError("Failed to scan resource", xhr)
+    }).done(function (data) {
+        console.log(data)
+        data = hljs.highlight(data, {language: 'yaml'}).value
+        $("#describeModalBody").empty().append("<pre class='bg-white rounded p-3' style='font-size: inherit; overflow: unset'></pre>").find("pre").html(data)
+    })
+}
 
 const btnRunScans = $("#nav-scanners form .btn-primary");
 btnRunScans.click(function () {

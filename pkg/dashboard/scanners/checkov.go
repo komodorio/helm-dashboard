@@ -60,6 +60,45 @@ func (c *Checkov) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
 	return res, nil
 }
 
+func (c *Checkov) RunResource(ns string, kind string, name string) (string, error) {
+	return "", nil
+	/*
+		mnf, err := c.Data.RevisionManifestsParsed(qp.Namespace, qp.Name, qp.Revision)
+		if err != nil {
+
+			return nil, err
+		}
+
+		fname, fclose, err := utils.TempFile(mnf)
+		defer fclose()
+
+		cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "json", "--file", fname}
+		out, err := utils.RunCommand(cmd, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		res := &subproc.ScanResults{}
+
+		err = json.Unmarshal([]byte(out), &res.OrigReport)
+		if err != nil {
+			return nil, err
+		}
+
+		sum := CheckovResults{}
+		err = json.Unmarshal([]byte(out), &sum)
+		if err != nil {
+			return nil, err
+		}
+
+		res.PassedCount = sum.Summary.Passed
+		res.FailedCount = sum.Summary.Failed
+
+		return res, nil
+
+	*/
+}
+
 type CheckovResults struct {
 	Summary CheckovSummary
 }

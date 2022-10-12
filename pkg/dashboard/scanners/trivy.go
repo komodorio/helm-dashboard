@@ -1,15 +1,11 @@
 package scanners
 
 import (
-	"encoding/json"
 	"github.com/aquasecurity/trivy/pkg/k8s/report"
-	tplReport "github.com/aquasecurity/trivy/pkg/report"
 	"github.com/aquasecurity/trivy/pkg/types"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"os"
 	"strings"
 )
 
@@ -32,66 +28,27 @@ func (c *Trivy) Test() bool {
 }
 
 func (c *Trivy) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
-	resources, err := c.Data.RevisionManifestsParsed(qp.Namespace, qp.Name, qp.Revision)
+	return nil, nil
+}
+
+func (c *Trivy) scanResource(ns string, kind string, name string) (string, error) {
+	cmd := []string{"trivy", "kubernetes", "--quiet", "--format", "table", "--report", "all", "--no-progress",
+		"--context", c.Data.KubeContext, "--namespace", ns, kind + "/" + name}
+	out, err := utils.RunCommand(cmd, nil)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	res := &subproc.ScanResults{}
+	return out, nil
+}
 
-	passed := report.Report{}
-	failed := report.Report{}
-	for _, res := range resources { // TODO: this loop is long, report progress back to UI
-		cmd := []string{"trivy", "kubernetes", "--format", "json", "--report", "all", "--no-progress",
-			"--context", c.Data.KubeContext, "--namespace", qp.Namespace, res.Kind + "/" + res.Name}
-		out, err := utils.RunCommand(cmd, nil)
-		if err != nil {
-			return nil, err
-		}
-
-		rep := report.Report{}
-		err = json.Unmarshal([]byte(out), &rep)
-		if err != nil {
-			return nil, err
-		}
-
-		if rep.Failed() {
-			failed.Misconfigurations = append(failed.Misconfigurations, rep.Misconfigurations...)
-			failed.Vulnerabilities = append(failed.Vulnerabilities, rep.Vulnerabilities...)
-		} else {
-			passed.Misconfigurations = append(passed.Misconfigurations, rep.Misconfigurations...)
-			passed.Vulnerabilities = append(passed.Vulnerabilities, rep.Vulnerabilities...)
-		}
-	}
-
-	res.OrigReport = failed
-	summarize(res, passed.Vulnerabilities)
-	summarize(res, passed.Misconfigurations)
-	summarize(res, failed.Vulnerabilities)
-	summarize(res, failed.Misconfigurations)
-
-	iow, err := os.OpenFile("/tmp/123.html", os.O_WRONLY|os.O_CREATE, 0600)
+func (c *Trivy) RunResource(ns string, kind string, name string) (string, error) {
+	resource, err := c.scanResource(ns, kind, name)
 	if err != nil {
-		return nil, err
-	}
-	defer iow.Close()
-
-	tpl, err := ioutil.ReadFile("/usr/local/share/trivy/templates/html.tpl")
-	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	wrt, err := tplReport.NewTemplateWriter(iow, string(tpl))
-	if err != nil {
-		return nil, err
-	}
-
-	err = wrt.Write(reportToReport(&failed))
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return resource, nil
 }
 
 func reportToReport(failed *report.Report) types.Report {

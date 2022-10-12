@@ -43,3 +43,26 @@ func (h *ScannersHandler) Run(c *gin.Context) {
 
 	c.String(http.StatusNotFound, "Scanner with this name is not found")
 }
+
+func (h *ScannersHandler) ScanResource(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	reps := ""
+	for _, scanner := range h.Data.Scanners {
+		sr, err := scanner.RunResource(qp.Namespace, c.Param("kind"), qp.Name)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		if sr != "" {
+			reps += scanner.Name() + " results:\n\n" + sr
+		}
+	}
+
+	c.String(http.StatusOK, reps)
+}
