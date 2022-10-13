@@ -244,16 +244,29 @@ function showDescribe(ns, kind, name, badge) {
 function scanResource(ns, kind, name, badge) {
     $("#describeModal .offcanvas-header p").text(kind)
     $("#describeModalLabel").text(name).append(badge.addClass("ms-3 small fw-normal"))
-    $("#describeModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Scanning...')
+    const body = $("#describeModalBody");
+    body.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Scanning...')
 
     const myModal = new bootstrap.Offcanvas(document.getElementById('describeModal'));
     myModal.show()
     $.get("/api/scanners/resource/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
         reportError("Failed to scan resource", xhr)
     }).done(function (data) {
-        console.log(data)
-        data = hljs.highlight(data, {language: 'yaml'}).value
-        $("#describeModalBody").empty().append("<pre class='bg-white rounded p-3' style='font-size: inherit; overflow: unset'></pre>").find("pre").html(data)
+        body.empty()
+        if ($.isEmptyObject(data)) {
+            body.append("No information from scanners. Make sure you have installed some and scanned object is supported.")
+        }
+
+        for (let name in data) {
+            const res = data[name]
+
+            if (!res.OrigReport) continue
+            body.append("<h3>" + name + " Scan Results <span class='badge bg-success'>10 passed</span></h3>")
+
+            const hl = hljs.highlight(res.OrigReport, {language: 'yaml'}).value
+            const pre = $("<pre class='bg-white rounded p-3' style='font-size: inherit; overflow: unset'></pre>").html(hl)
+            body.append(pre)
+        }
     })
 }
 

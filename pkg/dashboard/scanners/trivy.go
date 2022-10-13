@@ -42,13 +42,16 @@ func (c *Trivy) scanResource(ns string, kind string, name string) (string, error
 	return out, nil
 }
 
-func (c *Trivy) RunResource(ns string, kind string, name string) (string, error) {
+func (c *Trivy) RunResource(ns string, kind string, name string) (*subproc.ScanResults, error) {
+	res := subproc.ScanResults{}
 	resource, err := c.scanResource(ns, kind, name)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return resource, nil
+	res.OrigReport = resource
+
+	return &res, nil
 }
 
 func reportToReport(failed *report.Report) types.Report {

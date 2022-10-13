@@ -61,13 +61,13 @@ func (c *Checkov) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
 	return res, nil
 }
 
-func (c *Checkov) RunResource(ns string, kind string, name string) (string, error) {
+func (c *Checkov) RunResource(ns string, kind string, name string) (*subproc.ScanResults, error) {
 	carp := v1.Carp{}
 	carp.Kind = kind
 	carp.Name = name
 	mnf, err := c.Data.GetResourceYAML(ns, &carp)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	fname, fclose, err := utils.TempFile(mnf)
@@ -76,10 +76,18 @@ func (c *Checkov) RunResource(ns string, kind string, name string) (string, erro
 	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "cli", "--file", fname}
 	out, err := utils.RunCommand(cmd, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return out, nil
+	res := subproc.ScanResults{}
+	line, out, found := strings.Cut(out, "\n")
+	if found {
+		_ = line
+	}
+
+	res.OrigReport = out
+
+	return &res, nil
 }
 
 type CheckovResults struct {

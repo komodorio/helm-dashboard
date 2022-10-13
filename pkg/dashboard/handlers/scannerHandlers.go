@@ -51,7 +51,7 @@ func (h *ScannersHandler) ScanResource(c *gin.Context) {
 		return
 	}
 
-	reps := ""
+	reps := map[string]*subproc.ScanResults{}
 	for _, scanner := range h.Data.Scanners {
 		sr, err := scanner.RunResource(qp.Namespace, c.Param("kind"), qp.Name)
 		if err != nil {
@@ -59,14 +59,8 @@ func (h *ScannersHandler) ScanResource(c *gin.Context) {
 			return
 		}
 
-		if sr != "" {
-			reps += scanner.Name() + " results:\n\n" + sr
-		}
+		reps[scanner.Name()] = sr
 	}
 
-	if reps == "" {
-		reps = "No information from scanners"
-	}
-
-	c.String(http.StatusOK, reps)
+	c.IndentedJSON(http.StatusOK, reps)
 }
