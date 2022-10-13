@@ -261,7 +261,17 @@ function scanResource(ns, kind, name, badge) {
             const res = data[name]
 
             if (!res.OrigReport) continue
-            body.append("<h3>" + name + " Scan Results <span class='badge bg-success'>10 passed</span></h3>")
+            const hdr = $("<h3>" + name + " Scan Results</h3>");
+
+            if (res.FailedCount) {
+                hdr.append("<span class='badge bg-danger ms-3'>" + res.FailedCount + " failed</span>")
+            }
+
+            if (res.PassedCount) {
+                hdr.append("<span class='badge bg-info ms-3'>" + res.PassedCount + " passed</span>")
+            }
+
+            body.append(hdr)
 
             const hl = hljs.highlight(res.OrigReport, {language: 'yaml'}).value
             const pre = $("<pre class='bg-white rounded p-3' style='font-size: inherit; overflow: unset'></pre>").html(hl)

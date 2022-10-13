@@ -6,6 +6,7 @@ import (
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
+	"strconv"
 	"strings"
 )
 
@@ -47,6 +48,39 @@ func (c *Trivy) RunResource(ns string, kind string, name string) (*subproc.ScanR
 	resource, err := c.scanResource(ns, kind, name)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, line := range strings.Split(resource, "\n") {
+		if strings.HasPrefix(line, "Tests:") {
+			parts := strings.FieldsFunc(line, func(r rune) bool {
+				return r == ':' || r == ',' || r == ')'
+			})
+
+			if cnt, err := strconv.Atoi(strings.TrimSpace(parts[2])); err == nil {
+				res.PassedCount += cnt
+			} else {
+				log.Warnf("Failed to parse Trivy output: %s", err)
+			}
+
+			if cnt, err := strconv.Atoi(strings.TrimSpace(parts[4])); err == nil {
+				res.FailedCount += cnt
+			} else {
+				log.Warnf("Failed to parse Trivy output: %s", err)
+			}
+		}
+
+		if strings.HasPrefix(line, "Total:") {
+			parts := strings.FieldsFunc(line, func(r rune) bool {
+				return r == ':' || r == ',' || r == '('
+			})
+
+			if cnt, err := strconv.Atoi(strings.TrimSpace(parts[1])); err == nil {
+				res.FailedCount += cnt
+			} else {
+				log.Warnf("Failed to parse Trivy output: %s", err)
+			}
+		}
+
 	}
 
 	res.OrigReport = resource

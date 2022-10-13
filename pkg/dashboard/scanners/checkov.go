@@ -6,6 +6,7 @@ import (
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"strconv"
 	"strings"
 )
 
@@ -80,12 +81,28 @@ func (c *Checkov) RunResource(ns string, kind string, name string) (*subproc.Sca
 	}
 
 	res := subproc.ScanResults{}
-	line, out, found := strings.Cut(out, "\n")
+	_, out, _ = strings.Cut(out, "\n")         // kubernetes scan results:
+	_, out, _ = strings.Cut(out, "\n")         // empty line
+	line, out, found := strings.Cut(out, "\n") // status line
 	if found {
-		_ = line
+		parts := strings.FieldsFunc(line, func(r rune) bool {
+			return r == ':' || r == ','
+		})
+		if cnt, err := strconv.Atoi(strings.TrimSpace(parts[1])); err == nil {
+			res.PassedCount = cnt
+		} else {
+			log.Warnf("Failed to parse Checkov output: %s", err)
+		}
+		if cnt, err := strconv.Atoi(strings.TrimSpace(parts[3])); err == nil {
+			res.FailedCount = cnt
+		} else {
+			log.Warnf("Failed to parse Checkov output: %s", err)
+		}
+	} else {
+		log.Warnf("Failed to parse Checkov output")
 	}
 
-	res.OrigReport = out
+	res.OrigReport = strings.TrimSpace(out)
 
 	return &res, nil
 }
