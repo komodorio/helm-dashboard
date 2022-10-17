@@ -1,4 +1,4 @@
-package dashboard
+package subproc
 
 import (
 	"bytes"
@@ -8,12 +8,11 @@ import (
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"os"
-	"os/exec"
 	"regexp"
 	"sort"
 	"strconv"
@@ -21,61 +20,17 @@ import (
 	"time"
 )
 
-type CmdError struct {
-	Command   []string
-	OrigError error
-	StdErr    []byte
-}
-
-func (e CmdError) Error() string {
-	//return fmt.Sprintf("failed to run command %s:\nError: %s\nSTDERR:%s", e.Command, e.OrigError, e.StdErr)
-	return string(e.StdErr)
-}
-
 type DataLayer struct {
 	KubeContext string
 	Helm        string
 	Kubectl     string
+	Scanners    []Scanner
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
 	log.Debugf("Starting command: %s", cmd)
-	prog := exec.Command(cmd[0], cmd[1:]...)
-	prog.Env = os.Environ()
-	prog.Env = append(prog.Env, "HELM_KUBECONTEXT="+d.KubeContext)
 
-	var stdout bytes.Buffer
-	prog.Stdout = &stdout
-
-	var stderr bytes.Buffer
-	prog.Stderr = &stderr
-
-	if err := prog.Run(); err != nil {
-		log.Warnf("Failed command: %s", cmd)
-		serr := stderr.Bytes()
-		if serr != nil {
-			log.Warnf("STDERR:\n%s", serr)
-		}
-		if eerr, ok := err.(*exec.ExitError); ok {
-			return "", CmdError{
-				Command:   cmd,
-				StdErr:    serr,
-				OrigError: eerr,
-			}
-		}
-
-		return "", CmdError{
-			Command:   cmd,
-			StdErr:    serr,
-			OrigError: err,
-		}
-	}
-
-	sout := stdout.Bytes()
-	serr := stderr.Bytes()
-	log.Debugf("Command STDOUT:\n%s", sout)
-	log.Debugf("Command STDERR:\n%s", serr)
-	return string(sout), nil
+	return utils.RunCommand(cmd, map[string]string{"HELM_KUBECONTEXT": d.KubeContext})
 }
 
 func (d *DataLayer) runCommandHelm(cmd ...string) (string, error) {
@@ -166,7 +121,7 @@ func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
 	return res, nil
 }
 
-func (d *DataLayer) ListInstalled() (res []releaseElement, err error) {
+func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 	out, err := d.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
 	if err != nil {
 		return nil, err
@@ -179,7 +134,7 @@ func (d *DataLayer) ListInstalled() (res []releaseElement, err error) {
 	return res, nil
 }
 
-func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*historyElement, err error) {
+func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
 	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
 	if err != nil {
@@ -192,7 +147,7 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 	}
 
 	for _, elm := range res {
-		chartRepoName, curVer, err := chartAndVersion(elm.Chart)
+		chartRepoName, curVer, err := utils.ChartAndVersion(elm.Chart)
 		if err != nil {
 			return nil, err
 		}
@@ -204,7 +159,7 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*his
 	return res, nil
 }
 
-func (d *DataLayer) ChartRepoVersions(chartName string) (res []repoChartElement, err error) {
+func (d *DataLayer) ChartRepoVersions(chartName string) (res []RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "/" + chartName + "\v", "--versions", "--output", "json"}
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
@@ -255,6 +210,11 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 		err = json.Unmarshal(jsoned, &doc)
 		if err != nil {
 			return nil, err
+		}
+
+		if doc.Kind == "" {
+			log.Warnf("Manifest piece is not k8s resource: %s", jsoned)
+			continue
 		}
 
 		res = append(res, &doc)
@@ -328,6 +288,15 @@ func (d *DataLayer) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error
 	return &res, nil
 }
 
+func (d *DataLayer) GetResourceYAML(namespace string, def *v1.Carp) (string, error) {
+	out, err := d.runCommandKubectl("get", strings.ToLower(def.Kind), def.Name, "--namespace", namespace, "--output", "yaml")
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
+}
+
 func (d *DataLayer) DescribeResource(namespace string, kind string, name string) (string, error) {
 	out, err := d.runCommandKubectl("describe", strings.ToLower(kind), name, "--namespace", namespace)
 	if err != nil {
@@ -375,7 +344,7 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		values = oldVals
 	}
 
-	oldValsFile, close1, err := tempFile(values)
+	oldValsFile, close1, err := utils.TempFile(values)
 	defer close1()
 	if err != nil {
 		return "", err
@@ -390,26 +359,13 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 	if err != nil {
 		return "", err
 	}
-
+	res := release.Release{}
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return "", err
+	}
 	if justTemplate {
-		res := release.Release{}
-		err = json.Unmarshal([]byte(out), &res)
-		if err != nil {
-			return "", err
-		}
-
-		manifests, err := d.RevisionManifests(namespace, name, 0, false)
-		if err != nil {
-			return "", err
-		}
-		out = getDiff(strings.TrimSpace(manifests), strings.TrimSpace(res.Manifest), "current.yaml", "upgraded.yaml")
-	} else {
-		res := release.Release{}
-		err = json.Unmarshal([]byte(out), &res)
-		if err != nil {
-			return "", err
-		}
-		_ = res
+		out = strings.TrimSpace(res.Manifest)
 	}
 
 	return out, nil
@@ -435,11 +391,11 @@ func RevisionDiff(functor SectionFn, ext string, namespace string, name string, 
 		return "", err
 	}
 
-	diff := getDiff(manifest1, manifest2, strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext)
+	diff := GetDiff(manifest1, manifest2, strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext)
 	return diff, nil
 }
 
-func getDiff(text1 string, text2 string, name1 string, name2 string) string {
+func GetDiff(text1 string, text2 string, name1 string, name2 string) string {
 	edits := myers.ComputeEdits(span.URIFromPath(""), text1, text2)
 	unified := gotextdiff.ToUnified(name1, name2, text1, edits)
 	diff := fmt.Sprint(unified)

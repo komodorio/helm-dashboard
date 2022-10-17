@@ -1,6 +1,7 @@
-package dashboard
+package subproc
 
 import (
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
@@ -45,7 +46,7 @@ func TestFlow(t *testing.T) {
 	}
 	_ = history
 
-	chartRepoName, curVer, err := chartAndVersion(chart.Chart)
+	chartRepoName, curVer, err := utils.ChartAndVersion(chart.Chart)
 	if err != nil {
 		t.Fatal(err)
 	}

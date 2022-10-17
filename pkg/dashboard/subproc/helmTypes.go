@@ -1,4 +1,4 @@
-package dashboard
+package subproc
 
 import (
 	"helm.sh/helm/v3/pkg/release"
@@ -6,7 +6,7 @@ import (
 )
 
 // unpleasant copy from Helm sources, where they have it non-public
-type releaseElement struct {
+type ReleaseElement struct {
 	Name       string         `json:"name"`
 	Namespace  string         `json:"namespace"`
 	Revision   string         `json:"revision"`
@@ -16,7 +16,7 @@ type releaseElement struct {
 	AppVersion string         `json:"app_version"`
 }
 
-type historyElement struct {
+type HistoryElement struct {
 	Revision    int            `json:"revision"`
 	Updated     helmtime.Time  `json:"updated"`
 	Status      release.Status `json:"status"`
@@ -27,7 +27,7 @@ type historyElement struct {
 	ChartVer    string         `json:"chart_ver"`
 }
 
-type repoChartElement struct {
+type RepoChartElement struct {
 	Name        string `json:"name"`
 	Version     string `json:"version"`
 	AppVersion  string `json:"app_version"`

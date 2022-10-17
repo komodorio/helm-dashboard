@@ -1,14 +1,17 @@
-package dashboard
+package handlers
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type HelmHandler struct {
-	Data *DataLayer
+	Data *subproc.DataLayer
 }
 
 func (h *HelmHandler) GetCharts(c *gin.Context) {
@@ -23,7 +26,7 @@ func (h *HelmHandler) GetCharts(c *gin.Context) {
 // TODO: helm show chart komodorio/k8s-watcher to get the icon URL
 
 func (h *HelmHandler) Uninstall(c *gin.Context) {
-	qp, err := getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -37,7 +40,7 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 }
 
 func (h *HelmHandler) Rollback(c *gin.Context) {
-	qp, err := getQueryProps(c, true)
+	qp, err := utils.GetQueryProps(c, true)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -52,7 +55,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 }
 
 func (h *HelmHandler) History(c *gin.Context) {
-	qp, err := getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -67,7 +70,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 }
 
 func (h *HelmHandler) Resources(c *gin.Context) {
-	qp, err := getQueryProps(c, true)
+	qp, err := utils.GetQueryProps(c, true)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -82,7 +85,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoSearch(c *gin.Context) {
-	qp, err := getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -97,7 +100,7 @@ func (h *HelmHandler) RepoSearch(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {
-	qp, err := getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -112,7 +115,7 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 }
 
 func (h *HelmHandler) Install(c *gin.Context) {
-	qp, err := getQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -127,13 +130,20 @@ func (h *HelmHandler) Install(c *gin.Context) {
 
 	if !justTemplate {
 		c.Header("Content-Type", "application/json")
+	} else {
+		manifests, err := h.Data.RevisionManifests(qp.Namespace, qp.Name, 0, false)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		out = subproc.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
 	}
 
 	c.String(http.StatusAccepted, out)
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
-	qp, err := getQueryProps(c, true)
+	qp, err := utils.GetQueryProps(c, true)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -158,8 +168,8 @@ func (h *HelmHandler) RepoValues(c *gin.Context) {
 	c.String(http.StatusOK, out)
 }
 
-func handleGetSection(data *DataLayer, section string, rDiff string, qp *QueryProps, flag bool) (string, error) {
-	sections := map[string]SectionFn{
+func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp *utils.QueryProps, flag bool) (string, error) {
+	sections := map[string]subproc.SectionFn{
 		"manifests": data.RevisionManifests,
 		"values":    data.RevisionValues,
 		"notes":     data.RevisionNotes,
@@ -181,7 +191,7 @@ func handleGetSection(data *DataLayer, section string, rDiff string, qp *QueryPr
 			ext = ".txt"
 		}
 
-		res, err := RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Revision, flag)
+		res, err := subproc.RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Revision, flag)
 		if err != nil {
 			return "", err
 		}

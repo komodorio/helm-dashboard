@@ -2,13 +2,14 @@ package dashboard
 
 import (
 	"embed"
-	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"path"
-	"strconv"
 )
 
 //go:embed static/*
@@ -33,7 +34,17 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func NewRouter(abortWeb ControlChan, data *DataLayer, version string) *gin.Engine {
+func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
+			log.Debugf("Setting current context to: %s", context)
+			data.KubeContext = context[0]
+		}
+		c.Next()
+	}
+}
+
+func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, version string) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -52,7 +63,7 @@ func NewRouter(abortWeb ControlChan, data *DataLayer, version string) *gin.Engin
 	return api
 }
 
-func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine, version string) {
+func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *gin.Engine, version string) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -65,10 +76,11 @@ func configureRoutes(abortWeb ControlChan, data *DataLayer, api *gin.Engine, ver
 
 	configureHelms(api.Group("/api/helm"), data)
 	configureKubectls(api.Group("/api/kube"), data)
+	configureScanners(api.Group("/api/scanners"), data)
 }
 
-func configureHelms(api *gin.RouterGroup, data *DataLayer) {
-	h := HelmHandler{Data: data}
+func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
+	h := handlers.HelmHandler{Data: data}
 	api.GET("/charts", h.GetCharts)
 	api.DELETE("/charts", h.Uninstall)
 	api.POST("/charts/rollback", h.Rollback)
@@ -81,8 +93,8 @@ func configureHelms(api *gin.RouterGroup, data *DataLayer) {
 	api.GET("/charts/:section", h.GetInfoSection)
 }
 
-func configureKubectls(api *gin.RouterGroup, data *DataLayer) {
-	h := KubeHandler{Data: data}
+func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
+	h := handlers.KubeHandler{Data: data}
 	api.GET("/contexts", h.GetContexts)
 	api.GET("/resources/:kind", h.GetResourceInfo)
 	api.GET("/describe/:kind", h.Describe)
@@ -118,36 +130,9 @@ func configureStatic(api *gin.Engine) {
 	}
 }
 
-func contextSetter(data *DataLayer) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
-			log.Debugf("Setting current context to: %s", context)
-			data.KubeContext = context[0]
-		}
-		c.Next()
-	}
-}
-
-type QueryProps struct {
-	Namespace string
-	Name      string
-	Revision  int
-}
-
-func getQueryProps(c *gin.Context, revRequired bool) (*QueryProps, error) {
-	qp := QueryProps{}
-
-	qp.Namespace = c.Query("namespace")
-	qp.Name = c.Query("name")
-	if qp.Name == "" {
-		return nil, errors.New("missing required query string parameter: name")
-	}
-
-	cRev, err := strconv.Atoi(c.Query("revision"))
-	if err != nil && revRequired {
-		return nil, err
-	}
-	qp.Revision = cRev
-
-	return &qp, nil
+func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
+	h := handlers.ScannersHandler{Data: data}
+	api.GET("", h.List)
+	api.POST("/manifests", h.ScanDraftManifest)
+	api.GET("/resource/:kind", h.ScanResource)
 }

@@ -174,15 +174,15 @@
                         Resources
                     </button>
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="manifests"
-                            type="button" role="tab" aria-controls="nav-manifest-diff" aria-selected="false"
+                            type="button" role="tab" aria-controls="nav-manifest" aria-selected="false"
                             tabindex="-1">Manifests
                     </button>
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="values"
-                            type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" tabindex="-1">
+                            type="button" role="tab" aria-controls="nav-manifest" aria-selected="false" tabindex="-1">
                         Values
                     </button>
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-manifest" data-tab="notes"
-                            type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" tabindex="-1">
+                            type="button" role="tab" aria-controls="nav-manifest" aria-selected="false" tabindex="-1">
                         Notes
                     </button>
                 </div>
@@ -200,7 +200,7 @@
                     <div class="body"></div>
                 </div>
                 <div class="tab-pane" id="nav-manifest" role="tabpanel">
-                    <nav class="navbar bg-light">
+                    <nav class="navbar bg-white rounded border border-secondary">
                         <form class="container-fluid" id="modePanel">
                             <label class="form-check-label" for="diffModeNone">
                                 <input class="form-check-input" type="radio" name="diffMode" id="diffModeNone"
@@ -217,16 +217,10 @@
                                        data-mode="diff-rev">
                                 Diff with specific revision: <input class="form-input" size="3" id="specRev">
                             </label>
-                            <label class="form-check-label" for="userDefinedVals">
-                                <input class="form-check-input" type="checkbox" id="userDefinedVals"> User-defined only
-                            </label>
                         </form>
                     </nav>
 
                     <div id="manifestText" class="mt-2 bg-white"></div>
-                </div>
-                <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab"
-                     tabindex="0">...
                 </div>
             </div>
         </div>
@@ -235,7 +229,7 @@
 
 
 <!-- Modals -->
-<div id="errorAlert" style="z-index: 2000"
+<div id="errorAlert" style="z-index: 2000; max-width: 95%; overflow: auto"
      class="display-none alert alert-sm alert-danger alert-dismissible position-absolute position-absolute top-0 start-50 translate-middle-x mt-3 border-danger"
      role="alert">
     <h4 class="alert-heading"><i class="bi-exclamation-triangle-fill"></i> <span></span></h4>
@@ -245,7 +239,7 @@
 </div>
 
 <div class="offcanvas offcanvas-end rounded-start" tabindex="-1" id="describeModal"
-     aria-labelledby="describeModalLabel">
+     aria-labelledby="describeModalLabel" style="overflow-x: auto">
     <div class="offcanvas-header border-bottom p-4">
         <div>
             <h5 id="describeModalLabel"></h5>
@@ -302,7 +296,7 @@
                 </div>
                 <div class="row">
                     <div class="col-6 pe-3">
-                        <textarea name="values" class="form-control w-100 h-100" rows="5"></textarea>
+                        <textarea name="values" class="form-control w-100 h-100" rows="5" style="font-family: monospace"></textarea>
                     </div>
                     <div class="col-6 ps-3">
                         <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>
@@ -314,10 +308,11 @@
                         <span class="invalid-feedback small mb-3"> (wrong YAML)</span>
                     </div>
                 </div>
-                <label class="form-label mt-5">Manifest changes:</label>
+                <label class="form-label mt-4">Manifest changes:</label>
                 <div id="upgradeModalBody" class="small"></div>
             </form>
-            <div class="modal-footer">
+            <div class="modal-footer d-flex">
+                <button type="button" class="btn btn-scan bg-white border-secondary">Scan for Problems</button>
                 <button type="button" class="btn btn-primary btn-confirm">Confirm Upgrade</button>
             </div>
         </div>
@@ -336,6 +331,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"
         integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script src="static/list-view.js"></script>
 <script src="static/revisions-view.js"></script>
 <script src="static/details-view.js"></script>

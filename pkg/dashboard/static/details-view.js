@@ -97,7 +97,7 @@ $('#specRev').keyup(function (event) {
     }
 });
 
-$("form").submit(function(e){
+$("form").submit(function (e) {
     e.preventDefault();
 });
 
@@ -140,6 +140,7 @@ $("#nav-tab [data-tab]").click(function () {
     }
 })
 
+
 function showResources(namespace, chart, revision) {
     const resBody = $("#nav-resources .body");
     resBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
@@ -156,9 +157,9 @@ function showResources(namespace, chart, revision) {
                     <div class="row px-3 py-2 mb-3 bg-white rounded">
                         <div class="col-2 res-kind text-break"></div>
                         <div class="col-3 res-name text-break fw-bold"></div>
-                        <div class="col-1 res-status"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
-                        <div class="col-5 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
-                        <div class="col-1 res-actions"></div>
+                        <div class="col-1 res-status overflow-hidden"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
+                        <div class="col-4 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
+                        <div class="col-2 res-actions"></div>
                     </div>
             `)
 
@@ -182,15 +183,22 @@ function showResources(namespace, chart, revision) {
                 }
 
                 const statusBlock = resBlock.find(".res-status");
-                statusBlock.empty().append(badge)
+                statusBlock.empty().append(badge).attr("title", data.status.phase)
                 resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
 
                 if (badge.text() !== "NotFound") {
                     resBlock.find(".res-actions")
+
                     const btn = $("<button class=\"btn btn-sm btn-white border-secondary\">Describe</button>");
                     resBlock.find(".res-actions").append(btn)
                     btn.click(function () {
                         showDescribe(ns, res.kind, res.metadata.name, badge.clone())
+                    })
+
+                    const btn2 = $("<button class='btn btn-sm btn-white border-secondary ms-2'>Scan</button>");
+                    resBlock.find(".res-actions").append(btn2)
+                    btn2.click(function () {
+                        scanResource(ns, res.kind, res.metadata.name, badge.clone())
                     })
                 }
             })
@@ -210,5 +218,44 @@ function showDescribe(ns, kind, name, badge) {
     }).done(function (data) {
         data = hljs.highlight(data, {language: 'yaml'}).value
         $("#describeModalBody").empty().append("<pre class='bg-white rounded p-3'></pre>").find("pre").html(data)
+    })
+}
+
+function scanResource(ns, kind, name, badge) {
+    $("#describeModal .offcanvas-header p").text(kind)
+    $("#describeModalLabel").text(name).append(badge.addClass("ms-3 small fw-normal"))
+    const body = $("#describeModalBody");
+    body.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Scanning...')
+
+    const myModal = new bootstrap.Offcanvas(document.getElementById('describeModal'));
+    myModal.show()
+    $.get("/api/scanners/resource/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
+        reportError("Failed to scan resource", xhr)
+    }).done(function (data) {
+        body.empty()
+        if ($.isEmptyObject(data)) {
+            body.append("No information from scanners. Make sure you have installed some and scanned object is supported.")
+        }
+
+        for (let name in data) {
+            const res = data[name]
+
+            if (!res.OrigReport) continue
+            const hdr = $("<h3>" + name + " Scan Results</h3>");
+
+            if (res.FailedCount) {
+                hdr.append("<span class='badge bg-danger ms-3'>" + res.FailedCount + " failed</span>")
+            }
+
+            if (res.PassedCount) {
+                hdr.append("<span class='badge bg-info ms-3'>" + res.PassedCount + " passed</span>")
+            }
+
+            body.append(hdr)
+
+            const hl = hljs.highlight(res.OrigReport, {language: 'yaml'}).value
+            const pre = $("<pre class='bg-white rounded p-3' style='font-size: inherit; overflow: unset'></pre>").html(hl)
+            body.append(pre)
+        }
     })
 }
