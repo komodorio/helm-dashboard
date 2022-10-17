@@ -19,29 +19,31 @@ func (h *ScannersHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (h *ScannersHandler) Run(c *gin.Context) {
+func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	for _, scanner := range h.Data.Scanners {
-		if scanner.Name() != c.Param("scanner") {
-			continue
-		}
+	mnf, err := h.Data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, c.PostForm("values"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
-		sr, err := scanner.Run(qp)
+	reps := map[string]*subproc.ScanResults{}
+	for _, scanner := range h.Data.Scanners {
+		sr, err := scanner.ScanManifests(mnf)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, sr)
-		return
+		reps[scanner.Name()] = sr
 	}
 
-	c.String(http.StatusNotFound, "Scanner with this name is not found")
+	c.IndentedJSON(http.StatusOK, reps)
 }
 
 func (h *ScannersHandler) ScanResource(c *gin.Context) {
@@ -53,7 +55,7 @@ func (h *ScannersHandler) ScanResource(c *gin.Context) {
 
 	reps := map[string]*subproc.ScanResults{}
 	for _, scanner := range h.Data.Scanners {
-		sr, err := scanner.RunResource(qp.Namespace, c.Param("kind"), qp.Name)
+		sr, err := scanner.ScanResource(qp.Namespace, c.Param("kind"), qp.Name)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return

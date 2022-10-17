@@ -212,6 +212,11 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 			return nil, err
 		}
 
+		if doc.Kind == "" {
+			log.Warnf("Manifest piece is not k8s resource: %s", jsoned)
+			continue
+		}
+
 		res = append(res, &doc)
 	}
 

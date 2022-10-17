@@ -1,7 +1,6 @@
 package scanners
 
 import (
-	"encoding/json"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
@@ -27,17 +26,11 @@ func (c *Checkov) Test() bool {
 	return true
 }
 
-func (c *Checkov) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
-	mnf, err := c.Data.RevisionManifests(qp.Namespace, qp.Name, qp.Revision, false)
-	if err != nil {
-
-		return nil, err
-	}
-
+func (c *Checkov) ScanManifests(mnf string) (*subproc.ScanResults, error) {
 	fname, fclose, err := utils.TempFile(mnf)
 	defer fclose()
 
-	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "json", "--file", fname}
+	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "cli", "--file", fname}
 	out, err := utils.RunCommand(cmd, nil)
 	if err != nil {
 		return nil, err
@@ -45,24 +38,12 @@ func (c *Checkov) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
 
 	res := &subproc.ScanResults{}
 
-	err = json.Unmarshal([]byte(out), &res.OrigReport)
-	if err != nil {
-		return nil, err
-	}
-
-	sum := CheckovResults{}
-	err = json.Unmarshal([]byte(out), &sum)
-	if err != nil {
-		return nil, err
-	}
-
-	res.PassedCount = sum.Summary.Passed
-	res.FailedCount = sum.Summary.Failed
+	res.OrigReport = out
 
 	return res, nil
 }
 
-func (c *Checkov) RunResource(ns string, kind string, name string) (*subproc.ScanResults, error) {
+func (c *Checkov) ScanResource(ns string, kind string, name string) (*subproc.ScanResults, error) {
 	carp := v1.Carp{}
 	carp.Kind = kind
 	carp.Name = name

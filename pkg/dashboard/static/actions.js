@@ -65,7 +65,7 @@ function popUpUpgrade(self, verCur, elm) {
     const name = getHashParam("chart");
     const qstr = "?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
     let url = "/api/helm/charts/install" + qstr
-    $('#upgradeModal select').data("url", url).data("chart", elm.name)
+    $('#upgradeModal select').data("qstr", qstr).data("url", url).data("chart", elm.name)
 
     $("#upgradeModalLabel .name").text(name)
     $("#upgradeModal .ver-old").text(verCur)
@@ -127,6 +127,40 @@ $('#upgradeModal select').change(function () {
     }).done(function (data) {
         data = hljs.highlight(data, {language: 'yaml'}).value
         $("#upgradeModal .ref-vals").html(data)
+    })
+})
+
+$('#upgradeModal .btn-scan').click(function () {
+    const self = $(this)
+
+    self.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    const qstr = $('#upgradeModal select').data("qstr")
+    $.ajax({
+        type: "POST",
+        url: "/api/scanners/manifests" + qstr + "&version=" + $('#upgradeModal select').val(),
+        data: $("#upgradeModal form").serialize(),
+    }).fail(function (xhr) {
+        reportError("Failed to scan the manifest", xhr)
+    }).done(function (data) {
+        self.prop("disabled", false).find(".spinner-border").hide()
+
+        const container = $("<div></div>")
+        for (let name in data) {
+            const res = data[name]
+
+            if (!res) {
+                continue
+            }
+
+            const pre = $("<pre></pre>").text(res.OrigReport)
+
+            container.append("<h2>" + name + " Scan Results</h2>")
+            container.append(pre)
+        }
+
+        const tab = window.open('about:blank', '_blank');
+        tab.document.write(container.prop('outerHTML')); // where 'html' is a variable containing your HTML
+        tab.document.close(); // to finish loading the page
     })
 })
 

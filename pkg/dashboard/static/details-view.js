@@ -130,8 +130,6 @@ $("#nav-tab [data-tab]").click(function () {
 
     if (self.data("tab") === "resources") {
         showResources(getHashParam("namespace"), getHashParam("chart"), getHashParam("revision"))
-    } else if (self.data("tab") === "scanners") {
-        handleScanners()
     } else {
         const mode = getHashParam("mode")
         if (!mode) {
@@ -142,24 +140,6 @@ $("#nav-tab [data-tab]").click(function () {
     }
 })
 
-function handleScanners() {
-
-
-    const btnScan = $("#upgradeModal .btn-scanners");
-    btnScan.off('click').click(function () {
-        btnScan.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        $.ajax({
-            type: 'POST',
-            url: "/api/scanners/run" + qstr + "&version=" + $('#upgradeModal select').val(),
-            data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
-        }).fail(function (xhr) {
-            reportError("Failed to run scanners", xhr)
-        }).done(function (data) {
-            btnScan.prop("disabled", false).find("span").hide()
-            console.log(data)
-        })
-    })
-}
 
 function showResources(namespace, chart, revision) {
     const resBody = $("#nav-resources .body");
@@ -279,40 +259,3 @@ function scanResource(ns, kind, name, badge) {
         }
     })
 }
-
-const btnRunScans = $("#nav-scanners form .btn-primary");
-btnRunScans.click(function () {
-    btnRunScans.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>')
-    const body = $("#nav-scanners .body").empty();
-    $("#nav-scanners form span input:checked").each(function (idx, obj) {
-        const scanner = $(obj).val();
-
-        const block = $(`
-            <div class="row mb-3 bg-white p-2">
-                <h5 class="col-2 fw-bold"><span class="spinner-border spinner-border-sm me-1 " role="status" aria-hidden="true"></span> ` + scanner + `</h5>
-                <div class="col descr"></div>
-                <div class="col text-end"><button class="btn btn-sm btn-light btn-outline-secondary" disabled>View Report</button></div>
-            </div>
-        `)
-
-        body.append(block)
-
-        $.ajax({
-            type: 'POST',
-            url: "/api/scanners/" + scanner + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart") + "&revision=" + getHashParam("revision"),
-            dataType: "json",
-        }).fail(function (xhr) {
-            block.find(".spinner-border").hide()
-            block.find(".descr").append("<span class='text-danger'><i class='bi-x-octagon m-1'></i> " + xhr.responseText + "</span>")
-            //reportError("Failed to run scanner " + scanner, xhr)
-        }).done(function (data) {
-            console.log(data)
-            block.find(".spinner-border").hide()
-            if (data.FailedCount) {
-                block.find(".descr").append("<span class='fs-6 badge bg-light text-danger'>" + data.FailedCount + " problems</span>")
-            }
-            block.find(".descr").append("<span class='fs-6 badge bg-light text-success'>" + data.PassedCount + " passed</span>")
-            block.find("button").prop("disabled", false)
-        })
-    })
-})

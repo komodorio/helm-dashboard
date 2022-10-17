@@ -185,10 +185,6 @@
                             type="button" role="tab" aria-controls="nav-manifest" aria-selected="false" tabindex="-1">
                         Notes
                     </button>
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-scanners" data-tab="scanners"
-                            type="button" role="tab" aria-controls="nav-scanners" aria-selected="false" tabindex="-1">
-                        Scanners
-                    </button>
                 </div>
             </nav>
             <div class="tab-content">
@@ -225,17 +221,6 @@
                     </nav>
 
                     <div id="manifestText" class="mt-2 bg-white"></div>
-                </div>
-                <div class="tab-pane p-0 pb-5 container-fluid" id="nav-scanners" role="tabpanel">
-                    <nav class="navbar bg-white rounded border border-secondary mb-3">
-                        <form class="container-fluid" enctype="application/x-www-form-urlencoded" method="post">
-                            <span></span>
-                            <button class="btn btn-sm btn-primary">Run Scans</button>
-                        </form>
-                    </nav>
-                    <div class="body p-2">
-
-                    </div>
                 </div>
             </div>
         </div>
@@ -323,10 +308,11 @@
                         <span class="invalid-feedback small mb-3"> (wrong YAML)</span>
                     </div>
                 </div>
-                <label class="form-label mt-5">Manifest changes:</label>
+                <label class="form-label mt-4">Manifest changes:</label>
                 <div id="upgradeModalBody" class="small"></div>
             </form>
-            <div class="modal-footer">
+            <div class="modal-footer d-flex">
+                <button type="button" class="btn btn-scan bg-white border-secondary">Scan for Problems</button>
                 <button type="button" class="btn btn-primary btn-confirm">Confirm Upgrade</button>
             </div>
         </div>

@@ -28,7 +28,7 @@ func (c *Trivy) Test() bool {
 	return true
 }
 
-func (c *Trivy) Run(qp *utils.QueryProps) (*subproc.ScanResults, error) {
+func (c *Trivy) ScanManifests(mnf string) (*subproc.ScanResults, error) {
 	return nil, nil
 }
 
@@ -43,7 +43,7 @@ func (c *Trivy) scanResource(ns string, kind string, name string) (string, error
 	return out, nil
 }
 
-func (c *Trivy) RunResource(ns string, kind string, name string) (*subproc.ScanResults, error) {
+func (c *Trivy) ScanResource(ns string, kind string, name string) (*subproc.ScanResults, error) {
 	res := subproc.ScanResults{}
 	resource, err := c.scanResource(ns, kind, name)
 	if err != nil {

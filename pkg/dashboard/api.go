@@ -133,6 +133,6 @@ func configureStatic(api *gin.Engine) {
 func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
 	h := handlers.ScannersHandler{Data: data}
 	api.GET("", h.List)
-	api.POST("/:scanner", h.Run)
+	api.POST("/manifests", h.ScanDraftManifest)
 	api.GET("/resource/:kind", h.ScanResource)
 }
