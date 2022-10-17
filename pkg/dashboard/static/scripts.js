@@ -31,6 +31,10 @@ $(function () {
 
             $("#nav-scanners form span").prepend(item)
         }
+
+        if (!data.length) {
+            $("#upgradeModal .btn-scan").hide()
+        }
     })
 })
 

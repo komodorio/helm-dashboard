@@ -10,6 +10,14 @@ The _Helm Dashboard_ plugin offers a UI-driven way to view the installed Helm ch
 
 This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision of helping Kubernetes users to navigate and troubleshoot their clusters.
 
+Some of the key capabilities of the tool:
+ - See all installed charts and their revision history
+ - See manifest diff of the past revisions
+ - Browse k8s resources resulting from the chart
+ - Easy rollback or upgrade version with a clear and easy manifest diff
+ - Integration with popular problem scanners
+ - Easy switch between multiple clusters
+
 ## Installing 
 
 To install it, simply run Helm command:
@@ -47,6 +55,16 @@ If your port 8080 is busy, you can specify a different port to use via `HD_PORT`
 If you don't want browser tab to automatically open, set `HD_NOBROWSER=1` in your environment variables.
 
 If you want to increase the logging verbosity and see all the debug info, set `DEBUG=1` environment variable.
+
+## Scanner Integrations
+
+Upon startup, Helm Dashboard detects the presence of [Trivy](https://github.com/aquasecurity/trivy) and [Checkov](https://github.com/bridgecrewio/checkov) scanners. When available, these scanners are offered on k8s resources page, as well as install/upgrade preview page.
+
+You can request scanning of the specific k8s resource in your cluster:
+![](screenshot_scan_resource.png)
+
+If you want to validate the k8s manifest prior to installing/reconfiguring a Helm chart, look for "Scan for Problems" button at the bottom of the dialog:
+![](screenshot_scan_manifest.png)
 
 ## Support Channels
 

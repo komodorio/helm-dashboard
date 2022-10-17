@@ -1,8 +1,6 @@
 package scanners
 
 import (
-	"github.com/aquasecurity/trivy/pkg/k8s/report"
-	"github.com/aquasecurity/trivy/pkg/types"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
@@ -28,8 +26,8 @@ func (c *Trivy) Test() bool {
 	return true
 }
 
-func (c *Trivy) ScanManifests(mnf string) (*subproc.ScanResults, error) {
-	return nil, nil
+func (c *Trivy) ScanManifests(_ string) (*subproc.ScanResults, error) {
+	return nil, nil // Trivy is unable to scan manifests
 }
 
 func (c *Trivy) scanResource(ns string, kind string, name string) (string, error) {
@@ -86,34 +84,4 @@ func (c *Trivy) ScanResource(ns string, kind string, name string) (*subproc.Scan
 	res.OrigReport = resource
 
 	return &res, nil
-}
-
-func reportToReport(failed *report.Report) types.Report {
-	result := types.Report{
-		Results: make(types.Results, 0),
-	}
-
-	for _, a := range failed.Misconfigurations {
-		result.Results = append(result.Results, a.Results...)
-	}
-
-	for _, a := range failed.Vulnerabilities {
-		result.Results = append(result.Results, a.Results...)
-	}
-
-	return result
-}
-
-func summarize(sum *subproc.ScanResults, rep []report.Resource) {
-	for _, res := range rep {
-		for _, r := range res.Results {
-			if r.MisconfSummary != nil {
-				sum.FailedCount += r.MisconfSummary.Exceptions
-				sum.FailedCount += r.MisconfSummary.Failures
-				sum.PassedCount += r.MisconfSummary.Successes
-			}
-
-			sum.FailedCount += len(r.Vulnerabilities)
-		}
-	}
 }
