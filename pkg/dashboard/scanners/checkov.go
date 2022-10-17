@@ -28,6 +28,9 @@ func (c *Checkov) Test() bool {
 
 func (c *Checkov) ScanManifests(mnf string) (*subproc.ScanResults, error) {
 	fname, fclose, err := utils.TempFile(mnf)
+	if err != nil {
+		return nil, err
+	}
 	defer fclose()
 
 	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "cli", "--file", fname}
@@ -53,6 +56,9 @@ func (c *Checkov) ScanResource(ns string, kind string, name string) (*subproc.Sc
 	}
 
 	fname, fclose, err := utils.TempFile(mnf)
+	if err != nil {
+		return nil, err
+	}
 	defer fclose()
 
 	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "cli", "--file", fname}
