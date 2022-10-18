@@ -1,0 +1,3 @@
+function loadRepoView() {
+    $("#sectionRepo").show()
+}

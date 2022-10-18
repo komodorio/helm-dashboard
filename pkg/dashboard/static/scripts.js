@@ -33,9 +33,14 @@ $(function () {
 })
 
 function initView() {
+    $(".section").hide()
+
     const section = getHashParam("section")
-    if (section === "repo") {
+    if (section === "repository") {
+        $("#topNav ul a.section-repo").addClass("active")
+        loadRepoView()
     } else {
+        $("#topNav ul a.section-installed").addClass("active")
         const namespace = getHashParam("namespace")
         const chart = getHashParam("chart")
         if (!chart) {
@@ -46,6 +51,19 @@ function initView() {
     }
 }
 
+$("#topNav ul a").click(function () {
+    const self = $(this)
+
+    $("#topNav ul a").removeClass("active")
+
+    if (self.hasClass("section-repo")) {
+        setHashParam("section", "repository")
+    } else {
+        setHashParam("section", null)
+    }
+
+    initView()
+})
 
 const myAlert = document.getElementById('errorAlert')
 myAlert.addEventListener('close.bs.alert', event => {
@@ -69,7 +87,11 @@ function getHashParam(name) {
 
 function setHashParam(name, val) {
     const params = new URLSearchParams(window.location.hash.substring(1))
-    params.set(name, val)
+    if (!val) {
+        params.delete(name)
+    } else {
+        params.set(name, val)
+    }
     window.location.hash = new URLSearchParams(params).toString()
 }
 

@@ -48,16 +48,11 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item mx-2">
-                    <a class="nav-link px-3 active" aria-current="page" href="/">Installed</a>
+                    <a class="nav-link px-3 section-installed" href="/#">Installed</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a href="/#area=repository" class="nav-link px-3">Repository</a>
+                    <a class="nav-link px-3 section-repo" href="/#section=repository">Repository</a>
                 </li>
-                <!-- TODO
-                <li class="nav-item">
-                    <a class="nav-link disabled">Provisional Charts</a>
-                </li>
-                -->
             </ul>
             <div>
                 <a class="btn" href="https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash"><img
@@ -73,7 +68,7 @@
     </nav>
     <!-- /TOP BAR -->
 
-    <div class="row mt-3 pt-3 me-5" id="sectionRepo" style="display: none">
+    <div class="row mt-3 pt-3 me-5 section" id="sectionRepo" style="display: none">
         <div class="col-3 ps-4">
             <div class="p-2 bg-white rounded-1 b-shadow">
                 <h4 class="fs-6">Repositories</h4>
@@ -84,7 +79,7 @@
         <div class="col-9">Repo details</div>
     </div>
 
-    <div class="row mt-3 pt-3 me-5" id="sectionList" style="display: none">
+    <div class="row mt-3 pt-3 me-5 section" id="sectionList" style="display: none">
         <div class="col-2 ms-3">
             <!-- FILTER BLOCK -->
             <div class="p-2 ps-2 bg-white rounded-1 b-shadow" id="filters">
@@ -126,7 +121,7 @@
         <!-- /INSTALLED LIST -->
     </div>
 
-    <div class="row flex-nowrap pt-0 mx-0" id="sectionDetails" style="display: none">
+    <div class="row flex-nowrap pt-0 mx-0 section" id="sectionDetails" style="display: none">
         <div class="col-2 px-4 py-4 pe-3 rev-list">
             <h3 class="fw-bold small">Revisions</h3>
             <ul class="list-unstyled">
@@ -342,6 +337,7 @@
         integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+<script src="static/repo.js"></script>
 <script src="static/list-view.js"></script>
 <script src="static/revisions-view.js"></script>
 <script src="static/details-view.js"></script>
