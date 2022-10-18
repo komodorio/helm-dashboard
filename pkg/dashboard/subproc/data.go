@@ -375,6 +375,19 @@ func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
 	return d.runCommandHelm("show", "values", chart, "--version", ver)
 }
 
+func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
+	out, err := d.runCommandHelm("repo", "list", "--output", "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)

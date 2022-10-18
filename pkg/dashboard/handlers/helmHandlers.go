@@ -168,6 +168,15 @@ func (h *HelmHandler) RepoValues(c *gin.Context) {
 	c.String(http.StatusOK, out)
 }
 
+func (h *HelmHandler) RepoList(c *gin.Context) {
+	out, err := h.Data.ChartRepoList()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, out)
+}
+
 func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp *utils.QueryProps, flag bool) (string, error) {
 	sections := map[string]subproc.SectionFn{
 		"manifests": data.RevisionManifests,

@@ -17,15 +17,6 @@ $(function () {
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
     }).done(function (data) {
-        for (let n = 0; n < data.length; n++) {
-            const item = $(`
-                <label class="form-check-label me-4">
-                    <input class="form-check-input me-1" type="checkbox" checked name="scanner" value="` + data[n] + `"> ` + data[n] + `
-                </label>`)
-
-            $("#nav-scanners form span").prepend(item)
-        }
-
         if (!data.length) {
             $("#upgradeModal .btn-scan").hide()
         }
@@ -118,9 +109,9 @@ function statusStyle(status, card, txt) {
 function getCleanClusterName(rawClusterName) {
     if (rawClusterName.indexOf('arn') === 0) {
         // AWS cluster
-        clusterSplit = rawClusterName.split(':')
-        clusterName = clusterSplit.at(-1).split("/").at(-1)
-        region = clusterSplit.at(-3)
+        const clusterSplit = rawClusterName.split(':')
+        const clusterName = clusterSplit.at(-1).split("/").at(-1)
+        const region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
     if (rawClusterName.indexOf('gke') === 0) {
@@ -132,13 +123,11 @@ function getCleanClusterName(rawClusterName) {
 
 function fillClusterList(data, context) {
     data.forEach(function (elm) {
-        // aws CLI uses complicated context names, the suffix does not work well
-        // maybe we should have an `if` statement here
-        let label = elm.Name //+ " (" + elm.Cluster + "/" + elm.AuthInfo + "/" + elm.Namespace + ")"
+        let label = getCleanClusterName(elm.Name)
         let opt = $('<li><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
-        opt.attr('title', label)
+        opt.attr('title', elm.Name)
         opt.find("input").val(elm.Name).text(label)
-        opt.find("span").text(getCleanClusterName(label))
+        opt.find("span").text(label)
         if (elm.IsCurrent && !context) {
             opt.find("input").prop("checked", true)
             setCurrentContext(elm.Name)

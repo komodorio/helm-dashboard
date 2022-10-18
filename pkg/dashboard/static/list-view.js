@@ -15,7 +15,6 @@ function loadChartsList() {
     })
 }
 
-
 function buildChartCard(elm) {
     const card = $(`<div class="row m-0 py-3 bg-white rounded-1 b-shadow border-4 border-start">
             <div class="col-4 rel-name"><span class="link">release-name</span><div></div></div>
