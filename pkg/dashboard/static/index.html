@@ -50,11 +50,9 @@
                 <li class="nav-item mx-2">
                     <a class="nav-link px-3 active" aria-current="page" href="/">Installed</a>
                 </li>
-                <!-- TODO
                 <li class="nav-item mx-2">
-                    <a href="#" class="nav-link px-3">Repository</a>
+                    <a href="/#area=repository" class="nav-link px-3">Repository</a>
                 </li>
-                -->
                 <!-- TODO
                 <li class="nav-item">
                     <a class="nav-link disabled">Provisional Charts</a>
@@ -74,6 +72,17 @@
         </div>
     </nav>
     <!-- /TOP BAR -->
+
+    <div class="row mt-3 pt-3 me-5" id="sectionRepo" style="display: none">
+        <div class="col-3 ps-4">
+            <div class="p-2 bg-white rounded-1 b-shadow">
+                <h4 class="fs-6">Repositories</h4>
+                <ul class="list-unstyled">
+                </ul>
+            </div>
+        </div>
+        <div class="col-9">Repo details</div>
+    </div>
 
     <div class="row mt-3 pt-3 me-5" id="sectionList" style="display: none">
         <div class="col-2 ms-3">
@@ -296,7 +305,8 @@
                 </div>
                 <div class="row">
                     <div class="col-6 pe-3">
-                        <textarea name="values" class="form-control w-100 h-100" rows="5" style="font-family: monospace"></textarea>
+                        <textarea name="values" class="form-control w-100 h-100" rows="5"
+                                  style="font-family: monospace"></textarea>
                     </div>
                     <div class="col-6 ps-3">
                         <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>

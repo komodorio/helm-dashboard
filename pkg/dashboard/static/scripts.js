@@ -11,13 +11,7 @@ $(function () {
         const context = getHashParam("context")
         fillClusterList(data, context);
 
-        const namespace = getHashParam("namespace")
-        const chart = getHashParam("chart")
-        if (!chart) {
-            loadChartsList()
-        } else {
-            loadChartHistory(namespace, chart)
-        }
+        initView(); // can only do it after loading cluster list
     })
 
     $.getJSON("/api/scanners").fail(function (xhr) {
@@ -37,6 +31,20 @@ $(function () {
         }
     })
 })
+
+function initView() {
+    const section = getHashParam("section")
+    if (section === "repo") {
+    } else {
+        const namespace = getHashParam("namespace")
+        const chart = getHashParam("chart")
+        if (!chart) {
+            loadChartsList()
+        } else {
+            loadChartHistory(namespace, chart)
+        }
+    }
+}
 
 
 const myAlert = document.getElementById('errorAlert')
@@ -86,14 +94,14 @@ function statusStyle(status, card, txt) {
 }
 
 function getCleanClusterName(rawClusterName) {
-    if (rawClusterName.indexOf('arn') == 0) {
+    if (rawClusterName.indexOf('arn') === 0) {
         // AWS cluster
         clusterSplit = rawClusterName.split(':')
         clusterName = clusterSplit.at(-1).split("/").at(-1)
         region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
-    if (rawClusterName.indexOf('gke') == 0) {
+    if (rawClusterName.indexOf('gke') === 0) {
         // GKE cluster
         return rawClusterName.split('_').at(-2) + '/' + rawClusterName.split('_').at(-1) + ' [GKE]'
     }
