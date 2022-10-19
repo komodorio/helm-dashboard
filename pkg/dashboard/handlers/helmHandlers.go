@@ -201,6 +201,21 @@ func (h *HelmHandler) RepoAdd(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func (h *HelmHandler) RepoDelete(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, true)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	_, err = h.Data.ChartRepoDelete(qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp *utils.QueryProps, flag bool) (string, error) {
 	sections := map[string]subproc.SectionFn{
 		"manifests": data.RevisionManifests,

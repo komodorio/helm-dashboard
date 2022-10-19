@@ -20,12 +20,18 @@ function loadRepoView() {
         }
 
         items.find("input").click(function () {
-            const self=$(this)
+            const self = $(this)
             const elm = self.data("item");
             setHashParam("repo", elm.name)
             $("#sectionRepo .repo-details").show()
             $("#sectionRepo .repo-details h2").text(elm.name)
-            $("#sectionRepo .repo-details .url span").text(elm.url)
+            $("#sectionRepo .repo-details .url").text(elm.url)
+
+            $.getJSON("/api/helm/repo/charts?name=" + elm.name).fail(function (xhr) {
+                reportError("Failed to get list of charts in repo", xhr)
+            }).done(function (data) {
+                console.log(data)
+            })
         })
 
         if (getHashParam("repo")) {
@@ -52,6 +58,32 @@ $("#repoAddModal .btn-confirm").click(function () {
         reportError("Failed to add repo", xhr)
     }).done(function () {
         setHashParam("repo", $("#repoAddModal form input[name=name]").val())
+        window.location.reload()
+    })
+})
+
+$("#sectionRepo .btn-remove").click(function () {
+    if (confirm("Confirm removing repository?")) {
+        $.ajax({
+            type: 'DELETE',
+            url: "/api/helm/repo?name=" + $("#sectionRepo .repo-details h2").text(),
+        }).fail(function (xhr) {
+            reportError("Failed to add repo", xhr)
+        }).done(function () {
+            setHashParam("repo", null)
+            window.location.reload()
+        })
+    }
+})
+
+$("#sectionRepo .btn-update").click(function () {
+    $("#sectionRepo .btn-update i").removeClass("bi-arrow-repeat").append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    $.ajax({
+        type: 'POST',
+        url: "/api/helm/repo/update?name=" + $("#sectionRepo .repo-details h2").text(),
+    }).fail(function (xhr) {
+        reportError("Failed to add repo", xhr)
+    }).done(function () {
         window.location.reload()
     })
 })

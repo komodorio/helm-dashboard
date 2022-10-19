@@ -81,13 +81,18 @@
         </div>
         <div class="col-9 repo-details bg-white b-shadow pt-4 px-5 overflow-auto rounded">
             <div class="float-end">
-                <button class="btn btn-sm btn-light bg-white  border border-secondary">
+                <button class="me-2 btn btn-sm btn-light bg-white border border-secondary btn-update">
+                    <i class="bi-arrow-repeat"></i> Update
+                </button>
+                <button class="btn btn-sm btn-light bg-white border border-secondary btn-remove">
                     <i class="bi-trash3"></i> Remove
                 </button>
             </div>
             <div><span class="text-muted small fw-bold me-3">REPOSITORY</span></div>
             <h2>name-of-repo</h2>
-            <div class="url mb-5">URL: <span class="fw-bold">http://somerepo/somepath</span></div>
+            <div class="mb-5">
+                <span class="rounded rounded-1 me-2 p-1 px-2 bg-tag text-dark">URL: <span class="url fw-bold">http://somerepo/somepath</span></span>
+            </div>
 
             <div class="float-end">
                 <input class="form-control form-control-sm" type="text" placeholder="Filter...">
