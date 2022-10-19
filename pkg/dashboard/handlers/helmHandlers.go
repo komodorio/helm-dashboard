@@ -99,6 +99,21 @@ func (h *HelmHandler) RepoSearch(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
+func (h *HelmHandler) RepoCharts(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	res, err := h.Data.ChartRepoCharts(qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, res)
+}
+
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {

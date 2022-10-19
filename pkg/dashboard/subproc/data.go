@@ -173,6 +173,20 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []RepoChartElement,
 	return res, nil
 }
 
+func (d *DataLayer) ChartRepoCharts(repoName string) (res []RepoChartElement, err error) {
+	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
+	out, err := d.runCommandHelm(cmd...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
 
 func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {

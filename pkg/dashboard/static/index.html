@@ -74,10 +74,27 @@
                 <h4 class="fs-6">Repositories</h4>
                 <ul class="list-unstyled p-2">
                 </ul>
-                <button class="btn btn-sm border-secondary text-muted"><i class="bi-plus-lg"></i> Add Repository</button>
+                <button class="btn btn-sm border-secondary text-muted">
+                    <i class="bi-plus-lg"></i> Add Repository
+                </button>
             </div>
         </div>
-        <div class="col-9">Repo details</div>
+        <div class="col-9 repo-details bg-white b-shadow pt-4 px-5 overflow-auto rounded">
+            <div class="float-end">
+                <button class="btn btn-sm btn-light bg-white  border border-secondary">
+                    <i class="bi-trash3"></i> Remove
+                </button>
+            </div>
+            <div><span class="text-muted small fw-bold me-3">REPOSITORY</span></div>
+            <h2>name-of-repo</h2>
+            <div class="url mb-5">URL: <span class="fw-bold">http://somerepo/somepath</span></div>
+
+            <div class="float-end">
+                <input class="form-control form-control-sm" type="text" placeholder="Filter...">
+            </div>
+            <h5>Charts</h5>
+            <ul class="list-unstyled"></ul>
+        </div>
     </div>
 
     <div class="row mt-3 pt-3 me-5 section" id="sectionList" style="display: none">
@@ -275,7 +292,7 @@
     </div>
 </div>
 
-<div class="modal" id="repoAddModal" tabindex="-1" >
+<div class="modal" id="repoAddModal" tabindex="-1">
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -295,7 +312,7 @@
     </div>
 </div>
 
-<div class="modal" id="upgradeModal" tabindex="-1" >
+<div class="modal" id="upgradeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header">

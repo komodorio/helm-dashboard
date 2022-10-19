@@ -48,7 +48,7 @@ $("#topNav ul a").click(function () {
     $("#topNav ul a").removeClass("active")
 
     const ctx = getHashParam("context")
-    //setHashParam(null, null)
+    setHashParam(null, null)
     setHashParam("context", ctx)
 
     if (self.hasClass("section-repo")) {

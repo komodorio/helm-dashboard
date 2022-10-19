@@ -1,4 +1,5 @@
 function loadRepoView() {
+    $("#sectionRepo .repo-details").hide()
     $("#sectionRepo").show()
 
     $.getJSON("/api/helm/repo").fail(function (xhr) {
@@ -9,17 +10,30 @@ function loadRepoView() {
         data.forEach(function (elm) {
             let opt = $('<li class="mb-2"><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
             opt.attr('title', elm.url)
-            opt.find("input").val(elm.name).text(elm.name)
+            opt.find("input").val(elm.name).text(elm.name).data("item", elm)
             opt.find("span").text(elm.name)
-            if (getHashParam("repo") === elm.name) {
-                opt.find("input").prop("checked", true)
-            }
             items.append(opt)
         })
 
         if (!data.length) {
             items.text("No repositories found, try adding one")
         }
+
+        items.find("input").click(function () {
+            const self=$(this)
+            const elm = self.data("item");
+            setHashParam("repo", elm.name)
+            $("#sectionRepo .repo-details").show()
+            $("#sectionRepo .repo-details h2").text(elm.name)
+            $("#sectionRepo .repo-details .url span").text(elm.url)
+        })
+
+        if (getHashParam("repo")) {
+            items.find("input[value='" + getHashParam("repo") + "']").click()
+        } else {
+            items.find("input").first().click()
+        }
+
     })
 }
 
@@ -36,7 +50,7 @@ $("#repoAddModal .btn-confirm").click(function () {
         data: $("#repoAddModal form").serialize(),
     }).fail(function (xhr) {
         reportError("Failed to add repo", xhr)
-    }).done(function (data) {
+    }).done(function () {
         setHashParam("repo", $("#repoAddModal form input[name=name]").val())
         window.location.reload()
     })
