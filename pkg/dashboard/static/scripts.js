@@ -47,6 +47,10 @@ $("#topNav ul a").click(function () {
 
     $("#topNav ul a").removeClass("active")
 
+    const ctx = getHashParam("context")
+    //setHashParam(null, null)
+    setHashParam("context", ctx)
+
     if (self.hasClass("section-repo")) {
         setHashParam("section", "repository")
     } else {
@@ -77,8 +81,10 @@ function getHashParam(name) {
 }
 
 function setHashParam(name, val) {
-    const params = new URLSearchParams(window.location.hash.substring(1))
-    if (!val) {
+    let params = new URLSearchParams(window.location.hash.substring(1))
+    if (!name) {
+        params = new URLSearchParams()
+    } else if (!val) {
         params.delete(name)
     } else {
         params.set(name, val)

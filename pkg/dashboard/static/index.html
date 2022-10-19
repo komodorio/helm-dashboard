@@ -69,11 +69,12 @@
     <!-- /TOP BAR -->
 
     <div class="row mt-3 pt-3 me-5 section" id="sectionRepo" style="display: none">
-        <div class="col-3 ps-4">
+        <div class="col-3 ps-4 repo-list">
             <div class="p-2 bg-white rounded-1 b-shadow">
                 <h4 class="fs-6">Repositories</h4>
-                <ul class="list-unstyled repo-list">
+                <ul class="list-unstyled p-2">
                 </ul>
+                <button class="btn btn-sm border-secondary text-muted"><i class="bi-plus-lg"></i> Add Repository</button>
             </div>
         </div>
         <div class="col-9">Repo details</div>
@@ -274,8 +275,27 @@
     </div>
 </div>
 
+<div class="modal" id="repoAddModal" tabindex="-1" >
+    <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Chart Repository</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="application/x-www-form-urlencoded">
+                    <label class="form-label">Name: <input class="form-control" name="name"></label>
+                    <label class="form-label">URL: <input class="form-control" name="url"></label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-confirm">Add Repository</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="modal" id="upgradeModal" tabindex="-1" aria-labelledby="describeModalLabel" aria-hidden="true">
+<div class="modal" id="upgradeModal" tabindex="-1" >
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header">

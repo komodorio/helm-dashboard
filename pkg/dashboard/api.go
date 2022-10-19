@@ -92,6 +92,7 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.POST("/charts/rollback", h.Rollback)
 
 	api.GET("/repo", h.RepoList)
+	api.POST("/repo", h.RepoAdd)
 	api.GET("/repo/search", h.RepoSearch)
 	api.POST("/repo/update", h.RepoUpdate)
 	api.GET("/repo/values", h.RepoValues)

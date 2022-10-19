@@ -177,6 +177,15 @@ func (h *HelmHandler) RepoList(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, out)
 }
 
+func (h *HelmHandler) RepoAdd(c *gin.Context) {
+	_, err := h.Data.ChartRepoAdd(c.PostForm("name"), c.PostForm("url"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp *utils.QueryProps, flag bool) (string, error) {
 	sections := map[string]subproc.SectionFn{
 		"manifests": data.RevisionManifests,

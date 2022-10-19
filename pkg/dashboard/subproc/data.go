@@ -388,6 +388,15 @@ func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
 	return res, nil
 }
 
+func (d *DataLayer) ChartRepoAdd(name string, url string) (string, error) {
+	out, err := d.runCommandHelm("repo", "add", "--force-update", name, url)
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)
