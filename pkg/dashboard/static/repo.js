@@ -27,10 +27,22 @@ function loadRepoView() {
             $("#sectionRepo .repo-details h2").text(elm.name)
             $("#sectionRepo .repo-details .url").text(elm.url)
 
+            $("#sectionRepo .repo-details ul").html('<span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true"></span>')
             $.getJSON("/api/helm/repo/charts?name=" + elm.name).fail(function (xhr) {
                 reportError("Failed to get list of charts in repo", xhr)
             }).done(function (data) {
-                console.log(data)
+                $("#sectionRepo .repo-details ul").empty()
+                data.forEach(function (elm) {
+                    console.log(elm)
+                    const li = $(`<li class="row mb-2">
+                        <h6 class="col-3">`+elm.name.split('/').pop()+`</h6>
+                        <div class="col">`+elm.description+`</div>
+                        <button class="col-1 btn btn-sm border-secondary">Install</button>
+                    </li>`)
+                    li.data("item", elm)
+
+                    $("#sectionRepo .repo-details ul").append(li)
+                })
             })
         })
 
@@ -39,7 +51,6 @@ function loadRepoView() {
         } else {
             items.find("input").first().click()
         }
-
     })
 }
 

@@ -202,7 +202,7 @@ func (h *HelmHandler) RepoAdd(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoDelete(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, true)
+	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
