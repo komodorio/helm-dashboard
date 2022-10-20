@@ -119,6 +119,8 @@ There is a need to build binary for plugin to function, run:
 go build -o bin/dashboard .
 ```
 
+You can just run the `bin/dashboard` binary directly, it will just work.
+
 To install, checkout the source code and run from source dir:
 
 ```shell
