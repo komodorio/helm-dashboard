@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard"
+	"github.com/pkg/browser"
 	log "github.com/sirupsen/logrus"
-	"github.com/toqueteos/webbrowser"
 	"os"
 )
 
@@ -26,7 +26,7 @@ func main() {
 
 	if os.Getenv("HD_NOBROWSER") == "" {
 		log.Infof("Opening web UI: %s", address)
-		err := webbrowser.Open(address)
+		err := browser.OpenURL(address)
 		if err != nil {
 			log.Warnf("Failed to open Web browser for URL: %s", err)
 		}
