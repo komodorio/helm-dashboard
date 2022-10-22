@@ -201,7 +201,7 @@ func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []Relea
 		for _, rel := range installed {
 			pieces := strings.Split(chart.Name, "/")
 			if pieces[1] == rel.Name {
-				chart.IsInstalled = true
+				chart.InstalledNamespace = rel.Namespace
 			}
 		}
 	}

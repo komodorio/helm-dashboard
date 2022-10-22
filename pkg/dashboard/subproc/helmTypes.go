@@ -34,7 +34,7 @@ type RepoChartElement struct {
 	AppVersion  string `json:"app_version"`
 	Description string `json:"description"`
 
-	IsInstalled bool `json:"is_installed"` // custom addition on top of Helm
+	InstalledNamespace string `json:"installed_namespace"` // custom addition on top of Helm
 }
 
 type RepositoryElement struct {

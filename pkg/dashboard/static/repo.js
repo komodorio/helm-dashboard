@@ -34,17 +34,19 @@ function loadRepoView() {
                 $("#sectionRepo .repo-details ul").empty()
                 data.forEach(function (elm) {
                     const li = $(`<li class="row p-2 rounded">
-                        <h6 class="col-3">` + elm.name.split('/').pop() + `</h6>
-                        <div class="col">` + elm.description + `</div>
-                        <div class="col-1">` + elm.version + `</div>
-                        <button class="col-1 btn btn-sm border-secondary bg-white">Install</button>
+                        <h6 class="col-3 py-2">` + elm.name.split('/').pop() + `</h6>
+                        <div class="col py-2">` + elm.description + `</div>
+                        <div class="col-1 py-2">` + elm.version + `</div>
+                        <div class="col-1 action text-nowrap"><button class="btn btn-sm border-secondary bg-white">Install</button></div>
                     </li>`)
                     li.data("item", elm)
 
-                    if (elm.is_installed) {
+                    if (elm.installed_namespace) {
                         li.find("button").text("View").addClass("btn-success").removeClass("bg-white")
-                        li.addClass("text-primary")
+                        li.find(".action").prepend("<i class='bi-check-circle-fill me-1 text-success' title='Already installed'></i>")
                     }
+
+                    li.click(repoChartClicked)
 
                     $("#sectionRepo .repo-details ul").append(li)
                 })
@@ -103,3 +105,15 @@ $("#sectionRepo .btn-update").click(function () {
         window.location.reload()
     })
 })
+
+function repoChartClicked() {
+    const self = $(this)
+    const elm = self.data("item")
+    if (elm.installed_namespace) {
+        setHashParam("section", null)
+        setHashParam("namespace", elm.installed_namespace)
+        setHashParam("chart", elm.name.split("/").pop())
+        window.location.reload()
+    } else {
+    }
+}
