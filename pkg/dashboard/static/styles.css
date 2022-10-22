@@ -1,3 +1,7 @@
+.link, .nav-link {
+    cursor: pointer;
+}
+
 .strike {
     text-decoration: line-through;
 }

@@ -48,10 +48,10 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item mx-2">
-                    <a class="nav-link px-3 section-installed" href="/#">Installed</a>
+                    <a class="nav-link px-3 section-installed">Installed</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link px-3 section-repo" href="/#section=repository">Repository</a>
+                    <a class="nav-link px-3 section-repo">Repository</a>
                 </li>
             </ul>
             <div>
@@ -68,6 +68,7 @@
     </nav>
     <!-- /TOP BAR -->
 
+    <!--REPO SECTION-->
     <div class="row mt-3 pt-3 me-5 section" id="sectionRepo" style="display: none">
         <div class="col-3 ps-4 repo-list">
             <div class="p-2 bg-white rounded-1 b-shadow">
@@ -95,9 +96,15 @@
             </div>
 
             <div class="float-end">
-                <input class="form-control form-control-sm" type="text" placeholder="Filter...">
+            <!-- TODO   <input class="form-control form-control-sm" type="text" placeholder="Filter..."> -->
             </div>
-            <h5>Charts</h5>
+            <div class="row bg-secondary rounded px-3 py-2 mb-3 fw-bold small"
+                 style="text-transform: uppercase">
+                <div class="col-3">Chart Name</div>
+                <div class="col">Description</div>
+                <div class="col-1">Version</div>
+                <div class="col-1"></div>
+            </div>
             <ul class="list-unstyled mt-4"></ul>
         </div>
     </div>

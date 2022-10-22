@@ -33,13 +33,18 @@ function loadRepoView() {
             }).done(function (data) {
                 $("#sectionRepo .repo-details ul").empty()
                 data.forEach(function (elm) {
-                    console.log(elm)
                     const li = $(`<li class="row p-2 rounded">
-                        <h6 class="col-3">`+elm.name.split('/').pop()+`</h6>
-                        <div class="col">`+elm.description+`</div>
-                        <button class="col-2 btn btn-sm border-secondary bg-white">Install v`+elm.version+`</button>
+                        <h6 class="col-3">` + elm.name.split('/').pop() + `</h6>
+                        <div class="col">` + elm.description + `</div>
+                        <div class="col-1">` + elm.version + `</div>
+                        <button class="col-1 btn btn-sm border-secondary bg-white">Install</button>
                     </li>`)
                     li.data("item", elm)
+
+                    if (elm.is_installed) {
+                        li.find("button").text("View").addClass("btn-success").removeClass("bg-white")
+                        li.addClass("text-primary")
+                    }
 
                     $("#sectionRepo .repo-details ul").append(li)
                 })

@@ -122,6 +122,7 @@ func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
 }
 
 func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
+	// TODO: filter by namespace
 	out, err := d.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
 	if err != nil {
 		return nil, err
@@ -159,7 +160,7 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*His
 	return res, nil
 }
 
-func (d *DataLayer) ChartRepoVersions(chartName string) (res []RepoChartElement, err error) {
+func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "/" + chartName + "\v", "--versions", "--output", "json"}
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
@@ -173,7 +174,7 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []RepoChartElement,
 	return res, nil
 }
 
-func (d *DataLayer) ChartRepoCharts(repoName string) (res []RepoChartElement, err error) {
+func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
@@ -184,7 +185,26 @@ func (d *DataLayer) ChartRepoCharts(repoName string) (res []RepoChartElement, er
 	if err != nil {
 		return nil, err
 	}
+
+	ins, err := d.ListInstalled()
+	if err != nil {
+		return nil, err
+	}
+
+	enrichRepoChartsWithInstalled(res, ins)
+
 	return res, nil
+}
+
+func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []ReleaseElement) {
+	for _, chart := range charts {
+		for _, rel := range installed {
+			pieces := strings.Split(chart.Name, "/")
+			if pieces[1] == rel.Name {
+				chart.IsInstalled = true
+			}
+		}
+	}
 }
 
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
