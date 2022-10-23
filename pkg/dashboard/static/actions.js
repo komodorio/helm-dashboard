@@ -67,7 +67,6 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModal .rel-ns").prop("disabled", false).val("")
     }
 
-
     $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (vers) {
@@ -83,7 +82,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
             $('#upgradeModal select').append(opt)
         }
 
-        $('#upgradeModal select').val(verCur ? verCur : elm.version).trigger("change")
+        $('#upgradeModal select').val(elm.version).trigger("change")
 
         const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
         myModal.show()
@@ -102,6 +101,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
 }
 
 $("#upgradeModal .btn-confirm").click(function () {
+    const btnConfirm = $("#upgradeModal .btn-confirm")
     btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: 'POST',
@@ -111,6 +111,9 @@ $("#upgradeModal .btn-confirm").click(function () {
         reportError("Failed to upgrade the chart", xhr)
     }).done(function (data) {
         if (data.version) {
+            setHashParam("section", null)
+            setHashParam("namespace", $("#upgradeModal .rel-ns").val())
+            setHashParam("chart", $("#upgradeModal .rel-name").val())
             setHashParam("revision", data.version)
             window.location.reload()
         } else {
