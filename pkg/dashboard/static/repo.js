@@ -112,8 +112,9 @@ function repoChartClicked() {
     if (elm.installed_namespace) {
         setHashParam("section", null)
         setHashParam("namespace", elm.installed_namespace)
-        setHashParam("chart", elm.name.split("/").pop())
+        setHashParam("chart", elm.installed_name)
         window.location.reload()
     } else {
+        popUpUpgrade(elm)
     }
 }

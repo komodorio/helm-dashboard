@@ -30,17 +30,6 @@ function checkUpgradeable(name) {
         }
 
         const verCur = $("#specRev").data("last-chart-ver");
-        $('#upgradeModal select').empty()
-        for (let i = 0; i < data.length; i++) {
-            const opt = $("<option value='" + data[i].version + "'></option>");
-            if (data[i].version === verCur) {
-                opt.html(data[i].version + " &middot;")
-            } else {
-                opt.html(data[i].version)
-            }
-            $('#upgradeModal select').append(opt)
-        }
-
         const elm = data[0]
         $("#btnUpgradeCheck").data("repo", elm.name.split('/').shift())
         $("#btnUpgradeCheck").data("chart", elm.name.split('/').pop())
@@ -56,50 +45,74 @@ function checkUpgradeable(name) {
         }
 
         $("#btnUpgrade").off("click").click(function () {
-            popUpUpgrade($(this), verCur, elm)
+            popUpUpgrade(elm, getHashParam("namespace"), getHashParam("chart"), verCur, $("#specRev").data("last-rev"))
         })
     })
 }
 
-function popUpUpgrade(self, verCur, elm) {
-    const name = getHashParam("chart");
-    const qstr = "?namespace=" + getHashParam("namespace") + "&name=" + name + "&chart=" + elm.name;
-    let url = "/api/helm/charts/install" + qstr
-    $('#upgradeModal select').data("qstr", qstr).data("url", url).data("chart", elm.name)
-
-    $("#upgradeModalLabel .name").text(name)
-    $("#upgradeModal .ver-old").text(verCur)
-
-    $('#upgradeModal select').val(elm.version).trigger("change")
-
-    const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
-    myModal.show()
-
-    const btnConfirm = $("#upgradeModal .btn-confirm");
-    btnConfirm.prop("disabled", true).off('click').click(function () {
-        btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        $.ajax({
-            type: 'POST',
-            url: url + "&version=" + $('#upgradeModal select').val() + "&flag=true",
-            data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
-        }).fail(function (xhr) {
-            reportError("Failed to upgrade the chart", xhr)
-        }).done(function (data) {
-            if (data.version) {
-                setHashParam("revision", data.version)
-                window.location.reload()
+function popUpUpgrade(elm, ns, name, verCur, lastRev) {
+    $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
+        reportError("Failed to find chart in repo", xhr)
+    }).done(function (vers) {
+        // fill versions
+        $('#upgradeModal select').empty()
+        for (let i = 0; i < vers.length; i++) {
+            const opt = $("<option value='" + vers[i].version + "'></option>");
+            if (vers[i].version === verCur) {
+                opt.html(vers[i].version + " &middot;")
             } else {
-                reportError("Failed to get new revision number")
+                opt.html(vers[i].version)
             }
-        })
-    })
+            $('#upgradeModal select').append(opt)
+        }
 
-    // fill current values
-    const lastRev = $("#specRev").data("last-rev")
-    $.get("/api/helm/charts/values?namespace=" + getHashParam("namespace") + "&revision=" + lastRev + "&name=" + getHashParam("chart") + "&flag=true").fail(function (xhr) {
-        reportError("Failed to get charts values info", xhr)
-    }).done(function (data) {
-        $("#upgradeModal textarea").val(data).data("dirty", false)
+        // show form
+        const qstr = "?namespace=" + ns + "&name=" + name + "&chart=" + elm.name;
+        let url = "/api/helm/charts/install" + qstr
+        $('#upgradeModal select').data("qstr", qstr).data("url", url).data("chart", elm.name)
+
+        $("#upgradeModalLabel .name").text(name)
+
+        if (verCur) {
+            $("#upgradeModal .ver-old").show().find("span").text(verCur)
+        } else {
+            $("#upgradeModal .ver-old").hide()
+        }
+
+        $('#upgradeModal select').val(verCur?verCur:elm.version).trigger("change")
+
+        const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
+        myModal.show()
+
+        const btnConfirm = $("#upgradeModal .btn-confirm");
+        btnConfirm.prop("disabled", true).off('click').click(function () {
+            btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+            $.ajax({
+                type: 'POST',
+                url: url + "&version=" + $('#upgradeModal select').val() + "&flag=true",
+                data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
+            }).fail(function (xhr) {
+                reportError("Failed to upgrade the chart", xhr)
+            }).done(function (data) {
+                if (data.version) {
+                    setHashParam("revision", data.version)
+                    window.location.reload()
+                } else {
+                    reportError("Failed to get new revision number")
+                }
+            })
+        })
+
+        if (verCur) {
+            // fill current values
+            $.get("/api/helm/charts/values?namespace=" + ns + "&revision=" + lastRev + "&name=" + name + "&flag=true").fail(function (xhr) {
+                reportError("Failed to get charts values info", xhr)
+            }).done(function (data) {
+                $("#upgradeModal textarea").val(data).data("dirty", false)
+            })
+        } else {
+            $("#upgradeModal textarea").val("").data("dirty", true)
+        }
     })
 }
 

@@ -161,7 +161,12 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*His
 }
 
 func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement, err error) {
-	cmd := []string{"search", "repo", "--regexp", "/" + chartName + "\v", "--versions", "--output", "json"}
+	search := "/" + chartName + "\v"
+	if strings.Contains(chartName, "/") {
+		search = "\v" + chartName + "\v"
+	}
+
+	cmd := []string{"search", "repo", "--regexp", search, "--versions", "--output", "json"}
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
 		return nil, err
@@ -199,9 +204,16 @@ func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, e
 func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []ReleaseElement) {
 	for _, chart := range charts {
 		for _, rel := range installed {
+			c, _, err := utils.ChartAndVersion(rel.Chart)
+			if err != nil {
+				log.Warnf("Failed to parse chart: %s", err)
+				continue
+			}
+
 			pieces := strings.Split(chart.Name, "/")
-			if pieces[1] == rel.Name {
+			if pieces[1] == c {
 				chart.InstalledNamespace = rel.Namespace
+				chart.InstalledName = rel.Name
 			}
 		}
 	}
@@ -384,7 +396,7 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		return "", err
 	}
 
-	cmd := []string{"upgrade", name, repoChart, "--version", version, "--namespace", namespace, "--values", oldValsFile, "--output", "json"}
+	cmd := []string{"upgrade", "--install", name, repoChart, "--version", version, "--namespace", namespace, "--values", oldValsFile, "--output", "json"}
 	if justTemplate {
 		cmd = append(cmd, "--dry-run")
 	}
