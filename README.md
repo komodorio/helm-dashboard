@@ -83,32 +83,6 @@ We have two main channels for supporting the Helm Dashboard
 users: [Slack community](https://komodorkommunity.slack.com/archives/C044U1B0265) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
-## Roadmap & Ideas
-
-### First Public Version
-
-- CLI launcher
-- Web Server with REST API
-- Listing the installed applications
-- View k8s resources created by the application (describe, status)
-- Viewing revision history for application
-- View manifest diffs between revisions, also changelogs etc
-- Analytics reporting (telemetry)
-- Rollback to a revision
-- Check for repo updates & upgrade flow
-- Uninstalling the app completely
-- Switch clusters
-- Show manifest/describe upon clicking on resource
-
-- Helm Plugin Packaging
-- Styled properly
-
-### Further Ideas
-
-- solve umbrella-chart case
-- Have cleaner idea on the web API structure
-- Recognise & show ArgoCD-originating charts/objects, those `helm ls` does not show
-- loki example - DaemonSet and StatefulSet better status display
 
 ## Local Dev Testing
 
