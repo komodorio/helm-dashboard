@@ -6,6 +6,7 @@ import (
 )
 
 // unpleasant copy from Helm sources, where they have it non-public
+
 type ReleaseElement struct {
 	Name       string         `json:"name"`
 	Namespace  string         `json:"namespace"`
@@ -32,4 +33,12 @@ type RepoChartElement struct {
 	Version     string `json:"version"`
 	AppVersion  string `json:"app_version"`
 	Description string `json:"description"`
+
+	InstalledNamespace string `json:"installed_namespace"` // custom addition on top of Helm
+	InstalledName      string `json:"installed_name"`      // custom addition on top of Helm
+}
+
+type RepositoryElement struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }

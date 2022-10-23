@@ -122,6 +122,7 @@ func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
 }
 
 func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
+	// TODO: filter by namespace
 	out, err := d.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
 	if err != nil {
 		return nil, err
@@ -159,8 +160,13 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*His
 	return res, nil
 }
 
-func (d *DataLayer) ChartRepoVersions(chartName string) (res []RepoChartElement, err error) {
-	cmd := []string{"search", "repo", "--regexp", "/" + chartName + "\v", "--versions", "--output", "json"}
+func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement, err error) {
+	search := "/" + chartName + "\v"
+	if strings.Contains(chartName, "/") {
+		search = "\v" + chartName + "\v"
+	}
+
+	cmd := []string{"search", "repo", "--regexp", search, "--versions", "--output", "json"}
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
 		return nil, err
@@ -171,6 +177,46 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []RepoChartElement,
 		return nil, err
 	}
 	return res, nil
+}
+
+func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, err error) {
+	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
+	out, err := d.runCommandHelm(cmd...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	ins, err := d.ListInstalled()
+	if err != nil {
+		return nil, err
+	}
+
+	enrichRepoChartsWithInstalled(res, ins)
+
+	return res, nil
+}
+
+func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []ReleaseElement) {
+	for _, chart := range charts {
+		for _, rel := range installed {
+			c, _, err := utils.ChartAndVersion(rel.Chart)
+			if err != nil {
+				log.Warnf("Failed to parse chart: %s", err)
+				continue
+			}
+
+			pieces := strings.Split(chart.Name, "/")
+			if pieces[1] == c {
+				chart.InstalledNamespace = rel.Namespace
+				chart.InstalledName = rel.Name
+			}
+		}
+	}
 }
 
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
@@ -305,7 +351,7 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 	return out, nil
 }
 
-func (d *DataLayer) UninstallChart(namespace string, name string) error {
+func (d *DataLayer) ChartUninstall(namespace string, name string) error {
 	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
 	if err != nil {
 		return err
@@ -335,8 +381,8 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 	return nil
 }
 
-func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool, values string) (string, error) {
-	if values == "" {
+func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string, version string, justTemplate bool, values string, reuseVals bool) (string, error) {
+	if values == "" && reuseVals {
 		oldVals, err := d.RevisionValues(namespace, name, 0, true)
 		if err != nil {
 			return "", err
@@ -344,13 +390,13 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		values = oldVals
 	}
 
-	oldValsFile, close1, err := utils.TempFile(values)
+	valsFile, close1, err := utils.TempFile(values)
 	defer close1()
 	if err != nil {
 		return "", err
 	}
 
-	cmd := []string{"upgrade", name, repoChart, "--version", version, "--namespace", namespace, "--values", oldValsFile, "--output", "json"}
+	cmd := []string{"upgrade", "--install", "--create-namespace", name, repoChart, "--version", version, "--namespace", namespace, "--values", valsFile, "--output", "json"}
 	if justTemplate {
 		cmd = append(cmd, "--dry-run")
 	}
@@ -373,6 +419,37 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 
 func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
 	return d.runCommandHelm("show", "values", chart, "--version", ver)
+}
+
+func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
+	out, err := d.runCommandHelm("repo", "list", "--output", "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (d *DataLayer) ChartRepoAdd(name string, url string) (string, error) {
+	out, err := d.runCommandHelm("repo", "add", "--force-update", name, url)
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
+}
+
+func (d *DataLayer) ChartRepoDelete(name string) (string, error) {
+	out, err := d.runCommandHelm("repo", "remove", name)
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {

@@ -81,16 +81,23 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 
 func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	h := handlers.HelmHandler{Data: data}
+
 	api.GET("/charts", h.GetCharts)
 	api.DELETE("/charts", h.Uninstall)
-	api.POST("/charts/rollback", h.Rollback)
+
 	api.GET("/charts/history", h.History)
 	api.GET("/charts/resources", h.Resources)
+	api.GET("/charts/:section", h.GetInfoSection)
+	api.POST("/charts/install", h.Install)
+	api.POST("/charts/rollback", h.Rollback)
+
+	api.GET("/repo", h.RepoList)
+	api.POST("/repo", h.RepoAdd)
+	api.DELETE("/repo", h.RepoDelete)
+	api.GET("/repo/charts", h.RepoCharts)
 	api.GET("/repo/search", h.RepoSearch)
 	api.POST("/repo/update", h.RepoUpdate)
 	api.GET("/repo/values", h.RepoValues)
-	api.POST("/charts/install", h.Install)
-	api.GET("/charts/:section", h.GetInfoSection)
 }
 
 func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {

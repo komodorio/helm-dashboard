@@ -11,6 +11,27 @@ $(function () {
         const context = getHashParam("context")
         fillClusterList(data, context);
 
+        initView(); // can only do it after loading cluster list
+    })
+
+    $.getJSON("/api/scanners").fail(function (xhr) {
+        reportError("Failed to get list of scanners", xhr)
+    }).done(function (data) {
+        if (!data.length) {
+            $("#upgradeModal .btn-scan").hide()
+        }
+    })
+})
+
+function initView() {
+    $(".section").hide()
+
+    const section = getHashParam("section")
+    if (section === "repository") {
+        $("#topNav ul a.section-repo").addClass("active")
+        loadRepoView()
+    } else {
+        $("#topNav ul a.section-installed").addClass("active")
         const namespace = getHashParam("namespace")
         const chart = getHashParam("chart")
         if (!chart) {
@@ -18,26 +39,26 @@ $(function () {
         } else {
             loadChartHistory(namespace, chart)
         }
-    })
+    }
+}
 
-    $.getJSON("/api/scanners").fail(function (xhr) {
-        reportError("Failed to get list of scanners", xhr)
-    }).done(function (data) {
-        for (let n = 0; n < data.length; n++) {
-            const item = $(`
-                <label class="form-check-label me-4">
-                    <input class="form-check-input me-1" type="checkbox" checked name="scanner" value="` + data[n] + `"> ` + data[n] + `
-                </label>`)
+$("#topNav ul a").click(function () {
+    const self = $(this)
 
-            $("#nav-scanners form span").prepend(item)
-        }
+    $("#topNav ul a").removeClass("active")
 
-        if (!data.length) {
-            $("#upgradeModal .btn-scan").hide()
-        }
-    })
+    const ctx = getHashParam("context")
+    setHashParam(null, null)
+    setHashParam("context", ctx)
+
+    if (self.hasClass("section-repo")) {
+        setHashParam("section", "repository")
+    } else {
+        setHashParam("section", null)
+    }
+
+    initView()
 })
-
 
 const myAlert = document.getElementById('errorAlert')
 myAlert.addEventListener('close.bs.alert', event => {
@@ -60,8 +81,14 @@ function getHashParam(name) {
 }
 
 function setHashParam(name, val) {
-    const params = new URLSearchParams(window.location.hash.substring(1))
-    params.set(name, val)
+    let params = new URLSearchParams(window.location.hash.substring(1))
+    if (!name) {
+        params = new URLSearchParams()
+    } else if (!val) {
+        params.delete(name)
+    } else {
+        params.set(name, val)
+    }
     window.location.hash = new URLSearchParams(params).toString()
 }
 
@@ -86,14 +113,14 @@ function statusStyle(status, card, txt) {
 }
 
 function getCleanClusterName(rawClusterName) {
-    if (rawClusterName.indexOf('arn') == 0) {
+    if (rawClusterName.indexOf('arn') === 0) {
         // AWS cluster
-        clusterSplit = rawClusterName.split(':')
-        clusterName = clusterSplit.at(-1).split("/").at(-1)
-        region = clusterSplit.at(-3)
+        const clusterSplit = rawClusterName.split(':')
+        const clusterName = clusterSplit.at(-1).split("/").at(-1)
+        const region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
-    if (rawClusterName.indexOf('gke') == 0) {
+    if (rawClusterName.indexOf('gke') === 0) {
         // GKE cluster
         return rawClusterName.split('_').at(-2) + '/' + rawClusterName.split('_').at(-1) + ' [GKE]'
     }
@@ -102,13 +129,11 @@ function getCleanClusterName(rawClusterName) {
 
 function fillClusterList(data, context) {
     data.forEach(function (elm) {
-        // aws CLI uses complicated context names, the suffix does not work well
-        // maybe we should have an `if` statement here
-        let label = elm.Name //+ " (" + elm.Cluster + "/" + elm.AuthInfo + "/" + elm.Namespace + ")"
+        let label = getCleanClusterName(elm.Name)
         let opt = $('<li><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
-        opt.attr('title', label)
+        opt.attr('title', elm.Name)
         opt.find("input").val(elm.Name).text(label)
-        opt.find("span").text(getCleanClusterName(label))
+        opt.find("span").text(label)
         if (elm.IsCurrent && !context) {
             opt.find("input").prop("checked", true)
             setCurrentContext(elm.Name)

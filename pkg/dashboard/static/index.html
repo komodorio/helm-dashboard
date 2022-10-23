@@ -48,18 +48,11 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item mx-2">
-                    <a class="nav-link px-3 active" aria-current="page" href="/">Installed</a>
+                    <a class="nav-link px-3 section-installed">Installed</a>
                 </li>
-                <!-- TODO
                 <li class="nav-item mx-2">
-                    <a href="#" class="nav-link px-3">Repository</a>
+                    <a class="nav-link px-3 section-repo">Repository</a>
                 </li>
-                -->
-                <!-- TODO
-                <li class="nav-item">
-                    <a class="nav-link disabled">Provisional Charts</a>
-                </li>
-                -->
             </ul>
             <div>
                 <a class="btn" href="https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash"><img
@@ -75,7 +68,48 @@
     </nav>
     <!-- /TOP BAR -->
 
-    <div class="row mt-3 pt-3 me-5" id="sectionList" style="display: none">
+    <!--REPO SECTION-->
+    <div class="row mt-3 pt-3 me-5 section" id="sectionRepo" style="display: none">
+        <div class="col-3 ps-4 repo-list">
+            <div class="p-2 bg-white rounded-1 b-shadow">
+                <h4 class="fs-6">Repositories</h4>
+                <ul class="list-unstyled p-2">
+                </ul>
+                <button class="btn btn-sm border-secondary text-muted">
+                    <i class="bi-plus-lg"></i> Add Repository
+                </button>
+            </div>
+        </div>
+        <div class="col-9 repo-details bg-white b-shadow pt-4 px-5 overflow-auto rounded">
+            <div class="float-end">
+                <button class="me-2 btn btn-sm btn-light bg-white border border-secondary btn-update">
+                    <i class="bi-arrow-repeat"></i> Update
+                </button>
+                <button class="btn btn-sm btn-light bg-white border border-secondary btn-remove">
+                    <i class="bi-trash3"></i> Remove
+                </button>
+            </div>
+            <div><span class="text-muted small fw-bold me-3">REPOSITORY</span></div>
+            <h2 class="mb-3">name-of-repo</h2>
+            <div class="mb-5">
+                <span class="rounded rounded-1 me-2 p-1 px-2 bg-tag text-dark">URL: <span class="url fw-bold">http://somerepo/somepath</span></span>
+            </div>
+
+            <div class="float-end">
+            <!-- TODO   <input class="form-control form-control-sm" type="text" placeholder="Filter..."> -->
+            </div>
+            <div class="row bg-secondary rounded px-3 py-2 mb-3 fw-bold small"
+                 style="text-transform: uppercase">
+                <div class="col-3">Chart Name</div>
+                <div class="col">Description</div>
+                <div class="col-1">Version</div>
+                <div class="col-1"></div>
+            </div>
+            <ul class="list-unstyled mt-4"></ul>
+        </div>
+    </div>
+
+    <div class="row mt-3 pt-3 me-5 section" id="sectionList" style="display: none">
         <div class="col-2 ms-3">
             <!-- FILTER BLOCK -->
             <div class="p-2 ps-2 bg-white rounded-1 b-shadow" id="filters">
@@ -117,7 +151,7 @@
         <!-- /INSTALLED LIST -->
     </div>
 
-    <div class="row flex-nowrap pt-0 mx-0" id="sectionDetails" style="display: none">
+    <div class="row flex-nowrap pt-0 mx-0 section" id="sectionDetails" style="display: none">
         <div class="col-2 px-4 py-4 pe-3 rev-list">
             <h3 class="fw-bold small">Revisions</h3>
             <ul class="list-unstyled">
@@ -270,21 +304,48 @@
     </div>
 </div>
 
+<div class="modal" id="repoAddModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Chart Repository</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="application/x-www-form-urlencoded">
+                    <label class="form-label">Name: <input class="form-control" name="name"></label>
+                    <label class="form-label">URL: <input class="form-control" name="url"></label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-confirm">Add Repository</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="modal" id="upgradeModal" tabindex="-1" aria-labelledby="describeModalLabel" aria-hidden="true">
+<div class="modal" id="upgradeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="upgradeModalLabel">
-                    Upgrade <b class='text-success name'></b>
+                    Install <b class='text-success name'></b>
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form class="modal-body border-bottom fs-5" enctype="multipart/form-data">
                 <div class="input-group mb-3 text-muted">
                     <label class="form-label me-4 text-dark">Version to install: <select
-                            class='fw-bold text-success ver-new'></select></label> (current version is <span
-                        class='text-success ver-old ms-1'>0.0.0</span>)
+                            class='fw-bold text-success ver-new'></select></label> <span class="ver-old">(current version is <span
+                        class='text-success ms-1'>0.0.0</span>)</span>
+                </div>
+                <div class="input-group mb-3 text-muted">
+                    <label class="form-label me-4 text-dark">
+                        Release Name: <input class="form-control rel-name">
+                    </label>
+                    <label class="form-label me-4 text-dark">
+                        Namespace (optional): <input class="form-control rel-ns">
+                    </label>
                 </div>
                 <div class="row">
                     <div class="col-6 pe-3">
@@ -296,7 +357,8 @@
                 </div>
                 <div class="row">
                     <div class="col-6 pe-3">
-                        <textarea name="values" class="form-control w-100 h-100" rows="5" style="font-family: monospace"></textarea>
+                        <textarea name="values" class="form-control w-100 h-100" rows="5"
+                                  style="font-family: monospace"></textarea>
                     </div>
                     <div class="col-6 ps-3">
                         <pre class="ref-vals fs-6 w-100 bg-secondary p-2 rounded" style="max-height: 20rem"></pre>
@@ -313,7 +375,7 @@
             </form>
             <div class="modal-footer d-flex">
                 <button type="button" class="btn btn-scan bg-white border-secondary">Scan for Problems</button>
-                <button type="button" class="btn btn-primary btn-confirm">Confirm Upgrade</button>
+                <button type="button" class="btn btn-primary btn-confirm">Confirm</button>
             </div>
         </div>
     </div>
@@ -332,6 +394,7 @@
         integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+<script src="static/repo.js"></script>
 <script src="static/list-view.js"></script>
 <script src="static/revisions-view.js"></script>
 <script src="static/details-view.js"></script>

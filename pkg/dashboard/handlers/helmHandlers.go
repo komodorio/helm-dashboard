@@ -31,7 +31,7 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	err = h.Data.UninstallChart(qp.Namespace, qp.Name)
+	err = h.Data.ChartUninstall(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -99,6 +99,21 @@ func (h *HelmHandler) RepoSearch(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
+func (h *HelmHandler) RepoCharts(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	res, err := h.Data.ChartRepoCharts(qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, res)
+}
+
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
@@ -122,21 +137,25 @@ func (h *HelmHandler) Install(c *gin.Context) {
 	}
 
 	justTemplate := c.Query("flag") != "true"
-	out, err := h.Data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, c.PostForm("values"))
+	isInitial := c.Query("initial") != "true"
+	out, err := h.Data.ChartInstall(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, c.PostForm("values"), isInitial)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	if !justTemplate {
-		c.Header("Content-Type", "application/json")
-	} else {
-		manifests, err := h.Data.RevisionManifests(qp.Namespace, qp.Name, 0, false)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
+	if justTemplate {
+		manifests := ""
+		if isInitial {
+			manifests, err = h.Data.RevisionManifests(qp.Namespace, qp.Name, 0, false)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
 		}
 		out = subproc.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
+	} else {
+		c.Header("Content-Type", "application/json")
 	}
 
 	c.String(http.StatusAccepted, out)
@@ -166,6 +185,39 @@ func (h *HelmHandler) RepoValues(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, out)
+}
+
+func (h *HelmHandler) RepoList(c *gin.Context) {
+	out, err := h.Data.ChartRepoList()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, out)
+}
+
+func (h *HelmHandler) RepoAdd(c *gin.Context) {
+	_, err := h.Data.ChartRepoAdd(c.PostForm("name"), c.PostForm("url"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
+func (h *HelmHandler) RepoDelete(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	_, err = h.Data.ChartRepoDelete(qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
 }
 
 func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp *utils.QueryProps, flag bool) (string, error) {

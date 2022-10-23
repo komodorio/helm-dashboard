@@ -26,7 +26,8 @@ func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 		return
 	}
 
-	mnf, err := h.Data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, c.PostForm("values"))
+	reuseVals := c.Query("initial") != "true"
+	mnf, err := h.Data.ChartInstall(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, c.PostForm("values"), reuseVals)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

@@ -1,3 +1,7 @@
+.link, .nav-link {
+    cursor: pointer;
+}
+
 .strike {
     text-decoration: line-through;
 }
@@ -325,7 +329,7 @@ span.link {
 }
 
 #nav-resources .bg-secondary {
-    background-color: #E6E7EB!important;
+    background-color: #E6E7EB !important;
 }
 
 .res-actions .btn-sm {
@@ -349,4 +353,16 @@ span.link {
 
 #describeModalBody pre {
     font-size: 1rem;
+}
+
+#sectionRepo .repo-details ul .row .btn {
+    visibility: hidden;
+}
+
+#sectionRepo .repo-details ul .row:hover {
+    background-color: #F4F7FA !important;
+}
+
+#sectionRepo .repo-details ul .row:hover .btn {
+    visibility: visible;
 }
