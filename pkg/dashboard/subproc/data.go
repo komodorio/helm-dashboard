@@ -351,7 +351,7 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 	return out, nil
 }
 
-func (d *DataLayer) UninstallChart(namespace string, name string) error {
+func (d *DataLayer) ChartUninstall(namespace string, name string) error {
 	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
 	if err != nil {
 		return err
@@ -381,8 +381,8 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 	return nil
 }
 
-func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string, version string, justTemplate bool, values string) (string, error) {
-	if values == "" {
+func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string, version string, justTemplate bool, values string, reuseVals bool) (string, error) {
+	if values == "" && reuseVals {
 		oldVals, err := d.RevisionValues(namespace, name, 0, true)
 		if err != nil {
 			return "", err
@@ -390,13 +390,13 @@ func (d *DataLayer) ChartUpgrade(namespace string, name string, repoChart string
 		values = oldVals
 	}
 
-	oldValsFile, close1, err := utils.TempFile(values)
+	valsFile, close1, err := utils.TempFile(values)
 	defer close1()
 	if err != nil {
 		return "", err
 	}
 
-	cmd := []string{"upgrade", "--install", name, repoChart, "--version", version, "--namespace", namespace, "--values", oldValsFile, "--output", "json"}
+	cmd := []string{"upgrade", "--install", "--create-namespace", name, repoChart, "--version", version, "--namespace", namespace, "--values", valsFile, "--output", "json"}
 	if justTemplate {
 		cmd = append(cmd, "--dry-run")
 	}

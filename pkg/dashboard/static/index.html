@@ -329,7 +329,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="upgradeModalLabel">
-                    Upgrade <b class='text-success name'></b>
+                    Install <b class='text-success name'></b>
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -338,6 +338,14 @@
                     <label class="form-label me-4 text-dark">Version to install: <select
                             class='fw-bold text-success ver-new'></select></label> <span class="ver-old">(current version is <span
                         class='text-success ms-1'>0.0.0</span>)</span>
+                </div>
+                <div class="input-group mb-3 text-muted">
+                    <label class="form-label me-4 text-dark">
+                        Release Name: <input class="form-control rel-name">
+                    </label>
+                    <label class="form-label me-4 text-dark">
+                        Namespace (optional): <input class="form-control rel-ns">
+                    </label>
                 </div>
                 <div class="row">
                     <div class="col-6 pe-3">

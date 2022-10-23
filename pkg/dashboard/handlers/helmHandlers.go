@@ -31,7 +31,7 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	err = h.Data.UninstallChart(qp.Namespace, qp.Name)
+	err = h.Data.ChartUninstall(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -137,21 +137,25 @@ func (h *HelmHandler) Install(c *gin.Context) {
 	}
 
 	justTemplate := c.Query("flag") != "true"
-	out, err := h.Data.ChartUpgrade(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, c.PostForm("values"))
+	isInitial := c.Query("initial") != "true"
+	out, err := h.Data.ChartInstall(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, c.PostForm("values"), isInitial)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	if !justTemplate {
-		c.Header("Content-Type", "application/json")
-	} else {
-		manifests, err := h.Data.RevisionManifests(qp.Namespace, qp.Name, 0, false)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
+	if justTemplate {
+		manifests := ""
+		if isInitial {
+			manifests, err = h.Data.RevisionManifests(qp.Namespace, qp.Name, 0, false)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
 		}
 		out = subproc.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
+	} else {
+		c.Header("Content-Type", "application/json")
 	}
 
 	c.String(http.StatusAccepted, out)

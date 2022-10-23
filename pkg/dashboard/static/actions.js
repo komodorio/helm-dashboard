@@ -51,6 +51,23 @@ function checkUpgradeable(name) {
 }
 
 function popUpUpgrade(elm, ns, name, verCur, lastRev) {
+    $("#upgradeModal .btn-confirm").prop("disabled", true)
+
+    $('#upgradeModal').data("chart", elm.name).data("initial", !verCur)
+
+    $("#upgradeModalLabel .name").text(elm.name)
+
+    if (verCur) {
+        $("#upgradeModal .ver-old").show().find("span").text(verCur)
+        $("#upgradeModal .rel-name").prop("disabled", true).val(name)
+        $("#upgradeModal .rel-ns").prop("disabled", true).val(ns)
+    } else {
+        $("#upgradeModal .ver-old").hide()
+        $("#upgradeModal .rel-name").prop("disabled", false).val(elm.name.split("/").pop())
+        $("#upgradeModal .rel-ns").prop("disabled", false).val("")
+    }
+
+
     $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (vers) {
@@ -66,42 +83,10 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
             $('#upgradeModal select').append(opt)
         }
 
-        // show form
-        const qstr = "?namespace=" + ns + "&name=" + name + "&chart=" + elm.name;
-        let url = "/api/helm/charts/install" + qstr
-        $('#upgradeModal select').data("qstr", qstr).data("url", url).data("chart", elm.name)
-
-        $("#upgradeModalLabel .name").text(name)
-
-        if (verCur) {
-            $("#upgradeModal .ver-old").show().find("span").text(verCur)
-        } else {
-            $("#upgradeModal .ver-old").hide()
-        }
-
-        $('#upgradeModal select').val(verCur?verCur:elm.version).trigger("change")
+        $('#upgradeModal select').val(verCur ? verCur : elm.version).trigger("change")
 
         const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
         myModal.show()
-
-        const btnConfirm = $("#upgradeModal .btn-confirm");
-        btnConfirm.prop("disabled", true).off('click').click(function () {
-            btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-            $.ajax({
-                type: 'POST',
-                url: url + "&version=" + $('#upgradeModal select').val() + "&flag=true",
-                data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
-            }).fail(function (xhr) {
-                reportError("Failed to upgrade the chart", xhr)
-            }).done(function (data) {
-                if (data.version) {
-                    setHashParam("revision", data.version)
-                    window.location.reload()
-                } else {
-                    reportError("Failed to get new revision number")
-                }
-            })
-        })
 
         if (verCur) {
             // fill current values
@@ -116,8 +101,27 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     })
 }
 
+$("#upgradeModal .btn-confirm").click(function () {
+    btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    $.ajax({
+        type: 'POST',
+        url: "/api/helm/charts/install" + upgradeModalQstr() + "&flag=true",
+        data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
+    }).fail(function (xhr) {
+        reportError("Failed to upgrade the chart", xhr)
+    }).done(function (data) {
+        if (data.version) {
+            setHashParam("revision", data.version)
+            window.location.reload()
+        } else {
+            reportError("Failed to get new revision number")
+        }
+    })
+})
+
 let reconfigTimeout = null;
-$("#upgradeModal textarea").keyup(function () {
+
+function changeTimer() {
     const self = $(this);
     self.data("dirty", true)
     if (reconfigTimeout) {
@@ -126,7 +130,11 @@ $("#upgradeModal textarea").keyup(function () {
     reconfigTimeout = window.setTimeout(function () {
         requestChangeDiff()
     }, 500)
-})
+}
+
+$("#upgradeModal textarea").keyup(changeTimer)
+$("#upgradeModal .rel-name").keyup(changeTimer)
+$("#upgradeModal .rel-ns").keyup(changeTimer)
 
 $('#upgradeModal select').change(function () {
     const self = $(this)
@@ -135,7 +143,7 @@ $('#upgradeModal select').change(function () {
 
     // fill reference values
     $("#upgradeModal .ref-vals").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    $.get("/api/helm/repo/values?chart=" + self.data("chart") + "&version=" + self.val()).fail(function (xhr) {
+    $.get("/api/helm/repo/values?chart=" + $("#upgradeModal").data("chart") + "&version=" + self.val()).fail(function (xhr) {
         reportError("Failed to get upgrade info", xhr)
     }).done(function (data) {
         data = hljs.highlight(data, {language: 'yaml'}).value
@@ -147,10 +155,9 @@ $('#upgradeModal .btn-scan').click(function () {
     const self = $(this)
 
     self.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    const qstr = $('#upgradeModal select').data("qstr")
     $.ajax({
         type: "POST",
-        url: "/api/scanners/manifests" + qstr + "&version=" + $('#upgradeModal select').val(),
+        url: "/api/scanners/manifests" + upgradeModalQstr(),
         data: $("#upgradeModal form").serialize(),
     }).fail(function (xhr) {
         reportError("Failed to scan the manifest", xhr)
@@ -199,7 +206,7 @@ function requestChangeDiff() {
 
     $.ajax({
         type: "POST",
-        url: self.data("url") + "&version=" + self.val(),
+        url: "/api/helm/charts/install" + upgradeModalQstr(),
         data: values,
     }).fail(function (xhr) {
         $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info:     " + xhr.responseText + "</p>")
@@ -218,6 +225,20 @@ function requestChangeDiff() {
             diffBody.html("No changes will happen to the cluster")
         }
     })
+}
+
+function upgradeModalQstr() {
+    let qstr = "?" +
+        "namespace=" + $("#upgradeModal .rel-ns").val() +
+        "&name=" + $("#upgradeModal .rel-name").val() +
+        "&chart=" + $("#upgradeModal").data("chart") +
+        "&version=" + $('#upgradeModal select').val()
+
+    if ($("#upgradeModal").data("initial")) {
+        qstr += "&initial=true"
+    }
+
+    return qstr
 }
 
 const btnConfirm = $("#confirmModal .btn-confirm");
