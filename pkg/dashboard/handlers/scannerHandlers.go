@@ -12,7 +12,7 @@ type ScannersHandler struct {
 }
 
 func (h *ScannersHandler) List(c *gin.Context) {
-	var res []string
+	res := make([]string, 0)
 	for _, scanner := range h.Data.Scanners {
 		res = append(res, scanner.Name())
 	}
