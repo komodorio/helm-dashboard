@@ -21,6 +21,12 @@ $(function () {
             $("#upgradeModal .btn-scan").hide()
         }
     })
+
+    $.get("/status").fail(function (xhr) {
+        reportError("Failed to get tool version", xhr)
+    }).done(function (data) {
+        fillToolVersion(data)
+    })
 })
 
 function initView() {
@@ -195,4 +201,8 @@ function isNewerVersion(oldVer, newVer) {
         if (a < b) return false
     }
     return false
+}
+
+function fillToolVersion(data) {
+    $("#toolVersion").append($('<a>' + data + '</a>'))
 }
