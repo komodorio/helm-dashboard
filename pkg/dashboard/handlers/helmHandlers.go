@@ -248,11 +248,11 @@ func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp 
 			return "", err
 		}
 		return res, nil
-	} else {
-		res, err := functor(qp.Namespace, qp.Name, qp.Revision, flag)
-		if err != nil {
-			return "", err
-		}
-		return res, nil
 	}
+
+	res, err := functor(qp.Namespace, qp.Name, qp.Revision, flag)
+	if err != nil {
+		return "", err
+	}
+	return res, nil
 }
