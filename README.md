@@ -42,9 +42,11 @@ To uninstall, run:
 helm plugin uninstall dashboard
 ```
 
+Note: In case standard Helm plugin way did not work for you, you can just download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
+
 ## Running
 
-To use the plugin, your machine needs to have working `helm` and also `kubectl` commands.
+To use the plugin, your machine needs to have working `helm` and also `kubectl` commands. Helm version 3.4.0+ is required.
 
 After installing, start the UI by running:
 
