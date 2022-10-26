@@ -218,5 +218,6 @@ function fillToolVersion(data) {
     if (isNewerVersion(data.CurVer, data.LatestVer)) {
         $("#toolVersionUpgrade").text(data.LatestVer)
         $(".new-version-pill").show()
+        $(".upgrade-possible").show()
     }
 }
