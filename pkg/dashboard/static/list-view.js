@@ -13,7 +13,7 @@ function loadChartsList() {
             chartsCards.append(card)
         })
 
-        if (!data) {
+        if (!data.length) {
             $("#installedList .no-charts").show()
         }
     })
