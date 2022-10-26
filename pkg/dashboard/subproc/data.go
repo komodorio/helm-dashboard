@@ -25,6 +25,12 @@ type DataLayer struct {
 	Helm        string
 	Kubectl     string
 	Scanners    []Scanner
+	VersionInfo *VersionInfo
+}
+
+type VersionInfo struct {
+	CurVer    string
+	LatestVer string
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {

@@ -54,8 +54,11 @@
                     <a class="nav-link px-3 section-repo">Repository</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
+                        <span class="position-absolute top-50 start-0 translate-middle p-1 bg-danger border border-light rounded-circle new-version-pill display-none">
+                            <span class="visually-hidden">New version</span>
+                        </span>
                         Help
                     </a>
                     <ul class="dropdown-menu fs-80">
@@ -67,6 +70,13 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li><a class="dropdown-item disabled" href="#">Version <span id="toolVersion"></span></a></li>
+                        <li class="">
+                            <a class="dropdown-item position-relative" href="https://github.com/komodorio/helm-dashboard#installing" target="_blank">
+                            <span class="position-absolute top-50 start-0 translate-middle p-1 bg-danger border border-light rounded-circle new-version-pill display-none">
+                                <span class="visually-hidden">New version</span>
+                            </span>
+                            Upgrade to <span id="toolVersionUpgrade"></span>
+                        </a></li>
                     </ul>
                 </li>
 

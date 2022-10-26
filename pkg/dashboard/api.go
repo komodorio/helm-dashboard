@@ -44,7 +44,7 @@ func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, version string) *gin.Engine {
+func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer) *gin.Engine {
 	var api *gin.Engine
 	if os.Getenv("DEBUG") == "" {
 		api = gin.New()
@@ -58,12 +58,12 @@ func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, version stri
 	api.Use(errorHandler)
 
 	configureStatic(api)
-	configureRoutes(abortWeb, data, api, version)
+	configureRoutes(abortWeb, data, api)
 
 	return api
 }
 
-func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *gin.Engine, version string) {
+func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -71,7 +71,7 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 	})
 
 	api.GET("/status", func(c *gin.Context) {
-		c.String(http.StatusOK, version)
+		c.IndentedJSON(http.StatusOK, data.VersionInfo)
 	})
 
 	configureHelms(api.Group("/api/helm"), data)
