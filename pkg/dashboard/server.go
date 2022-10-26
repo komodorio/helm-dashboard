@@ -92,11 +92,16 @@ func checkUpgrade(d *subproc.VersionInfo) {
 	r, err := myClient.Get(url)
 	if err != nil {
 		log.Warnf("Failed to check for new version: %s", err)
+		return
 	}
 	defer r.Body.Close()
 
 	target := new(GHRelease)
 	err = json.NewDecoder(r.Body).Decode(target)
+	if err != nil {
+		log.Warnf("Failed to decode new release version: %s", err)
+		return
+	}
 	d.LatestVer = target.Name
 
 	v1, err := version.NewVersion(d.CurVer)
