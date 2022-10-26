@@ -12,6 +12,10 @@ function loadChartsList() {
             let card = buildChartCard(elm);
             chartsCards.append(card)
         })
+
+        if (!data.length) {
+            $("#installedList .no-charts").show()
+        }
     })
 }
 

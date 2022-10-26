@@ -76,6 +76,10 @@
     min-width: 60%;
 }
 
+.fs-80 {
+    font-size: 0.8rem!important;
+}
+
 html {
     min-height: 100%;
 }
