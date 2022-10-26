@@ -5,8 +5,8 @@
 })(window,document,'script','https://www.datadoghq-browser-agent.com/datadog-rum-v4.js','DD_RUM')
     DD_RUM.onReady(function() {
         const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            const version = xhr.responseText;
+        xhr.onload = function() {
+            const version = JSON.parse(xhr.responseText).VerCur;
             if (xhr.readyState === XMLHttpRequest.DONE && version!=="dev") {
                 DD_RUM.init({
                     clientToken: 'pub16d64cd1c00cf073ce85af914333bf72',

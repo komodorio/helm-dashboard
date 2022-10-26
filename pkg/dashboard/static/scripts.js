@@ -22,7 +22,7 @@ $(function () {
         }
     })
 
-    $.get("/status").fail(function (xhr) {
+    $.getJSON("/status").fail(function (xhr) {
         reportError("Failed to get tool version", xhr)
     }).done(function (data) {
         fillToolVersion(data)
@@ -51,17 +51,19 @@ function initView() {
 $("#topNav ul a").click(function () {
     const self = $(this)
 
+    if (self.hasClass("section-repo")) {
+        setHashParam("section", "repository")
+    } else if (self.hasClass("section-installed")) {
+        setHashParam("section", null)
+    } else {
+        return
+    }
+
     $("#topNav ul a").removeClass("active")
 
     const ctx = getHashParam("context")
     setHashParam(null, null)
     setHashParam("context", ctx)
-
-    if (self.hasClass("section-repo")) {
-        setHashParam("section", "repository")
-    } else {
-        setHashParam("section", null)
-    }
 
     initView()
 })
@@ -192,6 +194,14 @@ $(".bi-power").click(function () {
 })
 
 function isNewerVersion(oldVer, newVer) {
+    if (oldVer && oldVer[0] === 'v') {
+        oldVer = oldVer.substring(1)
+    }
+
+    if (newVer && newVer[0] === 'v') {
+        newVer = newVer.substring(1)
+    }
+
     const oldParts = oldVer.split('.')
     const newParts = newVer.split('.')
     for (let i = 0; i < newParts.length; i++) {
@@ -204,5 +214,9 @@ function isNewerVersion(oldVer, newVer) {
 }
 
 function fillToolVersion(data) {
-    $("#toolVersion").append($('<a>' + data + '</a>'))
+    $("#toolVersion").text(data.CurVer)
+    if (isNewerVersion(data.CurVer, data.LatestVer)) {
+        $("#toolVersionUpgrade").text(data.LatestVer)
+        $(".new-version-pill").show()
+    }
 }
