@@ -50,6 +50,15 @@ function initView() {
 
 $("#topNav ul a").click(function () {
     const self = $(this)
+    if (self.hasClass("section-help")) {
+        return;
+    }
+
+    $("#topNav ul a").removeClass("active")
+
+    const ctx = getHashParam("context")
+    setHashParam(null, null)
+    setHashParam("context", ctx)
 
     if (self.hasClass("section-repo")) {
         setHashParam("section", "repository")
@@ -58,12 +67,6 @@ $("#topNav ul a").click(function () {
     } else {
         return
     }
-
-    $("#topNav ul a").removeClass("active")
-
-    const ctx = getHashParam("context")
-    setHashParam(null, null)
-    setHashParam("context", ctx)
 
     initView()
 })
