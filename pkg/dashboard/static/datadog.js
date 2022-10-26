@@ -6,7 +6,7 @@
     DD_RUM.onReady(function() {
         const xhr = new XMLHttpRequest();
         xhr.onload = function() {
-            const version = JSON.parse(xhr.responseText).VerCur;
+            const version = JSON.parse(xhr.responseText).CurVer;
             if (xhr.readyState === XMLHttpRequest.DONE && version!=="dev") {
                 DD_RUM.init({
                     clientToken: 'pub16d64cd1c00cf073ce85af914333bf72',
