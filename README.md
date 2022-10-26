@@ -82,7 +82,7 @@ button at the bottom of the dialog:
 ## Support Channels
 
 We have two main channels for supporting the Helm Dashboard
-users: [Slack community](https://komodorkommunity.slack.com/archives/C044U1B0265) for general conversations
+users: [Slack community](https://join.slack.com/t/komodorkommunity/shared_invite/zt-1dm3cnkue-ov1Yh~_95teA35QNx5yuMg) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
 
