@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.8.1
+	github.com/hashicorp/go-version v1.6.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/sirupsen/logrus v1.9.0
-	github.com/toqueteos/webbrowser v1.2.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.9.4
 	k8s.io/apimachinery v0.25.0-alpha.2
