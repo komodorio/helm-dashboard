@@ -44,9 +44,6 @@
                 </div>
             </div>
 
-            <div id="toolVersion">
-            </div>
-            
             <div class="separator-vertical mx-3"><span></span></div>
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -56,14 +53,28 @@
                 <li class="nav-item mx-2">
                     <a class="nav-link px-3 section-repo">Repository</a>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Help
+                    </a>
+                    <ul class="dropdown-menu fs-80">
+                        <li><a class="dropdown-item" href="https://komodorkommunity.slack.com/archives/C044U1B0265"
+                               target="_blank"><i class="bi-slack"></i> Support Chat</a></li>
+                        <li><a class="dropdown-item" href="https://github.com/komodorio/helm-dashboard" target="_blank"><i
+                                class="bi-github"></i> Project Page</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item disabled" href="#">Version <span id="toolVersion"></span></a></li>
+                    </ul>
+                </li>
+
             </ul>
             <div>
                 <a class="btn" href="https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash"><img
-                        src="https://komodor.com/wp-content/uploads/2021/05/favicon.png" alt="komodor.io"
+                        src="static/komodor-logo.svg" alt="komodor.io"
                         style="height: 1.2rem; vertical-align: text-bottom; filter: grayscale(00%);"></a>
-
-                <a class="btn me-2 text-muted" href="https://github.com/komodorio/helm-dashboard"
-                   title="Project page on GitHub"><i class="bi-github"></i></a>
             </div>
             <div class="separator-vertical"><span></span></div>
             <i class="btn bi-power text-muted p-2 m-1 mx-2" title="Shut down the Helm Dashboard application"></i>
@@ -99,7 +110,7 @@
             </div>
 
             <div class="float-end">
-            <!-- TODO   <input class="form-control form-control-sm" type="text" placeholder="Filter..."> -->
+                <!-- TODO   <input class="form-control form-control-sm" type="text" placeholder="Filter..."> -->
             </div>
             <div class="row bg-secondary rounded px-3 py-2 mb-3 fw-bold small"
                  style="text-transform: uppercase">
@@ -150,6 +161,9 @@
             </div>
 
             <div class="body"></div>
+            <div class="bg-white rounded shadow p-3 display-none no-charts">Looks like you don't have any charts
+                installed. "Repository" section may be a good place to start.
+            </div>
         </div>
         <!-- /INSTALLED LIST -->
     </div>
@@ -253,6 +267,9 @@
                                 <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev"
                                        data-mode="diff-rev">
                                 Diff with specific revision: <input class="form-input" size="3" id="specRev">
+                            </label>
+                            <label class="form-check-label" for="userDefinedVals">
+                                <input class="form-check-input" type="checkbox" id="userDefinedVals"> User-defined only
                             </label>
                         </form>
                     </nav>
