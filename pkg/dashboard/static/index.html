@@ -57,7 +57,7 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Help
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu fs-80">
                         <li><a class="dropdown-item" href="https://komodorkommunity.slack.com/archives/C044U1B0265"><i class="bi-slack"></i> Support Chat</a></li>
                         <li><a class="dropdown-item" href="https://github.com/komodorio/helm-dashboard"><i class="bi-github"></i> Project Page</a></li>
                         <li><hr class="dropdown-divider"></li>
@@ -156,7 +156,7 @@
             </div>
 
             <div class="body"></div>
-            <div class="bg-white rounded shadow p-3 hidden no-charts">Looks like you don't have any charts installed. "Repository" section may be a good place to start.</div>
+            <div class="bg-white rounded shadow p-3 display-none no-charts">Looks like you don't have any charts installed. "Repository" section may be a good place to start.</div>
         </div>
         <!-- /INSTALLED LIST -->
     </div>
@@ -260,6 +260,9 @@
                                 <input class="form-check-input" type="radio" name="diffMode" id="diffModeRev"
                                        data-mode="diff-rev">
                                 Diff with specific revision: <input class="form-input" size="3" id="specRev">
+                            </label>
+                            <label class="form-check-label" for="userDefinedVals">
+                                <input class="form-check-input" type="checkbox" id="userDefinedVals"> User-defined only
                             </label>
                         </form>
                     </nav>
