@@ -160,6 +160,10 @@ body > .container-fluid {
     color: #3B3D45 !important;
 }
 
+#topNav .nav-link.text-danger {
+   color: #FC1683 !important;
+}
+
 #topNav .nav-link.active {
     background: #EBEFFF;
     border-radius: 2px;
@@ -236,6 +240,10 @@ span.link {
 
 #installedList .body .row:hover span.link {
     text-decoration: underline;
+}
+
+#installedList .body .row div {
+    overflow: hidden;
 }
 
 #installedList .rel-name {

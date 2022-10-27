@@ -48,14 +48,14 @@ function fillChartHistory(data, namespace, name) {
 
         if (elm.description.startsWith("Rollback to ")) {
             //rev.find(".rev-status").append(" <span class='small fw-normal text-lowercase'>(rollback)</span>")
-            rev.find(".rev-status").append(" <i class='bi-arrow-counterclockwise text-muted' title='"+elm.description+"'></i>")
+            rev.find(".rev-status").append(" <i class='bi-arrow-counterclockwise text-muted' title='" + elm.description + "'></i>")
         }
 
         const nxt = data[x + 1];
         if (nxt && isNewerVersion(elm.chart_ver, nxt.chart_ver)) {
-            rev.find(".rev-changes").html("<span class='strike'>" + nxt.chart_ver + "</span> <i class='text-danger bi-arrow-down-right'></i> " + elm.chart_ver)
+            rev.find(".rev-changes").html("<span class='strike'>" + nxt.chart_ver + "</span> <i class='bi-arrow-down-right'></i> " + elm.chart_ver)
         } else if (nxt && isNewerVersion(nxt.chart_ver, elm.chart_ver)) {
-            rev.find(".rev-changes").html("<span class='strike'>" + nxt.chart_ver + "</span> <i class='text-success bi-arrow-up-right'></i> " + elm.chart_ver)
+            rev.find(".rev-changes").html("<span class='strike'>" + nxt.chart_ver + "</span> <i class='bi-arrow-up-right'></i> " + elm.chart_ver)
         }
 
         rev.data("elm", elm)

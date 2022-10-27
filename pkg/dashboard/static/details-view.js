@@ -172,7 +172,7 @@ function showResources(namespace, chart, revision) {
                 //reportError("Failed to get list of resources")
             }).done(function (data) {
                 const badge = $("<span class='badge me-2 fw-normal'></span>").text(data.status.phase);
-                if (["Available", "Active", "Established", "Bound"].includes(data.status.phase)) {
+                if (["Available", "Active", "Established", "Bound", "Ready"].includes(data.status.phase)) {
                     badge.addClass("bg-success text-dark")
                 } else if (["Exists"].includes(data.status.phase)) {
                     badge.addClass("bg-success text-dark bg-opacity-50")
@@ -186,7 +186,7 @@ function showResources(namespace, chart, revision) {
                 statusBlock.empty().append(badge).attr("title", data.status.phase)
                 resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
 
-                if (badge.text() !== "NotFound") {
+                if (badge.text() !== "NotFound" && revision == $("#specRev").data("last-rev")) {
                     resBlock.find(".res-actions")
 
                     const btn = $("<button class=\"btn btn-sm btn-white border-secondary\">Describe</button>");
