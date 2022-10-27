@@ -62,3 +62,8 @@ fi
 tar xzf "releases/v${version}.tar.gz" -C "releases/v${version}"
 mv "releases/v${version}/${name}" "bin/${name}" || \
     mv "releases/v${version}/${name}.exe" "bin/${name}"
+
+echo
+echo "Helm Dashboard is installed, to start it, run in your terminal:"
+echo "    helm dashboard"
+echo
