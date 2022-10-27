@@ -220,7 +220,6 @@ function fillToolVersion(data) {
     $("#toolVersion").text(data.CurVer)
     if (isNewerVersion(data.CurVer, data.LatestVer)) {
         $("#toolVersionUpgrade").text(data.LatestVer)
-        $(".new-version-pill").show()
         $(".upgrade-possible").show()
     }
 }
