@@ -58,7 +58,6 @@ func (d *DataLayer) runCommandHelm(cmd ...string) (string, error) {
 }
 
 func (d *DataLayer) runCommandKubectl(cmd ...string) (string, error) {
-	// TODO: migrate into using kubectl "k8s.io/kubectl/pkg/cmd" and kube API
 	if d.Kubectl == "" {
 		d.Kubectl = "kubectl"
 	}
