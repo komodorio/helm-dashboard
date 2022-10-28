@@ -1,9 +1,9 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jessevdk/go-flags"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard"
 	"github.com/pkg/browser"
 	log "github.com/sirupsen/logrus"
@@ -16,36 +16,43 @@ var (
 	date    = "unknown"
 )
 
+type options struct {
+	Verbose   bool `short:"v" long:"verbose" description:"Show verbose debug information"`
+	NoBrowser bool `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
+	Version   bool `long:"version" description:"Show tool version"`
+
+	Port uint `short:"p" long:"port" description:"Port to start server on" default:"8080"` // TODO: better default port to clash less?
+
+	Namespace string `short:"n" long:"namespace" description:"Limit operations to a specific namespace"`
+}
+
 func main() {
-	verbose := false
-	flag.BoolVar(&verbose, "v", false, "")
-	flag.BoolVar(&verbose, "verbose", false, "Display more debugging output")
+	opts := options{}
+	args, err := flags.Parse(&opts)
+	if err != nil {
+		if e, ok := err.(*flags.Error); ok {
+			if e.Type == flags.ErrHelp {
+				os.Exit(0)
+			}
+		}
 
-	help := false
-	flag.BoolVar(&help, "h", false, "")
-	flag.BoolVar(&help, "help", false, "Display tool help")
+		os.Exit(1) // we rely on default behavior to print the problem inside `flags` library
+	}
 
-	noBrowser := false
-	flag.BoolVar(&noBrowser, "no-browser", false, "Do not attempt to open Web browser upon start")
-
-	port := 8080 // TODO: better default port to clash less?
-	flag.IntVar(&port, "p", port, "")
-	flag.IntVar(&port, "port", port, fmt.Sprintf("Port to start server on, default is %d", port))
-
-	ns := ""
-	flag.StringVar(&ns, "n", ns, "")
-	flag.StringVar(&ns, "namespace", ns, "Limit operations to a specific namespace")
-
-	flag.Parse()
-	setupLogging(verbose || os.Getenv("DEBUG") != "")
-	if help {
-		flag.Usage()
+	if opts.Version {
+		fmt.Print(version)
 		os.Exit(0)
 	}
 
-	address, webServerDone := dashboard.StartServer(version, port, ns)
+	if len(args) > 0 {
+		panic("The program does not take argumants, see --help for usage")
+	}
 
-	if os.Getenv("HD_NOBROWSER") == "" && !noBrowser {
+	setupLogging(opts.Verbose || os.Getenv("DEBUG") != "")
+
+	address, webServerDone := dashboard.StartServer(version, int(opts.Port), opts.Namespace)
+
+	if os.Getenv("HD_NOBROWSER") == "" && !opts.NoBrowser {
 		log.Infof("Opening web UI: %s", address)
 		err := browser.OpenURL(address)
 		if err != nil {
