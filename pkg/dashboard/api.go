@@ -44,9 +44,9 @@ func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer) *gin.Engine {
+func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
-	if os.Getenv("DEBUG") == "" {
+	if debug {
 		api = gin.New()
 		api.Use(gin.Recovery())
 	} else {

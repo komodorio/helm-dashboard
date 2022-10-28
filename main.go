@@ -27,6 +27,27 @@ type options struct {
 }
 
 func main() {
+	opts := parseFlags()
+
+	setupLogging(opts.Verbose)
+
+	address, webServerDone := dashboard.StartServer(version, int(opts.Port), opts.Namespace, opts.Verbose)
+
+	if opts.NoBrowser {
+		log.Infof("Access web UI at: %s", address)
+	} else {
+		log.Infof("Opening web UI: %s", address)
+		err := browser.OpenURL(address)
+		if err != nil {
+			log.Warnf("Failed to open Web browser for URL: %s", err)
+		}
+	}
+
+	<-webServerDone
+	log.Infof("Done.")
+}
+
+func parseFlags() options {
 	opts := options{}
 	args, err := flags.Parse(&opts)
 	if err != nil {
@@ -36,7 +57,8 @@ func main() {
 			}
 		}
 
-		os.Exit(1) // we rely on default behavior to print the problem inside `flags` library
+		// we rely on default behavior to print the problem inside `flags` library
+		os.Exit(1)
 	}
 
 	if opts.Version {
@@ -47,23 +69,7 @@ func main() {
 	if len(args) > 0 {
 		panic("The program does not take argumants, see --help for usage")
 	}
-
-	setupLogging(opts.Verbose || os.Getenv("DEBUG") != "")
-
-	address, webServerDone := dashboard.StartServer(version, int(opts.Port), opts.Namespace)
-
-	if os.Getenv("HD_NOBROWSER") == "" && !opts.NoBrowser {
-		log.Infof("Opening web UI: %s", address)
-		err := browser.OpenURL(address)
-		if err != nil {
-			log.Warnf("Failed to open Web browser for URL: %s", err)
-		}
-	} else {
-		log.Infof("Access web UI at: %s", address)
-	}
-
-	<-webServerDone
-	log.Infof("Done.")
+	return opts
 }
 
 func setupLogging(verbose bool) {

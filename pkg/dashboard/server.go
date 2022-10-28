@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func StartServer(version string, port int, ns string) (string, utils.ControlChan) {
+func StartServer(version string, port int, ns string, debug bool) (string, utils.ControlChan) {
 	data := subproc.DataLayer{
 		Namespace: ns,
 	}
@@ -35,14 +35,10 @@ func StartServer(version string, port int, ns string) (string, utils.ControlChan
 		address = "localhost"
 	}
 
-	if os.Getenv("HD_PORT") == "" {
-		address += ":" + strconv.Itoa(port)
-	} else {
-		address += ":" + os.Getenv("HD_PORT")
-	}
+	address += ":" + strconv.Itoa(port)
 
 	abort := make(utils.ControlChan)
-	api := NewRouter(abort, &data)
+	api := NewRouter(abort, &data, debug)
 	done := startBackgroundServer(address, api, abort)
 
 	return "http://" + address, done
