@@ -11,11 +11,14 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
-func StartServer(version string) (string, utils.ControlChan) {
-	data := subproc.DataLayer{}
+func StartServer(version string, port int, ns string, debug bool) (string, utils.ControlChan) {
+	data := subproc.DataLayer{
+		Namespace: ns,
+	}
 	err := data.CheckConnectivity()
 	if err != nil {
 		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
@@ -32,14 +35,10 @@ func StartServer(version string) (string, utils.ControlChan) {
 		address = "localhost"
 	}
 
-	if os.Getenv("HD_PORT") == "" {
-		address += ":8080" // TODO: better default port to clash less?
-	} else {
-		address += ":" + os.Getenv("HD_PORT")
-	}
+	address += ":" + strconv.Itoa(port)
 
 	abort := make(utils.ControlChan)
-	api := NewRouter(abort, &data)
+	api := NewRouter(abort, &data, debug)
 	done := startBackgroundServer(address, api, abort)
 
 	return "http://" + address, done

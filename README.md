@@ -57,14 +57,18 @@ helm dashboard
 The command above will launch the local Web server and will open the UI in new browser tab. The command will hang
 waiting for you to terminate it in command-line or web UI.
 
+You can see the list of available command-line flags by running `helm dashboard --help`.
+
 By default, the web server is only available locally. You can change that by specifying `HD_BIND` environment variable
 to the desired value. For example, `0.0.0.0` would bind to all IPv4 addresses or `[::0]` would be all IPv6 addresses.
 
-If your port 8080 is busy, you can specify a different port to use via `HD_PORT` environment variable.
+If your port 8080 is busy, you can specify a different port to use via `--port <number>` command-line flag.
 
-If you don't want browser tab to automatically open, set `HD_NOBROWSER=1` in your environment variables.
+If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line. 
 
-If you want to increase the logging verbosity and see all the debug info, set `DEBUG=1` environment variable.
+If you don't want browser tab to automatically open, add `--no-browser` flag in your command line.
+
+If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
 
 ## Scanner Integrations
 

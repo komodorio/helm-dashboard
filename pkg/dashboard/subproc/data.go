@@ -26,6 +26,7 @@ type DataLayer struct {
 	Kubectl     string
 	Scanners    []Scanner
 	VersionInfo *VersionInfo
+	Namespace   string
 }
 
 type VersionInfo struct {
@@ -34,7 +35,11 @@ type VersionInfo struct {
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
-	log.Debugf("Starting command: %s", cmd)
+	for i, c := range cmd {
+		if c == "--namespace" && i < len(cmd) { // TODO: in case it's not found - add it?
+			d.forceNamespace(&cmd[i+1])
+		}
+	}
 
 	return utils.RunCommand(cmd, map[string]string{"HELM_KUBECONTEXT": d.KubeContext})
 }
@@ -65,6 +70,12 @@ func (d *DataLayer) runCommandKubectl(cmd ...string) (string, error) {
 	}
 
 	return d.runCommand(cmd...)
+}
+
+func (d *DataLayer) forceNamespace(s *string) {
+	if d.Namespace != "" {
+		*s = d.Namespace
+	}
 }
 
 func (d *DataLayer) CheckConnectivity() error {
@@ -128,8 +139,16 @@ func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
 }
 
 func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
+	cmd := []string{"ls", "--all", "--output", "json", "--time-format", time.RFC3339}
+
 	// TODO: filter by namespace
-	out, err := d.runCommandHelm("ls", "--all", "--all-namespaces", "--output", "json", "--time-format", time.RFC3339)
+	if d.Namespace == "" {
+		cmd = append(cmd, "--all-namespaces")
+	} else {
+		cmd = append(cmd, "--namespace", d.Namespace)
+	}
+
+	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
 		return nil, err
 	}
@@ -218,6 +237,7 @@ func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []Relea
 
 			pieces := strings.Split(chart.Name, "/")
 			if pieces[1] == c {
+				// TODO: there can be more than one
 				chart.InstalledNamespace = rel.Namespace
 				chart.InstalledName = rel.Name
 			}
