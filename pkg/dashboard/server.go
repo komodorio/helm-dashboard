@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -51,7 +52,12 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlC
 	go func() {
 		err := server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			panic(err) // TODO: in case of "port busy", check that it's another instance of us and just open browser
+			log.Warnf("Looks like port is busy for %s, checking if it's us...", addr)
+			if itIsUs(addr) {
+				log.Infof("Yes, it's another instance of us. Just reuse it.")
+			} else {
+				panic(err)
+			}
 		}
 		done <- struct{}{}
 	}()
@@ -65,6 +71,18 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlC
 	}()
 
 	return done
+}
+
+func itIsUs(addr string) bool {
+	var myClient = &http.Client{Timeout: 5 * time.Second}
+	r, err := myClient.Get("http://" + addr + "/status")
+	if err != nil {
+		log.Debugf("It's not us on %s: %s", addr, err)
+		return false
+	}
+	defer r.Body.Close()
+
+	return strings.HasPrefix(r.Header.Get("X-Application-Name"), "Helm Dashboard")
 }
 
 func discoverScanners(data *subproc.DataLayer) {

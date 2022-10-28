@@ -71,6 +71,7 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 	})
 
 	api.GET("/status", func(c *gin.Context) {
+		c.Header("X-Application-Name", "Helm Dashboard by Komodor.io") // to identify ourselves by ourselves
 		c.IndentedJSON(http.StatusOK, data.VersionInfo)
 	})
 

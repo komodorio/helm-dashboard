@@ -26,7 +26,7 @@ function checkUpgradeable(name) {
             $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-x-octagon")
             $("#btnUpgrade").prop("disabled", true)
             $("#btnUpgradeCheck").prop("disabled", true)
-            $("#btnAddRepository").text("Add missing repository")
+            $("#btnAddRepository").text("Add repository for it")
             return
         }
 
@@ -332,3 +332,7 @@ $("#btnRollback").click(function () {
     })
 })
 
+$("#btnAddRepository").click(function () {
+    setHashParam("section", "repository")
+    window.location.reload()
+})
