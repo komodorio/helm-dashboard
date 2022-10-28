@@ -34,7 +34,7 @@ func TempFile(txt string) (string, func(), error) {
 		return "", nil, err
 	}
 
-	return file.Name(), func() { os.Remove(file.Name()) }, nil
+	return file.Name(), func() { _ = os.Remove(file.Name()) }, nil
 }
 
 type CmdError struct {
@@ -49,6 +49,7 @@ func (e CmdError) Error() string {
 }
 
 func RunCommand(cmd []string, env map[string]string) (string, error) {
+	log.Debugf("Starting command: %s", cmd)
 	prog := exec.Command(cmd[0], cmd[1:]...)
 	prog.Env = os.Environ()
 
