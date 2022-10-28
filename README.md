@@ -1,4 +1,4 @@
-# <img src="pkg/dashboard/static/logo.png" height=30 style="height: 2rem"> Helm Dashboard
+# ![Helm Dashboard](pkg/dashboard/static/logo-header.svg)
 
 A simplified way of working with Helm.
 
