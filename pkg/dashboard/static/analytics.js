@@ -36,7 +36,8 @@ function enableDD(version) {
             trackInteractions: true,
             trackResources: true,
             trackLongTasks: true,
-            defaultPrivacyLevel: 'mask'
+            defaultPrivacyLevel: 'mask',
+            sessionReplaySampleRate: 0
         })
     })
 }

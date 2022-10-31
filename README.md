@@ -42,7 +42,7 @@ To uninstall, run:
 helm plugin uninstall dashboard
 ```
 
-Note: In case standard Helm plugin way did not work for you, you can just download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
+> In case standard Helm plugin way did not work for you, you can just download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
 
 ## Running
 
@@ -69,6 +69,8 @@ If you need to limit the operations to a specific namespace, please use `--names
 If you don't want browser tab to automatically open, add `--no-browser` flag in your command line.
 
 If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
+
+> Disclaimer: For the sake of improving the project quality, there is user analytics collected by the tool. You can disable this collecting with `--no-analytics` option. The collection is done via DataDog RUM and Heap Analytics. Only the anonymous data is collected, no sensitive information is used. No session recording is performed. 
 
 ## Scanner Integrations
 

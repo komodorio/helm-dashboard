@@ -33,7 +33,10 @@ func main() {
 	setupLogging(opts.Verbose)
 
 	address, webServerDone := dashboard.StartServer(version, int(opts.Port), opts.Namespace, opts.Verbose, opts.NoTracking)
-	log.Infof("User analytics collected to improve the quality, disable it with --no-analytics")
+
+	if !opts.NoTracking {
+		log.Infof("User analytics collected to improve the quality, disable it with --no-analytics")
+	}
 
 	if opts.NoBrowser {
 		log.Infof("Access web UI at: %s", address)
