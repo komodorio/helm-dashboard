@@ -70,7 +70,7 @@ If you don't want browser tab to automatically open, add `--no-browser` flag in 
 
 If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
 
-> Disclaimer: For the sake of improving the project quality, there is user analytics collected by the tool. You can disable this collecting with `--no-analytics` option. The collection is done via DataDog RUM and Heap Analytics. Only the anonymous data is collected, no sensitive information is used. No session recording is performed. 
+> Disclaimer: For the sake of improving the project quality, there is user analytics collected by the tool. You can disable this collecting with `--no-analytics` option. The collection is done via DataDog RUM and Heap Analytics. Only the anonymous data is collected, no sensitive information is used.
 
 ## Scanner Integrations
 
