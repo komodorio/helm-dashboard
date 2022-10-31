@@ -53,7 +53,7 @@ func main() {
 }
 
 func parseFlags() options {
-	opts := options{}
+	opts := options{Namespace: os.Getenv("HELM_NAMESPACE")}
 	args, err := flags.Parse(&opts)
 	if err != nil {
 		if e, ok := err.(*flags.Error); ok {
