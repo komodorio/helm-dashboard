@@ -59,6 +59,8 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
 
     $("#upgradeModalLabel .name").text(elm.name)
 
+    $("#upgradeModal .rel-cluster").text(getHashParam("context"))
+
     if (verCur) {
         $("#upgradeModal .ver-old").show().find("span").text(verCur)
         $("#upgradeModal .rel-name").prop("disabled", true).val(name)
