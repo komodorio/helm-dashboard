@@ -6,7 +6,8 @@ function loadRepoView() {
         reportError("Failed to get list of repositories", xhr)
     }).done(function (data) {
         const items = $("#sectionRepo .repo-list ul").empty()
-
+        data.sort((a, b) => (a.name > b.name) - (a.name < b.name))
+        
         data.forEach(function (elm) {
             let opt = $('<li class="mb-2"><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
             opt.attr('title', elm.url)

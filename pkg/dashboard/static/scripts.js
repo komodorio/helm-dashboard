@@ -9,6 +9,7 @@ $(function () {
         reportError("Failed to get list of clusters", xhr)
     }).done(function (data) {
         const context = getHashParam("context")
+        data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
         fillClusterList(data, context);
 
         initView(); // can only do it after loading cluster list
