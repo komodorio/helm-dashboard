@@ -2,8 +2,9 @@ const xhr = new XMLHttpRequest();
 xhr.onload = function () {
     if (xhr.readyState === XMLHttpRequest.DONE) {
         const status = JSON.parse(xhr.responseText);
-        if (status.Analytics && status.version !== "dev") {
-            enableDD(status.version)
+        const version = status.CurVer
+        if (status.Analytics && version !== "dev") {
+            enableDD(version)
             enableHeap()
         }
     }
