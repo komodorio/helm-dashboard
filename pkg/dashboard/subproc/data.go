@@ -32,6 +32,7 @@ type DataLayer struct {
 type VersionInfo struct {
 	CurVer    string
 	LatestVer string
+	Analytics bool
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
