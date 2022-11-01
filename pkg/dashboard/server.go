@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-func StartServer(version string, port int, ns string, debug bool) (string, utils.ControlChan) {
+func StartServer(version string, port int, ns string, debug bool, noTracking bool) (string, utils.ControlChan) {
 	data := subproc.DataLayer{
 		Namespace: ns,
 	}
@@ -26,7 +26,10 @@ func StartServer(version string, port int, ns string, debug bool) (string, utils
 		os.Exit(1) // TODO: propagate error instead?
 	}
 
-	data.VersionInfo = &subproc.VersionInfo{CurVer: version}
+	data.VersionInfo = &subproc.VersionInfo{
+		CurVer:    version,
+		Analytics: !noTracking,
+	}
 	go checkUpgrade(data.VersionInfo)
 
 	discoverScanners(&data)

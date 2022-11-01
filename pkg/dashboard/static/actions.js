@@ -352,6 +352,3 @@ $("#inputSearch").keyup(function() {
         }
     })
 })
-window.onload = function() {
-    document.getElementById('inputSearch').value = '';
-}
