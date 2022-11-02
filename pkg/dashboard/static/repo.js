@@ -21,6 +21,7 @@ function loadRepoView() {
         }
 
         items.find("input").click(function () {
+            $("#inputSearch").val('')
             const self = $(this)
             const elm = self.data("item");
             setHashParam("repo", elm.name)
