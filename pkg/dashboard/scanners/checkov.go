@@ -46,6 +46,9 @@ func (c *Checkov) Name() string {
 }
 
 func (c *Checkov) Test() bool {
+	utils.FailLogLevel = log.DebugLevel
+	defer func() { utils.FailLogLevel = log.WarnLevel }()
+
 	res, err := utils.RunCommand([]string{"checkov", "--version"}, nil)
 	if err != nil {
 		return false

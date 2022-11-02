@@ -30,7 +30,10 @@ func (c *Trivy) Name() string {
 }
 
 func (c *Trivy) Test() bool {
-	res, err := utils.RunCommand([]string{"trivy", "--version"}, nil)
+	utils.FailLogLevel = log.DebugLevel
+	defer func() { utils.FailLogLevel = log.WarnLevel }()
+
+	res, err := utils.RunCommand([]string{"trivy1", "--version"}, nil)
 	if err != nil {
 		return false
 	}
