@@ -13,6 +13,34 @@ type Checkov struct {
 	Data *subproc.DataLayer
 }
 
+func (c *Checkov) SupportedResourceKinds() []string {
+	// from https://github.com/bridgecrewio/checkov//blob/master/docs/5.Policy%20Index/kubernetes.md
+	return []string{
+		"AdmissionConfiguration",
+		"ClusterRole",
+		"ClusterRoleBinding",
+		"ConfigMap",
+		"CronJob",
+		"DaemonSet",
+		"Deployment",
+		"DeploymentConfig",
+		"Ingress",
+		"Job",
+		"Pod",
+		"PodSecurityPolicy",
+		"PodTemplate",
+		"Policy",
+		"ReplicaSet",
+		"ReplicationController",
+		"Role",
+		"RoleBinding",
+		"Secret",
+		"Service",
+		"ServiceAccount",
+		"StatefulSet",
+	}
+}
+
 func (c *Checkov) Name() string {
 	return "Checkov"
 }

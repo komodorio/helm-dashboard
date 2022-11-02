@@ -12,6 +12,19 @@ type Trivy struct {
 	Data *subproc.DataLayer
 }
 
+func (c *Trivy) SupportedResourceKinds() []string {
+	// from https://github.com/aquasecurity/trivy-kubernetes/blob/main/pkg/k8s/k8s.go#L190
+	return []string{
+		"ReplicaSet",
+		"ReplicationController",
+		"StatefulSet",
+		"Deployment",
+		"CronJob",
+		"DaemonSet",
+		"Job",
+	}
+}
+
 func (c *Trivy) Name() string {
 	return "Trivy"
 }
