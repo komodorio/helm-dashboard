@@ -150,6 +150,12 @@ function showResources(namespace, chart, revision) {
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
+        const scanners=$("body").data("scanners");
+        const scannableResKinds=new Set();
+        for (let k in scanners) {
+            scanners[k].SupportedResourceKinds.forEach(scannableResKinds.add, scannableResKinds)
+        }
+
         resBody.empty();
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
@@ -159,7 +165,7 @@ function showResources(namespace, chart, revision) {
                         <div class="col-3 res-name text-break fw-bold"></div>
                         <div class="col-1 res-status overflow-hidden"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
                         <div class="col-4 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
-                        <div class="col-2 res-actions"></div>
+                        <div class="col-2 res-actions"><button class='btn btn-sm ms-2 visually-hidden'>Vertical-sizer</button></div>
                     </div>
             `)
 
@@ -195,11 +201,13 @@ function showResources(namespace, chart, revision) {
                         showDescribe(ns, res.kind, res.metadata.name, badge.clone())
                     })
 
-                    const btn2 = $("<button class='btn btn-sm btn-white border-secondary ms-2'>Scan</button>");
-                    resBlock.find(".res-actions").append(btn2)
-                    btn2.click(function () {
-                        scanResource(ns, res.kind, res.metadata.name, badge.clone())
-                    })
+                    if (scannableResKinds.has(res.kind)) {
+                        const btn2 = $("<button class='btn btn-sm btn-white border-secondary ms-2'>Scan</button>");
+                        resBlock.find(".res-actions").append(btn2)
+                        btn2.click(function () {
+                            scanResource(ns, res.kind, res.metadata.name, badge.clone())
+                        })
+                    }
                 }
             })
         }
