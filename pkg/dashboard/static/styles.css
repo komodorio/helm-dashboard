@@ -141,9 +141,9 @@ body > .container-fluid {
     font-size: 0.75rem;
 }
 
-#installedList .body .row div div {
+/* #installedList .body .row div div {
     margin-top: 0.75rem;
-}
+} */
 
 span.link {
     cursor: pointer;
