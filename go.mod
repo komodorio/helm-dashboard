@@ -12,6 +12,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.9.4
 	k8s.io/apimachinery v0.25.0-alpha.2
+    github.com/ghodss/yaml v1.0.0
 )
 
 require (

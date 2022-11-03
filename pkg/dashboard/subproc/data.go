@@ -5,19 +5,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
+	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"regexp"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type DataLayer struct {
@@ -445,6 +447,33 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 
 func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
 	return d.runCommandHelm("show", "values", chart, "--version", ver)
+}
+
+func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) {
+	out, err := d.runCommandHelm("show", "chart", chartName)
+	if err != nil {
+		return nil, err
+	}
+
+	deccoder := yaml.NewDecoder(bytes.NewReader([]byte(out)))
+	res := make([]*chart.Metadata, 0)
+	var tmp interface{}
+
+	for deccoder.Decode(&tmp) == nil {
+		jsoned, err := json.Marshal(tmp)
+		if err != nil {
+			return nil, err
+		}
+
+		var resjson chart.Metadata
+		err = json.Unmarshal(jsoned, &resjson)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, &resjson)
+	}
+
+	return res, nil
 }
 
 func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {

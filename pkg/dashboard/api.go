@@ -2,14 +2,15 @@ package dashboard
 
 import (
 	"embed"
+	"net/http"
+	"os"
+	"path"
+
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"os"
-	"path"
 )
 
 //go:embed static/*
@@ -89,6 +90,7 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.GET("/charts/history", h.History)
 	api.GET("/charts/resources", h.Resources)
 	api.GET("/charts/:section", h.GetInfoSection)
+	api.GET("/charts/show", h.Show)
 	api.POST("/charts/install", h.Install)
 	api.POST("/charts/rollback", h.Rollback)
 
