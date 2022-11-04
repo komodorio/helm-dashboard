@@ -98,6 +98,16 @@ func (c *Checkov) ScanResource(ns string, kind string, name string) (*subproc.Sc
 		return nil, err
 	}
 
+	res, out := parseOutput(out)
+
+	// TODO: use JSON output of checkov, list issues into table
+
+	res.OrigReport = strings.TrimSpace(out)
+
+	return &res, nil
+}
+
+func parseOutput(out string) (subproc.ScanResults, string) {
 	res := subproc.ScanResults{}
 	_, out, _ = strings.Cut(out, "\n")         // kubernetes scan results:
 	_, out, _ = strings.Cut(out, "\n")         // empty line
@@ -119,10 +129,7 @@ func (c *Checkov) ScanResource(ns string, kind string, name string) (*subproc.Sc
 	} else {
 		log.Warnf("Failed to parse Checkov output")
 	}
-
-	res.OrigReport = strings.TrimSpace(out)
-
-	return &res, nil
+	return res, out
 }
 
 type CheckovResults struct {

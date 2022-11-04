@@ -248,7 +248,7 @@ function scanResource(ns, kind, name, badge) {
         for (let name in data) {
             const res = data[name]
 
-            if (!res.OrigReport) continue
+            if (!res.OrigReport && !res.PassedCount) continue
             const hdr = $("<h3>" + name + " Scan Results</h3>");
 
             if (res.FailedCount) {

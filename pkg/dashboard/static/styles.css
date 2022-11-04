@@ -26,10 +26,6 @@ body > .container-fluid {
     min-height: 100% !important;
 }
 
-#topNav.navbar {
-}
-
-
 .navbar-brand > a > img {
     vertical-align: middle;
     height: 3rem;
