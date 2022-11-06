@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
@@ -13,11 +19,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"regexp"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type DataLayer struct {
@@ -476,6 +477,20 @@ func (d *DataLayer) ChartRepoDelete(name string) (string, error) {
 	}
 
 	return out, nil
+}
+
+func (d *DataLayer) GetNameSpaces() (res *NamespaceElement, err error) {
+	out, err := d.runCommandKubectl("get", "namespaces", "-o", "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {

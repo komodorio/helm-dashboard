@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"net/http"
 )
 
 type KubeHandler struct {
@@ -68,4 +69,14 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, res)
+}
+
+func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
+	res, err := h.Data.GetNameSpaces()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
 }

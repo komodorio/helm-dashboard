@@ -71,6 +71,18 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModal .rel-ns").prop("disabled", false).val("")
     }
 
+    $.getJSON("/api/kube/namespaces").fail(function (xhr) {
+        reportError("Failed to get namespaces", xhr)
+    }).done(function(res) {
+      const ns = res.items.map(i => i.metadata.name)
+      $.each(ns, function(i, item) {
+        $("#upgradeModal #ns-datalist").append($("<option>", {
+          value: item,
+          text: item
+        }))
+      })
+    })
+
     $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (vers) {
