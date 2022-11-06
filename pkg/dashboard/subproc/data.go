@@ -26,14 +26,15 @@ type DataLayer struct {
 	Helm        string
 	Kubectl     string
 	Scanners    []Scanner
-	VersionInfo *VersionInfo
+	StatusInfo  *StatusInfo
 	Namespace   string
 }
 
-type VersionInfo struct {
-	CurVer    string
-	LatestVer string
-	Analytics bool
+type StatusInfo struct {
+	CurVer             string
+	LatestVer          string
+	Analytics          bool
+	LimitedToNamespace string
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {

@@ -26,11 +26,12 @@ func StartServer(version string, port int, ns string, debug bool, noTracking boo
 		os.Exit(1) // TODO: propagate error instead?
 	}
 
-	data.VersionInfo = &subproc.VersionInfo{
-		CurVer:    version,
-		Analytics: !noTracking,
+	data.StatusInfo = &subproc.StatusInfo{
+		CurVer:             version,
+		Analytics:          !noTracking,
+		LimitedToNamespace: ns,
 	}
-	go checkUpgrade(data.VersionInfo)
+	go checkUpgrade(data.StatusInfo)
 
 	discoverScanners(&data)
 
@@ -102,7 +103,7 @@ func discoverScanners(data *subproc.DataLayer) {
 	}
 }
 
-func checkUpgrade(d *subproc.VersionInfo) {
+func checkUpgrade(d *subproc.StatusInfo) {
 	url := "https://api.github.com/repos/komodorio/helm-dashboard/releases/latest"
 	type GHRelease struct {
 		Name string `json:"name"`

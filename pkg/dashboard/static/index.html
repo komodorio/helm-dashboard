@@ -90,7 +90,8 @@
                 <button class="btn btn-sm btn-light bg-white border border-secondary btn-remove">
                     <i class="bi-trash3"></i> Remove
                 </button>
-                <p class="my-3"><input class="form-control form-control-sm" type="text" placeholder="Filter..." id="inputSearch"></p>
+                <p class="my-3"><input class="form-control form-control-sm" type="text" placeholder="Filter..."
+                                       id="inputSearch"></p>
             </div>
             <div><span class="text-muted small fw-bold me-3">REPOSITORY</span></div>
             <h2 class="mb-3">name-of-repo</h2>
@@ -120,6 +121,7 @@
                     <ul class="list-unstyled" id="cluster">
                     </ul>
 
+                    <h4 id="limitNamespace" class="display-none">Forced Namespace: <span></span></h4>
                     <!-- TODO
                     <h4 class="mt-4">Namespaces</h4>
                     <ul class="list-unstyled" id="namespaces">
@@ -357,8 +359,8 @@
                     </label>
                     <label class="form-label me-4 text-dark">
                         Namespace (optional):
-                    <input type="text" class="form-control rel-ns" list="ns-datalist"/>
-                    <datalist id="ns-datalist"></datalist>
+                        <input type="text" class="form-control rel-ns" list="ns-datalist"/>
+                        <datalist id="ns-datalist"></datalist>
                     </label>
                     <label class="form-label me-4 text-dark">
                         Cluster: <span class="form-label rel-cluster"></span>
@@ -391,7 +393,8 @@
                 <div id="upgradeModalBody" class="small"></div>
             </form>
             <div class="modal-footer d-flex">
-                <button type="button" class="btn btn-scan bg-white border-secondary display-none">Scan for Problems</button>
+                <button type="button" class="btn btn-scan bg-white border-secondary display-none">Scan for Problems
+                </button>
                 <button type="button" class="btn btn-primary btn-confirm">Confirm</button>
             </div>
         </div>
