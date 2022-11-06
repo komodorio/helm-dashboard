@@ -29,7 +29,9 @@ $(function () {
         reportError("Failed to get tool version", xhr)
     }).done(function (data) {
         fillToolVersion(data)
-        $("#limitNamespace").show().find("span").text(data.LimitedToNamespace)
+        if (data.LimitedToNamespace) {
+            $("#limitNamespace").show().find("span").text(data.LimitedToNamespace)
+        }
     })
 })
 
