@@ -62,6 +62,19 @@ function loadRepoView() {
     })
 }
 
+$("#inputSearch").keyup(function () {
+    let val = $(this).val().toLowerCase();
+
+    $(".charts li").each(function () {
+        let chartName = $(this.firstElementChild).text().toLowerCase()
+        if (chartName.indexOf(val) >= 0) {
+            $(this).show()
+        } else {
+            $(this).hide()
+        }
+    })
+})
+
 $("#sectionRepo .repo-list .btn").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('repoAddModal'), {});
     myModal.show()

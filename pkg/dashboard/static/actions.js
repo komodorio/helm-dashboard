@@ -350,17 +350,3 @@ $("#btnAddRepository").click(function () {
     setHashParam("section", "repository")
     window.location.reload()
 })
-
-$("#inputSearch").keyup(function() {
-    var val = $(this).val().toLowerCase();
-
-    $(".charts li").hide()
-    
-    $(".charts li").each(function(){
-        var chartNameElem = this.firstElementChild
-        var chartName = $(chartNameElem).text().toLowerCase()
-        if(chartName.indexOf(val) != -1) {
-            $(this).show()
-        }
-    })
-})

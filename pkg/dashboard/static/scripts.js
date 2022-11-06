@@ -17,8 +17,11 @@ $(function () {
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
     }).done(function (data) {
-        if (!data || !data.length) {
-            $("#upgradeModal .btn-scan").hide()
+        $("body").data("scanners", data)
+        for (let k in data) {
+            if (data[k].ManifestScannable) {
+                $("#upgradeModal .btn-scan").show() // TODO: move this to install flow
+            }
         }
     })
 

@@ -163,7 +163,7 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 
 func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
+	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json")
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*His
 		if err != nil {
 			return nil, err
 		}
-		elm.ChartName = chartRepoName
+		elm.ChartName = chartRepoName // TODO: move it to frontend?
 		elm.ChartVer = curVer
 		elm.Updated.Time = elm.Updated.Time.Round(time.Second)
 	}

@@ -26,10 +26,6 @@ body > .container-fluid {
     min-height: 100% !important;
 }
 
-#topNav.navbar {
-}
-
-
 .navbar-brand > a > img {
     vertical-align: middle;
     height: 3rem;
@@ -211,17 +207,17 @@ span.link {
     position: static;
 }
 
-.nav-tabs {
+nav .nav-tabs {
     border: none;
     margin-bottom: 1rem;
 }
 
-.nav-tabs .nav-link {
+nav .nav-tabs .nav-link {
     padding-bottom: 0.25rem;
     color: #3B3D45;
 }
 
-.nav-tabs .nav-link.active {
+nav .nav-tabs .nav-link.active {
     border: none;
     border-bottom: 3px solid #3B3D45;
     background-color: transparent;

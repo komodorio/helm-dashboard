@@ -90,14 +90,15 @@
                 <button class="btn btn-sm btn-light bg-white border border-secondary btn-remove">
                     <i class="bi-trash3"></i> Remove
                 </button>
+                <p class="my-3"><input class="form-control form-control-sm" type="text" placeholder="Filter..." id="inputSearch"></p>
             </div>
             <div><span class="text-muted small fw-bold me-3">REPOSITORY</span></div>
             <h2 class="mb-3">name-of-repo</h2>
             <div class="mb-5">
                 <span class="rounded rounded-1 me-2 p-1 px-2 bg-tag text-dark">URL: <span class="url fw-bold">http://somerepo/somepath</span></span>
             </div>
-            <div class="row py-2 mb-3">
-                <input class="form-control" type="text" placeholder="Search..." id="inputSearch">
+            <div class="py-2 mb-3 float-end">
+
             </div>
             <div class="row bg-secondary rounded px-3 py-2 mb-3 fw-bold small"
                  style="text-transform: uppercase">
@@ -390,7 +391,7 @@
                 <div id="upgradeModalBody" class="small"></div>
             </form>
             <div class="modal-footer d-flex">
-                <button type="button" class="btn btn-scan bg-white border-secondary">Scan for Problems</button>
+                <button type="button" class="btn btn-scan bg-white border-secondary display-none">Scan for Problems</button>
                 <button type="button" class="btn btn-primary btn-confirm">Confirm</button>
             </div>
         </div>

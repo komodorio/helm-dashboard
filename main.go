@@ -35,7 +35,7 @@ func main() {
 	address, webServerDone := dashboard.StartServer(version, int(opts.Port), opts.Namespace, opts.Verbose, opts.NoTracking)
 
 	if !opts.NoTracking {
-		log.Infof("User analytics collected to improve the quality, disable it with --no-analytics")
+		log.Infof("User analytics is collected to improve the quality, disable it with --no-analytics")
 	}
 
 	if opts.NoBrowser {
