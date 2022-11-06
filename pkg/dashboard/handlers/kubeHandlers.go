@@ -74,9 +74,9 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
 	res, err := h.Data.GetNameSpaces()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.String(http.StatusOK, res)
+	c.JSON(http.StatusOK, res)
 }

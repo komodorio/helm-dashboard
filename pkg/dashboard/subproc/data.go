@@ -479,12 +479,18 @@ func (d *DataLayer) ChartRepoDelete(name string) (string, error) {
 	return out, nil
 }
 
-func (d *DataLayer) GetNameSpaces() (string, error) {
+func (d *DataLayer) GetNameSpaces() (res *NamespaceElement, err error) {
 	out, err := d.runCommandKubectl("get", "namespaces", "-o", "json")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return out, nil
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
