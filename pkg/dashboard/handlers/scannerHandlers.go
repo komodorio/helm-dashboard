@@ -14,10 +14,14 @@ type ScannersHandler struct {
 func (h *ScannersHandler) List(c *gin.Context) {
 	type ScannerInfo struct {
 		SupportedResourceKinds []string
+		ManifestScannable      bool
 	}
 	res := map[string]ScannerInfo{}
 	for _, scanner := range h.Data.Scanners {
-		res[scanner.Name()] = ScannerInfo{SupportedResourceKinds: scanner.SupportedResourceKinds()}
+		res[scanner.Name()] = ScannerInfo{
+			SupportedResourceKinds: scanner.SupportedResourceKinds(),
+			ManifestScannable:      scanner.ManifestIsScannable(),
+		}
 	}
 	c.IndentedJSON(http.StatusOK, res)
 }

@@ -18,8 +18,10 @@ $(function () {
         reportError("Failed to get list of scanners", xhr)
     }).done(function (data) {
         $("body").data("scanners", data)
-        if (!data || !data.length) {
-            $("#upgradeModal .btn-scan").hide() // TODO: move this to install flow
+        for (let k in data) {
+            if (data[k].ManifestScannable) {
+                $("#upgradeModal .btn-scan").show() // TODO: move this to install flow
+            }
         }
     })
 

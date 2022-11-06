@@ -14,6 +14,10 @@ type Checkov struct {
 	Data *subproc.DataLayer
 }
 
+func (c *Checkov) ManifestIsScannable() bool {
+	return true
+}
+
 func (c *Checkov) SupportedResourceKinds() []string {
 	// from https://github.com/bridgecrewio/checkov//blob/master/docs/5.Policy%20Index/kubernetes.md
 	return []string{

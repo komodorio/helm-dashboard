@@ -6,6 +6,7 @@ type Scanner interface {
 	ScanManifests(mnf string) (*ScanResults, error)                         // run the scanner on manifests
 	ScanResource(ns string, kind string, name string) (*ScanResults, error) // run the scanner on k8s resource
 	SupportedResourceKinds() []string
+	ManifestIsScannable() bool
 }
 
 type ScanResults struct {

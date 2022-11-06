@@ -12,6 +12,10 @@ type Trivy struct {
 	Data *subproc.DataLayer
 }
 
+func (c *Trivy) ManifestIsScannable() bool {
+	return false
+}
+
 func (c *Trivy) SupportedResourceKinds() []string {
 	// from https://github.com/aquasecurity/trivy-kubernetes/blob/main/pkg/k8s/k8s.go#L190
 	return []string{
