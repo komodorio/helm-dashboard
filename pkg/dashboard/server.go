@@ -3,22 +3,31 @@ package dashboard
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-version"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
-func StartServer(version string, port int, ns string, debug bool, noTracking bool) (string, utils.ControlChan) {
+type Server struct {
+	Version    string
+	Namespace  string
+	Address    string
+	Debug      bool
+	NoTracking bool
+}
+
+func (s Server) StartServer() (string, utils.ControlChan) {
 	data := subproc.DataLayer{
-		Namespace: ns,
+		Namespace: s.Namespace,
 	}
 	err := data.CheckConnectivity()
 	if err != nil {
@@ -27,37 +36,33 @@ func StartServer(version string, port int, ns string, debug bool, noTracking boo
 	}
 
 	data.StatusInfo = &subproc.StatusInfo{
-		CurVer:             version,
-		Analytics:          !noTracking,
-		LimitedToNamespace: ns,
+		CurVer:             s.Version,
+		Analytics:          !s.NoTracking,
+		LimitedToNamespace: s.Namespace,
 	}
 	go checkUpgrade(data.StatusInfo)
 
 	discoverScanners(&data)
 
-	address := os.Getenv("HD_BIND")
-	if address == "" {
-		address = "localhost"
-	}
-
-	address += ":" + strconv.Itoa(port)
-
 	abort := make(utils.ControlChan)
-	api := NewRouter(abort, &data, debug)
-	done := startBackgroundServer(address, api, abort)
+	api := NewRouter(abort, &data, s.Debug)
+	done := s.startBackgroundServer(api, abort)
 
-	return "http://" + address, done
+	return "http://" + s.Address, done
 }
 
-func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {
+func (s Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {
 	done := make(utils.ControlChan)
-	server := &http.Server{Addr: addr, Handler: routes}
+	server := &http.Server{
+		Addr:    s.Address,
+		Handler: routes,
+	}
 
 	go func() {
 		err := server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			log.Warnf("Looks like port is busy for %s, checking if it's us...", addr)
-			if itIsUs(addr) {
+			log.Warnf("Looks like port is busy for %s, checking if it's us...", s.Address)
+			if s.itIsUs() {
 				log.Infof("Yes, it's another instance of us. Just reuse it.")
 			} else {
 				panic(err)
@@ -77,11 +82,14 @@ func startBackgroundServer(addr string, routes *gin.Engine, abort utils.ControlC
 	return done
 }
 
-func itIsUs(addr string) bool {
-	var myClient = &http.Client{Timeout: 5 * time.Second}
-	r, err := myClient.Get("http://" + addr + "/status")
+func (s Server) itIsUs() bool {
+	url := fmt.Sprintf("http://%s/status", s.Address)
+	var myClient = &http.Client{
+		Timeout: 5 * time.Second,
+	}
+	r, err := myClient.Get(url)
 	if err != nil {
-		log.Debugf("It's not us on %s: %s", addr, err)
+		log.Debugf("It's not us on %s: %s", s.Address, err)
 		return false
 	}
 	defer r.Body.Close()

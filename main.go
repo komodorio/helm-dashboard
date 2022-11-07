@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard"
 	"github.com/pkg/browser"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 var (
@@ -17,22 +18,35 @@ var (
 )
 
 type options struct {
-	Version    bool `long:"version" description:"Show tool version"`
-	Verbose    bool `short:"v" long:"verbose" description:"Show verbose debug information"`
-	NoBrowser  bool `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
-	NoTracking bool `long:"no-analytics" description:"Disable user analytics (GA, DataDog etc.)"`
-
-	Port uint `short:"p" long:"port" description:"Port to start server on" default:"8080"` // TODO: better default port to clash less?
-
-	Namespace string `short:"n" long:"namespace" description:"Limit operations to a specific namespace"`
+	Version    bool   `long:"version" description:"Show tool version"`
+	Verbose    bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
+	NoBrowser  bool   `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
+	NoTracking bool   `long:"no-analytics" description:"Disable user analytics (GA, DataDog etc.)"`
+	BindHost   string `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
+	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`  // TODO: better default port to clash less?
+	Namespace  string `short:"n" long:"namespace" description:"Limit operations to a specific namespace"`
 }
 
 func main() {
 	opts := parseFlags()
+	if opts.BindHost == "" {
+		host := os.Getenv("HD_BIND")
+		if host == "" {
+			host = "localhost"
+		}
+		opts.BindHost = host
+	}
 
 	setupLogging(opts.Verbose)
 
-	address, webServerDone := dashboard.StartServer(version, int(opts.Port), opts.Namespace, opts.Verbose, opts.NoTracking)
+	server := dashboard.Server{
+		Version:    version,
+		Namespace:  opts.Namespace,
+		Address:    fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
+		Debug:      opts.Verbose,
+		NoTracking: opts.NoTracking,
+	}
+	address, webServerDone := server.StartServer()
 
 	if !opts.NoTracking {
 		log.Infof("User analytics is collected to improve the quality, disable it with --no-analytics")
