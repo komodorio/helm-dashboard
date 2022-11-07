@@ -61,6 +61,8 @@ You can see the list of available command-line flags by running `helm dashboard 
 
 By default, the web server is only available locally. You can change that by specifying `HD_BIND` environment variable
 to the desired value. For example, `0.0.0.0` would bind to all IPv4 addresses or `[::0]` would be all IPv6 addresses.
+This can also be specified using flag `--bind <host>`, for example `--bind=0.0.0.0` or `--bind 0.0.0.0`.
+> Precedence order: flag `--bind=<host>` > env `HD_BIND=<host>` > default value `localhost`
 
 If your port 8080 is busy, you can specify a different port to use via `--port <number>` command-line flag.
 
