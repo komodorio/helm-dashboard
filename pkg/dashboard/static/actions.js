@@ -62,10 +62,12 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     $("#upgradeModal .rel-cluster").text(getHashParam("context"))
 
     if (verCur) {
+        $("#upgradeModalLabel .type").text("Upgrade")
         $("#upgradeModal .ver-old").show().find("span").text(verCur)
         $("#upgradeModal .rel-name").prop("disabled", true).val(name)
         $("#upgradeModal .rel-ns").prop("disabled", true).val(ns)
     } else {
+        $("#upgradeModalLabel .type").text("Install")
         $("#upgradeModal .ver-old").hide()
         $("#upgradeModal .rel-name").prop("disabled", false).val(elm.name.split("/").pop())
         $("#upgradeModal .rel-ns").prop("disabled", false).val("")
