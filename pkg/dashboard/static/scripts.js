@@ -129,22 +129,28 @@ function statusStyle(status, card, txt) {
     }
 }
 
-function getCleanClusterName(rawClusterName){
+function getCleanClusterName(rawClusterName) {
     if (rawClusterName.indexOf('arn') === 0) {
         // AWS cluster
         const clusterSplit = rawClusterName.split(':')
-        const clusterName = clusterSplit.slice(-1)[0].replace('cluster/','')
+        const clusterName = clusterSplit.slice(-1)[0].replace('cluster/', '')
         const region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
+    
     if (rawClusterName.indexOf('gke') === 0) {
         // GKE cluster
         return rawClusterName.split('_').at(-2) + '/' + rawClusterName.split('_').at(-1) + ' [GKE]'
     }
+
     return rawClusterName
 }
 
 function fillClusterList(data, context) {
+    if (!data || !data.length) {
+        $("#cluster").append("No clusters listed in kubectl config, please configure some")
+        return
+    }
     data.forEach(function (elm) {
         let label = getCleanClusterName(elm.Name)
         let opt = $('<li><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
