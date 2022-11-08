@@ -129,11 +129,11 @@ function statusStyle(status, card, txt) {
     }
 }
 
-function getCleanClusterName(rawClusterName) {
+function getCleanClusterName(rawClusterName){
     if (rawClusterName.indexOf('arn') === 0) {
         // AWS cluster
         const clusterSplit = rawClusterName.split(':')
-        const clusterName = clusterSplit.at(-1).split("/").at(-1)
+        const clusterName = clusterSplit.slice(-1)[0].replace('cluster/','')
         const region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
