@@ -14,6 +14,18 @@ $(function () {
         initView(); // can only do it after loading cluster list
     })
 
+    $.getJSON("/api/kube/namespaces").fail(function (xhr) {
+        reportError("Failed to get namespaces", xhr)
+    }).done(function(res) {
+        const ns = res.items.map(i => i.metadata.name)
+        $.each(ns, function(i, item) {
+            $("#upgradeModal #ns-datalist").append($("<option>", {
+                value: item,
+                text: item
+            }))
+        })
+    })
+
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
     }).done(function (data) {
@@ -137,7 +149,7 @@ function getCleanClusterName(rawClusterName) {
         const region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
-    
+
     if (rawClusterName.indexOf('gke') === 0) {
         // GKE cluster
         return rawClusterName.split('_').at(-2) + '/' + rawClusterName.split('_').at(-1) + ' [GKE]'

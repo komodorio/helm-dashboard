@@ -521,3 +521,11 @@ func GetDiff(text1 string, text2 string, name1 string, name2 string) string {
 	log.Debugf("The diff is: %s", diff)
 	return diff
 }
+
+type NamespaceElement struct {
+	Items []struct {
+		Metadata struct {
+			Name string `json:"name"`
+		} `json:"metadata"`
+	} `json:"items"`
+}

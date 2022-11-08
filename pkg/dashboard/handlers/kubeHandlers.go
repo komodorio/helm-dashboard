@@ -39,6 +39,7 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 		return
 	}
 
+	// custom logic to provide most meaningful status for the resource
 	if res.Status.Phase == "Active" || res.Status.Phase == "Error" {
 		_ = res.Name + ""
 	} else if res.Status.Phase == "" && len(res.Status.Conditions) > 0 {

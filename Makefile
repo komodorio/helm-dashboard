@@ -15,7 +15,7 @@ pull: ; $(info $(M) Pulling source...) @
 
 .PHONY: build
 build: $(BIN) ; $(info $(M) Building executable...) @ ## Build program binary
-	$Q $(GO) build \
+	go build \
 		-ldflags '-X main.version=$(VERSION) -X main.buildDate=$(DATE)' \
 		-o bin/dashboard .
 

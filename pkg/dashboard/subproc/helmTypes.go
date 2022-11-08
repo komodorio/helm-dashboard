@@ -43,11 +43,3 @@ type RepositoryElement struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 }
-
-type NamespaceElement struct {
-	Items []struct {
-		Metadata struct {
-			Name string `json:"name"`
-		} `json:"metadata"`
-	} `json:"items"`
-}
