@@ -24,8 +24,9 @@ type HistoryElement struct {
 	Chart       string         `json:"chart"`
 	AppVersion  string         `json:"app_version"`
 	Description string         `json:"description"`
-	ChartName   string         `json:"chart_name"`
-	ChartVer    string         `json:"chart_ver"`
+
+	ChartName string `json:"chart_name"` // custom addition on top of Helm
+	ChartVer  string `json:"chart_ver"`  // custom addition on top of Helm
 }
 
 type RepoChartElement struct {
@@ -41,4 +42,12 @@ type RepoChartElement struct {
 type RepositoryElement struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
+}
+
+type NamespaceElement struct {
+	Items []struct {
+		Metadata struct {
+			Name string `json:"name"`
+		} `json:"metadata"`
+	} `json:"items"`
 }

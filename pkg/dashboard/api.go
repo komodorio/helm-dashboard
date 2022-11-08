@@ -2,14 +2,15 @@ package dashboard
 
 import (
 	"embed"
+	"net/http"
+	"os"
+	"path"
+
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"os"
-	"path"
 )
 
 //go:embed static/*
@@ -72,7 +73,7 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 
 	api.GET("/status", func(c *gin.Context) {
 		c.Header("X-Application-Name", "Helm Dashboard by Komodor.io") // to identify ourselves by ourselves
-		c.IndentedJSON(http.StatusOK, data.VersionInfo)
+		c.IndentedJSON(http.StatusOK, data.StatusInfo)
 	})
 
 	configureHelms(api.Group("/api/helm"), data)
@@ -106,6 +107,7 @@ func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.GET("/contexts", h.GetContexts)
 	api.GET("/resources/:kind", h.GetResourceInfo)
 	api.GET("/describe/:kind", h.Describe)
+	api.GET("/namespaces", h.GetNameSpaces)
 }
 
 func configureStatic(api *gin.Engine) {

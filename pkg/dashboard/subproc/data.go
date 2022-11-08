@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
@@ -13,11 +19,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"regexp"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type DataLayer struct {
@@ -25,14 +26,15 @@ type DataLayer struct {
 	Helm        string
 	Kubectl     string
 	Scanners    []Scanner
-	VersionInfo *VersionInfo
+	StatusInfo  *StatusInfo
 	Namespace   string
 }
 
-type VersionInfo struct {
-	CurVer    string
-	LatestVer string
-	Analytics bool
+type StatusInfo struct {
+	CurVer             string
+	LatestVer          string
+	Analytics          bool
+	LimitedToNamespace string
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
@@ -162,7 +164,7 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 
 func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json", "--max", "18")
+	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json")
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +179,7 @@ func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*His
 		if err != nil {
 			return nil, err
 		}
-		elm.ChartName = chartRepoName
+		elm.ChartName = chartRepoName // TODO: move it to frontend?
 		elm.ChartVer = curVer
 		elm.Updated.Time = elm.Updated.Time.Round(time.Second)
 	}
@@ -476,6 +478,20 @@ func (d *DataLayer) ChartRepoDelete(name string) (string, error) {
 	}
 
 	return out, nil
+}
+
+func (d *DataLayer) GetNameSpaces() (res *NamespaceElement, err error) {
+	out, err := d.runCommandKubectl("get", "namespaces", "-o", "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(out), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {

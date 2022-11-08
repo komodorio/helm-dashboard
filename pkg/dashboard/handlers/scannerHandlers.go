@@ -12,11 +12,18 @@ type ScannersHandler struct {
 }
 
 func (h *ScannersHandler) List(c *gin.Context) {
-	res := make([]string, 0)
-	for _, scanner := range h.Data.Scanners {
-		res = append(res, scanner.Name())
+	type ScannerInfo struct {
+		SupportedResourceKinds []string
+		ManifestScannable      bool
 	}
-	c.JSON(http.StatusOK, res)
+	res := map[string]ScannerInfo{}
+	for _, scanner := range h.Data.Scanners {
+		res[scanner.Name()] = ScannerInfo{
+			SupportedResourceKinds: scanner.SupportedResourceKinds(),
+			ManifestScannable:      scanner.ManifestIsScannable(),
+		}
+	}
+	c.IndentedJSON(http.StatusOK, res)
 }
 
 func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
