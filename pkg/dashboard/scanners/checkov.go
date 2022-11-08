@@ -1,11 +1,12 @@
 package scanners
 
 import (
+	"encoding/json"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"strconv"
 	"strings"
 )
 
@@ -13,11 +14,46 @@ type Checkov struct {
 	Data *subproc.DataLayer
 }
 
+func (c *Checkov) ManifestIsScannable() bool {
+	return true
+}
+
+func (c *Checkov) SupportedResourceKinds() []string {
+	// from https://github.com/bridgecrewio/checkov//blob/master/docs/5.Policy%20Index/kubernetes.md
+	return []string{
+		"AdmissionConfiguration",
+		"ClusterRole",
+		"ClusterRoleBinding",
+		"ConfigMap",
+		"CronJob",
+		"DaemonSet",
+		"Deployment",
+		"DeploymentConfig",
+		"Ingress",
+		"Job",
+		"Pod",
+		"PodSecurityPolicy",
+		"PodTemplate",
+		"Policy",
+		"ReplicaSet",
+		"ReplicationController",
+		"Role",
+		"RoleBinding",
+		"Secret",
+		"Service",
+		"ServiceAccount",
+		"StatefulSet",
+	}
+}
+
 func (c *Checkov) Name() string {
 	return "Checkov"
 }
 
 func (c *Checkov) Test() bool {
+	utils.FailLogLevel = log.DebugLevel
+	defer func() { utils.FailLogLevel = log.WarnLevel }()
+
 	res, err := utils.RunCommand([]string{"checkov", "--version"}, nil)
 	if err != nil {
 		return false
@@ -33,7 +69,7 @@ func (c *Checkov) ScanManifests(mnf string) (*subproc.ScanResults, error) {
 	}
 	defer fclose()
 
-	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "cli", "--file", fname}
+	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "json", "--file", fname}
 	out, err := utils.RunCommand(cmd, nil)
 	if err != nil {
 		return nil, err
@@ -41,7 +77,10 @@ func (c *Checkov) ScanManifests(mnf string) (*subproc.ScanResults, error) {
 
 	res := &subproc.ScanResults{}
 
-	res.OrigReport = out
+	err = json.Unmarshal([]byte(out), res.OrigReport)
+	if err != nil {
+		return nil, err
+	}
 
 	return res, nil
 }
@@ -61,41 +100,46 @@ func (c *Checkov) ScanResource(ns string, kind string, name string) (*subproc.Sc
 	}
 	defer fclose()
 
-	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "cli", "--file", fname}
+	cmd := []string{"checkov", "--quiet", "--soft-fail", "--framework", "kubernetes", "--output", "json", "--file", fname}
 	out, err := utils.RunCommand(cmd, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res := subproc.ScanResults{}
-	_, out, _ = strings.Cut(out, "\n")         // kubernetes scan results:
-	_, out, _ = strings.Cut(out, "\n")         // empty line
-	line, out, found := strings.Cut(out, "\n") // status line
-	if found {
-		parts := strings.FieldsFunc(line, func(r rune) bool {
-			return r == ':' || r == ','
-		})
-		if cnt, err := strconv.Atoi(strings.TrimSpace(parts[1])); err == nil {
-			res.PassedCount = cnt
-		} else {
-			log.Warnf("Failed to parse Checkov output: %s", err)
-		}
-		if cnt, err := strconv.Atoi(strings.TrimSpace(parts[3])); err == nil {
-			res.FailedCount = cnt
-		} else {
-			log.Warnf("Failed to parse Checkov output: %s", err)
-		}
-	} else {
-		log.Warnf("Failed to parse Checkov output")
+	cr := CheckovReport{}
+	err = json.Unmarshal([]byte(out), &cr)
+	if err != nil {
+		return nil, err
 	}
 
-	res.OrigReport = strings.TrimSpace(out)
+	res := &subproc.ScanResults{
+		PassedCount: cr.Summary.Passed,
+		FailedCount: cr.Summary.Failed,
+		OrigReport:  checkovReportTable(&cr),
+	}
 
-	return &res, nil
+	return res, nil
 }
 
-type CheckovResults struct {
-	Summary CheckovSummary
+func checkovReportTable(c *CheckovReport) string {
+	data := [][]string{}
+	for _, item := range c.Results.FailedChecks {
+		data = append(data, []string{item.Id, item.Name + "\n", item.Guideline})
+	}
+
+	tableString := &strings.Builder{}
+	table := tablewriter.NewWriter(tableString)
+	table.SetHeader([]string{"ID", "Name", "Guideline"})
+	table.SetBorder(false)
+	table.SetColWidth(64)
+	table.AppendBulk(data)
+	table.Render()
+	return tableString.String()
+}
+
+type CheckovReport struct {
+	Summary CheckovSummary `json:"summary"`
+	Results CheckovResults `json:"results"`
 }
 
 type CheckovSummary struct {
@@ -104,4 +148,17 @@ type CheckovSummary struct {
 	ResourceCount int `json:"resource_count"`
 	// parsing errors?
 	// skipped ?
+}
+
+type CheckovResults struct {
+	FailedChecks []CheckovCheck `json:"failed_checks"`
+}
+
+type CheckovCheck struct {
+	Id            string `json:"check_id"`
+	BcId          string `json:"bc_check_id"`
+	Name          string `json:"check_name"`
+	Resource      string `json:"resource"`
+	Guideline     string `json:"guideline"`
+	FileLineRange []int  `json:"file_line_range"`
 }

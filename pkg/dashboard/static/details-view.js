@@ -150,6 +150,12 @@ function showResources(namespace, chart, revision) {
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
+        const scanners = $("body").data("scanners");
+        const scannableResKinds = new Set();
+        for (let k in scanners) {
+            scanners[k].SupportedResourceKinds.forEach(scannableResKinds.add, scannableResKinds)
+        }
+
         resBody.empty();
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
@@ -159,7 +165,7 @@ function showResources(namespace, chart, revision) {
                         <div class="col-3 res-name text-break fw-bold"></div>
                         <div class="col-1 res-status overflow-hidden"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
                         <div class="col-4 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
-                        <div class="col-2 res-actions"></div>
+                        <div class="col-2 res-actions"><button class='btn btn-sm ms-2 visually-hidden'>Vertical-sizer</button></div>
                     </div>
             `)
 
@@ -195,11 +201,13 @@ function showResources(namespace, chart, revision) {
                         showDescribe(ns, res.kind, res.metadata.name, badge.clone())
                     })
 
-                    const btn2 = $("<button class='btn btn-sm btn-white border-secondary ms-2'>Scan</button>");
-                    resBlock.find(".res-actions").append(btn2)
-                    btn2.click(function () {
-                        scanResource(ns, res.kind, res.metadata.name, badge.clone())
-                    })
+                    if (scannableResKinds.has(res.kind)) {
+                        const btn2 = $("<button class='btn btn-sm btn-white border-secondary ms-2'>Scan</button>");
+                        resBlock.find(".res-actions").append(btn2)
+                        btn2.click(function () {
+                            scanResource(ns, res.kind, res.metadata.name, badge.clone())
+                        })
+                    }
                 }
             })
         }
@@ -237,25 +245,36 @@ function scanResource(ns, kind, name, badge) {
             body.append("No information from scanners. Make sure you have installed some and scanned object is supported.")
         }
 
+        const tabs = $('<ul class="nav nav-tabs mt-3" role="tablist"></ul>')
+        const content = $('<div class="tab-content"></div>')
+
         for (let name in data) {
             const res = data[name]
 
-            if (!res.OrigReport) continue
-            const hdr = $("<h3>" + name + " Scan Results</h3>");
+            if (!res.OrigReport && !res.PassedCount) continue
+
+            const hdr = $(`<li class="nav-item" role="presentation">
+                <button class="nav-link" id="` + name + `-tab" data-bs-toggle="tab" data-bs-target="#` + name + `-tab-pane" type="button" role="tab">` + name + `</button>
+              </li>`)
 
             if (res.FailedCount) {
-                hdr.append("<span class='badge bg-danger ms-3'>" + res.FailedCount + " failed</span>")
+                hdr.find('button').append("<span class='badge bg-danger ms-2'>" + res.FailedCount + " failed</span>")
             }
 
             if (res.PassedCount) {
-                hdr.append("<span class='badge bg-info ms-3'>" + res.PassedCount + " passed</span>")
+                hdr.find('button').append("<span class='badge bg-info ms-2'>" + res.PassedCount + " passed</span>")
             }
-
-            body.append(hdr)
 
             const hl = hljs.highlight(res.OrigReport, {language: 'yaml'}).value
             const pre = $("<pre class='bg-white rounded p-3' style='font-size: inherit; overflow: unset'></pre>").html(hl)
-            body.append(pre)
+            const div = $('<div class="tab-pane fade" id="' + name + '-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0"></div>').append(pre)
+
+            tabs.append(hdr)
+            content.append(div)
         }
+
+        body.append(tabs)
+        body.append(content)
+        tabs.find('li').first().find('button').click()
     })
 }

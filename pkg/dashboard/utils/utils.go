@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+var FailLogLevel = log.WarnLevel // allows to suppress error logging in some situations
+
 type ControlChan = chan struct{}
 
 func ChartAndVersion(x string) (string, string, error) {
@@ -64,10 +66,10 @@ func RunCommand(cmd []string, env map[string]string) (string, error) {
 	prog.Stderr = &stderr
 
 	if err := prog.Run(); err != nil {
-		log.Warnf("Failed command: %s", cmd)
+		log.StandardLogger().Logf(FailLogLevel, "Failed command: %s", cmd)
 		serr := stderr.Bytes()
 		if serr != nil {
-			log.Warnf("STDERR:\n%s", serr)
+			log.StandardLogger().Logf(FailLogLevel, "STDERR:\n%s", serr)
 		}
 		if eerr, ok := err.(*exec.ExitError); ok {
 			return "", CmdError{

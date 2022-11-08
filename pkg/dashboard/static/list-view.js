@@ -21,9 +21,9 @@ function loadChartsList() {
 
 function buildChartCard(elm) {
     const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start">
-            <div class="col-6 rel-name"><span class="link">release-name</span><div></div></div>
-            <div class="col-1 rel-status"><span></span><div></div></div>
-            <div class="col-1 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
+            <div class="col-4 rel-name"><span class="link">release-name</span><div></div></div>
+            <div class="col-3 rel-status"><span></span><div></div></div>
+            <div class="col-2 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
             <div class="col-1 rel-rev"><span>#0</span><div>Revision</div></div>
             <div class="col-1 rel-ns text-nowrap"><span>default</span><div>Namespace</div></div>
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>

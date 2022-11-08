@@ -17,8 +17,11 @@ $(function () {
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
     }).done(function (data) {
-        if (!data || !data.length) {
-            $("#upgradeModal .btn-scan").hide()
+        $("body").data("scanners", data)
+        for (let k in data) {
+            if (data[k].ManifestScannable) {
+                $("#upgradeModal .btn-scan").show() // TODO: move this to install flow
+            }
         }
     })
 
@@ -26,6 +29,9 @@ $(function () {
         reportError("Failed to get tool version", xhr)
     }).done(function (data) {
         fillToolVersion(data)
+        if (data.LimitedToNamespace) {
+            $("#limitNamespace").show().find("span").text(data.LimitedToNamespace)
+        }
     })
 })
 
@@ -127,18 +133,24 @@ function getCleanClusterName(rawClusterName) {
     if (rawClusterName.indexOf('arn') === 0) {
         // AWS cluster
         const clusterSplit = rawClusterName.split(':')
-        const clusterName = clusterSplit.at(-1).split("/").at(-1)
+        const clusterName = clusterSplit.slice(-1)[0].replace('cluster/', '')
         const region = clusterSplit.at(-3)
         return region + "/" + clusterName + ' [AWS]'
     }
+    
     if (rawClusterName.indexOf('gke') === 0) {
         // GKE cluster
         return rawClusterName.split('_').at(-2) + '/' + rawClusterName.split('_').at(-1) + ' [GKE]'
     }
+
     return rawClusterName
 }
 
 function fillClusterList(data, context) {
+    if (!data || !data.length) {
+        $("#cluster").append("No clusters listed in kubectl config, please configure some")
+        return
+    }
     data.forEach(function (elm) {
         let label = getCleanClusterName(elm.Name)
         let opt = $('<li><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');

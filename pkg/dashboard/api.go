@@ -73,7 +73,7 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 
 	api.GET("/status", func(c *gin.Context) {
 		c.Header("X-Application-Name", "Helm Dashboard by Komodor.io") // to identify ourselves by ourselves
-		c.IndentedJSON(http.StatusOK, data.VersionInfo)
+		c.IndentedJSON(http.StatusOK, data.StatusInfo)
 	})
 
 	configureHelms(api.Group("/api/helm"), data)
@@ -108,6 +108,7 @@ func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.GET("/contexts", h.GetContexts)
 	api.GET("/resources/:kind", h.GetResourceInfo)
 	api.GET("/describe/:kind", h.Describe)
+	api.GET("/namespaces", h.GetNameSpaces)
 }
 
 func configureStatic(api *gin.Engine) {
