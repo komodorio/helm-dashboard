@@ -90,6 +90,7 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.GET("/charts/history", h.History)
 	api.GET("/charts/resources", h.Resources)
 	api.GET("/charts/:section", h.GetInfoSection)
+	api.GET("/charts/show", h.Show)
 	api.POST("/charts/install", h.Install)
 	api.POST("/charts/rollback", h.Rollback)
 

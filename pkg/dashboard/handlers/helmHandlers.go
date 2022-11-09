@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 )
 
 type HelmHandler struct {
@@ -125,6 +126,22 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusNoContent)
+}
+
+func (h *HelmHandler) Show(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	res, err := h.Data.ShowChart(qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, res)
 }
 
 func (h *HelmHandler) Install(c *gin.Context) {

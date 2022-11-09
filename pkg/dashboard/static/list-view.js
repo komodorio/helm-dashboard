@@ -20,7 +20,7 @@ function loadChartsList() {
 }
 
 function buildChartCard(elm) {
-    const card = $(`<div class="row m-0 py-3 bg-white rounded-1 b-shadow border-4 border-start">
+    const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start">
             <div class="col-4 rel-name"><span class="link">release-name</span><div></div></div>
             <div class="col-3 rel-status"><span></span><div></div></div>
             <div class="col-2 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
@@ -28,6 +28,27 @@ function buildChartCard(elm) {
             <div class="col-1 rel-ns text-nowrap"><span>default</span><div>Namespace</div></div>
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
+    
+    $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
+        reportError("Failed to get repo name for charts", xhr)
+    }).done(function (data) {
+        if(data.length > 0) {
+            $.getJSON("/api/helm/charts/show?name=" + data[0].name).fail(function (xhr) {
+                reportError("Failed to get list of charts", xhr)
+            }).done(function (data) {
+                if(data) {
+                    var res = data[0]
+                    if(res.icon) {
+                        card.find(".rel-name").attr("style", "background-image: url(" + res.icon + ")")
+                    }
+                    if(res.description) {
+                        card.find(".rel-name div").text(res.description)
+                    }
+                }
+
+            })
+        }
+    })
 
     card.find(".rel-name span").text(elm.name)
     card.find(".rel-rev span").text("#" + elm.revision)

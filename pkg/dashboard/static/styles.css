@@ -162,6 +162,10 @@ span.link {
     background-size: 3rem;
 }
 
+#installedList .rel-name div {
+    overflow: hidden;
+}
+
 #installedList .rel-name span {
     font-family: Roboto Slab, sans-serif;
     font-weight: 700;
