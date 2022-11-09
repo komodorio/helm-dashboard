@@ -2,9 +2,12 @@ package subproc
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/eko/gocache/v3/marshaler"
+	"github.com/eko/gocache/v3/store"
 	"regexp"
 	"sort"
 	"strconv"
@@ -22,6 +25,10 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
 
+type CacheKey = string
+
+const CacheKeyRelList CacheKey = "installed-releases-list"
+
 type DataLayer struct {
 	KubeContext string
 	Helm        string
@@ -29,6 +36,7 @@ type DataLayer struct {
 	Scanners    []Scanner
 	StatusInfo  *StatusInfo
 	Namespace   string
+	Cache       *marshaler.Marshaler
 }
 
 type StatusInfo struct {
@@ -40,6 +48,7 @@ type StatusInfo struct {
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
 	for i, c := range cmd {
+		// TODO: remove namespace parameter if it's empty
 		if c == "--namespace" && i < len(cmd) { // TODO: in case it's not found - add it?
 			d.forceNamespace(&cmd[i+1])
 		}
@@ -151,16 +160,41 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 		cmd = append(cmd, "--namespace", d.Namespace)
 	}
 
-	out, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return nil, err
-	}
+	out, err := d.CachedString(CacheKeyRelList, store.WithTags([]string{"book"}), func() (string, error) {
+		out, err := d.runCommandHelm(cmd...)
+		if err != nil {
+			return "", err
+		}
+		return out, nil
+	})
 
 	err = json.Unmarshal([]byte(out), &res)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
+}
+
+func (d *DataLayer) CachedString(key CacheKey, tags store.Option, callback func() (string, error)) (string, error) {
+	ctx := context.Background()
+	out := ""
+	_, err := d.Cache.Get(ctx, key, &out)
+	if err == nil {
+		return out, nil
+	} else if !errors.Is(err, store.NotFound{}) {
+		return "", err
+	}
+
+	out, err = callback()
+	if err != nil {
+		return "", err
+	}
+
+	err = d.Cache.Set(ctx, key, out, tags)
+	if err != nil {
+		return "", err
+	}
+	return out, nil
 }
 
 func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*HistoryElement, err error) {
@@ -381,7 +415,12 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 }
 
 func (d *DataLayer) ChartUninstall(namespace string, name string) error {
-	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
+	err := d.Cache.Delete(context.Background(), CacheKeyRelList)
+	if err != nil {
+		return err
+	}
+
+	_, err = d.runCommandHelm("uninstall", name, "--namespace", namespace)
 	if err != nil {
 		return err
 	}
@@ -389,7 +428,12 @@ func (d *DataLayer) ChartUninstall(namespace string, name string) error {
 }
 
 func (d *DataLayer) Revert(namespace string, name string, rev int) error {
-	_, err := d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
+	err := d.Cache.Delete(context.Background(), CacheKeyRelList)
+	if err != nil {
+		return err
+	}
+
+	_, err = d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
 	if err != nil {
 		return err
 	}
@@ -434,6 +478,15 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	if err != nil {
 		return "", err
 	}
+
+	if !justTemplate {
+		err := d.Cache.Delete(context.Background(), CacheKeyRelList)
+		if err != nil {
+			return "", err
+		}
+		//d.Cache.Invalidate(context.Background(), store.WithInvalidateTags([]string{"book"}))
+	}
+
 	res := release.Release{}
 	err = json.Unmarshal([]byte(out), &res)
 	if err != nil {

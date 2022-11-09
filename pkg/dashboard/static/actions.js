@@ -119,7 +119,7 @@ $("#upgradeModal .btn-confirm").click(function () {
         if (data.version) {
             setHashParam("section", null)
             const ns = $("#upgradeModal .rel-ns").val();
-            setHashParam("namespace", ns ? ns : "default")
+            setHashParam("namespace", ns ? ns : "default") // TODO: relaets issue #51
             setHashParam("chart", $("#upgradeModal .rel-name").val())
             setHashParam("revision", data.version)
             window.location.reload()
