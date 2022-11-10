@@ -227,7 +227,7 @@ nav .nav-tabs .nav-link.active {
     background-color: transparent;
 }
 
-#installedList .b-shadow:hover {
+#installedList .body .b-shadow:hover {
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.18);
 }
 
