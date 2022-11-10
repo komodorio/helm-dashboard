@@ -143,6 +143,7 @@ $("#nav-tab [data-tab]").click(function () {
 
 function showResources(namespace, chart, revision) {
     const resBody = $("#nav-resources .body");
+    const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
     resBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
@@ -157,6 +158,7 @@ function showResources(namespace, chart, revision) {
         }
 
         resBody.empty();
+        data = data.sort(function(a, b){return interestingResources.indexOf(a.kind.toUpperCase()) - interestingResources.indexOf(b.kind.toUpperCase())}).reverse();
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
             const resBlock = $(`
