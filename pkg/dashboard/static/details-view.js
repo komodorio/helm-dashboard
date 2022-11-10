@@ -143,6 +143,7 @@ $("#nav-tab [data-tab]").click(function () {
 
 function showResources(namespace, chart, revision) {
     const resBody = $("#nav-resources .body");
+    const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
     resBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
     let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
     let url = "/api/helm/charts/resources"
@@ -157,8 +158,9 @@ function showResources(namespace, chart, revision) {
         }
 
         resBody.empty();
-        for (let i = 0; i < data.length; i++) {
-            const res = data[i]
+        let sortedData = data.sort(function(a, b){return interestingResources.indexOf(a.kind.toUpperCase()) - interestingResources.indexOf(b.kind.toUpperCase())}).reverse();
+        for (let i = 0; i < sortedData.length; i++) {
+            const res = sortedData[i]
             const resBlock = $(`
                     <div class="row px-3 py-2 mb-3 bg-white rounded">
                         <div class="col-2 res-kind text-break"></div>
@@ -176,21 +178,21 @@ function showResources(namespace, chart, revision) {
             let ns = res.metadata.namespace ? res.metadata.namespace : namespace
             $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
                 //reportError("Failed to get list of resources")
-            }).done(function (data) {
-                const badge = $("<span class='badge me-2 fw-normal'></span>").text(data.status.phase);
-                if (["Available", "Active", "Established", "Bound", "Ready"].includes(data.status.phase)) {
+            }).done(function (sortedData) {
+                const badge = $("<span class='badge me-2 fw-normal'></span>").text(sortedData.status.phase);
+                if (["Available", "Active", "Established", "Bound", "Ready"].includes(sortedData.status.phase)) {
                     badge.addClass("bg-success text-dark")
-                } else if (["Exists"].includes(data.status.phase)) {
+                } else if (["Exists"].includes(sortedData.status.phase)) {
                     badge.addClass("bg-success text-dark bg-opacity-50")
-                } else if (["Progressing"].includes(data.status.phase)) {
+                } else if (["Progressing"].includes(sortedData.status.phase)) {
                     badge.addClass("bg-warning")
                 } else {
                     badge.addClass("bg-danger")
                 }
 
                 const statusBlock = resBlock.find(".res-status");
-                statusBlock.empty().append(badge).attr("title", data.status.phase)
-                resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
+                statusBlock.empty().append(badge).attr("title", sortedData.status.phase)
+                resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (sortedData.status.message ? sortedData.status.message : '') + "</span>")
 
                 if (badge.text() !== "NotFound" && revision == $("#specRev").data("last-rev")) {
                     resBlock.find(".res-actions")
