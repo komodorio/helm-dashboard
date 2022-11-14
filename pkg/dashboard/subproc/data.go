@@ -28,6 +28,7 @@ import (
 type CacheKey = string
 
 const CacheKeyRelList CacheKey = "installed-releases-list"
+const CacheKeyShowChart CacheKey = "show-chart"
 
 type DataLayer struct {
 	KubeContext string
@@ -160,7 +161,7 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 		cmd = append(cmd, "--namespace", d.Namespace)
 	}
 
-	out, err := d.CachedString(CacheKeyRelList, store.WithTags([]string{"book"}), func() (string, error) {
+	out, err := d.CachedString(CacheKeyRelList, store.WithTags([]string{}), func() (string, error) {
 		out, err := d.runCommandHelm(cmd...)
 		if err != nil {
 			return "", err
@@ -176,6 +177,7 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 }
 
 func (d *DataLayer) CachedString(key CacheKey, tags store.Option, callback func() (string, error)) (string, error) {
+	// TODO: extract into separate class
 	ctx := context.Background()
 	out := ""
 	_, err := d.Cache.Get(ctx, key, &out)
@@ -503,8 +505,15 @@ func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
 	return d.runCommandHelm("show", "values", chart, "--version", ver)
 }
 
-func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) {
-	out, err := d.runCommandHelm("show", "chart", chartName)
+func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // TODO: add version parameter to method
+	out, err := d.CachedString(CacheKeyShowChart+"\v"+chartName, store.WithTags([]string{"chart\v" + chartName}), func() (string, error) {
+		out, err := d.runCommandHelm("show", "chart", chartName)
+		if err != nil {
+			return "", err
+		}
+		return out, nil
+	})
+
 	if err != nil {
 		return nil, err
 	}

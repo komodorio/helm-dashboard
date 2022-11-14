@@ -160,6 +160,8 @@ func NewCache() *marshaler.Marshaler {
 	gocacheClient := gocache.New(5*time.Minute, 10*time.Minute)
 	gocacheStore := store.NewGoCache(gocacheClient)
 
+	// TODO: use tiered cache with some disk backend, allow configuring that static cache folder
+
 	// Initializes marshaler
 	marshal := marshaler.New(gocacheStore)
 	return marshal
