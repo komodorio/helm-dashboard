@@ -29,7 +29,7 @@ function buildChartCard(elm) {
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
     
-    const chartName = elm.chart.substr(0, elm.chart.lastIndexOf("-"))
+    const chartName = elm.chart.substring(0, elm.chart.lastIndexOf("-"))
     $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
         reportError("Failed to get repo name for charts", xhr)
     }).done(function (data) {

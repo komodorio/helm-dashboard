@@ -40,7 +40,7 @@ func TestFlow(t *testing.T) {
 	}
 
 	chart := installed[1]
-	history, err := data.ChartHistory(chart.Namespace, chart.Name)
+	history, err := data.ReleaseHistory(chart.Namespace, chart.Name)
 	if err != nil {
 		t.Fatal(err)
 	}

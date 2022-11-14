@@ -29,6 +29,12 @@ type CacheKey = string
 
 const CacheKeyRelList CacheKey = "installed-releases-list"
 const CacheKeyShowChart CacheKey = "show-chart"
+const CacheKeyRelHistory CacheKey = "release-history"
+const CacheKeyRepoVersions CacheKey = "repo-versions"
+const CacheKeyRevManifests CacheKey = "rev-manifests"
+const CacheKeyRevNotes CacheKey = "rev-notes"
+const CacheKeyRevValues CacheKey = "rev-values"
+const CacheKeyRepoChartValues CacheKey = "chart-values"
 
 type DataLayer struct {
 	KubeContext string
@@ -109,6 +115,51 @@ func (d *DataLayer) CheckConnectivity() error {
 	return nil
 }
 
+func (d *DataLayer) CachedString(key CacheKey, tags store.Option, callback func() (string, error)) (string, error) {
+	// TODO: extract this functionality into separate class
+
+	if tags == nil {
+		tags = func(o *store.Options) {}
+	}
+
+	ctx := context.Background()
+	out := ""
+	_, err := d.Cache.Get(ctx, key, &out)
+	if err == nil {
+		log.Debugf("Using cached value for %s", key)
+		return out, nil
+	} else if !errors.Is(err, store.NotFound{}) {
+		return "", err
+	}
+
+	out, err = callback()
+	if err != nil {
+		return "", err
+	}
+
+	err = d.Cache.Set(ctx, key, out, tags)
+	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
+func (d *DataLayer) InvalidateByKey(key CacheKey) {
+	log.Debugf("Invalidating key %s", key)
+	err := d.Cache.Delete(context.Background(), key)
+	if err != nil {
+		log.Warnf("Failed to invalidate cache key %s: %s", key, err)
+	}
+}
+
+func (d *DataLayer) InvalidateByTags(tags []string) {
+	log.Debugf("Invalidating tags %v", tags)
+	err := d.Cache.Invalidate(context.Background(), store.WithInvalidateTags(tags))
+	if err != nil {
+		log.Warnf("Failed to invalidate tags %v: %s", tags, err)
+	}
+}
+
 type KubeContext struct {
 	IsCurrent bool
 	Name      string
@@ -161,12 +212,8 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 		cmd = append(cmd, "--namespace", d.Namespace)
 	}
 
-	out, err := d.CachedString(CacheKeyRelList, store.WithTags([]string{}), func() (string, error) {
-		out, err := d.runCommandHelm(cmd...)
-		if err != nil {
-			return "", err
-		}
-		return out, nil
+	out, err := d.CachedString(CacheKeyRelList, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
 	})
 
 	err = json.Unmarshal([]byte(out), &res)
@@ -176,32 +223,12 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 	return res, nil
 }
 
-func (d *DataLayer) CachedString(key CacheKey, tags store.Option, callback func() (string, error)) (string, error) {
-	// TODO: extract into separate class
-	ctx := context.Background()
-	out := ""
-	_, err := d.Cache.Get(ctx, key, &out)
-	if err == nil {
-		return out, nil
-	} else if !errors.Is(err, store.NotFound{}) {
-		return "", err
-	}
-
-	out, err = callback()
-	if err != nil {
-		return "", err
-	}
-
-	err = d.Cache.Set(ctx, key, out, tags)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
-}
-
-func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*HistoryElement, err error) {
+func (d *DataLayer) ReleaseHistory(namespace string, releaseName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json")
+	out, err := d.CachedString(CacheKeyRelHistory+"\v"+namespace+"\v"+releaseName, nil, func() (string, error) {
+		return d.runCommandHelm("history", releaseName, "--namespace", namespace, "--output", "json")
+	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +258,9 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 	}
 
 	cmd := []string{"search", "repo", "--regexp", search, "--versions", "--output", "json"}
-	out, err := d.runCommandHelm(cmd...)
+	out, err := d.CachedString(CacheKeyRepoVersions+"\v"+chartName, store.WithTags([]string{"all-repos"}), func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +274,9 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 
 func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
-	out, err := d.runCommandHelm(cmd...)
+	out, err := d.CachedString(CacheKeyRepoVersions+"\v"+repoName, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -287,16 +318,12 @@ func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []Relea
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
 
 func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	cmd := []string{"get", "manifest", chartName, "--namespace", namespace}
-	if revision > 0 {
-		cmd = append(cmd, "--revision", strconv.Itoa(revision))
-	}
+	cmd := []string{"get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
 
-	out, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+	key := CacheKeyRevManifests + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
+	return d.CachedString(key, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 }
 
 func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*v1.Carp, error) {
@@ -311,7 +338,7 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 	var tmp interface{}
 	for dec.Decode(&tmp) == nil {
 		// k8s libs uses only JSON tags defined, say hello to https://github.com/go-yaml/yaml/issues/424
-		// bug we can juggle it
+		// we can juggle it
 		jsoned, err := json.Marshal(tmp)
 		if err != nil {
 			return nil, err
@@ -335,28 +362,24 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 }
 
 func (d *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	out, err := d.runCommandHelm("get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+	cmd := []string{"get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
+	key := CacheKeyRevNotes + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
+	return d.CachedString(key, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 }
 
 func (d *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
-	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--output", "yaml"}
-
-	if revision > 0 {
-		cmd = append(cmd, "--revision", strconv.Itoa(revision))
-	}
+	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--output", "yaml", "--revision", strconv.Itoa(revision)}
 
 	if !onlyUserDefined {
 		cmd = append(cmd, "--all")
 	}
-	out, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+
+	key := CacheKeyRevValues + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision) + "\v" + fmt.Sprintf("%v", onlyUserDefined)
+	return d.CachedString(key, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 }
 
 func (d *DataLayer) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error) {
@@ -416,44 +439,32 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 	return out, nil
 }
 
-func (d *DataLayer) ChartUninstall(namespace string, name string) error {
-	err := d.Cache.Delete(context.Background(), CacheKeyRelList)
-	if err != nil {
-		return err
-	}
+func (d *DataLayer) ReleaseUninstall(namespace string, name string) error {
+	d.InvalidateByKey(CacheKeyRelList)
+	// TODO: invalidate what?
 
-	_, err = d.runCommandHelm("uninstall", name, "--namespace", namespace)
-	if err != nil {
-		return err
-	}
-	return nil
+	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
+	return err
 }
 
 func (d *DataLayer) Revert(namespace string, name string, rev int) error {
-	err := d.Cache.Delete(context.Background(), CacheKeyRelList)
-	if err != nil {
-		return err
-	}
+	d.InvalidateByKey(CacheKeyRelList)
+	// TODO: invalidate what?
 
-	_, err = d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
-	if err != nil {
-		return err
-	}
-	return nil
+	_, err := d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
+	return err
 }
 
 func (d *DataLayer) ChartRepoUpdate(name string) error {
+	// TODO: invalidate what?
+
 	cmd := []string{"repo", "update"}
 	if name != "" {
 		cmd = append(cmd, name)
 	}
 
 	_, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string, version string, justTemplate bool, values string, reuseVals bool) (string, error) {
@@ -482,11 +493,8 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	}
 
 	if !justTemplate {
-		err := d.Cache.Delete(context.Background(), CacheKeyRelList)
-		if err != nil {
-			return "", err
-		}
-		//d.Cache.Invalidate(context.Background(), store.WithInvalidateTags([]string{"book"}))
+		d.InvalidateByKey(CacheKeyRelList)
+		// TODO: invalidate what?
 	}
 
 	res := release.Release{}
@@ -501,8 +509,11 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	return out, nil
 }
 
+// ShowValues get values from repo chart, not from installed release
 func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
-	return d.runCommandHelm("show", "values", chart, "--version", ver)
+	return d.CachedString(CacheKeyRepoChartValues+"\v"+chart+"\v"+ver, nil, func() (string, error) {
+		return d.runCommandHelm("show", "values", chart, "--version", ver)
+	})
 }
 
 func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // TODO: add version parameter to method
