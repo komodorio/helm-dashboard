@@ -3,13 +3,14 @@ package utils
 import (
 	"bytes"
 	"errors"
-	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 var FailLogLevel = log.WarnLevel // allows to suppress error logging in some situations
@@ -17,12 +18,35 @@ var FailLogLevel = log.WarnLevel // allows to suppress error logging in some sit
 type ControlChan = chan struct{}
 
 func ChartAndVersion(x string) (string, string, error) {
-	lastInd := strings.LastIndex(x, "-")
-	if lastInd < 0 {
+	strs := strings.Split(x, "-")
+	lens := len(strs)
+	if lens < 2 {
 		return "", "", errors.New("can't parse chart version string")
+	} else if lens == 2 {
+		return strs[0], strs[1], nil
+	} else {
+		i := 1
+		for ; i < lens; i++ {
+			_, err := strconv.ParseInt(string(strs[i][0]), 10, 64)
+			if err == nil {
+				//find one string that start with [0-9],chartVersion string must start with [0-9]
+				break
+			}
+		}
+		if i == lens {
+			//no string start with [0-9], get the last string as version
+			i = lens - 1
+		}
+		chartName := strs[0]
+		chartVersion := strs[i]
+		for j := 1; j < i; j++ {
+			chartName += "-" + strs[j]
+		}
+		for j := i + 1; j < lens; j++ {
+			chartVersion += "-" + strs[j]
+		}
+		return chartName, chartVersion, nil
 	}
-
-	return x[:lastInd], x[lastInd+1:], nil
 }
 
 func TempFile(txt string) (string, func(), error) {
