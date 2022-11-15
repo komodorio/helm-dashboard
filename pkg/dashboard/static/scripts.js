@@ -10,8 +10,8 @@ $(function () {
     })
     const namespaceSelect = $("#namespace");
     namespaceSelect.change(function () {
-        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val() +"&namespace="+namespaceSelect.find("input:radio:checked").val();
-        window.location.reload()
+        setHashParam("namespace", namespaceSelect.find("input:radio:checked").val())
+        window.location.reload() // FIXME: why reload? should update the list with filter instead
     })
 
     $.getJSON("/api/kube/contexts").fail(function (xhr) {
@@ -19,23 +19,24 @@ $(function () {
     }).done(function (data) {
         console.log("data is:", data)
         const context = getHashParam("context")
-        console.log("******context:",context)
+        console.log("******context:", context)
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
-        fillClusterList(data, context);
-    })
+        fillClusterList(data, context); // critical for further communication
 
-    $.getJSON("/api/kube/namespaces").fail(function (xhr) {
-        reportError("Failed to get namespaces", xhr)
-    }).done(function(data) {
-        const ns = data.items.map(i => i.metadata.name)
-        $.each(ns, function(i, item) {
-            $("#upgradeModal #ns-datalist").append($("<option>", {
-                value: item,
-                text: item
-            }))
+        initView(); // can only do it after loading cluster list
+
+        $.getJSON("/api/kube/namespaces").fail(function (xhr) {
+            reportError("Failed to get namespaces", xhr)
+        }).done(function (data) {
+            const ns = data.items.map(i => i.metadata.name)
+            $.each(ns, function (i, item) {
+                $("#upgradeModal #ns-datalist").append($("<option>", {
+                    value: item,
+                    text: item
+                }))
+            })
+            fillNamespaceList(data.items)
         })
-        fillNamespaceList(data.items)
-        initView();
     })
 
     $.getJSON("/api/scanners").fail(function (xhr) {
@@ -59,7 +60,7 @@ $(function () {
     })
 })
 
-function initView(chart, namespace) {
+function initView() {
     $(".section").hide()
 
     const section = getHashParam("section")
@@ -181,10 +182,9 @@ function fillClusterList(data, context) {
         opt.attr('title', elm.Name)
         opt.find("input").val(elm.Name).text(label)
         opt.find("span").text(label)
-        if (elm.IsCurrent && !context) {
-            opt.find("input").prop("checked", true)
-            setCurrentContext(elm.Name)
-        } else if (context && elm.Name === context) {
+        const isCurrent = elm.IsCurrent && !context;
+        const isSelected = context && elm.Name === context
+        if (isCurrent || isSelected) {
             opt.find("input").prop("checked", true)
             setCurrentContext(elm.Name)
         }
@@ -198,17 +198,18 @@ function fillNamespaceList(data) {
         return
     }
     Array.from(data).forEach(function (elm) {
+        const cur = getHashParam("namespace")
         console.log("elm is:", elm)
         let opt = $('<li><label><input type="radio" name="namespace" class="me-2"/><span></span></label></li>');
         opt.attr('title', elm.metadata.name)
         opt.find("input").val(elm.metadata.name).text(elm.metadata.name)
         opt.find("span").text(elm.metadata.name)
-        if (elm.IsCurrent) {
+        if (cur && cur === elm.metadata.name) {
             opt.find("input").prop("checked", true)
-            setCurrentContext(elm.Name)
-        } else {
+            // FIXME: setCurrentContext(elm.Name)
+        } else if (false) { // TODO: get the default namespace from current context, if it's not 'default' - pre-select it
             opt.find("input").prop("checked", true)
-            setCurrentContext(elm.Name)
+            // FIXME: setCurrentContext(elm.Name)
         }
         $("#namespace").append(opt)
     })
