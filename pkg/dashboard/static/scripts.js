@@ -1,30 +1,41 @@
 $(function () {
+    // const onChange = function () {
+    //     window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val() +"&namespace="+namespaceSelect.find("input:radio:checked").val();
+    //     window.location.reload()
+    // }
     const clusterSelect = $("#cluster");
     clusterSelect.change(function () {
-        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val()
+        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val();
+        window.location.reload()
+    })
+    const namespaceSelect = $("#namespace");
+    namespaceSelect.change(function () {
+        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val() +"&namespace="+namespaceSelect.find("input:radio:checked").val();
         window.location.reload()
     })
 
     $.getJSON("/api/kube/contexts").fail(function (xhr) {
         reportError("Failed to get list of clusters", xhr)
     }).done(function (data) {
+        console.log("data is:", data)
         const context = getHashParam("context")
+        console.log("******context:",context)
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
         fillClusterList(data, context);
-
-        initView(); // can only do it after loading cluster list
     })
 
     $.getJSON("/api/kube/namespaces").fail(function (xhr) {
         reportError("Failed to get namespaces", xhr)
-    }).done(function(res) {
-        const ns = res.items.map(i => i.metadata.name)
+    }).done(function(data) {
+        const ns = data.items.map(i => i.metadata.name)
         $.each(ns, function(i, item) {
             $("#upgradeModal #ns-datalist").append($("<option>", {
                 value: item,
                 text: item
             }))
         })
+        fillNamespaceList(data.items)
+        initView();
     })
 
     $.getJSON("/api/scanners").fail(function (xhr) {
@@ -48,7 +59,7 @@ $(function () {
     })
 })
 
-function initView() {
+function initView(chart, namespace) {
     $(".section").hide()
 
     const section = getHashParam("section")
@@ -178,6 +189,28 @@ function fillClusterList(data, context) {
             setCurrentContext(elm.Name)
         }
         $("#cluster").append(opt)
+    })
+}
+
+function fillNamespaceList(data) {
+    if (!data || !data.length) {
+        $("#namespace").append("default")
+        return
+    }
+    Array.from(data).forEach(function (elm) {
+        console.log("elm is:", elm)
+        let opt = $('<li><label><input type="radio" name="namespace" class="me-2"/><span></span></label></li>');
+        opt.attr('title', elm.metadata.name)
+        opt.find("input").val(elm.metadata.name).text(elm.metadata.name)
+        opt.find("span").text(elm.metadata.name)
+        if (elm.IsCurrent) {
+            opt.find("input").prop("checked", true)
+            setCurrentContext(elm.Name)
+        } else {
+            opt.find("input").prop("checked", true)
+            setCurrentContext(elm.Name)
+        }
+        $("#namespace").append(opt)
     })
 }
 
