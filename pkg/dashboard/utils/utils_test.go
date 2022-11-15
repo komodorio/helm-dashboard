@@ -79,6 +79,13 @@ func TestChartAndVersion(t *testing.T) {
 		},
 		{
 			name:      "Chart and version - successfully parsing chart and version",
+			params:    "chart-v1.0.0-alpha",
+			wantChart: "chart",
+			wantVer:   "v1.0.0-alpha",
+			wantError: false,
+		},
+		{
+			name:      "Chart and version - successfully parsing chart and version",
 			params:    "chart-1.0.0-alpha",
 			wantChart: "chart",
 			wantVer:   "1.0.0-alpha",
