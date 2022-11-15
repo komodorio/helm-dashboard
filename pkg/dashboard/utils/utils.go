@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -25,27 +26,11 @@ func ChartAndVersion(x string) (string, string, error) {
 	} else if lens == 2 {
 		return strs[0], strs[1], nil
 	} else {
-		i := 1
-		for ; i < lens; i++ {
-			_, err := strconv.ParseInt(string(strs[i][0]), 10, 64)
-			if err == nil {
-				//find one string that start with [0-9],chartVersion string must start with [0-9]
-				break
-			}
-		}
-		if i == lens {
-			//no string start with [0-9], get the last string as version
-			i = lens - 1
-		}
-		chartName := strs[0]
-		chartVersion := strs[i]
-		for j := 1; j < i; j++ {
-			chartName += "-" + strs[j]
-		}
-		for j := i + 1; j < lens; j++ {
-			chartVersion += "-" + strs[j]
-		}
-		return chartName, chartVersion, nil
+		// semver2 regex , add optional  v prefix
+		re := regexp.MustCompile(`v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?`)
+		match := re.FindString(x)
+		lastInd := strings.LastIndex(x, match)
+		return x[:lastInd-1], match, nil
 	}
 }
 
