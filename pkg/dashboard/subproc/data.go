@@ -122,7 +122,6 @@ func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
 	name := cur + len(fields[1])
 	cluster := name + len(fields[2])
 	auth := cluster + len(fields[3])
-	namespace := "default"
 
 	// read items
 	for _, line := range lines[1:] {
@@ -130,16 +129,12 @@ func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
 			continue
 		}
 
-		if strings.TrimSpace(line[auth:]) != "" {
-			namespace = strings.TrimSpace(line[auth:])
-		}
-
 		res = append(res, KubeContext{
 			IsCurrent: strings.TrimSpace(line[0:cur]) == "*",
 			Name:      strings.TrimSpace(line[cur:name]),
 			Cluster:   strings.TrimSpace(line[name:cluster]),
 			AuthInfo:  strings.TrimSpace(line[cluster:auth]),
-			Namespace: namespace,
+			Namespace: strings.TrimSpace(line[auth:]),
 		})
 	}
 
