@@ -13,19 +13,20 @@ $(function () {
         fillClusterList(data, context);
 
         initView(); // can only do it after loading cluster list
-    })
-
-    $.getJSON("/api/kube/namespaces").fail(function (xhr) {
-        reportError("Failed to get namespaces", xhr)
-    }).done(function(res) {
-        const ns = res.items.map(i => i.metadata.name)
-        $.each(ns, function(i, item) {
-            $("#upgradeModal #ns-datalist").append($("<option>", {
-                value: item,
-                text: item
-            }))
+        
+        $.getJSON("/api/kube/namespaces").fail(function (xhr) {
+            reportError("Failed to get namespaces", xhr)
+        }).done(function(res) {
+            const ns = res.items.map(i => i.metadata.name)
+            $.each(ns, function(i, item) {
+                $("#upgradeModal #ns-datalist").append($("<option>", {
+                    value: item,
+                    text: item
+                }))
+            })
         })
     })
+
 
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
