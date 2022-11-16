@@ -1,8 +1,4 @@
 $(function () {
-    // const onChange = function () {
-    //     window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val() +"&namespace="+namespaceSelect.find("input:radio:checked").val();
-    //     window.location.reload()
-    // }
     const clusterSelect = $("#cluster");
     clusterSelect.change(function () {
         window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val();
@@ -19,7 +15,6 @@ $(function () {
     }).done(function (data) {
         console.log("data is:", data)
         const context = getHashParam("context")
-        console.log("******context:", context)
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
         fillClusterList(data, context); // critical for further communication
 
