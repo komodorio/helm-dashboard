@@ -1,9 +1,10 @@
 package utils
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gin-gonic/gin"
 )
 
 func TestGetQueryProps(t *testing.T) {
@@ -67,6 +68,27 @@ func TestChartAndVersion(t *testing.T) {
 			params:    "chart-1.0.0",
 			wantChart: "chart",
 			wantVer:   "1.0.0",
+			wantError: false,
+		},
+		{
+			name:      "Chart and version - successfully parsing chart and version",
+			params:    "chart-v1.0.0",
+			wantChart: "chart",
+			wantVer:   "v1.0.0",
+			wantError: false,
+		},
+		{
+			name:      "Chart and version - successfully parsing chart and version",
+			params:    "chart-v1.0.0-alpha",
+			wantChart: "chart",
+			wantVer:   "v1.0.0-alpha",
+			wantError: false,
+		},
+		{
+			name:      "Chart and version - successfully parsing chart and version",
+			params:    "chart-1.0.0-alpha",
+			wantChart: "chart",
+			wantVer:   "1.0.0-alpha",
 			wantError: false,
 		},
 		{

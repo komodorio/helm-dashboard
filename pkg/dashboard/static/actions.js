@@ -70,7 +70,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModalLabel .type").text("Install")
         $("#upgradeModal .ver-old").hide()
         $("#upgradeModal .rel-name").prop("disabled", false).val(elm.name.split("/").pop())
-        $("#upgradeModal .rel-ns").prop("disabled", false).val("")
+        $("#upgradeModal .rel-ns").prop("disabled", false).val(ns)
     }
 
     $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {

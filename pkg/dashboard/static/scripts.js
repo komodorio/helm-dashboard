@@ -13,7 +13,7 @@ $(function () {
     $.getJSON("/api/kube/contexts").fail(function (xhr) {
         reportError("Failed to get list of clusters", xhr)
     }).done(function (data) {
-        console.log("data is:", data)
+        $("body").data("contexts", data)
         const context = getHashParam("context")
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
         fillClusterList(data, context); // critical for further communication
