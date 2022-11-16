@@ -130,11 +130,8 @@ function repoChartClicked() {
         setHashParam("chart", elm.installed_name)
         window.location.reload()
     } else {
-        $.getJSON("/api/kube/contexts").fail(function (xhr) {
-            reportError("Failed to get list of contexts", xhr)
-        }).done(function (data) {
-            contextNamespace = data.filter(obj => {return obj.IsCurrent === true})[0].Namespace
-            popUpUpgrade(elm, contextNamespace)
-        })
+        const contexts = $("body").data("contexts")
+        contextNamespace = contexts.filter(obj => {return obj.IsCurrent === true})[0].Namespace
+        popUpUpgrade(elm, contextNamespace)
     }
 }
