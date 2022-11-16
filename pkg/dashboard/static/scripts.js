@@ -34,6 +34,7 @@ $(function () {
         })
     })
 
+
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
     }).done(function (data) {
