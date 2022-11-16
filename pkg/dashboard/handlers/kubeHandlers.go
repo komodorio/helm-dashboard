@@ -49,6 +49,8 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 		if res.Status.Conditions[len(res.Status.Conditions)-1].Status == "False" {
 			res.Status.Phase = "Not" + res.Status.Phase
 		}
+	} else if res.Status.Phase == "" {
+		res.Status.Phase = "Exists"
 	}
 
 	c.IndentedJSON(http.StatusOK, res)
