@@ -74,3 +74,16 @@ function buildChartCard(elm) {
     return card;
 }
 
+$("#installedSearch").keyup(function () {
+    let val = $(this).val().toLowerCase();
+
+    $(".charts .row").each(function () {
+        let chartName = $(this.firstElementChild.firstElementChild).text().toLowerCase()
+        if (chartName.indexOf(val) >= 0) {
+            $(this).show()
+        } else {
+            $(this).hide()
+        }
+    })
+})
+

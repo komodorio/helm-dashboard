@@ -134,9 +134,12 @@
         <!-- INSTALLED LIST -->
         <div class="col ms-2" id="installedList">
             <div class="col rounded rounded-1 b-shadow header">
-                <div class="bg-white rounded-top m-0">
+                <div class="bg-white rounded-top m-0 column">
                     <h2 class="m-0 p-1"><img class="m-2 mx-3 me-2" src="static/helm-gray.svg" alt="Installed Charts">Installed
                         Charts (<span></span>)</h2>
+                    <div class="form-outline w-25">
+                        <input type="text" id="installedSearch" class="form-control form-control-sm" placeholder="Filter by name..." />
+                    </div>
                 </div>
                 <div class="bg-secondary rounded-bottom m-0 row p-2">
                     <div class="col-4 hdr-name">Name</div>
@@ -148,7 +151,7 @@
                 </div>
             </div>
 
-            <div class="body"></div>
+            <div class="body charts"></div>
             <div class="bg-white rounded shadow p-3 display-none no-charts">Looks like you don't have any charts
                 installed. "Repository" section may be a good place to start.
             </div>
