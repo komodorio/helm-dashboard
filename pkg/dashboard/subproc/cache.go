@@ -15,11 +15,11 @@ type CacheKey = string
 const CacheKeyRelList CacheKey = "installed-releases-list"
 const CacheKeyShowChart CacheKey = "show-chart"
 const CacheKeyRelHistory CacheKey = "release-history"
-const CacheKeyRepoVersions CacheKey = "repo-versions"
 const CacheKeyRevManifests CacheKey = "rev-manifests"
 const CacheKeyRevNotes CacheKey = "rev-notes"
 const CacheKeyRevValues CacheKey = "rev-values"
 const CacheKeyRepoChartValues CacheKey = "chart-values"
+const CacheKeyAllRepos CacheKey = "all-repos"
 
 type Cache struct {
 	Marshaler *marshaler.Marshaler
@@ -40,10 +40,11 @@ func NewCache() *Cache {
 	}
 }
 
-func (c *Cache) String(key CacheKey, tags store.Option, callback func() (string, error)) (string, error) {
+func (c *Cache) String(key CacheKey, tags []string, callback func() (string, error)) (string, error) {
 	if tags == nil {
-		tags = func(o *store.Options) {}
+		tags = make([]string, 0)
 	}
+	tags = append(tags, key)
 
 	ctx := context.Background()
 	out := ""
@@ -62,22 +63,14 @@ func (c *Cache) String(key CacheKey, tags store.Option, callback func() (string,
 		return "", err
 	}
 
-	err = c.Marshaler.Set(ctx, key, out, tags)
+	err = c.Marshaler.Set(ctx, key, out, store.WithTags(tags))
 	if err != nil {
 		return "", err
 	}
 	return out, nil
 }
 
-func (c *Cache) InvalidateByKey(key CacheKey) {
-	log.Debugf("Invalidating key %s", key)
-	err := c.Marshaler.Delete(context.Background(), key)
-	if err != nil {
-		log.Warnf("Failed to invalidate cache key %s: %s", key, err)
-	}
-}
-
-func (c *Cache) InvalidateByTags(tags []string) {
+func (c *Cache) Invalidate(tags ...string) {
 	log.Debugf("Invalidating tags %v", tags)
 	err := c.Marshaler.Invalidate(context.Background(), store.WithInvalidateTags(tags))
 	if err != nil {
@@ -86,5 +79,12 @@ func (c *Cache) InvalidateByTags(tags []string) {
 }
 
 func cacheTagRelease(namespace string, name string) string {
-	return "release-" + namespace + "\v" + name
+	return "release" + "\v" + namespace + "\v" + name
+}
+func cacheTagRepoVers(chartName string) CacheKey {
+	return "repo-versions" + "\v" + chartName
+}
+
+func cacheTagRepoCharts(name string) CacheKey {
+	return "repo-charts" + "\v" + name
 }
