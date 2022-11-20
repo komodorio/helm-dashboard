@@ -2,11 +2,9 @@ package subproc
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/eko/gocache/v3/marshaler"
 	"github.com/eko/gocache/v3/store"
 	"regexp"
 	"sort"
@@ -25,17 +23,6 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
 
-type CacheKey = string
-
-const CacheKeyRelList CacheKey = "installed-releases-list"
-const CacheKeyShowChart CacheKey = "show-chart"
-const CacheKeyRelHistory CacheKey = "release-history"
-const CacheKeyRepoVersions CacheKey = "repo-versions"
-const CacheKeyRevManifests CacheKey = "rev-manifests"
-const CacheKeyRevNotes CacheKey = "rev-notes"
-const CacheKeyRevValues CacheKey = "rev-values"
-const CacheKeyRepoChartValues CacheKey = "chart-values"
-
 type DataLayer struct {
 	KubeContext string
 	Helm        string
@@ -43,7 +30,7 @@ type DataLayer struct {
 	Scanners    []Scanner
 	StatusInfo  *StatusInfo
 	Namespace   string
-	Cache       *marshaler.Marshaler
+	Cache       *Cache
 }
 
 type StatusInfo struct {
@@ -115,51 +102,6 @@ func (d *DataLayer) CheckConnectivity() error {
 	return nil
 }
 
-func (d *DataLayer) CachedString(key CacheKey, tags store.Option, callback func() (string, error)) (string, error) {
-	// TODO: extract this functionality into separate class
-
-	if tags == nil {
-		tags = func(o *store.Options) {}
-	}
-
-	ctx := context.Background()
-	out := ""
-	_, err := d.Cache.Get(ctx, key, &out)
-	if err == nil {
-		log.Debugf("Using cached value for %s", key)
-		return out, nil
-	} else if !errors.Is(err, store.NotFound{}) {
-		return "", err
-	}
-
-	out, err = callback()
-	if err != nil {
-		return "", err
-	}
-
-	err = d.Cache.Set(ctx, key, out, tags)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
-}
-
-func (d *DataLayer) InvalidateByKey(key CacheKey) {
-	log.Debugf("Invalidating key %s", key)
-	err := d.Cache.Delete(context.Background(), key)
-	if err != nil {
-		log.Warnf("Failed to invalidate cache key %s: %s", key, err)
-	}
-}
-
-func (d *DataLayer) InvalidateByTags(tags []string) {
-	log.Debugf("Invalidating tags %v", tags)
-	err := d.Cache.Invalidate(context.Background(), store.WithInvalidateTags(tags))
-	if err != nil {
-		log.Warnf("Failed to invalidate tags %v: %s", tags, err)
-	}
-}
-
 type KubeContext struct {
 	IsCurrent bool
 	Name      string
@@ -212,7 +154,7 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 		cmd = append(cmd, "--namespace", d.Namespace)
 	}
 
-	out, err := d.CachedString(CacheKeyRelList, nil, func() (string, error) {
+	out, err := d.Cache.String(CacheKeyRelList, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
 
@@ -225,7 +167,7 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 
 func (d *DataLayer) ReleaseHistory(namespace string, releaseName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := d.CachedString(CacheKeyRelHistory+"\v"+namespace+"\v"+releaseName, nil, func() (string, error) {
+	out, err := d.Cache.String(CacheKeyRelHistory+"\v"+namespace+"\v"+releaseName, nil, func() (string, error) {
 		return d.runCommandHelm("history", releaseName, "--namespace", namespace, "--output", "json")
 	})
 
@@ -258,7 +200,7 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 	}
 
 	cmd := []string{"search", "repo", "--regexp", search, "--versions", "--output", "json"}
-	out, err := d.CachedString(CacheKeyRepoVersions+"\v"+chartName, store.WithTags([]string{"all-repos"}), func() (string, error) {
+	out, err := d.Cache.String(CacheKeyRepoVersions+"\v"+chartName, store.WithTags([]string{"all-repos"}), func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
 	if err != nil {
@@ -274,7 +216,7 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 
 func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
-	out, err := d.CachedString(CacheKeyRepoVersions+"\v"+repoName, nil, func() (string, error) {
+	out, err := d.Cache.String(CacheKeyRepoVersions+"\v"+repoName, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
 	if err != nil {
@@ -321,7 +263,7 @@ func (d *DataLayer) RevisionManifests(namespace string, chartName string, revisi
 	cmd := []string{"get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
 
 	key := CacheKeyRevManifests + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
-	return d.CachedString(key, nil, func() (string, error) {
+	return d.Cache.String(key, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
 }
@@ -364,7 +306,7 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 func (d *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
 	cmd := []string{"get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
 	key := CacheKeyRevNotes + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
-	return d.CachedString(key, nil, func() (string, error) {
+	return d.Cache.String(key, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
 }
@@ -377,7 +319,7 @@ func (d *DataLayer) RevisionValues(namespace string, chartName string, revision 
 	}
 
 	key := CacheKeyRevValues + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision) + "\v" + fmt.Sprintf("%v", onlyUserDefined)
-	return d.CachedString(key, nil, func() (string, error) {
+	return d.Cache.String(key, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
 }
@@ -440,7 +382,8 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 }
 
 func (d *DataLayer) ReleaseUninstall(namespace string, name string) error {
-	d.InvalidateByKey(CacheKeyRelList)
+	d.Cache.InvalidateByKey(CacheKeyRelList)
+	d.Cache.InvalidateByTags([]string{cacheTagRelease(namespace, name)})
 	// TODO: invalidate what?
 
 	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
@@ -448,7 +391,7 @@ func (d *DataLayer) ReleaseUninstall(namespace string, name string) error {
 }
 
 func (d *DataLayer) Revert(namespace string, name string, rev int) error {
-	d.InvalidateByKey(CacheKeyRelList)
+	d.Cache.InvalidateByKey(CacheKeyRelList)
 	// TODO: invalidate what?
 
 	_, err := d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
@@ -493,7 +436,7 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	}
 
 	if !justTemplate {
-		d.InvalidateByKey(CacheKeyRelList)
+		d.Cache.InvalidateByKey(CacheKeyRelList)
 		// TODO: invalidate what?
 	}
 
@@ -511,13 +454,13 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 
 // ShowValues get values from repo chart, not from installed release
 func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
-	return d.CachedString(CacheKeyRepoChartValues+"\v"+chart+"\v"+ver, nil, func() (string, error) {
+	return d.Cache.String(CacheKeyRepoChartValues+"\v"+chart+"\v"+ver, nil, func() (string, error) {
 		return d.runCommandHelm("show", "values", chart, "--version", ver)
 	})
 }
 
 func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // TODO: add version parameter to method
-	out, err := d.CachedString(CacheKeyShowChart+"\v"+chartName, store.WithTags([]string{"chart\v" + chartName}), func() (string, error) {
+	out, err := d.Cache.String(CacheKeyShowChart+"\v"+chartName, store.WithTags([]string{"chart\v" + chartName}), func() (string, error) {
 		out, err := d.runCommandHelm("show", "chart", chartName)
 		if err != nil {
 			return "", err

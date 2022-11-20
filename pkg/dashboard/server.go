@@ -4,9 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/eko/gocache/v3/marshaler"
-	"github.com/eko/gocache/v3/store"
-	gocache "github.com/patrickmn/go-cache"
 	"net/http"
 	"os"
 	"strings"
@@ -31,7 +28,7 @@ type Server struct {
 func (s Server) StartServer() (string, utils.ControlChan) {
 	data := subproc.DataLayer{
 		Namespace: s.Namespace,
-		Cache:     NewCache(),
+		Cache:     subproc.NewCache(),
 	}
 	err := data.CheckConnectivity()
 	if err != nil {
@@ -154,15 +151,4 @@ func checkUpgrade(d *subproc.StatusInfo) {
 			log.Debugf("Got latest version from GH: %s", d.LatestVer)
 		}
 	}
-}
-
-func NewCache() *marshaler.Marshaler {
-	gocacheClient := gocache.New(5*time.Minute, 10*time.Minute)
-	gocacheStore := store.NewGoCache(gocacheClient)
-
-	// TODO: use tiered cache with some disk backend, allow configuring that static cache folder
-
-	// Initializes marshaler
-	marshal := marshaler.New(gocacheStore)
-	return marshal
 }
