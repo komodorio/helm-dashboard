@@ -1,7 +1,7 @@
 $(function () {
     const clusterSelect = $("#cluster");
     clusterSelect.change(function () {
-        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val();
+        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val()
         window.location.reload()
     })
     const namespaceSelect = $("#namespace");
@@ -10,10 +10,10 @@ $(function () {
         namespaceSelect.find("input:checkbox:checked").each(function() {
             selectedNamespaces.push($(this).val());
         })
-        if (selectedNamespaces.length === 0 && getHashParam("namespace")) {
-            setHashParam("namespace")
+        if (selectedNamespaces.length === 0 && getHashParam("filteredNamespace")) {
+            setHashParam("filteredNamespace")
         } else if (selectedNamespaces.length != 0) {
-            setHashParam("namespace", selectedNamespaces.join('+'))
+            setHashParam("filteredNamespace", selectedNamespaces.join('+'))
         }
         $(".charts .row").each(function () {
             let releaseNamespace = $(this).find(".rel-ns span").text().toLowerCase()
@@ -37,9 +37,9 @@ $(function () {
 
         $.getJSON("/api/kube/namespaces").fail(function (xhr) {
             reportError("Failed to get namespaces", xhr)
-        }).done(function (res) {
+        }).done(function(res) {
             const ns = res.items.map(i => i.metadata.name)
-            $.each(ns, function (i, item) {
+            $.each(ns, function(i, item) {
                 $("#upgradeModal #ns-datalist").append($("<option>", {
                     value: item,
                     text: item
@@ -209,7 +209,7 @@ function fillNamespaceList(data) {
         return
     }
     Array.from(data).forEach(function (elm) {
-        const cur = getHashParam("namespace")
+        const cur = getHashParam("filteredNamespace")
         let opt = $('<li><label><input type="checkbox" name="namespace" class="me-2"/><span></span></label></li>');
         opt.attr('title', elm.metadata.name)
         opt.find("input").val(elm.metadata.name).text(elm.metadata.name)
