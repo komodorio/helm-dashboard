@@ -156,6 +156,9 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 	out, err := d.Cache.String(CacheKeyRelList, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	err = json.Unmarshal([]byte(out), &res)
 	if err != nil {
