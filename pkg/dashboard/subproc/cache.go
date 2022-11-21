@@ -70,7 +70,7 @@ func (c *Cache) String(key CacheKey, tags []string, callback func() (string, err
 	return out, nil
 }
 
-func (c *Cache) Invalidate(tags ...string) {
+func (c *Cache) Invalidate(tags ...CacheKey) {
 	log.Debugf("Invalidating tags %v", tags)
 	err := c.Marshaler.Invalidate(context.Background(), store.WithInvalidateTags(tags))
 	if err != nil {
@@ -78,7 +78,7 @@ func (c *Cache) Invalidate(tags ...string) {
 	}
 }
 
-func cacheTagRelease(namespace string, name string) string {
+func cacheTagRelease(namespace string, name string) CacheKey {
 	return "release" + "\v" + namespace + "\v" + name
 }
 func cacheTagRepoVers(chartName string) CacheKey {
@@ -87,4 +87,8 @@ func cacheTagRepoVers(chartName string) CacheKey {
 
 func cacheTagRepoCharts(name string) CacheKey {
 	return "repo-charts" + "\v" + name
+}
+
+func cacheTagRepoName(name string) CacheKey {
+	return "repo-name" + "\v" + name
 }

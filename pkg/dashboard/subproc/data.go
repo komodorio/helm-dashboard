@@ -396,7 +396,7 @@ func (d *DataLayer) Rollback(namespace string, name string, rev int) error {
 }
 
 func (d *DataLayer) ChartRepoUpdate(name string) error {
-	// TODO: invalidate what?
+	d.Cache.Invalidate(cacheTagRepoName(name), CacheKeyAllRepos)
 
 	cmd := []string{"repo", "update"}
 	if name != "" {
