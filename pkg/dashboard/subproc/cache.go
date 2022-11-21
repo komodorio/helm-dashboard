@@ -78,6 +78,10 @@ func (c *Cache) Invalidate(tags ...CacheKey) {
 	}
 }
 
+func (c *Cache) Clear() error {
+	return c.Marshaler.Clear(context.Background())
+}
+
 func cacheTagRelease(namespace string, name string) CacheKey {
 	return "release" + "\v" + namespace + "\v" + name
 }

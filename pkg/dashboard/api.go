@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"context"
 	"embed"
 	"net/http"
 	"os"
@@ -41,7 +40,7 @@ func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
 			log.Debugf("Setting current context to: %s", ctx)
 			if data.KubeContext != ctx[0] {
-				err := data.Cache.Clear(context.Background())
+				err := data.Cache.Clear()
 				if err != nil {
 					_ = c.AbortWithError(http.StatusBadRequest, err)
 					return
