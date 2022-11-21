@@ -12,7 +12,6 @@ function loadChartsList() {
             let card = buildChartCard(elm);
             chartsCards.append(card)
         })
-
         if (!data.length) {
             $("#installedList .no-charts").show()
         }
@@ -78,8 +77,9 @@ $("#installedSearch").keyup(function () {
     let val = $(this).val().toLowerCase();
 
     $(".charts .row").each(function () {
-        let chartName = $(this.firstElementChild.firstElementChild).text().toLowerCase()
-        if (chartName.indexOf(val) >= 0) {
+        let chartName = $(this).find(".rel-name span").text().toLowerCase()
+        let releaseName = $(this).find(".rel-chart span").text().toLowerCase()
+        if (releaseName.indexOf(val) >= 0 || chartName.indexOf(val) >= 0) {
             $(this).show()
         } else {
             $(this).hide()

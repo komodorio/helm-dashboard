@@ -6,8 +6,23 @@ $(function () {
     })
     const namespaceSelect = $("#namespace");
     namespaceSelect.change(function () {
-        setHashParam("namespace", namespaceSelect.find("input:radio:checked").val())
-        window.location.reload() // FIXME: why reload? should update the list with filter instead
+        selectedNamespaces = []
+        namespaceSelect.find("input:checkbox:checked").each(function() {
+            selectedNamespaces.push($(this).val());
+        })
+        if (selectedNamespaces.length === 0 && getHashParam("namespace")) {
+            setHashParam("namespace")
+        } else if (selectedNamespaces.length != 0) {
+            setHashParam("namespace", selectedNamespaces.join('+'))
+        }
+        $(".charts .row").each(function () {
+            let releaseNamespace = $(this).find(".rel-ns span").text().toLowerCase()
+            if (selectedNamespaces.includes(releaseNamespace) || selectedNamespaces.length === 0) {
+                $(this).show()
+            } else {
+                $(this).hide()
+            }
+        })
     })
 
     $.getJSON("/api/kube/contexts").fail(function (xhr) {
