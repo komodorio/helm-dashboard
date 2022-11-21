@@ -45,7 +45,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 		return
 	}
 
-	err = h.Data.Revert(qp.Namespace, qp.Name, qp.Revision)
+	err = h.Data.Rollback(qp.Namespace, qp.Name, qp.Revision)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

@@ -382,17 +382,14 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 }
 
 func (d *DataLayer) ReleaseUninstall(namespace string, name string) error {
-	d.Cache.Invalidate(CacheKeyRelList)
-	d.Cache.Invalidate(cacheTagRelease(namespace, name))
-	// TODO: invalidate what?
+	d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
 
 	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
 	return err
 }
 
-func (d *DataLayer) Revert(namespace string, name string, rev int) error {
-	d.Cache.Invalidate(CacheKeyRelList)
-	// TODO: invalidate what?
+func (d *DataLayer) Rollback(namespace string, name string, rev int) error {
+	d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
 
 	_, err := d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
 	return err
