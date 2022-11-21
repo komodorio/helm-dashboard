@@ -31,21 +31,21 @@ $(function () {
         $("body").data("contexts", data)
         const context = getHashParam("context")
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
-        fillClusterList(data, context); // critical for further communication
+        fillClusterList(data, context);
 
         initView(); // can only do it after loading cluster list
 
         $.getJSON("/api/kube/namespaces").fail(function (xhr) {
             reportError("Failed to get namespaces", xhr)
-        }).done(function (data) {
-            const ns = data.items.map(i => i.metadata.name)
+        }).done(function (res) {
+            const ns = res.items.map(i => i.metadata.name)
             $.each(ns, function (i, item) {
                 $("#upgradeModal #ns-datalist").append($("<option>", {
                     value: item,
                     text: item
                 }))
             })
-            fillNamespaceList(data.items)
+            fillNamespaceList(res.items)
         })
     })
 
