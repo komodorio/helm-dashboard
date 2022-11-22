@@ -22,7 +22,7 @@ const CacheKeyRepoChartValues CacheKey = "chart-values"
 const CacheKeyAllRepos CacheKey = "all-repos"
 
 type Cache struct {
-	Marshaler *marshaler.Marshaler
+	Marshaler *marshaler.Marshaler `json:"-"`
 	HitCount  int
 	MissCount int
 }
@@ -79,6 +79,8 @@ func (c *Cache) Invalidate(tags ...CacheKey) {
 }
 
 func (c *Cache) Clear() error {
+	c.HitCount = 0
+	c.MissCount = 0
 	return c.Marshaler.Clear(context.Background())
 }
 

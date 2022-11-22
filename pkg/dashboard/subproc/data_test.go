@@ -13,7 +13,9 @@ func TestFlow(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
 	var _ release.Status
-	data := DataLayer{}
+	data := DataLayer{
+		Cache: NewCache(),
+	}
 	err := data.CheckConnectivity()
 	if err != nil {
 		if err.Error() == "did not find any kubectl contexts configured" {

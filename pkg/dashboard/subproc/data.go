@@ -37,6 +37,7 @@ type StatusInfo struct {
 	LatestVer          string
 	Analytics          bool
 	LimitedToNamespace string
+	CacheHitRatio      float64
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
@@ -535,6 +536,16 @@ func (d *DataLayer) GetNameSpaces() (res *NamespaceElement, err error) {
 	}
 
 	return res, nil
+}
+
+func (d *DataLayer) GetStatus() *StatusInfo {
+	sum := float64(d.Cache.HitCount + d.Cache.MissCount)
+	if sum > 0 {
+		d.StatusInfo.CacheHitRatio = float64(d.Cache.HitCount) / sum
+	} else {
+		d.StatusInfo.CacheHitRatio = 0
+	}
+	return d.StatusInfo
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
