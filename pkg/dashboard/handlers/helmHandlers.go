@@ -30,7 +30,7 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	err = h.Data.ChartUninstall(qp.Namespace, qp.Name)
+	err = h.Data.ReleaseUninstall(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -45,7 +45,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 		return
 	}
 
-	err = h.Data.Revert(qp.Namespace, qp.Name, qp.Revision)
+	err = h.Data.Rollback(qp.Namespace, qp.Name, qp.Revision)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -60,7 +60,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.ChartHistory(qp.Namespace, qp.Name)
+	res, err := h.Data.ReleaseHistory(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

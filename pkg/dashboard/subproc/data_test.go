@@ -13,7 +13,9 @@ func TestFlow(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
 	var _ release.Status
-	data := DataLayer{}
+	data := DataLayer{
+		Cache: NewCache(),
+	}
 	err := data.CheckConnectivity()
 	if err != nil {
 		if err.Error() == "did not find any kubectl contexts configured" {
@@ -40,7 +42,7 @@ func TestFlow(t *testing.T) {
 	}
 
 	chart := installed[1]
-	history, err := data.ChartHistory(chart.Namespace, chart.Name)
+	history, err := data.ReleaseHistory(chart.Namespace, chart.Name)
 	if err != nil {
 		t.Fatal(err)
 	}

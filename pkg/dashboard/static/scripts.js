@@ -13,12 +13,12 @@ $(function () {
         fillClusterList(data, context);
 
         initView(); // can only do it after loading cluster list
-        
+
         $.getJSON("/api/kube/namespaces").fail(function (xhr) {
             reportError("Failed to get namespaces", xhr)
-        }).done(function(res) {
+        }).done(function (res) {
             const ns = res.items.map(i => i.metadata.name)
-            $.each(ns, function(i, item) {
+            $.each(ns, function (i, item) {
                 $("#upgradeModal #ns-datalist").append($("<option>", {
                     value: item,
                     text: item
@@ -218,6 +218,7 @@ $(".bi-power").click(function () {
         url: "/",
         type: 'DELETE',
     }).done(function () {
+        // TODO: display explanation overlay here
         window.close();
     })
 })
@@ -249,3 +250,12 @@ function fillToolVersion(data) {
         $(".upgrade-possible").show()
     }
 }
+
+$("#cacheClear").click(function () {
+    $.ajax({
+        url: "/api/cache",
+        type: 'DELETE',
+    }).done(function () {
+        window.location.reload()
+    })
+})
