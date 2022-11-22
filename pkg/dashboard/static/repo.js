@@ -130,6 +130,8 @@ function repoChartClicked() {
         setHashParam("chart", elm.installed_name)
         window.location.reload()
     } else {
-        popUpUpgrade(elm)
+        const contexts = $("body").data("contexts")
+        contextNamespace = contexts.filter(obj => {return obj.Name === getHashParam("context")})[0].Namespace
+        popUpUpgrade(elm, contextNamespace)
     }
 }
