@@ -83,34 +83,3 @@ function buildChartCard(elm) {
 $("#installedSearch").keyup(function () {
     filterInstalledList($("#installedList .body .row"))
 })
-
-
-function a1() {
-    let val = $("#installedSearch").val().toLowerCase();
-    const filteredNamespaces = getHashParam("filteredNamespace")
-    $(".charts .row").each(function () {
-        let chartName = $(this).find(".rel-name span").text().toLowerCase()
-        let releaseName = $(this).find(".rel-chart span").text().toLowerCase()
-        let releaseNamespace = $(this).find(".rel-ns span").text()
-        if (filteredNamespaces && val) {
-            if ((releaseName.indexOf(val) >= 0 || chartName.indexOf(val) >= 0) && filteredNamespaces.includes(releaseNamespace)) {
-                $(this).show()
-            } else {
-                $(this).hide()
-            }
-        } else if (filteredNamespaces) {
-            if (filteredNamespaces.includes(releaseNamespace)) {
-                $(this).show()
-            } else {
-                $(this).hide()
-            }
-        } else {
-            if (releaseName.indexOf(val) >= 0 || chartName.indexOf(val) >= 0) {
-                $(this).show()
-            } else {
-                $(this).hide()
-            }
-        }
-    })
-}
-
