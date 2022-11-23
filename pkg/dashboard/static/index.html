@@ -143,7 +143,7 @@
         <!-- INSTALLED LIST -->
         <div class="col ms-2" id="installedList">
             <div class="col rounded rounded-1 b-shadow header">
-                <div class="bg-white rounded-top m-0 column">
+                <div class="bg-white rounded-top m-0 spaced-out">
                     <h2 class="m-0 p-1"><img class="m-2 mx-3 me-2" src="static/helm-gray.svg" alt="Installed Charts">Installed
                         Charts (<span></span>)</h2>
                     <div class="form-outline w-25">
@@ -160,9 +160,11 @@
                 </div>
             </div>
 
-            <div class="body charts"></div>
+            <div class="body"></div>
             <div class="bg-white rounded shadow p-3 display-none no-charts">Looks like you don't have any charts
                 installed. "Repository" section may be a good place to start.
+            </div>
+            <div class="bg-white rounded shadow p-3 display-none all-filtered">There are no releases matching your filter criteria. Reset your filters or install more charts.
             </div>
         </div>
         <!-- /INSTALLED LIST -->

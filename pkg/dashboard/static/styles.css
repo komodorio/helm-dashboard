@@ -103,7 +103,7 @@ body > .container-fluid {
     margin-bottom: 0.75rem !important;
 }
 
-#installedList .header .column {
+#installedList .header .spaced-out {
     display: flex;
     justify-content: space-between;
     align-items: center;

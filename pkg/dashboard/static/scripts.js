@@ -6,23 +6,17 @@ $(function () {
     })
     const namespaceSelect = $("#namespace");
     namespaceSelect.change(function () {
-        filteredNamespaces = []
-        namespaceSelect.find("input:checkbox:checked").each(function() {
+        let filteredNamespaces = []
+        namespaceSelect.find("input:checkbox:checked").each(function () {
             filteredNamespaces.push($(this).val());
         })
         if (filteredNamespaces.length === 0 && getHashParam("filteredNamespace")) {
             setHashParam("filteredNamespace")
-        } else if (filteredNamespaces.length != 0) {
+        } else if (filteredNamespaces.length !== 0) {
             setHashParam("filteredNamespace", filteredNamespaces.join('+'))
         }
-        $(".charts .row").each(function () {
-            let releaseNamespace = $(this).find(".rel-ns span").text()
-            if(filteredNamespaces.length === 0 || filteredNamespaces.includes(releaseNamespace)) {
-                $(this).show()
-            } else {
-                $(this).hide()
-            }
-        })
+
+        filterInstalledList($("#installedList .body .row"))
     })
 
     $.getJSON("/api/kube/contexts").fail(function (xhr) {
@@ -216,7 +210,7 @@ function fillNamespaceList(data) {
         opt.attr('title', elm.metadata.name)
         opt.find("input").val(elm.metadata.name).text(elm.metadata.name)
         opt.find("span").text(elm.metadata.name)
-        if (filteredNamespace) { 
+        if (filteredNamespace) {
             if (filteredNamespace.split('+').includes(elm.metadata.name)) {
                 opt.find("input").prop("checked", true)
             }
@@ -304,3 +298,34 @@ $("#cacheClear").click(function () {
         window.location.reload()
     })
 })
+
+function showHideInstalledRelease(card, filteredNamespaces, filterStr) {
+    let releaseNamespace = card.data("namespace")
+    let releaseName = card.data("name")
+    let chartName = card.data("chart")
+    const shownByNS = !filteredNamespaces || filteredNamespaces.split('+').includes(releaseNamespace);
+    const shownByStr =  releaseName.indexOf(filterStr) >= 0 || chartName.indexOf(filterStr) >= 0
+    if (shownByNS && shownByStr) {
+        card.show()
+        return true
+    } else {
+        card.hide()
+        return false
+    }
+}
+
+
+function filterInstalledList(list) {
+    const warnMsg = $("#installedList .all-filtered").hide();
+
+    let filterStr = $("#installedSearch").val().toLowerCase();
+    let filteredNamespaces = getHashParam("filteredNamespace")
+    let anyShown = false;
+    list.each(function (ix, card) {
+        anyShown |= showHideInstalledRelease($(card), filteredNamespaces, filterStr)
+    })
+
+    if (list.length && !anyShown) {
+        warnMsg.show()
+    }
+}
