@@ -103,6 +103,13 @@ body > .container-fluid {
     margin-bottom: 0.75rem !important;
 }
 
+#installedList .header .spaced-out {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 0.5rem;
+}
+
 #installedList h2 {
     font-family: Inter, serif;
     font-weight: 700;

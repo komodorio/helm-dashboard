@@ -130,12 +130,10 @@
                     <ul class="list-unstyled" id="cluster">
                     </ul>
 
-                    <h4 id="limitNamespace" class="display-none">Forced Namespace: <span></span></h4>
-                    <!-- TODO
                     <h4 class="mt-4">Namespaces</h4>
-                    <ul class="list-unstyled" id="namespaces">
+                    <p id="limitNamespace" class="display-none ps-3"><span class="fw-bold"></span> (forced)</p>
+                    <ul class="list-unstyled" id="namespace">
                     </ul>
-                    -->
                 </form>
             </div>
             <!-- /FILTER BLOCK -->
@@ -145,9 +143,12 @@
         <!-- INSTALLED LIST -->
         <div class="col ms-2" id="installedList">
             <div class="col rounded rounded-1 b-shadow header">
-                <div class="bg-white rounded-top m-0">
+                <div class="bg-white rounded-top m-0 spaced-out">
                     <h2 class="m-0 p-1"><img class="m-2 mx-3 me-2" src="static/helm-gray.svg" alt="Installed Charts">Installed
                         Charts (<span></span>)</h2>
+                    <div class="form-outline w-25">
+                        <input type="text" id="installedSearch" class="form-control form-control-sm" placeholder="Filter..." />
+                    </div>
                 </div>
                 <div class="bg-secondary rounded-bottom m-0 row p-2">
                     <div class="col-4 hdr-name">Name</div>
@@ -162,6 +163,8 @@
             <div class="body"></div>
             <div class="bg-white rounded shadow p-3 display-none no-charts">Looks like you don't have any charts
                 installed. "Repository" section may be a good place to start.
+            </div>
+            <div class="bg-white rounded shadow p-3 display-none all-filtered">There are no releases matching your filter criteria. Reset your filters or install more charts.
             </div>
         </div>
         <!-- /INSTALLED LIST -->

@@ -1,32 +1,15 @@
 $(function () {
-    const clusterSelect = $("#cluster");
-    clusterSelect.change(function () {
-        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val()
-        window.location.reload()
-    })
-    $.getJSON("/api/kube/contexts").fail(function (xhr) {
-        reportError("Failed to get list of clusters", xhr)
+    let limNS = null
+    $.getJSON("/status").fail(function (xhr) { // maybe /options call in the future
+        reportError("Failed to get tool version", xhr)
     }).done(function (data) {
-        $("body").data("contexts", data)
-        const context = getHashParam("context")
-        data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
-        fillClusterList(data, context);
-
-        initView(); // can only do it after loading cluster list
-
-        $.getJSON("/api/kube/namespaces").fail(function (xhr) {
-            reportError("Failed to get namespaces", xhr)
-        }).done(function (res) {
-            const ns = res.items.map(i => i.metadata.name)
-            $.each(ns, function (i, item) {
-                $("#upgradeModal #ns-datalist").append($("<option>", {
-                    value: item,
-                    text: item
-                }))
-            })
-        })
+        fillToolVersion(data)
+        limNS = data.LimitedToNamespace
+        if (limNS) {
+            $("#limitNamespace").show().find("span").text(limNS)
+        }
+        fillClusters(limNS)
     })
-
 
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
@@ -38,16 +21,49 @@ $(function () {
             }
         }
     })
-
-    $.getJSON("/status").fail(function (xhr) {
-        reportError("Failed to get tool version", xhr)
-    }).done(function (data) {
-        fillToolVersion(data)
-        if (data.LimitedToNamespace) {
-            $("#limitNamespace").show().find("span").text(data.LimitedToNamespace)
-        }
-    })
 })
+
+function fillClusters(limNS) {
+    const clusterSelect = $("#cluster");
+    clusterSelect.change(function () {
+        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val()
+        window.location.reload()
+    })
+    const namespaceSelect = $("#namespace");
+    namespaceSelect.change(function () {
+        let filteredNamespaces = []
+        namespaceSelect.find("input:checkbox:checked").each(function () {
+            filteredNamespaces.push($(this).val());
+        })
+        setFilteredNamespaces(filteredNamespaces)
+        filterInstalledList($("#installedList .body .row"))
+    })
+
+    $.getJSON("/api/kube/contexts").fail(function (xhr) {
+        reportError("Failed to get list of clusters", xhr)
+    }).done(function (data) {
+        $("body").data("contexts", data)
+        const context = getHashParam("context")
+        data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
+        fillClusterList(data, context);
+
+        $.getJSON("/api/kube/namespaces").fail(function (xhr) {
+            reportError("Failed to get namespaces", xhr)
+        }).done(function (res) {
+            const ns = res.items.map(i => i.metadata.name)
+            $.each(ns, function (i, item) {
+                $("#upgradeModal #ns-datalist").append($("<option>", {
+                    value: item,
+                    text: item
+                }))
+            })
+            if (!limNS) {
+                fillNamespaceList(res.items)
+            }
+            initView(); // can only do it after loading cluster and namespace lists
+        })
+    })
+}
 
 function initView() {
     $(".section").hide()
@@ -77,8 +93,10 @@ $("#topNav ul a").click(function () {
     $("#topNav ul a").removeClass("active")
 
     const ctx = getHashParam("context")
+    const filteredNamespace = getHashParam("filteredNamespace")
     setHashParam(null, null)
     setHashParam("context", ctx)
+    setHashParam("filteredNamespace", filteredNamespace)
 
     if (self.hasClass("section-repo")) {
         setHashParam("section", "repository")
@@ -171,14 +189,41 @@ function fillClusterList(data, context) {
         opt.attr('title', elm.Name)
         opt.find("input").val(elm.Name).text(label)
         opt.find("span").text(label)
-        if (elm.IsCurrent && !context) {
-            opt.find("input").prop("checked", true)
-            setCurrentContext(elm.Name)
-        } else if (context && elm.Name === context) {
+        const isCurrent = elm.IsCurrent && !context;
+        const isSelected = context && elm.Name === context
+        if (isCurrent || isSelected) {
             opt.find("input").prop("checked", true)
             setCurrentContext(elm.Name)
         }
         $("#cluster").append(opt)
+    })
+}
+
+function fillNamespaceList(data) {
+    const curContextNamespaces = $("body").data("contexts").filter(obj => {
+        return obj.IsCurrent
+    })
+    console.log(curContextNamespaces)
+
+    if (!data || !data.length) {
+        $("#namespace").append("default")
+        return
+    }
+    Array.from(data).forEach(function (elm) {
+        const filteredNamespace = getHashParam("filteredNamespace")
+        let opt = $('<li><label><input type="checkbox" name="namespace" class="me-2"/><span></span></label></li>');
+        opt.attr('title', elm.metadata.name)
+        opt.find("input").val(elm.metadata.name).text(elm.metadata.name)
+        opt.find("span").text(elm.metadata.name)
+        if (filteredNamespace) {
+            if (filteredNamespace.split('+').includes(elm.metadata.name)) {
+                opt.find("input").prop("checked", true)
+            }
+        } else if (curContextNamespaces && curContextNamespaces[0].Namespace === elm.metadata.name) {
+            opt.find("input").prop("checked", true)
+            setFilteredNamespaces([elm.metadata.name])
+        }
+        $("#namespace").append(opt)
     })
 }
 
@@ -259,3 +304,42 @@ $("#cacheClear").click(function () {
         window.location.reload()
     })
 })
+
+function showHideInstalledRelease(card, filteredNamespaces, filterStr) {
+    let releaseNamespace = card.data("namespace")
+    let releaseName = card.data("name")
+    let chartName = card.data("chart")
+    const shownByNS = !filteredNamespaces || filteredNamespaces.split('+').includes(releaseNamespace);
+    const shownByStr = releaseName.indexOf(filterStr) >= 0 || chartName.indexOf(filterStr) >= 0
+    if (shownByNS && shownByStr) {
+        card.show()
+        return true
+    } else {
+        card.hide()
+        return false
+    }
+}
+
+
+function filterInstalledList(list) {
+    const warnMsg = $("#installedList .all-filtered").hide();
+
+    let filterStr = $("#installedSearch").val().toLowerCase();
+    let filteredNamespaces = getHashParam("filteredNamespace")
+    let anyShown = false;
+    list.each(function (ix, card) {
+        anyShown |= showHideInstalledRelease($(card), filteredNamespaces, filterStr)
+    })
+
+    if (list.length && !anyShown) {
+        warnMsg.show()
+    }
+}
+
+function setFilteredNamespaces(filteredNamespaces) {
+    if (filteredNamespaces.length === 0 && getHashParam("filteredNamespace")) {
+        setHashParam("filteredNamespace")
+    } else if (filteredNamespaces.length !== 0) {
+        setHashParam("filteredNamespace", filteredNamespaces.join('+'))
+    }
+}

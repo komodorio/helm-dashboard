@@ -6,18 +6,20 @@ function loadChartsList() {
     $.getJSON("/api/helm/charts").fail(function (xhr) {
         reportError("Failed to get list of charts", xhr)
     }).done(function (data) {
-        chartsCards.empty()
+        chartsCards.empty().hide()
         $("#installedList .header h2 span").text(data.length)
         data.forEach(function (elm) {
             let card = buildChartCard(elm);
             chartsCards.append(card)
         })
-
+        filterInstalledList(chartsCards.find(".row"))
+        chartsCards.show()
         if (!data.length) {
             $("#installedList .no-charts").show()
         }
     })
 }
+
 
 function buildChartCard(elm) {
     const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start">
@@ -28,21 +30,21 @@ function buildChartCard(elm) {
             <div class="col-1 rel-ns text-nowrap"><span>default</span><div>Namespace</div></div>
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
-    
+
     const chartName = elm.chart.substring(0, elm.chart.lastIndexOf("-"))
     $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
         reportError("Failed to get repo name for charts", xhr)
     }).done(function (data) {
-        if(data.length > 0) {
+        if (data.length > 0) {
             $.getJSON("/api/helm/charts/show?name=" + data[0].name).fail(function (xhr) {
                 reportError("Failed to get list of charts", xhr)
             }).done(function (data) {
-                if(data) {
-                    var res = data[0]
-                    if(res.icon) {
+                if (data) {
+                    const res = data[0];
+                    if (res.icon) {
                         card.find(".rel-name").attr("style", "background-image: url(" + res.icon + ")")
                     }
-                    if(res.description) {
+                    if (res.description) {
                         card.find(".rel-name div").text(res.description)
                     }
                 }
@@ -56,6 +58,10 @@ function buildChartCard(elm) {
     card.find(".rel-ns span").text(elm.namespace)
     card.find(".rel-chart span").text(elm.chart)
     card.find(".rel-date span").text(getAge(elm))
+
+    card.data("namespace", elm.namespace)
+    card.data("name", elm.name)
+    card.data("chart", elm.chart)
 
     statusStyle(elm.status, card, card.find(".rel-status span"))
 
@@ -74,3 +80,6 @@ function buildChartCard(elm) {
     return card;
 }
 
+$("#installedSearch").keyup(function () {
+    filterInstalledList($("#installedList .body .row"))
+})
