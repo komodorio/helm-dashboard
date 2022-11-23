@@ -10,6 +10,15 @@ function loadChartsList() {
         $("#installedList .header h2 span").text(data.length)
         data.forEach(function (elm) {
             let card = buildChartCard(elm);
+            let releaseNamespace = card.find(".rel-ns span").text()
+            filteredNamespaces = getHashParam("filteredNamespace")
+            if (filteredNamespaces) {
+                if (filteredNamespaces.split('+').includes(releaseNamespace)) {
+                    card.show()
+                } else {
+                    card.hide()
+                }
+            }
             chartsCards.append(card)
         })
         if (!data.length) {
@@ -75,14 +84,30 @@ function buildChartCard(elm) {
 
 $("#installedSearch").keyup(function () {
     let val = $(this).val().toLowerCase();
+    const filteredNamespaces = getHashParam("filteredNamespace")
 
     $(".charts .row").each(function () {
         let chartName = $(this).find(".rel-name span").text().toLowerCase()
         let releaseName = $(this).find(".rel-chart span").text().toLowerCase()
-        if (releaseName.indexOf(val) >= 0 || chartName.indexOf(val) >= 0) {
-            $(this).show()
+        let releaseNamespace = $(this).find(".rel-ns span").text()
+        if (filteredNamespaces && val) {
+            if ((releaseName.indexOf(val) >= 0 || chartName.indexOf(val) >= 0) && filteredNamespaces.includes(releaseNamespace)) {
+                $(this).show()
+            } else {
+                $(this).hide()
+            }
+        } else if (filteredNamespaces) {
+            if (filteredNamespaces.includes(releaseNamespace)) {
+                $(this).show()
+            } else {
+                $(this).hide()
+            }
         } else {
-            $(this).hide()
+            if (releaseName.indexOf(val) >= 0 || chartName.indexOf(val) >= 0) {
+                $(this).show()
+            } else {
+                $(this).hide()
+            }
         }
     })
 })

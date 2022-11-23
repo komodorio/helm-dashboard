@@ -6,18 +6,18 @@ $(function () {
     })
     const namespaceSelect = $("#namespace");
     namespaceSelect.change(function () {
-        selectedNamespaces = []
+        filteredNamespaces = []
         namespaceSelect.find("input:checkbox:checked").each(function() {
-            selectedNamespaces.push($(this).val());
+            filteredNamespaces.push($(this).val());
         })
-        if (selectedNamespaces.length === 0 && getHashParam("filteredNamespace")) {
+        if (filteredNamespaces.length === 0 && getHashParam("filteredNamespace")) {
             setHashParam("filteredNamespace")
-        } else if (selectedNamespaces.length != 0) {
-            setHashParam("filteredNamespace", selectedNamespaces.join('+'))
+        } else if (filteredNamespaces.length != 0) {
+            setHashParam("filteredNamespace", filteredNamespaces.join('+'))
         }
         $(".charts .row").each(function () {
-            let releaseNamespace = $(this).find(".rel-ns span").text().toLowerCase()
-            if (selectedNamespaces.includes(releaseNamespace) || selectedNamespaces.length === 0) {
+            let releaseNamespace = $(this).find(".rel-ns span").text()
+            if(filteredNamespaces.length === 0 || filteredNamespaces.includes(releaseNamespace)) {
                 $(this).show()
             } else {
                 $(this).hide()
@@ -99,8 +99,10 @@ $("#topNav ul a").click(function () {
     $("#topNav ul a").removeClass("active")
 
     const ctx = getHashParam("context")
+    const filteredNamespace = getHashParam("filteredNamespace")
     setHashParam(null, null)
     setHashParam("context", ctx)
+    setHashParam("filteredNamespace", filteredNamespace)
 
     if (self.hasClass("section-repo")) {
         setHashParam("section", "repository")
@@ -209,17 +211,17 @@ function fillNamespaceList(data) {
         return
     }
     Array.from(data).forEach(function (elm) {
-        const cur = getHashParam("filteredNamespace")
+        const filteredNamespace = getHashParam("filteredNamespace")
         let opt = $('<li><label><input type="checkbox" name="namespace" class="me-2"/><span></span></label></li>');
         opt.attr('title', elm.metadata.name)
         opt.find("input").val(elm.metadata.name).text(elm.metadata.name)
         opt.find("span").text(elm.metadata.name)
-        if (cur && cur === elm.metadata.name) {
-            opt.find("input").prop("checked", true)
-            // FIXME: setCurrentContext(elm.Name)
+        if (filteredNamespace) { 
+            if (filteredNamespace.split('+').includes(elm.metadata.name)) {
+                opt.find("input").prop("checked", true)
+            }
         } else if (false) { // TODO: get the default namespace from current context, if it's not 'default' - pre-select it
             opt.find("input").prop("checked", true)
-            // FIXME: setCurrentContext(elm.Name)
         }
         $("#namespace").append(opt)
     })
