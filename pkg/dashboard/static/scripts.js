@@ -1,48 +1,15 @@
 $(function () {
-    const clusterSelect = $("#cluster");
-    clusterSelect.change(function () {
-        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val()
-        window.location.reload()
-    })
-    const namespaceSelect = $("#namespace");
-    namespaceSelect.change(function () {
-        let filteredNamespaces = []
-        namespaceSelect.find("input:checkbox:checked").each(function () {
-            filteredNamespaces.push($(this).val());
-        })
-        if (filteredNamespaces.length === 0 && getHashParam("filteredNamespace")) {
-            setHashParam("filteredNamespace")
-        } else if (filteredNamespaces.length !== 0) {
-            setHashParam("filteredNamespace", filteredNamespaces.join('+'))
-        }
-
-        filterInstalledList($("#installedList .body .row"))
-    })
-
-    $.getJSON("/api/kube/contexts").fail(function (xhr) {
-        reportError("Failed to get list of clusters", xhr)
+    let limNS = null
+    $.getJSON("/status").fail(function (xhr) { // maybe /options call in the future
+        reportError("Failed to get tool version", xhr)
     }).done(function (data) {
-        $("body").data("contexts", data)
-        const context = getHashParam("context")
-        data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
-        fillClusterList(data, context);
-
-        initView(); // can only do it after loading cluster list
-
-        $.getJSON("/api/kube/namespaces").fail(function (xhr) {
-            reportError("Failed to get namespaces", xhr)
-        }).done(function (res) {
-            const ns = res.items.map(i => i.metadata.name)
-            $.each(ns, function (i, item) {
-                $("#upgradeModal #ns-datalist").append($("<option>", {
-                    value: item,
-                    text: item
-                }))
-            })
-            fillNamespaceList(res.items)
-        })
+        fillToolVersion(data)
+        limNS = data.LimitedToNamespace
+        if (limNS) {
+            $("#limitNamespace").show().find("span").text(limNS)
+        }
+        fillClusters(limNS)
     })
-
 
     $.getJSON("/api/scanners").fail(function (xhr) {
         reportError("Failed to get list of scanners", xhr)
@@ -54,16 +21,51 @@ $(function () {
             }
         }
     })
-
-    $.getJSON("/status").fail(function (xhr) {
-        reportError("Failed to get tool version", xhr)
-    }).done(function (data) {
-        fillToolVersion(data)
-        if (data.LimitedToNamespace) {
-            $("#limitNamespace").show().find("span").text(data.LimitedToNamespace)
-        }
-    })
 })
+
+function fillClusters(limNS) {
+    const clusterSelect = $("#cluster");
+    clusterSelect.change(function () {
+        window.location.href = "/#context=" + clusterSelect.find("input:radio:checked").val()
+        window.location.reload()
+    })
+    const namespaceSelect = $("#namespace");
+    namespaceSelect.change(function () {
+        let filteredNamespaces = []
+        namespaceSelect.find("input:checkbox:checked").each(function () {
+            filteredNamespaces.push($(this).val());
+        })
+        setFilteredNamespaces(filteredNamespaces)
+        filterInstalledList($("#installedList .body .row"))
+    })
+
+    $.getJSON("/api/kube/contexts").fail(function (xhr) {
+        reportError("Failed to get list of clusters", xhr)
+    }).done(function (data) {
+        $("body").data("contexts", data)
+        const context = getHashParam("context")
+        data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
+        fillClusterList(data, context);
+
+        $.getJSON("/api/kube/namespaces").fail(function (xhr) {
+            reportError("Failed to get namespaces", xhr)
+        }).done(function (res) {
+            const ns = res.items.map(i => i.metadata.name)
+            $.each(ns, function (i, item) {
+                $("#upgradeModal #ns-datalist").append($("<option>", {
+                    value: item,
+                    text: item
+                }))
+            })
+            if (!limNS) {
+                fillNamespaceList(res.items)
+            } else {
+
+            }
+            initView(); // can only do it after loading cluster and namespace lists
+        })
+    })
+}
 
 function initView() {
     $(".section").hide()
@@ -200,6 +202,11 @@ function fillClusterList(data, context) {
 }
 
 function fillNamespaceList(data) {
+    const curContextNamespaces = $("body").data("contexts").filter(obj => {
+        return obj.IsCurrent
+    })
+    console.log(curContextNamespaces)
+
     if (!data || !data.length) {
         $("#namespace").append("default")
         return
@@ -214,8 +221,9 @@ function fillNamespaceList(data) {
             if (filteredNamespace.split('+').includes(elm.metadata.name)) {
                 opt.find("input").prop("checked", true)
             }
-        } else if (false) { // TODO: get the default namespace from current context, if it's not 'default' - pre-select it
+        } else if (curContextNamespaces && curContextNamespaces[0].Namespace === elm.metadata.name) {
             opt.find("input").prop("checked", true)
+            setFilteredNamespaces([elm.metadata.name])
         }
         $("#namespace").append(opt)
     })
@@ -304,7 +312,7 @@ function showHideInstalledRelease(card, filteredNamespaces, filterStr) {
     let releaseName = card.data("name")
     let chartName = card.data("chart")
     const shownByNS = !filteredNamespaces || filteredNamespaces.split('+').includes(releaseNamespace);
-    const shownByStr =  releaseName.indexOf(filterStr) >= 0 || chartName.indexOf(filterStr) >= 0
+    const shownByStr = releaseName.indexOf(filterStr) >= 0 || chartName.indexOf(filterStr) >= 0
     if (shownByNS && shownByStr) {
         card.show()
         return true
@@ -327,5 +335,13 @@ function filterInstalledList(list) {
 
     if (list.length && !anyShown) {
         warnMsg.show()
+    }
+}
+
+function setFilteredNamespaces(filteredNamespaces) {
+    if (filteredNamespaces.length === 0 && getHashParam("filteredNamespace")) {
+        setHashParam("filteredNamespace")
+    } else if (filteredNamespaces.length !== 0) {
+        setHashParam("filteredNamespace", filteredNamespaces.join('+'))
     }
 }

@@ -131,7 +131,7 @@ function repoChartClicked() {
         window.location.reload()
     } else {
         const contexts = $("body").data("contexts")
-        contextNamespace = contexts.filter(obj => {return obj.Name === getHashParam("context")})[0].Namespace
+        const contextNamespace = contexts.filter(obj => {return obj.Name === getHashParam("context")})[0].Namespace
         popUpUpgrade(elm, contextNamespace)
     }
 }
