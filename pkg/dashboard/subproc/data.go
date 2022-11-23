@@ -29,6 +29,7 @@ type DataLayer struct {
 	Scanners    []Scanner
 	StatusInfo  *StatusInfo
 	Namespace   string
+	Cache       *Cache
 }
 
 type StatusInfo struct {
@@ -36,10 +37,12 @@ type StatusInfo struct {
 	LatestVer          string
 	Analytics          bool
 	LimitedToNamespace string
+	CacheHitRatio      float64
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
 	for i, c := range cmd {
+		// TODO: remove namespace parameter if it's empty
 		if c == "--namespace" && i < len(cmd) { // TODO: in case it's not found - add it?
 			d.forceNamespace(&cmd[i+1])
 		}
@@ -151,7 +154,9 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 		cmd = append(cmd, "--namespace", d.Namespace)
 	}
 
-	out, err := d.runCommandHelm(cmd...)
+	out, err := d.Cache.String(CacheKeyRelList, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -163,9 +168,13 @@ func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
 	return res, nil
 }
 
-func (d *DataLayer) ChartHistory(namespace string, chartName string) (res []*HistoryElement, err error) {
+func (d *DataLayer) ReleaseHistory(namespace string, releaseName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
-	out, err := d.runCommandHelm("history", chartName, "--namespace", namespace, "--output", "json")
+	ct := cacheTagRelease(namespace, releaseName)
+	out, err := d.Cache.String(CacheKeyRelHistory+ct, []string{ct}, func() (string, error) {
+		return d.runCommandHelm("history", releaseName, "--namespace", namespace, "--output", "json")
+	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +204,9 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 	}
 
 	cmd := []string{"search", "repo", "--regexp", search, "--versions", "--output", "json"}
-	out, err := d.runCommandHelm(cmd...)
+	out, err := d.Cache.String(cacheTagRepoVers(chartName), []string{CacheKeyAllRepos}, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +220,9 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 
 func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
-	out, err := d.runCommandHelm(cmd...)
+	out, err := d.Cache.String(cacheTagRepoCharts(repoName), []string{CacheKeyAllRepos}, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +243,7 @@ func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, e
 }
 
 func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []ReleaseElement) {
-	for _, chart := range charts {
+	for _, rchart := range charts {
 		for _, rel := range installed {
 			c, _, err := utils.ChartAndVersion(rel.Chart)
 			if err != nil {
@@ -238,11 +251,11 @@ func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []Relea
 				continue
 			}
 
-			pieces := strings.Split(chart.Name, "/")
+			pieces := strings.Split(rchart.Name, "/")
 			if pieces[1] == c {
 				// TODO: there can be more than one
-				chart.InstalledNamespace = rel.Namespace
-				chart.InstalledName = rel.Name
+				rchart.InstalledNamespace = rel.Namespace
+				rchart.InstalledName = rel.Name
 			}
 		}
 	}
@@ -251,16 +264,12 @@ func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []Relea
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
 
 func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	cmd := []string{"get", "manifest", chartName, "--namespace", namespace}
-	if revision > 0 {
-		cmd = append(cmd, "--revision", strconv.Itoa(revision))
-	}
+	cmd := []string{"get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
 
-	out, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+	key := CacheKeyRevManifests + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
+	return d.Cache.String(key, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 }
 
 func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*v1.Carp, error) {
@@ -275,7 +284,7 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 	var tmp interface{}
 	for dec.Decode(&tmp) == nil {
 		// k8s libs uses only JSON tags defined, say hello to https://github.com/go-yaml/yaml/issues/424
-		// bug we can juggle it
+		// we can juggle it
 		jsoned, err := json.Marshal(tmp)
 		if err != nil {
 			return nil, err
@@ -299,28 +308,24 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 }
 
 func (d *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	out, err := d.runCommandHelm("get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision))
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+	cmd := []string{"get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
+	key := CacheKeyRevNotes + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
+	return d.Cache.String(key, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 }
 
 func (d *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
-	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--output", "yaml"}
-
-	if revision > 0 {
-		cmd = append(cmd, "--revision", strconv.Itoa(revision))
-	}
+	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--output", "yaml", "--revision", strconv.Itoa(revision)}
 
 	if !onlyUserDefined {
 		cmd = append(cmd, "--all")
 	}
-	out, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+
+	key := CacheKeyRevValues + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision) + "\v" + fmt.Sprintf("%v", onlyUserDefined)
+	return d.Cache.String(key, nil, func() (string, error) {
+		return d.runCommandHelm(cmd...)
+	})
 }
 
 func (d *DataLayer) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error) {
@@ -380,34 +385,30 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 	return out, nil
 }
 
-func (d *DataLayer) ChartUninstall(namespace string, name string) error {
+func (d *DataLayer) ReleaseUninstall(namespace string, name string) error {
+	d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
+
 	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
-func (d *DataLayer) Revert(namespace string, name string, rev int) error {
+func (d *DataLayer) Rollback(namespace string, name string, rev int) error {
+	d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
+
 	_, err := d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (d *DataLayer) ChartRepoUpdate(name string) error {
+	d.Cache.Invalidate(cacheTagRepoName(name), CacheKeyAllRepos)
+
 	cmd := []string{"repo", "update"}
 	if name != "" {
 		cmd = append(cmd, name)
 	}
 
 	_, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string, version string, justTemplate bool, values string, reuseVals bool) (string, error) {
@@ -434,6 +435,11 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	if err != nil {
 		return "", err
 	}
+
+	if !justTemplate {
+		d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
+	}
+
 	res := release.Release{}
 	err = json.Unmarshal([]byte(out), &res)
 	if err != nil {
@@ -446,12 +452,18 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	return out, nil
 }
 
+// ShowValues get values from repo chart, not from installed release
 func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
-	return d.runCommandHelm("show", "values", chart, "--version", ver)
+	return d.Cache.String(CacheKeyRepoChartValues+"\v"+chart+"\v"+ver, nil, func() (string, error) {
+		return d.runCommandHelm("show", "values", chart, "--version", ver)
+	})
 }
 
-func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) {
-	out, err := d.runCommandHelm("show", "chart", chartName)
+func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // TODO: add version parameter to method
+	out, err := d.Cache.String(CacheKeyShowChart+"\v"+chartName, []string{"chart\v" + chartName}, func() (string, error) {
+		return d.runCommandHelm("show", "chart", chartName)
+	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -478,7 +490,9 @@ func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) {
 }
 
 func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
-	out, err := d.runCommandHelm("repo", "list", "--output", "json")
+	out, err := d.Cache.String(CacheKeyAllRepos, nil, func() (string, error) {
+		return d.runCommandHelm("repo", "list", "--output", "json")
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -491,6 +505,7 @@ func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
 }
 
 func (d *DataLayer) ChartRepoAdd(name string, url string) (string, error) {
+	d.Cache.Invalidate(CacheKeyAllRepos)
 	out, err := d.runCommandHelm("repo", "add", "--force-update", name, url)
 	if err != nil {
 		return "", err
@@ -500,6 +515,7 @@ func (d *DataLayer) ChartRepoAdd(name string, url string) (string, error) {
 }
 
 func (d *DataLayer) ChartRepoDelete(name string) (string, error) {
+	d.Cache.Invalidate(CacheKeyAllRepos)
 	out, err := d.runCommandHelm("repo", "remove", name)
 	if err != nil {
 		return "", err
@@ -520,6 +536,16 @@ func (d *DataLayer) GetNameSpaces() (res *NamespaceElement, err error) {
 	}
 
 	return res, nil
+}
+
+func (d *DataLayer) GetStatus() *StatusInfo {
+	sum := float64(d.Cache.HitCount + d.Cache.MissCount)
+	if sum > 0 {
+		d.StatusInfo.CacheHitRatio = float64(d.Cache.HitCount) / sum
+	} else {
+		d.StatusInfo.CacheHitRatio = 0
+	}
+	return d.StatusInfo
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
