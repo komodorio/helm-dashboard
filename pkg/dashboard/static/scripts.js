@@ -59,8 +59,6 @@ function fillClusters(limNS) {
             })
             if (!limNS) {
                 fillNamespaceList(res.items)
-            } else {
-
             }
             initView(); // can only do it after loading cluster and namespace lists
         })
