@@ -86,7 +86,7 @@ func parseFlags() options {
 	}
 
 	if opts.Version {
-		fmt.Print(version)
+		fmt.Println(version)
 		os.Exit(0)
 	}
 
