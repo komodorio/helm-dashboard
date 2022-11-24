@@ -58,3 +58,9 @@ function enableHeap(version) {
     heap.load("4249623943");
     window.heap.addEventProperties({'version': version});
 }
+
+function sendStats(name, prop){
+    if (window.heap) {
+        window.heap.track(name, prop);
+    }
+}

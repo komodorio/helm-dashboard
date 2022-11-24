@@ -116,11 +116,6 @@ myAlert.addEventListener('close.bs.alert', event => {
     $("#errorAlert").hide()
 })
 
-function sendStats(name, prop){
-    if (window.heap) {
-        window.heap.track(name, prop);
-    }
-}
 function reportError(err, xhr) {
     $("#errorAlert h4 span").text(err)
     if (xhr) {

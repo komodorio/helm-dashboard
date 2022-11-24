@@ -35,7 +35,7 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
 		os.Exit(1) // TODO: propagate error instead?
 	}
-	isDevModeWithAnalytics := s.Version == "0.0.0" && os.Getenv("enableDevAnalytics") == "true"
+	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
 	enableAnalytics := !s.NoTracking || isDevModeWithAnalytics
 	data.StatusInfo = &subproc.StatusInfo{
 		CurVer:             s.Version,
