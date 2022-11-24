@@ -68,7 +68,11 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 		return d.runCommandHelm(cmd...)
 	})
 	if err != nil {
-		return nil, err
+		if strings.Contains(err.Error(), "no repositories configured") {
+			out = "[]"
+		} else {
+			return nil, err
+		}
 	}
 
 	err = json.Unmarshal([]byte(out), &res)
