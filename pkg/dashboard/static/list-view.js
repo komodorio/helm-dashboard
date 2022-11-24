@@ -9,19 +9,30 @@ function loadChartsList() {
     }).done(function (data) {
         chartsCards.empty().hide()
         $("#installedList .header h2 span").text(data.length)
+        const usedNS = {}
         data.forEach(function (elm) {
             let card = buildChartCard(elm);
             chartsCards.append(card)
+            usedNS[elm.namespace] = usedNS[elm.namespace] ? usedNS[elm.namespace] + 1 : 1
         })
         sendStats('Get releases', {'status': 'success', length:data.length});
         filterInstalledList(chartsCards.find(".row"))
+        $("#namespace li").each(function (ix, obj) {
+            obj = $(obj)
+            const objNS = obj.find("input").val();
+            if (usedNS[objNS]) {
+                obj.find("label .text-muted").text('['+usedNS[objNS]+']')
+                obj.show()
+            } else {
+                obj.hide()
+            }
+        })
         chartsCards.show()
         if (!data.length) {
             $("#installedList .no-charts").show()
         }
     })
 }
-
 
 function buildChartCard(elm) {
     const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start link">
@@ -32,7 +43,7 @@ function buildChartCard(elm) {
             <div class="col-1 rel-ns text-nowrap"><span>default</span><div>Namespace</div></div>
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
-    
+
     // semver2 regex , add optional v prefix
     const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
     const chartName = elm.chart.substring(0, elm.chart.match(chartNameRegex).index - 1)

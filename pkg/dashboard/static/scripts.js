@@ -212,7 +212,7 @@ function fillNamespaceList(data) {
     }
     Array.from(data).forEach(function (elm) {
         const filteredNamespace = getHashParam("filteredNamespace")
-        let opt = $('<li><label><input type="checkbox" name="namespace" class="me-2"/><span></span></label></li>');
+        let opt = $('<li class="display-none"><label><input type="checkbox" name="namespace" class="me-2"/><span></span><span class="text-muted ms-2"></span></label></li>');
         opt.attr('title', elm.metadata.name)
         opt.find("input").val(elm.metadata.name).text(elm.metadata.name)
         opt.find("span").text(elm.metadata.name)
