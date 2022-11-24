@@ -40,13 +40,14 @@ function fillClusters(limNS) {
     })
 
     $.getJSON("/api/kube/contexts").fail(function (xhr) {
+        sendStats('contexts', {'status': 'fail'});
         reportError("Failed to get list of clusters", xhr)
     }).done(function (data) {
         $("body").data("contexts", data)
         const context = getHashParam("context")
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
         fillClusterList(data, context);
-
+        sendStats('contexts', {'status': 'success', length:data.length});
         $.getJSON("/api/kube/namespaces").fail(function (xhr) {
             reportError("Failed to get namespaces", xhr)
         }).done(function (res) {

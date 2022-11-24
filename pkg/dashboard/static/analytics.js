@@ -3,9 +3,9 @@ xhr.onload = function () {
     if (xhr.readyState === XMLHttpRequest.DONE) {
         const status = JSON.parse(xhr.responseText);
         const version = status.CurVer
-        if (status.Analytics && version !== "dev") {
+        if (status.Analytics) {
             enableDD(version)
-            enableHeap()
+            enableHeap(version)
         }
     }
 }
@@ -42,7 +42,7 @@ function enableDD(version) {
     })
 }
 
-function enableHeap() {
+function enableHeap(version) {
     window.heap = window.heap || [], heap.load = function (e, t) {
         window.heap.appid = e, window.heap.config = t = t || {};
         let r = document.createElement("script");
@@ -55,5 +55,12 @@ function enableHeap() {
             }
         }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], o = 0; o < p.length; o++) heap[p[o]] = n(p[o])
     };
-    heap.load("3615793373");
+    heap.load("4249623943");
+    window.heap.addEventProperties({'version': version});
+}
+
+function sendStats(name, prop){
+    if (window.heap) {
+        window.heap.track(name, prop);
+    }
 }

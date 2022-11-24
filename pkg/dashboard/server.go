@@ -35,10 +35,11 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
 		os.Exit(1) // TODO: propagate error instead?
 	}
-
+	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
+	enableAnalytics := !s.NoTracking || isDevModeWithAnalytics
 	data.StatusInfo = &subproc.StatusInfo{
 		CurVer:             s.Version,
-		Analytics:          !s.NoTracking,
+		Analytics:          enableAnalytics,
 		LimitedToNamespace: s.Namespace,
 	}
 	go checkUpgrade(data.StatusInfo)
@@ -136,13 +137,13 @@ func checkUpgrade(d *subproc.StatusInfo) {
 
 	v1, err := version.NewVersion(d.CurVer)
 	if err != nil {
-		log.Warnf("Failed to parse version: %s", err)
+		log.Warnf("Failed to parse CurVer: %s", err)
 		v1 = &version.Version{}
 	}
 
 	v2, err := version.NewVersion(d.LatestVer)
 	if err != nil {
-		log.Warnf("Failed to parse version: %s", err)
+		log.Warnf("Failed to parse LatestVer: %s", err)
 	} else {
 		if v1.LessThan(v2) {
 			log.Warnf("Newer Helm Dashboard version is available: %s", d.LatestVer)

@@ -4,6 +4,7 @@ function loadChartsList() {
     const chartsCards = $("#installedList .body")
     chartsCards.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Loading...</div>")
     $.getJSON("/api/helm/charts").fail(function (xhr) {
+        sendStats('Get releases', {'status': 'failed'});
         reportError("Failed to get list of charts", xhr)
     }).done(function (data) {
         chartsCards.empty().hide()
@@ -12,6 +13,7 @@ function loadChartsList() {
             let card = buildChartCard(elm);
             chartsCards.append(card)
         })
+        sendStats('Get releases', {'status': 'success', length:data.length});
         filterInstalledList(chartsCards.find(".row"))
         chartsCards.show()
         if (!data.length) {

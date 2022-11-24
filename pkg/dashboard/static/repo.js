@@ -4,6 +4,7 @@ function loadRepoView() {
 
     $.getJSON("/api/helm/repo").fail(function (xhr) {
         reportError("Failed to get list of repositories", xhr)
+        sendStats('Get repo', {'status': 'fail'});
     }).done(function (data) {
         const items = $("#sectionRepo .repo-list ul").empty()
         data.sort((a, b) => (a.name > b.name) - (a.name < b.name))
@@ -19,7 +20,7 @@ function loadRepoView() {
         if (!data.length) {
             items.text("No repositories found, try adding one")
         }
-
+        sendStats('Get repo', {'status': 'success', length:data.length});
         items.find("input").click(function () {
             $("#inputSearch").val('')
             const self = $(this)
