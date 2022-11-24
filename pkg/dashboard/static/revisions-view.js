@@ -32,7 +32,7 @@ function fillChartHistory(data, namespace, name) {
             $("#specRev").val(elm.revision).data("last-rev", elm.revision).data("last-chart-ver", elm.chart_ver)
         }
 
-        const rev = $(`<li class="px-2 pt-5 pb-4 mb-2 rounded border border-secondary bg-secondary position-relative">
+        const rev = $(`<li class="px-2 pt-5 pb-4 mb-2 rounded border border-secondary bg-secondary position-relative link">
                                 <div class="rev-status position-absolute top-0 m-2 mb-5 start-0 fw-bold"></div>
                                 <div class="rev-number position-absolute top-0 m-2 mb-5 end-0 fw-bold fs-6"></div>
                                 <div class="rev-changes position-absolute bottom-0 start-0 m-2 text-muted small"></div>
@@ -61,9 +61,13 @@ function fillChartHistory(data, namespace, name) {
         rev.data("elm", elm)
         rev.addClass("rev-" + elm.revision)
         rev.click(function () {
+            if (window.getSelection().toString()) {
+                return
+            }
             revisionClicked(namespace, name, $(this))
         })
 
+        // revRow.attr("class", "link")
         revRow.append(rev)
     }
 }
