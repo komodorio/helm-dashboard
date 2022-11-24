@@ -30,8 +30,10 @@ function buildChartCard(elm) {
             <div class="col-1 rel-ns text-nowrap"><span>default</span><div>Namespace</div></div>
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
-
-    const chartName = elm.chart.substring(0, elm.chart.lastIndexOf("-"))
+    
+    // semver2 regex , add optional v prefix
+    const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
+    const chartName = elm.chart.substring(0, elm.chart.match(chartNameRegex).index - 1)
     $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
         reportError("Failed to get repo name for charts", xhr)
     }).done(function (data) {
