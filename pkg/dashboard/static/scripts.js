@@ -309,7 +309,7 @@ $("#cacheClear").click(function () {
 function showHideInstalledRelease(card, filteredNamespaces, filterStr) {
     let releaseNamespace = card.data("namespace")
     let releaseName = card.data("name")
-    let chartName = card.data("chart")
+    let chartName = card.data("chart").chart
     const shownByNS = !filteredNamespaces || filteredNamespaces.split('+').includes(releaseNamespace);
     const shownByStr = releaseName.indexOf(filterStr) >= 0 || chartName.indexOf(filterStr) >= 0
     if (shownByNS && shownByStr) {
