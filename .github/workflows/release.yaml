@@ -27,12 +27,12 @@ jobs:
     needs: pre_release
     runs-on: ubuntu-latest
     steps:
-      - name: Plugin version/Tag name Check
-        if: needs.pre_release.outputs.release_tag != needs.pre_release.outputs.plugin_version
-        uses: actions/github-script@v3
-        with:
-          script: |
-            core.setFailed('Plugin version and tag name are not equivalent!')
+      #- name: Plugin version/Tag name Check
+      #  if: needs.pre_release.outputs.release_tag != needs.pre_release.outputs.plugin_version
+      #  uses: actions/github-script@v3
+      #  with:
+      #    script: |
+      #      core.setFailed('Plugin version and tag name are not equivalent!')
       - name: Checkout
         uses: actions/checkout@v3
         with:

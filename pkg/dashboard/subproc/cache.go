@@ -28,7 +28,7 @@ type Cache struct {
 }
 
 func NewCache() *Cache {
-	gocacheClient := gocache.New(5*time.Minute, 10*time.Minute)
+	gocacheClient := gocache.New(60*time.Minute, 10*time.Minute)
 	gocacheStore := store.NewGoCache(gocacheClient)
 
 	// TODO: use tiered cache with some disk backend, allow configuring that static cache folder
