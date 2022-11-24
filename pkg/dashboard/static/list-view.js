@@ -48,11 +48,12 @@ function buildChartCard(elm) {
     const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
     const chartName = elm.chart.substring(0, elm.chart.match(chartNameRegex).index - 1)
     $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
-        reportError("Failed to get repo name for charts", xhr)
+        // we're ok if we can't show icon and description
+        console.log("Failed to get repo name for charts", xhr)
     }).done(function (data) {
         if (data.length > 0) {
             $.getJSON("/api/helm/charts/show?name=" + data[0].name).fail(function (xhr) {
-                reportError("Failed to get list of charts", xhr)
+                console.log("Failed to get chart", xhr)
             }).done(function (data) {
                 if (data) {
                     const res = data[0];
