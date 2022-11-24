@@ -70,7 +70,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModalLabel .type").text("Install")
         $("#upgradeModal .ver-old").hide()
         $("#upgradeModal .rel-name").prop("disabled", false).val(elm.name.split("/").pop())
-        $("#upgradeModal .rel-ns").prop("disabled", false).val("")
+        $("#upgradeModal .rel-ns").prop("disabled", false).val(ns)
     }
 
     $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
@@ -119,7 +119,7 @@ $("#upgradeModal .btn-confirm").click(function () {
         if (data.version) {
             setHashParam("section", null)
             const ns = $("#upgradeModal .rel-ns").val();
-            setHashParam("namespace", ns ? ns : "default")
+            setHashParam("namespace", ns ? ns : "default") // TODO: relaets issue #51
             setHashParam("chart", $("#upgradeModal .rel-name").val())
             setHashParam("revision", data.version)
             window.location.reload()

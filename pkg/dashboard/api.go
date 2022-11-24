@@ -37,9 +37,16 @@ func errorHandler(c *gin.Context) {
 
 func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if context, ok := c.Request.Header["X-Kubecontext"]; ok {
-			log.Debugf("Setting current context to: %s", context)
-			data.KubeContext = context[0]
+		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
+			log.Debugf("Setting current context to: %s", ctx)
+			if data.KubeContext != ctx[0] {
+				err := data.Cache.Clear()
+				if err != nil {
+					_ = c.AbortWithError(http.StatusBadRequest, err)
+					return
+				}
+			}
+			data.KubeContext = ctx[0]
 		}
 		c.Next()
 	}
@@ -73,7 +80,20 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 
 	api.GET("/status", func(c *gin.Context) {
 		c.Header("X-Application-Name", "Helm Dashboard by Komodor.io") // to identify ourselves by ourselves
-		c.IndentedJSON(http.StatusOK, data.StatusInfo)
+		c.IndentedJSON(http.StatusOK, data.GetStatus())
+	})
+
+	api.GET("/api/cache", func(c *gin.Context) {
+		c.IndentedJSON(http.StatusOK, data.Cache)
+	})
+
+	api.DELETE("/api/cache", func(c *gin.Context) {
+		err := data.Cache.Clear()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		c.Status(http.StatusAccepted)
 	})
 
 	configureHelms(api.Group("/api/helm"), data)

@@ -28,6 +28,7 @@ type Server struct {
 func (s Server) StartServer() (string, utils.ControlChan) {
 	data := subproc.DataLayer{
 		Namespace: s.Namespace,
+		Cache:     subproc.NewCache(),
 	}
 	err := data.CheckConnectivity()
 	if err != nil {

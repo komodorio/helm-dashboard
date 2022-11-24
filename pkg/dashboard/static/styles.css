@@ -103,6 +103,13 @@ body > .container-fluid {
     margin-bottom: 0.75rem !important;
 }
 
+#installedList .header .spaced-out {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 0.5rem;
+}
+
 #installedList h2 {
     font-family: Inter, serif;
     font-weight: 700;
@@ -227,7 +234,7 @@ nav .nav-tabs .nav-link.active {
     background-color: transparent;
 }
 
-#installedList .b-shadow:hover {
+#installedList .body .b-shadow:hover {
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.18);
 }
 

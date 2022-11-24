@@ -61,6 +61,9 @@ function fillChartHistory(data, namespace, name) {
         rev.data("elm", elm)
         rev.addClass("rev-" + elm.revision)
         rev.click(function () {
+            if (window.getSelection().toString()) {
+                return
+            }
             revisionClicked(namespace, name, $(this))
         })
 

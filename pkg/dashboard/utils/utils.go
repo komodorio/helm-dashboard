@@ -3,13 +3,15 @@ package utils
 import (
 	"bytes"
 	"errors"
-	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 var FailLogLevel = log.WarnLevel // allows to suppress error logging in some situations
@@ -17,12 +19,19 @@ var FailLogLevel = log.WarnLevel // allows to suppress error logging in some sit
 type ControlChan = chan struct{}
 
 func ChartAndVersion(x string) (string, string, error) {
-	lastInd := strings.LastIndex(x, "-")
-	if lastInd < 0 {
+	strs := strings.Split(x, "-")
+	lens := len(strs)
+	if lens < 2 {
 		return "", "", errors.New("can't parse chart version string")
+	} else if lens == 2 {
+		return strs[0], strs[1], nil
+	} else {
+		// semver2 regex , add optional  v prefix
+		re := regexp.MustCompile(`v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?`)
+		match := re.FindString(x)
+		lastInd := strings.LastIndex(x, match)
+		return x[:lastInd-1], match, nil
 	}
-
-	return x[:lastInd], x[lastInd+1:], nil
 }
 
 func TempFile(txt string) (string, func(), error) {
