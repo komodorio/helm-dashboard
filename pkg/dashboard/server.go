@@ -36,7 +36,7 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 		os.Exit(1) // TODO: propagate error instead?
 	}
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
-	enableAnalytics := !s.NoTracking || isDevModeWithAnalytics
+	enableAnalytics := (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
 	data.StatusInfo = &subproc.StatusInfo{
 		CurVer:             s.Version,
 		Analytics:          enableAnalytics,
