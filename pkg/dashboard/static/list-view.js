@@ -24,16 +24,18 @@ function loadChartsList() {
 
 
 function buildChartCard(elm) {
-    const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start">
-            <div class="col-4 rel-name"><span class="link">release-name</span><div></div></div>
+    const card = $(`<div class="row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start link">
+            <div class="col-4 rel-name"><span>release-name</span><div></div></div>
             <div class="col-3 rel-status"><span></span><div></div></div>
             <div class="col-2 rel-chart text-nowrap"><span></span><div>Chart Version</div></div>
             <div class="col-1 rel-rev"><span>#0</span><div>Revision</div></div>
             <div class="col-1 rel-ns text-nowrap"><span>default</span><div>Namespace</div></div>
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
-
-    const chartName = elm.chart.substring(0, elm.chart.lastIndexOf("-"))
+    
+    // semver2 regex , add optional v prefix
+    const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
+    const chartName = elm.chart.substring(0, elm.chart.match(chartNameRegex).index - 1)
     $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
         reportError("Failed to get repo name for charts", xhr)
     }).done(function (data) {
@@ -69,7 +71,10 @@ function buildChartCard(elm) {
 
     card.find("a").attr("href", '#context=' + getHashParam('context') + '&namespace=' + elm.namespace + '&name=' + elm.name)
 
-    card.find(".rel-name span").data("chart", elm).click(function () {
+    card.data("chart", elm).click(function () {
+        if (window.getSelection().toString()) {
+            return
+        }
         const self = $(this)
         $("#sectionList").hide()
 

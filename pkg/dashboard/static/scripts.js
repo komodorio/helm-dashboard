@@ -61,6 +61,7 @@ function fillClusters(limNS) {
             if (!limNS) {
                 fillNamespaceList(res.items)
             }
+        }).always(function () {
             initView(); // can only do it after loading cluster and namespace lists
         })
     })
@@ -204,7 +205,6 @@ function fillNamespaceList(data) {
     const curContextNamespaces = $("body").data("contexts").filter(obj => {
         return obj.IsCurrent
     })
-    console.log(curContextNamespaces)
 
     if (!data || !data.length) {
         $("#namespace").append("default")
