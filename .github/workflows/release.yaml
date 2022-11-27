@@ -21,18 +21,18 @@ jobs:
         run: echo "TAG_NAME=$(echo ${{ github.ref_name }} | cut -d 'v' -f2)" >> $GITHUB_OUTPUT
     outputs:
       plugin_version: ${{ steps.get_plugin_version.outputs.PLUGIN_VERSION }}
-      tag_name: ${{ steps.get_tag_name.outputs.TAG_NAME }}
+      release_tag: ${{ steps.get_tag_name.outputs.TAG_NAME }}
 
   release:
     needs: pre_release
     runs-on: ubuntu-latest
     steps:
-      #- name: Plugin version/Tag name Check
-      #  if: needs.pre_release.outputs.release_tag != needs.pre_release.outputs.plugin_version
-      #  uses: actions/github-script@v3
-      #  with:
-      #    script: |
-      #      core.setFailed('Plugin version and tag name are not equivalent!')
+      - name: Plugin version/Tag name Check
+       if: needs.pre_release.outputs.release_tag != needs.pre_release.outputs.plugin_version
+       uses: actions/github-script@v3
+       with:
+         script: |
+           core.setFailed('Plugin version and tag name are not equivalent!')
       - name: Checkout
         uses: actions/checkout@v3
         with:
