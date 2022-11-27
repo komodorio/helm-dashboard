@@ -15,13 +15,13 @@ function loadChartsList() {
             chartsCards.append(card)
             usedNS[elm.namespace] = usedNS[elm.namespace] ? usedNS[elm.namespace] + 1 : 1
         })
-        sendStats('Get releases', {'status': 'success', length:data.length});
+        sendStats('Get releases', {'status': 'success', length: data.length});
         filterInstalledList(chartsCards.find(".row"))
         $("#namespace li").each(function (ix, obj) {
             obj = $(obj)
             const objNS = obj.find("input").val();
             if (usedNS[objNS]) {
-                obj.find("label .text-muted").text('['+usedNS[objNS]+']')
+                obj.find("label .text-muted").text('[' + usedNS[objNS] + ']')
                 obj.show()
             } else {
                 obj.hide()
@@ -44,9 +44,16 @@ function buildChartCard(elm) {
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
 
+    let chartName = elm.chart
     // semver2 regex , add optional v prefix
     const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
-    const chartName = elm.chart.substring(0, elm.chart.match(chartNameRegex).index - 1)
+    const match = elm.chart.match(chartNameRegex);
+    if (match) {
+        chartName = elm.chart.substring(0, match.index - 1)
+    } else {
+        // fall back to simple substr
+        chartName = elm.chart.substring(0, elm.chart.lastIndexOf("-"))
+    }
     $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
         // we're ok if we can't show icon and description
         console.log("Failed to get repo name for charts", xhr)
