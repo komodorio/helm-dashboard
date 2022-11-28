@@ -328,11 +328,17 @@ function filterInstalledList(list) {
     let filterStr = $("#installedSearch").val().toLowerCase();
     let filteredNamespaces = getHashParam("filteredNamespace")
     let anyShown = false;
+    let installedCount = 0;
+
     list.each(function (ix, card) {
-        anyShown |= showHideInstalledRelease($(card), filteredNamespaces, filterStr)
+        anyShown = showHideInstalledRelease($(card), filteredNamespaces, filterStr)
+        if (anyShown) {
+            installedCount++;
+        }
     })
 
-    if (list.length && !anyShown) {
+    $("#installedList .header h2 span").text(installedCount)
+    if (list.length && !installedCount) {
         warnMsg.show()
     }
 }

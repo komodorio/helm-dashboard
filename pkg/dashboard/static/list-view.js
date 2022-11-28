@@ -8,7 +8,6 @@ function loadChartsList() {
         reportError("Failed to get list of charts", xhr)
     }).done(function (data) {
         chartsCards.empty().hide()
-        $("#installedList .header h2 span").text(data.length)
         const usedNS = {}
         data.forEach(function (elm) {
             let card = buildChartCard(elm);
