@@ -165,8 +165,8 @@ function showResources(namespace, chart, revision) {
                     <div class="row px-3 py-2 mb-3 bg-white rounded">
                         <div class="col-2 res-kind text-break"></div>
                         <div class="col-3 res-name text-break fw-bold"></div>
-                        <div class="col-1 res-status overflow-hidden"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
-                        <div class="col-4 res-statusmsg"><span class="text-muted small">Getting status...</span></div>
+                        <div class="col-2 res-status overflow-hidden"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></div>
+                        <div class="col-3 res-statusmsg text-break"><span class="text-muted small">Getting status...</span></div>
                         <div class="col-2 res-actions"><button class='btn btn-sm ms-2 visually-hidden'>Vertical-sizer</button></div>
                     </div>
             `)
@@ -189,10 +189,10 @@ function showResources(namespace, chart, revision) {
                 } else {
                     badge.addClass("bg-danger")
                 }
-
                 const statusBlock = resBlock.find(".res-status");
                 statusBlock.empty().append(badge).attr("title", data.status.phase)
-                resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (data.status.message ? data.status.message : '') + "</span>")
+                const statusMessage = getStatusMessage(data.status)
+                resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (statusMessage ? statusMessage : '') + "</span>")
 
                 if (badge.text() !== "NotFound" && revision == $("#specRev").data("last-rev")) {
                     resBlock.find(".res-actions")
@@ -214,6 +214,16 @@ function showResources(namespace, chart, revision) {
             })
         }
     })
+}
+
+function getStatusMessage(status) {
+    if (!status) {
+        return
+    }
+    if (status.conditions) {
+        return status.conditions[0].message || status.conditions[0].reason
+    } 
+    return status.message || status.reason
 }
 
 function showDescribe(ns, kind, name, badge) {
