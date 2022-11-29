@@ -265,6 +265,7 @@ $(".bi-power").click(function () {
         type: 'DELETE',
     }).done(function () {
         // TODO: display explanation overlay here
+        $("#PowerOffModal").modal('show');
         window.close();
     })
 })
