@@ -11,6 +11,7 @@ if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
 fi
 
 version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
+# TODO: if no version provided, get it from https://api.github.com/repos/komodorio/helm-dashboard/releases/latest
 echo "Downloading and installing ${name} v${version} ..."
 
 url=""

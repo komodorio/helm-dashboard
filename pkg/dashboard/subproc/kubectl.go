@@ -31,6 +31,7 @@ type KubeContext struct {
 }
 
 func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
+	res = []KubeContext{}
 	out, err := d.runCommandKubectl("config", "get-contexts")
 	if err != nil {
 		return nil, err

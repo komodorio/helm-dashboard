@@ -12,6 +12,7 @@ import (
 
 func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
 	out, err := d.Cache.String(CacheKeyAllRepos, nil, func() (string, error) {
+		// TODO: do a bg check, if the state is changed - do reset some caches
 		return d.runCommandHelm("repo", "list", "--output", "json")
 	})
 	if err != nil {

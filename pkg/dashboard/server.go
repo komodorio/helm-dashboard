@@ -113,7 +113,7 @@ func discoverScanners(data *subproc.DataLayer) {
 	}
 }
 
-func checkUpgrade(d *subproc.StatusInfo) {
+func checkUpgrade(d *subproc.StatusInfo) { // TODO: check it once an hour
 	url := "https://api.github.com/repos/komodorio/helm-dashboard/releases/latest"
 	type GHRelease struct {
 		Name string `json:"name"`
