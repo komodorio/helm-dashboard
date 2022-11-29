@@ -27,9 +27,12 @@ function checkUpgradeable(name) {
             $("#btnUpgrade").prop("disabled", true)
             $("#btnUpgradeCheck").prop("disabled", true)
             $("#btnAddRepository").text("Add repository for it")
+            $("#btnUpgradeCheck").text("")
             return
         }
 
+        $("#btnUpgrade .icon").removeClass("bi-x-octagon").addClass("bi-hourglass-split")
+        $("#btnAddRepository").text("")
         $("#btnUpgradeCheck").text("Check for new version")
         const verCur = $("#specRev").data("last-chart-ver");
         const elm = data[0]
