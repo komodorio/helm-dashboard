@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "helm-dashboard.fullname" . }}:{{ .Values.service.port }}']
+      args: ['--timeout=5', '{{ include "helm-dashboard.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never

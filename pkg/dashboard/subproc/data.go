@@ -35,7 +35,7 @@ type StatusInfo struct {
 	Analytics          bool
 	LimitedToNamespace string
 	CacheHitRatio      float64
-	K8sMode            bool
+	ClusterMode        bool
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
@@ -82,7 +82,7 @@ func (d *DataLayer) CheckConnectivity() error {
 			return errors.New("did not find any kubectl contexts configured")
 		}
 		log.Infof("Assuming k8s environment")
-		d.StatusInfo.K8sMode = true
+		d.StatusInfo.ClusterMode = true
 	}
 
 	_, err = d.runCommandHelm("--help")
