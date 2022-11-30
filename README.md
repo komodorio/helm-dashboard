@@ -11,7 +11,7 @@ corresponding k8s resources. Also, you can perform simple actions like roll back
 version.
 
 This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision of
-helping Kubernetes users to navigate and troubleshoot their clusters.
+helping Kubernetes users to navigate and troubleshoot their clusters, the project in **NOT** an offical project by the [helm team](https://helm.sh/).
 
 Some of the key capabilities of the tool:
 
