@@ -13,6 +13,7 @@ $(function () {
 
         if (data.ClusterMode) {
             $(".bi-power").hide()
+            $("#clusterFilterBlock").hide()
         }
     })
 
