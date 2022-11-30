@@ -3,12 +3,17 @@ $(function () {
     $.getJSON("/status").fail(function (xhr) { // maybe /options call in the future
         reportError("Failed to get tool version", xhr)
     }).done(function (data) {
+        $("body").data("status", data)
         fillToolVersion(data)
         limNS = data.LimitedToNamespace
         if (limNS) {
             $("#limitNamespace").show().find("span").text(limNS)
         }
         fillClusters(limNS)
+
+        if (data.ClusterMode) {
+            $(".bi-power").hide()
+        }
     })
 
     $.getJSON("/api/scanners").fail(function (xhr) {
@@ -47,7 +52,7 @@ function fillClusters(limNS) {
         const context = getHashParam("context")
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
         fillClusterList(data, context);
-        sendStats('contexts', {'status': 'success', length:data.length});
+        sendStats('contexts', {'status': 'success', length: data.length});
         $.getJSON("/api/kube/namespaces").fail(function (xhr) {
             reportError("Failed to get namespaces", xhr)
         }).done(function (res) {
@@ -220,7 +225,7 @@ function fillNamespaceList(data) {
             if (filteredNamespace.split('+').includes(elm.metadata.name)) {
                 opt.find("input").prop("checked", true)
             }
-        } else if (curContextNamespaces && curContextNamespaces[0].Namespace === elm.metadata.name) {
+        } else if (curContextNamespaces.length && curContextNamespaces[0].Namespace === elm.metadata.name) {
             opt.find("input").prop("checked", true)
             setFilteredNamespaces([elm.metadata.name])
         }
