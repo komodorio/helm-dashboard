@@ -6,6 +6,7 @@ function loadChartsList() {
     $.getJSON("/api/helm/charts").fail(function (xhr) {
         sendStats('Get releases', {'status': 'failed'});
         reportError("Failed to get list of charts", xhr)
+        chartsCards.empty().append("<div class=\"row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start\"><div class=\"col\">Failed to get list of charts</div></div>")
     }).done(function (data) {
         chartsCards.empty().hide()
         const usedNS = {}
