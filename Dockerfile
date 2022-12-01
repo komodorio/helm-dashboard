@@ -23,9 +23,13 @@ FROM alpine/helm
 
 RUN curl -o /bin/kubectl -vf -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x /bin/kubectl && kubectl --help
 
-# TODO: trivy
-# TODO: checkov
+# Checkov scanner
+RUN apk add --update --no-cache python3
+RUN python3 -m ensurepip
+RUN pip3 install checkov
 
+# Trivy
+RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.18.3
 
 COPY --from=builder /build/src/bin/dashboard /bin/helm-dashboard
 
