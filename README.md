@@ -1,17 +1,21 @@
-# ![Helm Dashboard](pkg/dashboard/static/logo-header.svg)
+<p align="center">
+  <img src="pkg/dashboard/static/logo-readme.svg" width="200" />
+  <br/>
+</p>
 
-A simplified way of working with Helm.
+<p align="center">A simplified way of working with Helm.</p>
+
+![GitHub contributors](https://img.shields.io/github/contributors/komodorio/helm-dashboard)[![GitHub issues](https://img.shields.io/github/issues-raw/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard/issues) ![GitHub stars](https://img.shields.io/github/stars/komodorio/helm-dashboard?style=social) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/komodorio/helm-dashboard) ![GitHub pull requests](https://img.shields.io/github/issues-pr/komodorio/helm-dashboard) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/komodorio/helm-dashboard) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/komodorio/helm-dashboard) [![GitHub license](https://img.shields.io/github/license/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard)
 
 <kbd>[<img src="screenshot.png" style="width: 100%; border: 1px solid silver;" border="1" alt="Screenshot">](screenshot.png)</kbd>
 
-## What it Does?
+## Description
 
-The _Helm Dashboard_ plugin offers a UI-driven way to view the installed Helm charts, see their revision history and
+_Helm Dashboard_ is an **open-source project** which offers a UI-driven way to view the installed Helm charts, see their revision history and
 corresponding k8s resources. Also, you can perform simple actions like roll back to a revision or upgrade to newer
 version.
-
 This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision of
-helping Kubernetes users to navigate and troubleshoot their clusters, the project in **NOT** an offical project by the [helm team](https://helm.sh/).
+helping Kubernetes users to navigate and troubleshoot their clusters.
 
 Some of the key capabilities of the tool:
 
@@ -62,11 +66,12 @@ You can see the list of available command-line flags by running `helm dashboard 
 By default, the web server is only available locally. You can change that by specifying `HD_BIND` environment variable
 to the desired value. For example, `0.0.0.0` would bind to all IPv4 addresses or `[::0]` would be all IPv6 addresses.
 This can also be specified using flag `--bind <host>`, for example `--bind=0.0.0.0` or `--bind 0.0.0.0`.
+
 > Precedence order: flag `--bind=<host>` > env `HD_BIND=<host>` > default value `localhost`
 
 If your port 8080 is busy, you can specify a different port to use via `--port <number>` command-line flag.
 
-If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line. 
+If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line.
 
 If you don't want browser tab to automatically open, add `--no-browser` flag in your command line.
 
@@ -93,6 +98,15 @@ We have two main channels for supporting the Helm Dashboard
 users: [Slack community](https://join.slack.com/t/komodorkommunity/shared_invite/zt-1dm3cnkue-ov1Yh~_95teA35QNx5yuMg) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
+## Contributing
+
+Kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand about our development process, how to propose bug fixes and improvements, and how to build and test your changes to Helm Dashboard. <br>
+
+## Contributors
+
+<a href="https://github.com/komodorio/helm-dashboard/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=komodorio/helm-dashboard" />
+</a>
 
 ## Local Dev Testing
 
