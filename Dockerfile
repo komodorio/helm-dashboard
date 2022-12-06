@@ -1,12 +1,12 @@
 # Stage - builder
 FROM golang as builder
 
+ARG VER
+
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV CGO_ENABLED=0
 ENV VERSION=0.0.0
-
-ARG VER=${VERSION}
 
 WORKDIR /build
 
