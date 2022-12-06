@@ -81,3 +81,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ needs.pre_release.outputs.release_tag }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args:
+            VER=${{ needs.pre_release.outputs.release_tag }}

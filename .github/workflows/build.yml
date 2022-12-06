@@ -67,4 +67,6 @@ jobs:
         if: github.event_name != 'pull_request'
         with:
           context: .
-          push: false
+          outputs: local
+          build-args:
+            VER=0.0.0-dev
