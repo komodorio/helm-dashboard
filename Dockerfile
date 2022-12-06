@@ -1,4 +1,6 @@
+# Stage - builder
 FROM golang as builder
+
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV CGO_ENABLED=0
@@ -19,6 +21,7 @@ WORKDIR /build/src
 
 RUN make build
 
+# Stage - runner
 FROM alpine/helm
 
 RUN curl -o /bin/kubectl -vf -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x /bin/kubectl && kubectl --help
