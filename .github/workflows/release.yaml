@@ -3,7 +3,7 @@ name: release
 on:
   push:
     tags:
-      - "*"
+      - "v*"
 
 jobs:
   pre_release:
@@ -52,3 +52,32 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Binary Versions
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
+
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Docker meta
+        uses: docker/metadata-action@v3
+        id: meta
+        with:
+          images: komodorio/helm-dashboard
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        if: github.event_name != 'pull_request'
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        if: github.event_name != 'pull_request'
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ needs.pre_release.outputs.release_tag }}
+          labels: ${{ steps.meta.outputs.labels }}
