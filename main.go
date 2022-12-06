@@ -22,9 +22,9 @@ type options struct {
 	Verbose    bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
 	NoBrowser  bool   `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
 	NoTracking bool   `long:"no-analytics" description:"Disable user analytics (GA, DataDog etc.)"`
-	BindHost   string `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
-	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`  // TODO: better default port to clash less?
-	Namespace  string `short:"n" long:"namespace" description:"Limit operations to a specific namespace"`
+	BindHost   string `long:"bind" description:"Host binding to start server (default: localhost)"`       // default should be printed but not assigned as the precedence: flag > env > default
+	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`        // TODO: better default port to clash less?
+	Namespace  string `short:"n" long:"namespace" description:"Limit operations to a specific namespace"` // TODO: get rid of it in favor of standard HELM_NAMESPACE env var
 }
 
 func main() {
