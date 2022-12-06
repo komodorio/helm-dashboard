@@ -13,7 +13,11 @@ function revisionClicked(namespace, name, self) {
     $("#sectionDetails .rev-tags .rev-chart").text(elm.chart)
     $("#sectionDetails .rev-tags .rev-app").text(elm.app_version)
     $("#sectionDetails .rev-tags .rev-ns").text(getHashParam("namespace"))
-    $("#sectionDetails .rev-tags .rev-cluster").text(getHashParam("context"))
+    if (getHashParam("context")) {
+        $("#sectionDetails .rev-tags .rev-cluster").text(getHashParam("context"))
+    } else {
+        $("#sectionDetails .rev-tags .rev-cluster").parent().hide() // TODO: makes UI jumpy, change to showing
+    }
 
     $("#revDescr").text(elm.description).removeClass("text-danger")
     if (elm.status === "failed") {
