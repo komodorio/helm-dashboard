@@ -12,11 +12,11 @@ import (
 )
 
 type HelmHandler struct {
-	Data *subproc.DataLayer
+	Data *subproc.Application
 }
 
 func (h *HelmHandler) GetCharts(c *gin.Context) {
-	res, err := h.Data.ListInstalled()
+	res, err := h.Data.GetReleases()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -60,7 +60,13 @@ func (h *HelmHandler) History(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.ReleaseHistory(qp.Namespace, qp.Name)
+	rel, err := h.Data.ReleaseByName(qp.Namespace, qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	res, err := rel.History()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

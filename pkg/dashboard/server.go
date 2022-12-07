@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -26,7 +25,7 @@ type Server struct {
 }
 
 func (s Server) StartServer() (string, utils.ControlChan) {
-	data := subproc.DataLayer{
+	data1 := subproc.DataLayer{
 		Namespace: s.Namespace,
 		Cache:     subproc.NewCache(),
 		StatusInfo: &subproc.StatusInfo{
@@ -35,19 +34,25 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 			LimitedToNamespace: s.Namespace,
 		},
 	}
+
+	data := subproc.NewApplication(nil)
 	err := data.CheckConnectivity()
 	if err != nil {
-		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
-		os.Exit(1) // TODO: propagate error instead?
+		log.Fatalf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
+		// TODO: propagate error instead?
 	}
+
+	/* TODO
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
 	go checkUpgrade(data.StatusInfo)
 
-	discoverScanners(&data)
+	*/
+
+	//TODO discoverScanners(&data)
 
 	abort := make(utils.ControlChan)
-	api := NewRouter(abort, &data, s.Debug)
+	api := NewRouter(abort, data, s.Debug)
 	done := s.startBackgroundServer(api, abort)
 
 	return "http://" + s.Address, done

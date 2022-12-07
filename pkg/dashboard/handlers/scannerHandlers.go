@@ -8,7 +8,7 @@ import (
 )
 
 type ScannersHandler struct {
-	Data *subproc.DataLayer
+	Data *subproc.Application
 }
 
 func (h *ScannersHandler) List(c *gin.Context) {

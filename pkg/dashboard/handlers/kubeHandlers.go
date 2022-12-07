@@ -11,7 +11,7 @@ import (
 )
 
 type KubeHandler struct {
-	Data *subproc.DataLayer
+	Data *subproc.Application
 }
 
 func (h *KubeHandler) GetContexts(c *gin.Context) {
