@@ -8,7 +8,7 @@ import (
 func TestApplication_GetReleases(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
-	app := NewApplication(nil)
+	app, _ := NewApplication(nil)
 	err := app.SetContext("")
 	//err := app.SetContext("kind-kind")
 	if err != nil {
@@ -20,5 +20,9 @@ func TestApplication_GetReleases(t *testing.T) {
 	}
 
 	log.Infof("%v", rels)
-	rels[0].History()
+	hist, err := rels[0].History()
+	if err != nil {
+		log.Fatalf("%+v", err)
+	}
+	log.Infof("%v", hist)
 }

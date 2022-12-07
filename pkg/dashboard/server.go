@@ -34,9 +34,14 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 			LimitedToNamespace: s.Namespace,
 		},
 	}
+	_ = data1 // FIXME
 
-	data := subproc.NewApplication(nil)
-	err := data.CheckConnectivity()
+	data, err := subproc.NewApplication(nil)
+	if err != nil {
+		log.Fatalf("Failed to create new application, cannot continue. The error was: %s", err)
+		// TODO: propagate error instead?
+	}
+	err = data.CheckConnectivity() // TODO: still needed?
 	if err != nil {
 		log.Fatalf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
 		// TODO: propagate error instead?
@@ -49,7 +54,7 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 
 	*/
 
-	//TODO discoverScanners(&data)
+	discoverScanners(data)
 
 	abort := make(utils.ControlChan)
 	api := NewRouter(abort, data, s.Debug)
@@ -104,7 +109,7 @@ func (s Server) itIsUs() bool {
 	return strings.HasPrefix(r.Header.Get("X-Application-Name"), "Helm Dashboard")
 }
 
-func discoverScanners(data *subproc.DataLayer) {
+func discoverScanners(data *subproc.Application) {
 	potential := []subproc.Scanner{
 		&scanners.Checkov{Data: data},
 		&scanners.Trivy{Data: data},

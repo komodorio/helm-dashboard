@@ -11,7 +11,7 @@ import (
 )
 
 type Checkov struct {
-	Data *subproc.DataLayer
+	Data *subproc.Application
 }
 
 func (c *Checkov) ManifestIsScannable() bool {

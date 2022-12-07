@@ -6,6 +6,7 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
+	"k8s.io/client-go/tools/clientcmd"
 	"os"
 
 	// Import to initialize client auth plugins.
@@ -19,14 +20,24 @@ import (
 type Application struct {
 	HelmConfig *action.Configuration
 
+	K8s         K8s
+	KubeContext string
+	Scanners    []Scanner
+
 	releases     []*Release
 	repositories []*Repository
 }
 
-func NewApplication(helmConfig *action.Configuration) *Application {
-	return &Application{
-		HelmConfig: helmConfig,
+func NewApplication(helmConfig *action.Configuration) (*Application, *errorx.Error) {
+	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get kubectl config")
 	}
+
+	return &Application{
+		HelmConfig:    helmConfig,
+		KubectlConfig: cfg,
+	}, nil
 }
 
 func (a *Application) GetReleases() ([]*Release, *errorx.Error) {
@@ -56,15 +67,16 @@ func (a *Application) CheckConnectivity() *errorx.Error {
 func (a *Application) SetContext(ctx string) *errorx.Error {
 	x, err := NewHelmConfig(ctx)
 	if err != nil {
-		return errorx.Decorate(err, "failet to set context to '%s'", ctx)
+		return errorx.Decorate(err, "failed to set context to '%s'", ctx)
 	}
+	a.KubeContext = ctx
 	a.HelmConfig = x
 	return nil
 }
 
 func (a *Application) ReleaseByName(namespace string, name string) (*Release, *errorx.Error) {
 	// TODO
-	return nil, errorx.DataUnavailable.New("release '%s' is not found in namespace '%s'")
+	return nil, errorx.DataUnavailable.New("release '%s' is not found in namespace '%s'", name, namespace)
 }
 
 func NewHelmConfig(ctx string) (*action.Configuration, *errorx.Error) {

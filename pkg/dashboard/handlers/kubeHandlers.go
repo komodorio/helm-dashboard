@@ -11,11 +11,11 @@ import (
 )
 
 type KubeHandler struct {
-	Data *subproc.Application
+	K8s *subproc.K8s
 }
 
 func (h *KubeHandler) GetContexts(c *gin.Context) {
-	res, err := h.Data.ListContexts()
+	res, err := h.K8s.ListContexts()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -30,7 +30,7 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.GetResource(qp.Namespace, &v12.Carp{
+	res, err := h.K8s.GetResource(qp.Namespace, &v12.Carp{
 		TypeMeta:   v1.TypeMeta{Kind: c.Param("kind")},
 		ObjectMeta: v1.ObjectMeta{Name: qp.Name},
 	})
@@ -63,7 +63,7 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.DescribeResource(qp.Namespace, c.Param("kind"), qp.Name)
+	res, err := h.K8s.DescribeResource(qp.Namespace, c.Param("kind"), qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -73,7 +73,7 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
-	res, err := h.Data.GetNameSpaces()
+	res, err := h.K8s.GetNameSpaces()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
