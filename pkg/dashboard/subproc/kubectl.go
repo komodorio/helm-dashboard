@@ -1,8 +1,13 @@
 package subproc
 
 import (
+	"context"
 	"encoding/json"
-	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"github.com/pkg/errors"
+	"helm.sh/helm/v3/pkg/kube"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	testapiv1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"os"
 	"sort"
@@ -19,6 +24,7 @@ type KubeContext struct {
 
 type K8s struct {
 	KubectlConfig *api.Config
+	KubectlClient kube.Client
 }
 
 func (k *K8s) ListContexts() ([]KubeContext, error) {
@@ -49,26 +55,26 @@ type NamespaceElement struct {
 	} `json:"items"`
 }
 
-func (k *K8s) GetNameSpaces() (res *NamespaceElement, err error) {
-	out, err := k.runCommandKubectl("get", "namespaces", "-o", "json")
+func (k *K8s) GetNameSpaces() (res []corev1.Namespace, err error) {
+	clientset, err := k.KubectlClient.Factory.KubernetesClientSet()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get KubernetesClientSet")
 	}
 
-	err = json.Unmarshal([]byte(out), &res)
+	lst, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get list of namespaces")
 	}
 
-	return res, nil
+	return lst.Items, nil
 }
 
-func (k *K8s) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error) {
+func (k *K8s) GetResource(namespace string, def *testapiv1.Carp) (*testapiv1.Carp, error) {
 	out, err := k.runCommandKubectl("get", strings.ToLower(def.Kind), def.Name, "--namespace", namespace, "--output", "json")
 	if err != nil {
 		if strings.HasSuffix(strings.TrimSpace(err.Error()), " not found") {
-			return &v1.Carp{
-				Status: v1.CarpStatus{
+			return &testapiv1.Carp{
+				Status: testapiv1.CarpStatus{
 					Phase:   "NotFound",
 					Message: err.Error(),
 					Reason:  "not found",
@@ -79,7 +85,7 @@ func (k *K8s) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error) {
 		}
 	}
 
-	var res v1.Carp
+	var res testapiv1.Carp
 	err = json.Unmarshal([]byte(out), &res)
 	if err != nil {
 		return nil, err
@@ -103,7 +109,7 @@ func (k *K8s) GetResource(namespace string, def *v1.Carp) (*v1.Carp, error) {
 	return &res, nil
 }
 
-func (k *K8s) GetResourceYAML(namespace string, def *v1.Carp) (string, error) {
+func (k *K8s) GetResourceYAML(namespace string, def *testapiv1.Carp) (string, error) {
 	out, err := k.runCommandKubectl("get", strings.ToLower(def.Kind), def.Name, "--namespace", namespace, "--output", "yaml")
 	if err != nil {
 		return "", err
