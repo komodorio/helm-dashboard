@@ -124,15 +124,19 @@ func (r *Release) History() ([]*Release, error) {
 
 func (r *Release) Uninstall() error {
 	client := action.NewUninstall(r.HelmConfig)
-	run, err := client.Run(r.Orig.Name)
+	_, err := client.Run(r.Orig.Name)
 	// TODO: how to set namespace?
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to uninstall release")
+		return errors.Wrap(err, "failed to uninstall release")
 	}
+	return nil
 }
 
 func (r *Release) Rollback(toRevision int) error {
-
+	client := action.NewRollback(r.HelmConfig)
+	client.Version = toRevision
+	// TODO: how to set namespace?
+	return client.Run(r.Orig.Name)
 }
 
 type Repository struct {

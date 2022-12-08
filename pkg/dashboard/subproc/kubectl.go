@@ -70,6 +70,10 @@ func (k *K8s) GetNameSpaces() (res []corev1.Namespace, err error) {
 }
 
 func (k *K8s) GetResource(namespace string, def *testapiv1.Carp) (*testapiv1.Carp, error) {
+	resp := k.KubectlClient.Factory.NewBuilder().NamespaceParam(namespace).ResourceNames(def.Kind, def.Name).Do()
+
+	// FIXME what's next
+
 	out, err := k.runCommandKubectl("get", strings.ToLower(def.Kind), def.Name, "--namespace", namespace, "--output", "json")
 	if err != nil {
 		if strings.HasSuffix(strings.TrimSpace(err.Error()), " not found") {
