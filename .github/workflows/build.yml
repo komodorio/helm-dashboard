@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -54,5 +54,17 @@ jobs:
         with:
           context: .
           outputs: local
-          build-args:
-            VER=0.0.0-dev
+          build-args: VER=0.0.0-dev
+
+  helm_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Helm Template Check For Sanity
+        uses: igabaydulin/helm-check-action@0.1.4
+        env:
+          CHART_LOCATION: ./charts/helm-dashboard
+          CHART_VALUES: ./charts/helm-dashboard/values.yaml
