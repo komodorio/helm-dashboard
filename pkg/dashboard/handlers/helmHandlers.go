@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	helmtime "helm.sh/helm/v3/pkg/time"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,12 +17,27 @@ type HelmHandler struct {
 	Data *subproc.DataLayer
 }
 
-func (h *HelmHandler) GetCharts(c *gin.Context) {
-	res, err := h.Data.ListInstalled()
+func (h *HelmHandler) GetReleases(c *gin.Context) {
+	rels, err := h.Data.App.GetReleases()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
+	res := []*subproc.ReleaseElement{}
+	for _, r := range rels {
+		o := r.Orig
+		res = append(res, &subproc.ReleaseElement{
+			Name:       o.Name,
+			Namespace:  o.Namespace,
+			Revision:   strconv.Itoa(o.Version),
+			Updated:    helmtime.Time{},
+			Status:     o.Info.Status,
+			Chart:      fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
+			AppVersion: o.Chart.AppVersion(),
+		})
+	}
+
 	c.IndentedJSON(http.StatusOK, res)
 }
 

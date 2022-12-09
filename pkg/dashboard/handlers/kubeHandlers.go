@@ -15,7 +15,7 @@ type KubeHandler struct {
 }
 
 func (h *KubeHandler) GetContexts(c *gin.Context) {
-	res, err := h.Data.App.K8s.ListContexts1()
+	res, err := h.Data.App.K8s.ListContexts()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

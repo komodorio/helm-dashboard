@@ -100,7 +100,7 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	h := handlers.HelmHandler{Data: data}
 
-	api.GET("/charts", h.GetCharts)
+	api.GET("/charts", h.GetReleases)
 	api.DELETE("/charts", h.Uninstall)
 
 	api.GET("/charts/history", h.History)

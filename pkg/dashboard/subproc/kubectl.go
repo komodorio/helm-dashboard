@@ -162,9 +162,9 @@ type K8s struct {
 	KubectlClient *kube.Client
 }
 
-func (k *K8s) ListContexts1() ([]KubeContext, error) {
+func (k *K8s) ListContexts() ([]KubeContext, error) {
 	res := []KubeContext{}
-	
+
 	if os.Getenv("HD_CLUSTER_MODE") != "" {
 		return res, nil
 	}
