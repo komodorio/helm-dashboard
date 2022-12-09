@@ -8,6 +8,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/jessevdk/go-flags v1.5.0
+	github.com/joomcode/errorx v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
@@ -15,6 +16,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.9.4
+	k8s.io/api v0.25.0
 	k8s.io/apimachinery v0.25.0
 	k8s.io/client-go v0.25.0
 )
@@ -153,7 +155,6 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/api v0.25.0 // indirect
 	k8s.io/apiextensions-apiserver v0.25.0 // indirect
 	k8s.io/apiserver v0.25.0 // indirect
 	k8s.io/cli-runtime v0.24.2 // indirect

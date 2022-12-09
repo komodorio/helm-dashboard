@@ -12,11 +12,11 @@ import (
 )
 
 type HelmHandler struct {
-	Data *subproc.Application
+	Data *subproc.DataLayer
 }
 
 func (h *HelmHandler) GetCharts(c *gin.Context) {
-	res, err := h.Data.GetReleases()
+	res, err := h.Data.ListInstalled()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -30,14 +30,7 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-
-	rel, err := h.Data.ReleaseByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	err = rel.Uninstall()
+	err = h.Data.ReleaseUninstall(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -52,13 +45,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 		return
 	}
 
-	rel, err := h.Data.ReleaseByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	err = rel.Rollback(qp.Revision)
+	err = h.Data.Rollback(qp.Namespace, qp.Name, qp.Revision)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -73,13 +60,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 		return
 	}
 
-	rel, err := h.Data.ReleaseByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	res, err := rel.History()
+	res, err := h.Data.ReleaseHistory(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

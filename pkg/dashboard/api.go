@@ -35,7 +35,7 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func contextSetter(data *subproc.Application) gin.HandlerFunc {
+func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
 			log.Debugf("Setting current context to: %s", ctx)
@@ -48,7 +48,7 @@ func contextSetter(data *subproc.Application) gin.HandlerFunc {
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *subproc.Application, debug bool) *gin.Engine {
+func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
 	if debug {
 		api = gin.New()
@@ -67,27 +67,37 @@ func NewRouter(abortWeb utils.ControlChan, data *subproc.Application, debug bool
 	return api
 }
 
-func configureRoutes(abortWeb utils.ControlChan, data *subproc.Application, api *gin.Engine) {
+func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
 		c.Status(http.StatusAccepted)
 	})
 
-	/* TODO
 	api.GET("/status", func(c *gin.Context) {
 		c.Header("X-Application-Name", "Helm Dashboard by Komodor.io") // to identify ourselves by ourselves
 		c.IndentedJSON(http.StatusOK, data.GetStatus())
 	})
 
-	*/
+	api.GET("/api/cache", func(c *gin.Context) {
+		c.IndentedJSON(http.StatusOK, data.Cache)
+	})
+
+	api.DELETE("/api/cache", func(c *gin.Context) {
+		err := data.Cache.Clear()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		c.Status(http.StatusAccepted)
+	})
 
 	configureHelms(api.Group("/api/helm"), data)
 	configureKubectls(api.Group("/api/kube"), data)
 	configureScanners(api.Group("/api/scanners"), data)
 }
 
-func configureHelms(api *gin.RouterGroup, data *subproc.Application) {
+func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	h := handlers.HelmHandler{Data: data}
 
 	api.GET("/charts", h.GetCharts)
@@ -109,7 +119,7 @@ func configureHelms(api *gin.RouterGroup, data *subproc.Application) {
 	api.GET("/repo/values", h.RepoValues)
 }
 
-func configureKubectls(api *gin.RouterGroup, data *subproc.Application) {
+func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
 	h := handlers.KubeHandler{Data: data}
 	api.GET("/contexts", h.GetContexts)
 	api.GET("/resources/:kind", h.GetResourceInfo)
@@ -147,7 +157,7 @@ func configureStatic(api *gin.Engine) {
 	}
 }
 
-func configureScanners(api *gin.RouterGroup, data *subproc.Application) {
+func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
 	h := handlers.ScannersHandler{Data: data}
 	api.GET("", h.List)
 	api.POST("/manifests", h.ScanDraftManifest)

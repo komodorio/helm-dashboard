@@ -2,11 +2,13 @@ package subproc
 
 import (
 	"fmt"
+	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/kube"
+	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
@@ -33,10 +35,10 @@ type Application struct {
 func NewApplication(helmConfig *action.Configuration) (*Application, error) {
 	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get kubectl config")
+		return nil, errorx.Decorate(err, "failed to get kubectl config")
 	}
 
-	client, ok := helmConfig.KubeClient.(interface{}).(kube.Client)
+	client, ok := helmConfig.KubeClient.(*kube.Client)
 	if !ok {
 		return nil, errors.New("Failed to cast Helm's KubeClient into kube.Client")
 	}
@@ -54,7 +56,7 @@ func (a *Application) GetReleases() ([]*Release, error) {
 	client.Limit = 0
 	releases, err := client.Run()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get list of releases")
+		return nil, errorx.Decorate(err, "failed to get list of releases")
 	}
 	a.releases = []*Release{}
 	for _, r := range releases {
@@ -66,7 +68,7 @@ func (a *Application) GetReleases() ([]*Release, error) {
 func (a *Application) CheckConnectivity() error {
 	err := a.HelmConfig.KubeClient.IsReachable()
 	if err != nil {
-		return errors.Wrap(err, "failed to validate k8s cluster connectivity")
+		return errorx.Decorate(err, "failed to validate k8s cluster connectivity")
 	}
 	return nil
 }
@@ -74,7 +76,7 @@ func (a *Application) CheckConnectivity() error {
 func (a *Application) SetContext(ctx string) error {
 	x, err := NewHelmConfig(ctx)
 	if err != nil {
-		return errors.Wrapf(err, "failed to set context to '%s'", ctx)
+		return errorx.Decorate(err, "failed to set context to '%s'", ctx)
 	}
 	a.KubeContext = ctx
 	a.HelmConfig = x
@@ -90,13 +92,26 @@ func NewHelmConfig(ctx string) (*action.Configuration, error) {
 	settings := cli.New()
 	settings.KubeContext = ctx
 	actionConfig := new(action.Configuration)
+
+	registryClient, err := registry.NewClient(
+		registry.ClientOptDebug(false),
+		registry.ClientOptEnableCache(true),
+		//registry.ClientOptWriter(out),
+		registry.ClientOptCredentialsFile(settings.RegistryConfig),
+	)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to crete helm config object")
+	}
+	actionConfig.RegistryClient = registryClient
+
 	helmDriver := os.Getenv("HELM_DRIVER")
 	if err := actionConfig.Init(
 		settings.RESTClientGetter(),
 		"", // TODO settings.Namespace()
 		helmDriver, log.Debugf); err != nil {
-		return nil, errors.Wrap(err, "failed to init Helm action config")
+		return nil, errorx.Decorate(err, "failed to init Helm action config")
 	}
+
 	return actionConfig, nil
 }
 
@@ -111,7 +126,7 @@ func (r *Release) History() ([]*Release, error) {
 	// TODO: how to specify namespace?
 	revs, err := client.Run(r.Orig.Name)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get revisions of release")
+		return nil, errorx.Decorate(err, "failed to get revisions of release")
 	}
 
 	r.revisions = []*Release{}
@@ -127,7 +142,7 @@ func (r *Release) Uninstall() error {
 	_, err := client.Run(r.Orig.Name)
 	// TODO: how to set namespace?
 	if err != nil {
-		return errors.Wrap(err, "failed to uninstall release")
+		return errorx.Decorate(err, "failed to uninstall release")
 	}
 	return nil
 }

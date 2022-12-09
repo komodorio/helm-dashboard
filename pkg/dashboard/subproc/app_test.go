@@ -8,8 +8,14 @@ import (
 func TestApplication_GetReleases(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
-	app, _ := NewApplication(nil)
-	err := app.SetContext("")
+	c, err := NewHelmConfig("")
+
+	app, err := NewApplication(c)
+	if err != nil {
+		log.Fatalf("%+v", err)
+	}
+
+	err = app.SetContext("")
 	//err := app.SetContext("kind-kind")
 	if err != nil {
 		log.Fatalf("%+v", err)

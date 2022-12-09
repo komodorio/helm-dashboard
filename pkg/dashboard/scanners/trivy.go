@@ -9,7 +9,7 @@ import (
 )
 
 type Trivy struct {
-	Data *subproc.Application
+	Data *subproc.DataLayer
 }
 
 func (c *Trivy) ManifestIsScannable() bool {

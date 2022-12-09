@@ -3,8 +3,8 @@ package subproc
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"strconv"
 	"strings"
 	"time"
@@ -27,6 +27,7 @@ type DataLayer struct {
 	StatusInfo  *StatusInfo
 	Namespace   string
 	Cache       *Cache
+	App         *Application
 }
 
 type StatusInfo struct {
@@ -276,6 +277,16 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	}
 
 	return out, nil
+}
+
+func (d *DataLayer) SetContext(ctx string) error {
+	if d.KubeContext != ctx {
+		err := d.Cache.Clear()
+		if err != nil {
+			return errors.Wrap(err, "failed to set context")
+		}
+	}
+	return nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {

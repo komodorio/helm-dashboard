@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -25,7 +26,7 @@ type Server struct {
 }
 
 func (s Server) StartServer() (string, utils.ControlChan) {
-	data1 := subproc.DataLayer{
+	data := subproc.DataLayer{
 		Namespace: s.Namespace,
 		Cache:     subproc.NewCache(),
 		StatusInfo: &subproc.StatusInfo{
@@ -34,30 +35,28 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 			LimitedToNamespace: s.Namespace,
 		},
 	}
-	_ = data1 // FIXME
-
-	data, err := subproc.NewApplication(nil)
+	err := data.CheckConnectivity()
 	if err != nil {
-		log.Fatalf("Failed to create new application, cannot continue. The error was: %s", err)
-		// TODO: propagate error instead?
+		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
+		os.Exit(1) // TODO: propagate error instead?
 	}
-	err = data.CheckConnectivity() // TODO: still needed?
-	if err != nil {
-		log.Fatalf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
-		// TODO: propagate error instead?
-	}
-
-	/* TODO
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
 	go checkUpgrade(data.StatusInfo)
 
-	*/
+	discoverScanners(&data)
 
-	discoverScanners(data)
+	c, err := subproc.NewHelmConfig("")
+	if err != nil {
+		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
+		os.Exit(1) // TODO: propagate error instead?
+	}
+
+	app, err := subproc.NewApplication(c)
+	data.App = app // TODO: temporarily here
 
 	abort := make(utils.ControlChan)
-	api := NewRouter(abort, data, s.Debug)
+	api := NewRouter(abort, &data, s.Debug)
 	done := s.startBackgroundServer(api, abort)
 
 	return "http://" + s.Address, done
@@ -109,7 +108,7 @@ func (s Server) itIsUs() bool {
 	return strings.HasPrefix(r.Header.Get("X-Application-Name"), "Helm Dashboard")
 }
 
-func discoverScanners(data *subproc.Application) {
+func discoverScanners(data *subproc.DataLayer) {
 	potential := []subproc.Scanner{
 		&scanners.Checkov{Data: data},
 		&scanners.Trivy{Data: data},
