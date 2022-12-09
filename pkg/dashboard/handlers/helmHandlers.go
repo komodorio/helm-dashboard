@@ -3,7 +3,6 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	helmtime "helm.sh/helm/v3/pkg/time"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,7 +30,7 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 			Name:       o.Name,
 			Namespace:  o.Namespace,
 			Revision:   strconv.Itoa(o.Version),
-			Updated:    helmtime.Time{},
+			Updated:    o.Info.LastDeployed,
 			Status:     o.Info.Status,
 			Chart:      fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
 			AppVersion: o.Chart.AppVersion(),
