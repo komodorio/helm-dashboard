@@ -164,6 +164,11 @@ type K8s struct {
 
 func (k *K8s) ListContexts1() ([]KubeContext, error) {
 	res := []KubeContext{}
+	
+	if os.Getenv("HD_CLUSTER_MODE") != "" {
+		return res, nil
+	}
+
 	for name, ctx := range k.KubectlConfig.Contexts {
 		res = append(res, KubeContext{
 			IsCurrent: k.KubectlConfig.CurrentContext == name,
@@ -174,15 +179,10 @@ func (k *K8s) ListContexts1() ([]KubeContext, error) {
 		})
 	}
 
-	res = []KubeContext{}
-
-	if os.Getenv("HD_CLUSTER_MODE") != "" {
-		return res, nil
-	}
 	return res, nil
 }
 
-func (k *K8s) GetNameSpaces() (res []corev1.Namespace, err error) {
+func (k *K8s) GetNameSpaces() (res *corev1.NamespaceList, err error) {
 	clientset, err := k.KubectlClient.Factory.KubernetesClientSet()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get KubernetesClientSet")
@@ -193,7 +193,7 @@ func (k *K8s) GetNameSpaces() (res []corev1.Namespace, err error) {
 		return nil, errors.Wrap(err, "failed to get list of namespaces")
 	}
 
-	return lst.Items, nil
+	return lst, nil
 }
 
 func (k *K8s) GetResource(namespace string, def *testapiv1.Carp) (*testapiv1.Carp, error) {

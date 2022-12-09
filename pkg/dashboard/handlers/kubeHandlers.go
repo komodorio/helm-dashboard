@@ -15,7 +15,7 @@ type KubeHandler struct {
 }
 
 func (h *KubeHandler) GetContexts(c *gin.Context) {
-	res, err := h.Data.ListContexts()
+	res, err := h.Data.App.K8s.ListContexts1()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -73,11 +73,11 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
-	res, err := h.Data.GetNameSpaces()
+	res, err := h.Data.App.K8s.GetNameSpaces()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.IndentedJSON(http.StatusOK, res)
 }
