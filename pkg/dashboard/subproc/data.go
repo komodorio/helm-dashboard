@@ -196,6 +196,15 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 		return nil, err
 	}
 
+	res, err := ParseManifests(out)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func ParseManifests(out string) ([]*v1.Carp, error) {
 	dec := yaml.NewDecoder(bytes.NewReader([]byte(out)))
 
 	res := make([]*v1.Carp, 0)
@@ -221,7 +230,6 @@ func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, 
 
 		res = append(res, &doc)
 	}
-
 	return res, nil
 }
 
@@ -308,6 +316,8 @@ func (d *DataLayer) SetContext(ctx string) error {
 			return errors.Wrap(err, "failed to set context")
 		}
 	}
+
+	d.KubeContext = ctx
 
 	return nil
 }

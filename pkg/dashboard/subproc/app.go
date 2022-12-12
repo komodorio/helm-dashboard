@@ -106,6 +106,7 @@ func (a *Application) ReleaseByName(namespace string, name string) (*Release, er
 }
 
 func NewHelmConfig(ctx string, ns string) (*action.Configuration, error) {
+	// TODO: cache it into map
 	settings := cli.New()
 	settings.KubeContext = ctx
 	actionConfig := new(action.Configuration)

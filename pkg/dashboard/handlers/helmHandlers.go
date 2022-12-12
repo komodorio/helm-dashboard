@@ -126,11 +126,22 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.RevisionManifestsParsed(qp.Namespace, qp.Name, qp.Revision)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+
+	res, err := subproc.ParseManifests(rel.Orig.Manifest)
+	if err != nil {
+		return
+	}
+
 	c.IndentedJSON(http.StatusOK, res)
 }
 
