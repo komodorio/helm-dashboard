@@ -78,7 +78,18 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 		return
 	}
 
-	err = h.Data.Rollback(qp.Namespace, qp.Name, qp.Revision)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	err = rel.Rollback(qp.Revision)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
