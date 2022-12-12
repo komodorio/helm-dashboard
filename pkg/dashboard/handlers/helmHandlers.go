@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,16 +29,7 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 
 	res := []*subproc.ReleaseElement{}
 	for _, r := range rels {
-		o := r.Orig
-		res = append(res, &subproc.ReleaseElement{
-			Name:       o.Name,
-			Namespace:  o.Namespace,
-			Revision:   strconv.Itoa(o.Version),
-			Updated:    o.Info.LastDeployed,
-			Status:     o.Info.Status,
-			Chart:      fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
-			AppVersion: o.Chart.AppVersion(),
-		})
+		res = append(res, subproc.HReleaseToJSON(r.Orig))
 	}
 
 	c.IndentedJSON(http.StatusOK, res)
@@ -104,11 +94,28 @@ func (h *HelmHandler) History(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.ReleaseHistory(qp.Namespace, qp.Name)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	revs, err := rel.History()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
+	res := []*subproc.HistoryElement{}
+	for _, r := range revs {
+		res = append(res, subproc.HReleaseToHistElem(r.Orig))
+	}
+
 	c.IndentedJSON(http.StatusOK, res)
 }
 

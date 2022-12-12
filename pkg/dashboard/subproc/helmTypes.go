@@ -1,8 +1,10 @@
 package subproc
 
 import (
+	"fmt"
 	"helm.sh/helm/v3/pkg/release"
 	helmtime "helm.sh/helm/v3/pkg/time"
+	"strconv"
 )
 
 // unpleasant copy from Helm sources, where they have it non-public
@@ -42,4 +44,29 @@ type RepoChartElement struct {
 type RepositoryElement struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
+}
+
+func HReleaseToJSON(o *release.Release) *ReleaseElement {
+	return &ReleaseElement{
+		Name:       o.Name,
+		Namespace:  o.Namespace,
+		Revision:   strconv.Itoa(o.Version),
+		Updated:    o.Info.LastDeployed,
+		Status:     o.Info.Status,
+		Chart:      fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
+		AppVersion: o.Chart.AppVersion(),
+	}
+}
+
+func HReleaseToHistElem(o *release.Release) *HistoryElement {
+	return &HistoryElement{
+		Revision:    o.Version,
+		Updated:     o.Info.LastDeployed,
+		Status:      o.Info.Status,
+		Chart:       fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
+		AppVersion:  o.Chart.AppVersion(),
+		Description: o.Info.Description,
+		ChartName:   o.Chart.Name(),
+		ChartVer:    o.Chart.Metadata.Version,
+	}
 }
