@@ -10,7 +10,6 @@ import (
 	"helm.sh/helm/v3/pkg/kube"
 	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/release"
-	"k8s.io/client-go/tools/clientcmd"
 	"os"
 
 	// Import to initialize client auth plugins.
@@ -21,36 +20,51 @@ import (
 // object wrappers for lazy loading
 // all in memory, no cache needed
 
-type Application struct {
-	HelmConfig *action.Configuration
+type HelmConfigGetter = func(ctx string, ns string) (*action.Configuration, error)
+type HelmNSConfigGetter = func(ns string) (*action.Configuration, error)
 
-	K8s         *K8s
-	KubeContext string
-	Scanners    []Scanner
+type Application struct {
+	HelmConfig HelmConfigGetter
+	ctxConfig  HelmNSConfigGetter
+
+	K8s                *K8s
+	CurrentContextName string
+	Scanners           []Scanner
 
 	releases     []*Release
 	repositories []*Repository
 }
 
-func NewApplication(helmConfig *action.Configuration) (*Application, error) {
-	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
+func NewApplication(helmConfig HelmConfigGetter) (*Application, error) {
+
+	hc, err := ctxConfig("") // TODO: are these the right options?
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get kubectl config")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
 
-	client, ok := helmConfig.KubeClient.(*kube.Client)
+	client, ok := hc.KubeClient.(*kube.Client)
 	if !ok {
 		return nil, errors.New("Failed to cast Helm's KubeClient into kube.Client")
 	}
 
+	k8s, err := NewK8s(client)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get k8s client")
+	}
+
 	return &Application{
 		HelmConfig: helmConfig,
-		K8s:        &K8s{KubectlConfig: cfg, KubectlClient: client},
+		K8s:        k8s,
 	}, nil
 }
 
 func (a *Application) GetReleases() ([]*Release, error) {
-	client := action.NewList(a.HelmConfig)
+	hc, err := a.ctxConfig("")
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	client := action.NewList(hc)
 	client.All = true
 	client.AllNamespaces = true
 	client.Limit = 0
@@ -66,7 +80,12 @@ func (a *Application) GetReleases() ([]*Release, error) {
 }
 
 func (a *Application) CheckConnectivity() error {
-	err := a.HelmConfig.KubeClient.IsReachable()
+	hc, err := a.HelmConfig("")
+	if err != nil {
+		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	err = hc.KubeClient.IsReachable() // TODO: test it on cluster with limited access
 	if err != nil {
 		return errorx.Decorate(err, "failed to validate k8s cluster connectivity")
 	}
@@ -74,21 +93,27 @@ func (a *Application) CheckConnectivity() error {
 }
 
 func (a *Application) SetContext(ctx string) error {
-	x, err := NewHelmConfig(ctx)
-	if err != nil {
-		return errorx.Decorate(err, "failed to set context to '%s'", ctx)
-	}
-	a.KubeContext = ctx
-	a.HelmConfig = x
+	a.CurrentContextName = ctx
+	a.ctxConfig=
 	return nil
 }
 
 func (a *Application) ReleaseByName(namespace string, name string) (*Release, error) {
-	// TODO
+	rels, err := a.GetReleases()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get list of releases")
+	}
+
+	for _, r := range rels {
+		if r.Orig.Namespace == namespace && r.Orig.Name == name {
+			return r, nil
+		}
+	}
+
 	return nil, errors.New(fmt.Sprintf("release '%s' is not found in namespace '%s'", name, namespace))
 }
 
-func NewHelmConfig(ctx string) (*action.Configuration, error) {
+func NewHelmConfig(ctx string, ns string) (*action.Configuration, error) {
 	settings := cli.New()
 	settings.KubeContext = ctx
 	actionConfig := new(action.Configuration)
@@ -107,7 +132,7 @@ func NewHelmConfig(ctx string) (*action.Configuration, error) {
 	helmDriver := os.Getenv("HELM_DRIVER")
 	if err := actionConfig.Init(
 		settings.RESTClientGetter(),
-		"", // TODO settings.Namespace()
+		ns,
 		helmDriver, log.Debugf); err != nil {
 		return nil, errorx.Decorate(err, "failed to init Helm action config")
 	}
@@ -116,14 +141,18 @@ func NewHelmConfig(ctx string) (*action.Configuration, error) {
 }
 
 type Release struct {
-	HelmConfig *action.Configuration
+	HelmConfig HelmConfigGetter
 	Orig       *release.Release
 	revisions  []*Release
 }
 
 func (r *Release) History() ([]*Release, error) {
-	client := action.NewHistory(r.HelmConfig)
-	// TODO: how to specify namespace?
+	hc, err := r.HelmConfig(r.Orig.Namespace)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	client := action.NewHistory(hc)
 	revs, err := client.Run(r.Orig.Name)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get revisions of release")
@@ -138,9 +167,13 @@ func (r *Release) History() ([]*Release, error) {
 }
 
 func (r *Release) Uninstall() error {
-	client := action.NewUninstall(r.HelmConfig)
-	_, err := client.Run(r.Orig.Name)
-	// TODO: how to set namespace?
+	hc, err := r.HelmConfig(r.Orig.Namespace)
+	if err != nil {
+		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	client := action.NewUninstall(hc)
+	_, err = client.Run(r.Orig.Name)
 	if err != nil {
 		return errorx.Decorate(err, "failed to uninstall release")
 	}
@@ -148,9 +181,13 @@ func (r *Release) Uninstall() error {
 }
 
 func (r *Release) Rollback(toRevision int) error {
-	client := action.NewRollback(r.HelmConfig)
+	hc, err := r.HelmConfig(r.Orig.Namespace)
+	if err != nil {
+		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	client := action.NewRollback(hc)
 	client.Version = toRevision
-	// TODO: how to set namespace?
 	return client.Run(r.Orig.Name)
 }
 

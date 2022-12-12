@@ -3,12 +3,14 @@ package subproc
 import (
 	"context"
 	"encoding/json"
+	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/kube"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	testapiv1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"os"
 	"regexp"
@@ -160,6 +162,18 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 type K8s struct {
 	KubectlConfig *api.Config
 	KubectlClient *kube.Client
+}
+
+func NewK8s(client *kube.Client) (*K8s, error) {
+	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get kubectl config")
+	}
+
+	return &K8s{
+		KubectlConfig: cfg,
+		KubectlClient: client,
+	}, nil
 }
 
 func (k *K8s) ListContexts() ([]KubeContext, error) {

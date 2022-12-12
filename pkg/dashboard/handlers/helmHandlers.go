@@ -46,7 +46,14 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	err = h.Data.ReleaseUninstall(qp.Namespace, qp.Name)
+
+	rel, err := h.Data.App.ReleaseByName(qp.Namespace, qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	err = rel.Uninstall()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

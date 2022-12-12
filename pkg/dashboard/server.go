@@ -46,13 +46,13 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 
 	discoverScanners(&data)
 
-	c, err := subproc.NewHelmConfig("")
+	app, err := subproc.NewApplication(subproc.NewHelmConfig)
+	err = app.CheckConnectivity()
 	if err != nil {
-		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
+		log.Errorf("Failed to check that Application is operational, cannot continue. The error was: %s", err)
 		os.Exit(1) // TODO: propagate error instead?
 	}
 
-	app, err := subproc.NewApplication(c)
 	data.App = app // TODO: temporarily here
 
 	abort := make(utils.ControlChan)
