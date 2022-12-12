@@ -24,8 +24,7 @@ type HelmConfigGetter = func(ctx string, ns string) (*action.Configuration, erro
 type HelmNSConfigGetter = func(ns string) (*action.Configuration, error)
 
 type Application struct {
-	HelmConfig HelmConfigGetter
-	ctxConfig  HelmNSConfigGetter
+	HelmConfig HelmNSConfigGetter
 
 	K8s                *K8s
 	CurrentContextName string
@@ -35,9 +34,8 @@ type Application struct {
 	repositories []*Repository
 }
 
-func NewApplication(helmConfig HelmConfigGetter) (*Application, error) {
-
-	hc, err := ctxConfig("") // TODO: are these the right options?
+func NewApplication(helmConfig HelmNSConfigGetter) (*Application, error) {
+	hc, err := helmConfig("") // TODO: are these the right options?
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
@@ -59,7 +57,7 @@ func NewApplication(helmConfig HelmConfigGetter) (*Application, error) {
 }
 
 func (a *Application) GetReleases() ([]*Release, error) {
-	hc, err := a.ctxConfig("")
+	hc, err := a.HelmConfig("")
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
@@ -89,12 +87,6 @@ func (a *Application) CheckConnectivity() error {
 	if err != nil {
 		return errorx.Decorate(err, "failed to validate k8s cluster connectivity")
 	}
-	return nil
-}
-
-func (a *Application) SetContext(ctx string) error {
-	a.CurrentContextName = ctx
-	a.ctxConfig=
 	return nil
 }
 
@@ -141,7 +133,7 @@ func NewHelmConfig(ctx string, ns string) (*action.Configuration, error) {
 }
 
 type Release struct {
-	HelmConfig HelmConfigGetter
+	HelmConfig HelmNSConfigGetter
 	Orig       *release.Release
 	revisions  []*Release
 }

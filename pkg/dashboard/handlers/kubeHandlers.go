@@ -4,18 +4,22 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
 
 type KubeHandler struct {
-	Data *subproc.DataLayer
+	*Contexted
 }
 
 func (h *KubeHandler) GetContexts(c *gin.Context) {
-	res, err := h.Data.App.K8s.ListContexts()
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	res, err := app.K8s.ListContexts()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -73,7 +77,12 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
-	res, err := h.Data.App.K8s.GetNameSpaces()
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	res, err := app.K8s.GetNameSpaces()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

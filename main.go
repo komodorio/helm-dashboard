@@ -92,7 +92,8 @@ func parseFlags() options {
 	}
 
 	if len(args) > 0 {
-		panic("The program does not take argumants, see --help for usage")
+		fmt.Println("The program does not take arguments, see --help for usage")
+		os.Exit(1)
 	}
 	return opts
 }

@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
+	"helm.sh/helm/v3/pkg/action"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/hexops/gotextdiff"
@@ -27,7 +30,10 @@ type DataLayer struct {
 	StatusInfo  *StatusInfo
 	Namespace   string
 	Cache       *Cache
-	App         *Application
+
+	ConfGen         HelmConfigGetter
+	appPerContext   map[string]*Application
+	appPerContextMx *sync.Mutex
 }
 
 type StatusInfo struct {
@@ -37,6 +43,22 @@ type StatusInfo struct {
 	LimitedToNamespace string
 	CacheHitRatio      float64
 	ClusterMode        bool
+}
+
+func NewDataLayer(ns string, ver string, cg HelmConfigGetter) *DataLayer {
+	return &DataLayer{
+		Namespace: ns,
+		Cache:     NewCache(),
+		StatusInfo: &StatusInfo{
+			CurVer:             ver,
+			Analytics:          false,
+			LimitedToNamespace: ns,
+		},
+
+		ConfGen:         cg,
+		appPerContext:   map[string]*Application{},
+		appPerContextMx: new(sync.Mutex),
+	}
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
@@ -286,7 +308,29 @@ func (d *DataLayer) SetContext(ctx string) error {
 			return errors.Wrap(err, "failed to set context")
 		}
 	}
+
 	return nil
+}
+
+func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
+	d.appPerContextMx.Lock()
+	defer d.appPerContextMx.Unlock()
+
+	app, ok := d.appPerContext[ctx]
+	if !ok {
+		cfgGetter := func(ns string) (*action.Configuration, error) {
+			return d.ConfGen(ctx, ns)
+		}
+
+		a, err := NewApplication(cfgGetter)
+		if err != nil {
+			return nil, errorx.Decorate(err, "Failed to create application for context '%s'", ctx)
+		}
+
+		app = a
+		d.appPerContext[ctx] = app
+	}
+	return app, nil
 }
 
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {

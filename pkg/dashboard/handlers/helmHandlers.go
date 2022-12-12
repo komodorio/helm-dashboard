@@ -13,11 +13,16 @@ import (
 )
 
 type HelmHandler struct {
-	Data *subproc.DataLayer
+	*Contexted
 }
 
 func (h *HelmHandler) GetReleases(c *gin.Context) {
-	rels, err := h.Data.App.GetReleases()
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rels, err := app.GetReleases()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -47,7 +52,12 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 		return
 	}
 
-	rel, err := h.Data.App.ReleaseByName(qp.Namespace, qp.Name)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return

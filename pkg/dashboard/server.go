@@ -26,15 +26,7 @@ type Server struct {
 }
 
 func (s Server) StartServer() (string, utils.ControlChan) {
-	data := subproc.DataLayer{
-		Namespace: s.Namespace,
-		Cache:     subproc.NewCache(),
-		StatusInfo: &subproc.StatusInfo{
-			CurVer:             s.Version,
-			Analytics:          false,
-			LimitedToNamespace: s.Namespace,
-		},
-	}
+	data := subproc.NewDataLayer(s.Namespace, s.Version, subproc.NewHelmConfig)
 	err := data.CheckConnectivity()
 	if err != nil {
 		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
@@ -44,19 +36,10 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
 	go checkUpgrade(data.StatusInfo)
 
-	discoverScanners(&data)
-
-	app, err := subproc.NewApplication(subproc.NewHelmConfig)
-	err = app.CheckConnectivity()
-	if err != nil {
-		log.Errorf("Failed to check that Application is operational, cannot continue. The error was: %s", err)
-		os.Exit(1) // TODO: propagate error instead?
-	}
-
-	data.App = app // TODO: temporarily here
+	discoverScanners(data)
 
 	abort := make(utils.ControlChan)
-	api := NewRouter(abort, &data, s.Debug)
+	api := NewRouter(abort, data, s.Debug)
 	done := s.startBackgroundServer(api, abort)
 
 	return "http://" + s.Address, done

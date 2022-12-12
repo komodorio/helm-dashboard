@@ -26,7 +26,7 @@ func errorHandler(c *gin.Context) {
 
 	errs := ""
 	for _, err := range c.Errors {
-		log.Debugf("Error: %s", err)
+		log.Debugf("Error: %+v", err)
 		errs += err.Error() + "\n"
 	}
 
@@ -37,13 +37,24 @@ func errorHandler(c *gin.Context) {
 
 func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctxName := ""
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
 			log.Debugf("Setting current context to: %s", ctx)
-			if err := data.SetContext(ctx[0]); err != nil {
+			ctxName = ctx[0]
+			if err := data.SetContext(ctxName); err != nil {
 				c.String(http.StatusInternalServerError, err.Error())
 				return
 			}
 		}
+
+		app, err := data.AppForCtx(ctxName)
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.Set(handlers.APP, app)
+
 		c.Next()
 	}
 }
@@ -98,7 +109,11 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 }
 
 func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.HelmHandler{Data: data}
+	h := handlers.HelmHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 
 	api.GET("/charts", h.GetReleases)
 	api.DELETE("/charts", h.Uninstall)
@@ -120,7 +135,11 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 }
 
 func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.KubeHandler{Data: data}
+	h := handlers.KubeHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 	api.GET("/contexts", h.GetContexts)
 	api.GET("/resources/:kind", h.GetResourceInfo)
 	api.GET("/describe/:kind", h.Describe)
