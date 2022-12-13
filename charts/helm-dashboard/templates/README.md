@@ -50,7 +50,7 @@ The command removes all the Kubernetes components associated with the chart and 
 The following table lists the configurable parameters of the chart and their default values.
 
 | Parameter                        | Description                                                                                         | Default                              |
-| -------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ | --- |
+| -------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | `image.repository`               | Image registry/name                                                                                 | `docker.io/komodorio/helm-dashboard` |
 | `image.tag`                      | Image tag                                                                                           |                                      |
 | `image.pullPolicy`               | Image pull policy                                                                                   | `IfNotPresent`                       |
@@ -66,7 +66,7 @@ The following table lists the configurable parameters of the chart and their def
 | `serviceAccount.name`            | Optional name for the service account                                                               | `{RELEASE_FULLNAME}`                 |
 | `nodeSelector`                   | Node labels for pod assignment                                                                      |                                      |
 | `affinity`                       | Affinity settings for pod assignment                                                                |                                      |
-| `tolerations`                    | Tolerations for pod assignment                                                                      |                                      |     |
+| `tolerations`                    | Tolerations for pod assignment                                                                      |                                      |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
