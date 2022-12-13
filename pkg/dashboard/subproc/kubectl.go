@@ -5,13 +5,22 @@ import (
 	"encoding/json"
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/kube"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	testapiv1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/resource"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
+	describecmd "k8s.io/kubectl/pkg/cmd/describe"
+	cmdutil "k8s.io/kubectl/pkg/cmd/util"
+	"k8s.io/kubectl/pkg/describe"
 	"os"
 	"regexp"
 	"sort"
@@ -159,20 +168,50 @@ func (d *DataLayer) DescribeResource(namespace string, kind string, name string)
 	return out, nil
 }
 
-type K8s struct {
-	KubectlConfig *api.Config
-	KubectlClient *kube.Client
+type ProxyObject struct {
+	Impl action.RESTClientGetter
 }
 
-func NewK8s(client *kube.Client) (*K8s, error) {
+func (p *ProxyObject) ToRESTConfig() (*rest.Config, error) {
+	return p.Impl.ToRESTConfig()
+}
+
+func (p *ProxyObject) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
+	return p.Impl.ToDiscoveryClient()
+}
+
+func (p *ProxyObject) ToRESTMapper() (meta.RESTMapper, error) {
+	return p.Impl.ToRESTMapper()
+}
+
+func (p *ProxyObject) ToRawKubeConfigLoader() clientcmd.ClientConfig {
+	panic("Not implemented, stub")
+}
+
+type K8s struct {
+	KubectlConfig    *api.Config
+	KubectlClient    *kube.Client
+	RestClientGetter genericclioptions.RESTClientGetter
+}
+
+func NewK8s(helmConfig *action.Configuration) (*K8s, error) {
 	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get kubectl config")
 	}
 
+	client, ok := helmConfig.KubeClient.(*kube.Client)
+	if !ok {
+		return nil, errors.New("Failed to cast Helm's KubeClient into kube.Client")
+	}
+
+	//ConfigFlags:
+	factory := cmdutil.NewFactory(&ProxyObject{Impl: helmConfig.RESTClientGetter})
+
 	return &K8s{
-		KubectlConfig: cfg,
-		KubectlClient: client,
+		KubectlConfig:    cfg,
+		KubectlClient:    client,
+		RestClientGetter: factory,
 	}, nil
 }
 
@@ -210,10 +249,39 @@ func (k *K8s) GetNameSpaces() (res *corev1.NamespaceList, err error) {
 	return lst, nil
 }
 
-func (k *K8s) GetResource(namespace string, def *testapiv1.Carp) (*testapiv1.Carp, error) {
-	resp := k.KubectlClient.Factory.NewBuilder().NamespaceParam(namespace).ResourceNames(def.Kind, def.Name).Do()
-	_ = resp
+func (k *K8s) GetResource(namespace string, def string) (*v1.Carp, error) {
+	//resp := k.KubectlClient.RestClientGetter.NewBuilder().NamespaceParam(namespace).ResourceNames(def.Kind, def.Name).Do()
+	///_ = resp
 	// FIXME what's next
 
 	return nil, nil
+}
+
+func (k *K8s) DescribeResource(kind string, ns string, name string) (string, error) {
+	log.Debugf("Describing resource: %s %s in %s", kind, name, ns)
+	streams, _, out, errout := genericclioptions.NewTestIOStreams()
+	o := &describecmd.DescribeOptions{
+		Describer: func(mapping *meta.RESTMapping) (describe.ResourceDescriber, error) {
+			return describe.DescriberFn(k.RestClientGetter, mapping)
+		},
+		FilenameOptions: &resource.FilenameOptions{},
+		DescriberSettings: &describe.DescriberSettings{
+			ShowEvents: true,
+			ChunkSize:  cmdutil.DefaultChunkSize,
+		},
+
+		IOStreams: streams,
+
+		NewBuilder: k.KubectlClient.Factory.NewBuilder,
+	}
+
+	o.Namespace = ns
+	o.BuilderArgs = []string{kind, name}
+
+	err := o.Run()
+	if err != nil {
+		return "", errorx.Decorate(err, "Failed to run describe command: %s", errout.String())
+	}
+
+	return out.String(), nil
 }

@@ -7,9 +7,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/kube"
 	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/release"
+	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"os"
 
 	// Import to initialize client auth plugins.
@@ -40,12 +40,7 @@ func NewApplication(helmConfig HelmNSConfigGetter) (*Application, error) {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
 
-	client, ok := hc.KubeClient.(*kube.Client)
-	if !ok {
-		return nil, errors.New("Failed to cast Helm's KubeClient into kube.Client")
-	}
-
-	k8s, err := NewK8s(client)
+	k8s, err := NewK8s(hc)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get k8s client")
 	}
@@ -182,6 +177,21 @@ func (r *Release) Rollback(toRevision int) error {
 	client := action.NewRollback(hc)
 	client.Version = toRevision
 	return client.Run(r.Orig.Name)
+}
+
+func (r *Release) ParsedManifests() ([]*v1.Carp, error) {
+	carps, err := ParseManifests(r.Orig.Manifest)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, carp := range carps {
+		if carp.Namespace == "" {
+			carp.Namespace = r.Orig.Namespace
+		}
+	}
+
+	return carps, err
 }
 
 type Repository struct {

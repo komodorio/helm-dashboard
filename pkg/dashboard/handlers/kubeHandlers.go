@@ -67,7 +67,12 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.DescribeResource(qp.Namespace, c.Param("kind"), qp.Name)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	res, err := app.K8s.DescribeResource(c.Param("kind"), qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
