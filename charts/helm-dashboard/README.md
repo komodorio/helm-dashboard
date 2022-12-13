@@ -22,7 +22,7 @@ This chart bootstraps a Helm Dashboard deployment on a [Kubernetes](http://kuber
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm install my-release .
+helm install my-release .
 ```
 
 The command deploys Helm Dashboard on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -34,7 +34,7 @@ The command deploys Helm Dashboard on the Kubernetes cluster in the default conf
 To uninstall/delete the `my-release` deployment:
 
 ```bash
-$ helm uninstall my-release
+helm uninstall my-release
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -65,7 +65,7 @@ The following table lists the configurable parameters of the chart and their def
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 ```bash
-$ helm upgrade --install my-release komodorio/helm-dashboard --set dashboard.allowAdvancedActions=true --set service.port=9090
+helm upgrade --install my-release komodorio/helm-dashboard --set dashboard.allowWriteActions=true --set service.port=9090
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
