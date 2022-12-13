@@ -34,7 +34,7 @@ The command deploys Helm Dashboard on the Kubernetes cluster in the default conf
 To uninstall/delete the `my-release` deployment:
 
 ```bash
-helm uninstall my-release
+$ helm uninstall my-release
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -43,29 +43,29 @@ The command removes all the Kubernetes components associated with the chart and 
 
 The following table lists the configurable parameters of the chart and their default values.
 
-| Parameter                        | Description                                                                                         | Default                              |
-| -------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `image.repository`               | Image registry/name                                                                                 | `docker.io/komodorio/helm-dashboard` |
-| `image.tag`                      | Image tag                                                                                           |                                      |
-| `image.pullPolicy`               | Image pull policy                                                                                   | `IfNotPresent`                       |
-| `replicaCount`                   | Number of dashboard Pods to run                                                                     |                                      |
-| `dashboard.allowAdvancedActions` | Enables not read-only mode. Allow modifying, deleting and creating charts and kubernetes resources. | `false`                              |
-| `resources.requests.cpu`         | CPU resource requests                                                                               | `200m`                               |
-| `resources.limits.cpu`           | CPU resource limits                                                                                 | `1`                                  |
-| `resources.requests.memory`      | Memory resource requests                                                                            | `256Mi`                              |
-| `resources.limits.memory`        | Memory resource limits                                                                              | `1Gi`                                |
-| `service.type           `        | Kubernetes service type                                                                             | `ClusterIP`                          |
-| `service.port           `        | Kubernetes service port                                                                             | `8080`                               |
-| `serviceAccount.create`          | Creates a service account                                                                           | `true`                               |
-| `serviceAccount.name`            | Optional name for the service account                                                               | `{RELEASE_FULLNAME}`                 |
-| `nodeSelector`                   | Node labels for pod assignment                                                                      |                                      |
-| `affinity`                       | Affinity settings for pod assignment                                                                |                                      |
-| `tolerations`                    | Tolerations for pod assignment                                                                      |                                      |
+| Parameter                     | Description                                                                                    | Default                              |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `image.repository`            | Image registry/name                                                                            | `docker.io/komodorio/helm-dashboard` |
+| `image.tag`                   | Image tag                                                                                      |                                      |
+| `image.pullPolicy`            | Image pull policy                                                                              | `IfNotPresent`                       |
+| `replicaCount`                | Number of dashboard Pods to run                                                                |                                      |
+| `dashboard.allowWriteActions` | Enables write actions. Allow modifying, deleting and creating charts and kubernetes resources. | `false`                              |
+| `resources.requests.cpu`      | CPU resource requests                                                                          | `200m`                               |
+| `resources.limits.cpu`        | CPU resource limits                                                                            | `1`                                  |
+| `resources.requests.memory`   | Memory resource requests                                                                       | `256Mi`                              |
+| `resources.limits.memory`     | Memory resource limits                                                                         | `1Gi`                                |
+| `service.type           `     | Kubernetes service type                                                                        | `ClusterIP`                          |
+| `service.port           `     | Kubernetes service port                                                                        | `8080`                               |
+| `serviceAccount.create`       | Creates a service account                                                                      | `true`                               |
+| `serviceAccount.name`         | Optional name for the service account                                                          | `{RELEASE_FULLNAME}`                 |
+| `nodeSelector`                | Node labels for pod assignment                                                                 |                                      |
+| `affinity`                    | Affinity settings for pod assignment                                                           |                                      |
+| `tolerations`                 | Tolerations for pod assignment                                                                 |                                      |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 ```bash
-helm upgrade --install my-release komodorio/helm-dashboard --set dashboard.allowAdvancedActions=true --set service.port=9090
+$ helm upgrade --install my-release komodorio/helm-dashboard --set dashboard.allowAdvancedActions=true --set service.port=9090
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
