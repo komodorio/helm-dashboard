@@ -5,6 +5,11 @@ on:
     tags:
       - "v*"
 
+env:
+  HELM_REP: helm-charts
+  GH_OWNER: komodorio
+  CHART_DIR: charts/helm-dashboard
+
 jobs:
   pre_release:
     runs-on: ubuntu-latest
@@ -55,6 +60,7 @@ jobs:
 
   image:
     runs-on: ubuntu-latest
+    needs: release
     timeout-minutes: 60
     steps:
       - name: Check out the repo
@@ -83,9 +89,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: VER=${{ needs.pre_release.outputs.release_tag }}
 
-  bump_versions:
+  publish_chart:
     runs-on: ubuntu-latest
-    needs: [image, release]
+    need: image
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -99,7 +106,19 @@ jobs:
           git checkout main
           sh ./ci/bump-versions.sh
           git add charts/helm-dashboard/Chart.yaml
-          git commit -m "CI: Increment chart versions" || echo "Already up-to-date"
+          git commit -m "Increment chart versions [skip ci]" || echo "Already up-to-date"
           git push -f || echo "Nothing to push!"
         env:
           APP_VERSION: ${{ needs.pre_release.outputs.release_tag }}
+      - name: Push folder to helm-charts repository
+        uses: crykn/copy_folder_to_another_repo_action@v1.0.6
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.KOMI_WORKFLOW_TOKEN }}
+        with:
+          source_folder: "charts/helm-dashboard"
+          destination_repo: "komodorio/helm-charts"
+          destination_folder: "charts/helm-dashboard"
+          user_email: "komi@komodor.io"
+          user_name: "komodor-bot"
+          destination_branch: "master"
+          commit_msg: "feat(helm-dashboard): ${{ github.event.head_commit.message }}" #important!! don't change this commit message unless you change the condition in pipeline.yml on helm-charts repo

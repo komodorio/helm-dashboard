@@ -29,12 +29,9 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          #env:
-          #  - name: DEBUG
-          #    value: "1"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "komodorio/helm-dashboard:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

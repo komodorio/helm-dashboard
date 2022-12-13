@@ -2,12 +2,11 @@
 
 WORKING_DIRECTORY="$PWD"
 
-[ "$APP_VERSION" ] || {
-  echo "ERROR: Environment variable APP_VERSION is required"
-  exit 1
-}
-
 [ -z "$HELM_CHARTS_SOURCE" ] && HELM_CHARTS_SOURCE="$WORKING_DIRECTORY/charts/helm-dashboard"
+
+[ -z "$APP_VERSION" ] && {
+  APP_VERSION=$(cat ${HELM_CHARTS_SOURCE}/Chart.yaml | grep 'appVersion:' | awk -F'"' '{print $2}')
+}
 
 sed -i -e "s/appVersion.*/appVersion: \"${APP_VERSION}\" /g" ${HELM_CHARTS_SOURCE}/Chart.yaml
 CURRENT_VERSION=$(cat ${HELM_CHARTS_SOURCE}/Chart.yaml | grep 'version:' | awk '{print $2}')
