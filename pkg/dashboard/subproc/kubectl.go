@@ -12,7 +12,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	testapiv1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/cli-runtime/pkg/resource"
@@ -33,6 +33,7 @@ type KubeContext struct {
 	Namespace string
 }
 
+// maps action.RESTClientGetter into  genericclioptions.RESTClientGetter
 type cfgProxyObject struct {
 	Impl action.RESTClientGetter
 }
@@ -130,7 +131,7 @@ func (k *K8s) GetResource(kind string, namespace string, name string) (*runtime.
 	return &obj, nil
 }
 
-func (k *K8s) GetResourceInfo(kind string, namespace string, name string) (*v1.Carp, error) {
+func (k *K8s) GetResourceInfo(kind string, namespace string, name string) (*testapiv1.Carp, error) {
 	obj, err := k.GetResource(kind, namespace, name)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get k8s object")
@@ -141,7 +142,7 @@ func (k *K8s) GetResourceInfo(kind string, namespace string, name string) (*v1.C
 		return nil, errorx.Decorate(err, "failed to marshal k8s object into JSON")
 	}
 
-	res := new(v1.Carp)
+	res := new(testapiv1.Carp)
 	err = json.Unmarshal(data, &res)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to decode k8s object from JSON")

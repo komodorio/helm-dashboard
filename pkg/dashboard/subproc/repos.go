@@ -3,8 +3,6 @@ package subproc
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	"strings"
@@ -97,7 +95,12 @@ func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, e
 		return nil, err
 	}
 
-	ins, err := d.ListInstalled()
+	app, err := d.AppForCtx(d.KubeContext)
+	if err != nil {
+		return nil, err
+	}
+
+	ins, err := app.GetReleases()
 	if err != nil {
 		return nil, err
 	}
@@ -107,20 +110,14 @@ func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, e
 	return res, nil
 }
 
-func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []ReleaseElement) {
+func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []*Release) {
 	for _, rchart := range charts {
 		for _, rel := range installed {
-			c, _, err := utils.ChartAndVersion(rel.Chart)
-			if err != nil {
-				log.Warnf("Failed to parse chart: %s", err)
-				continue
-			}
-
 			pieces := strings.Split(rchart.Name, "/")
-			if pieces[1] == c {
+			if pieces[1] == rel.Orig.Chart.Name() {
 				// TODO: there can be more than one
-				rchart.InstalledNamespace = rel.Namespace
-				rchart.InstalledName = rel.Name
+				rchart.InstalledNamespace = rel.Orig.Namespace
+				rchart.InstalledName = rel.Orig.Name
 			}
 		}
 	}

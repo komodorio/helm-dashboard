@@ -162,30 +162,6 @@ func (d *DataLayer) GetStatus() *StatusInfo {
 	return d.StatusInfo
 }
 
-func (d *DataLayer) ListInstalled() (res []ReleaseElement, err error) {
-	cmd := []string{"ls", "--all", "--output", "json", "--time-format", time.RFC3339}
-
-	// TODO: filter by namespace
-	if d.Namespace == "" {
-		cmd = append(cmd, "--all-namespaces")
-	} else {
-		cmd = append(cmd, "--namespace", d.Namespace)
-	}
-
-	out, err := d.Cache.String(CacheKeyRelList, nil, func() (string, error) {
-		return d.runCommandHelm(cmd...)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal([]byte(out), &res)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
 func (d *DataLayer) ReleaseHistory(namespace string, releaseName string) (res []*HistoryElement, err error) {
 	// TODO: there is `max` but there is no `offset`
 	ct := cacheTagRelease(namespace, releaseName)
