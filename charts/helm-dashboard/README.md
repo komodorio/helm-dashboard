@@ -12,7 +12,7 @@ This chart bootstraps a Helm Dashboard deployment on a [Kubernetes](http://kuber
 
 ## Prerequisites
 
-- Kubernetes 1.16+ (older versions not tested)
+- Kubernetes 1.16+
 - Helm 3+
 
 ## Installing from the Komodorio Repository
@@ -31,7 +31,7 @@ To install the chart with the release name `my-release`:
 $ helm install my-release .
 ```
 
-The command deploys Helm-Dashboard on the Kubernetes cluster in the default configuration. The [parameters](#parameters) section lists the parameters that can be configured during installation.
+The command deploys Helm Dashboard on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
 
