@@ -7,6 +7,9 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -34,6 +37,7 @@ type DataLayer struct {
 	ConfGen         HelmConfigGetter
 	appPerContext   map[string]*Application
 	appPerContextMx *sync.Mutex
+	KubeConfig      *api.Config // just used to query
 }
 
 type StatusInfo struct {
@@ -45,7 +49,12 @@ type StatusInfo struct {
 	ClusterMode        bool
 }
 
-func NewDataLayer(ns string, ver string, cg HelmConfigGetter) *DataLayer {
+func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
+	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get kubectl config")
+	}
+
 	return &DataLayer{
 		Namespace: ns,
 		Cache:     NewCache(),
@@ -58,7 +67,9 @@ func NewDataLayer(ns string, ver string, cg HelmConfigGetter) *DataLayer {
 		ConfGen:         cg,
 		appPerContext:   map[string]*Application{},
 		appPerContextMx: new(sync.Mutex),
-	}
+
+		KubeConfig: cfg,
+	}, nil
 }
 
 func (d *DataLayer) runCommand(cmd ...string) (string, error) {
@@ -91,6 +102,26 @@ func (d *DataLayer) forceNamespace(s *string) {
 	}
 }
 
+func (d *DataLayer) ListContexts() ([]KubeContext, error) {
+	res := []KubeContext{}
+
+	if os.Getenv("HD_CLUSTER_MODE") != "" {
+		return res, nil
+	}
+
+	for name, ctx := range d.KubeConfig.Contexts {
+		res = append(res, KubeContext{
+			IsCurrent: d.KubeConfig.CurrentContext == name,
+			Name:      name,
+			Cluster:   ctx.Cluster,
+			AuthInfo:  ctx.AuthInfo,
+			Namespace: ctx.Namespace,
+		})
+	}
+
+	return res, nil
+}
+
 func (d *DataLayer) CheckConnectivity() error {
 	contexts, err := d.ListContexts()
 	if err != nil {
@@ -99,11 +130,16 @@ func (d *DataLayer) CheckConnectivity() error {
 
 	if len(contexts) < 1 {
 		log.Debugf("Did not find any contexts, will try checking k8s")
-		_, err := d.runCommandKubectl("get", "pods")
+		app, err := d.AppForCtx("")
 		if err != nil {
-			log.Debugf("The error were: %s", err)
 			return errors.New("did not find any kubectl contexts configured")
 		}
+
+		err = app.K8s.KubectlClient.IsReachable()
+		if err != nil {
+			return errorx.Decorate(err, "failed to access k8s cluster")
+		}
+
 		log.Infof("Assuming k8s environment")
 		d.StatusInfo.ClusterMode = true
 	}

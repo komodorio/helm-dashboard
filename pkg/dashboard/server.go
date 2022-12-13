@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/joomcode/errorx"
 	"net/http"
 	"os"
 	"strings"
@@ -25,12 +26,15 @@ type Server struct {
 	NoTracking bool
 }
 
-func (s Server) StartServer() (string, utils.ControlChan) {
-	data := subproc.NewDataLayer(s.Namespace, s.Version, subproc.NewHelmConfig)
-	err := data.CheckConnectivity()
+func (s Server) StartServer() (string, utils.ControlChan, error) {
+	data, err := subproc.NewDataLayer(s.Namespace, s.Version, subproc.NewHelmConfig)
 	if err != nil {
-		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
-		os.Exit(1) // TODO: propagate error instead?
+		return "", nil, errorx.Decorate(err, "Failed to create data layer")
+	}
+
+	err = data.CheckConnectivity()
+	if err != nil {
+		return "", nil, errorx.Decorate(err, "Failed to check that Helm is operational")
 	}
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
@@ -42,7 +46,7 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 	api := NewRouter(abort, data, s.Debug)
 	done := s.startBackgroundServer(api, abort)
 
-	return "http://" + s.Address, done
+	return "http://" + s.Address, done, nil
 }
 
 func (s Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {

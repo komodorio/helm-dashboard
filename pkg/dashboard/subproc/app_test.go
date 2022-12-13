@@ -33,6 +33,12 @@ func TestApplication_GetReleases(t *testing.T) {
 				log.Fatalf("%+v", err)
 			}
 			log.Infof(dtext)
+
+			resource, err := app.K8s.GetResource(res.Kind, res.Namespace, res.Name)
+			if err != nil {
+				log.Fatalf("%+v", err)
+			}
+			log.Infof("%v", resource)
 		}
 
 		hist, err := rel.History()

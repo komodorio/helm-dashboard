@@ -47,7 +47,10 @@ func main() {
 		Debug:      opts.Verbose,
 		NoTracking: opts.NoTracking,
 	}
-	address, webServerDone := server.StartServer()
+	address, webServerDone, err := server.StartServer()
+	if err != nil {
+		log.Fatalf("Failed to start Helm Dashboard: %+v", err)
+	}
 
 	if !opts.NoTracking {
 		log.Infof("User analytics is collected to improve the quality, disable it with --no-analytics")

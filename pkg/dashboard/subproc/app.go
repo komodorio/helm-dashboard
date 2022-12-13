@@ -102,6 +102,7 @@ func (a *Application) ReleaseByName(namespace string, name string) (*Release, er
 
 func NewHelmConfig(ctx string, ns string) (*action.Configuration, error) {
 	// TODO: cache it into map
+	// TODO: I feel there should be more elegant way to organize this code
 	settings := cli.New()
 	settings.KubeContext = ctx
 	actionConfig := new(action.Configuration)
