@@ -3,7 +3,9 @@
 ## TL;DR;
 
 ```bash
-$ helm install helm-dashboard .
+helm repo add komodorio https://helm-charts.komodor.io
+helm repo update
+helm upgrade --install my-release komodorio/helm-dashboard
 ```
 
 ## Introduction
@@ -14,14 +16,6 @@ This chart bootstraps a Helm Dashboard deployment on a [Kubernetes](http://kuber
 
 - Kubernetes 1.16+
 - Helm 3+
-
-## Installing from the Komodorio Repository
-
-```bash
-helm repo add komodorio https://helm-charts.komodor.io
-helm repo update
-helm upgrade --install my-release komodorio/helm-dashboard
-```
 
 ## Installing the Chart
 
