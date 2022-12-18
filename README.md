@@ -1,4 +1,4 @@
-# ![Helm Dashboard](pkg/dashboard/static/logo-header.svg)
+# ![Helm Dashboard](pkg/dashboard/static/logo-header.svg#gh-light-mode-only) ![Helm Dashboard](pkg/dashboard/static/logo-header-inverted.svg#gh-dark-mode-only)
 
 A simplified way of working with Helm.
 
