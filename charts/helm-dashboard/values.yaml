@@ -59,7 +59,7 @@ dashboard:
 
     ## Helm Dashboard data Persistent Volume size
     ##
-    size: 2Gi
+    size: 100M
 
 podAnnotations: {}
 
