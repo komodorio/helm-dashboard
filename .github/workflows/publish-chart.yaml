@@ -1,5 +1,6 @@
 name: publish helm chart
 
+# for manual running in case we need to update the chart without releasing the dashboard app
 on:
   workflow_dispatch:
 
