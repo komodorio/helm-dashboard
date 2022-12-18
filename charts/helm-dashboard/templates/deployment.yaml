@@ -35,11 +35,11 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: HELM_CACHE_HOME
-            value: /opt/dashboard/helm
+            value: /opt/dashboard/helm/cache
           - name: HELM_CONFIG_HOME
-            value: /opt/dashboard/helm
+            value: /opt/dashboard/helm/config
           - name: HELM_DATA_HOME
-            value: /opt/dashboard/helm
+            value: /opt/dashboard/helm/data
           ports:
             - name: http
               containerPort: 8080

@@ -43,24 +43,29 @@ The command removes all the Kubernetes components associated with the chart and 
 
 The following table lists the configurable parameters of the chart and their default values.
 
-| Parameter                     | Description                                                                                    | Default                              |
-| ----------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `image.repository`            | Image registry/name                                                                            | `docker.io/komodorio/helm-dashboard` |
-| `image.tag`                   | Image tag                                                                                      |                                      |
-| `image.pullPolicy`            | Image pull policy                                                                              | `IfNotPresent`                       |
-| `replicaCount`                | Number of dashboard Pods to run                                                                | `1`                                  |
-| `dashboard.allowWriteActions` | Enables write actions. Allow modifying, deleting and creating charts and kubernetes resources. | `false`                              |
-| `resources.requests.cpu`      | CPU resource requests                                                                          | `200m`                               |
-| `resources.limits.cpu`        | CPU resource limits                                                                            | `1`                                  |
-| `resources.requests.memory`   | Memory resource requests                                                                       | `256Mi`                              |
-| `resources.limits.memory`     | Memory resource limits                                                                         | `1Gi`                                |
-| `service.type           `     | Kubernetes service type                                                                        | `ClusterIP`                          |
-| `service.port           `     | Kubernetes service port                                                                        | `8080`                               |
-| `serviceAccount.create`       | Creates a service account                                                                      | `true`                               |
-| `serviceAccount.name`         | Optional name for the service account                                                          | `{RELEASE_FULLNAME}`                 |
-| `nodeSelector`                | Node labels for pod assignment                                                                 |                                      |
-| `affinity`                    | Affinity settings for pod assignment                                                           |                                      |
-| `tolerations`                 | Tolerations for pod assignment                                                                 |                                      |
+| Parameter                            | Description                                                                                    | Default                              |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `image.repository`                   | Image registry/name                                                                            | `docker.io/komodorio/helm-dashboard` |
+| `image.tag`                          | Image tag                                                                                      |                                      |
+| `image.pullPolicy`                   | Image pull policy                                                                              | `IfNotPresent`                       |
+| `replicaCount`                       | Number of dashboard Pods to run                                                                | `1`                                  |
+| `dashboard.allowWriteActions`        | Enables write actions. Allow modifying, deleting and creating charts and kubernetes resources. | `false`                              |
+| `resources.requests.cpu`             | CPU resource requests                                                                          | `200m`                               |
+| `resources.limits.cpu`               | CPU resource limits                                                                            | `1`                                  |
+| `resources.requests.memory`          | Memory resource requests                                                                       | `256Mi`                              |
+| `resources.limits.memory`            | Memory resource limits                                                                         | `1Gi`                                |
+| `service.type           `            | Kubernetes service type                                                                        | `ClusterIP`                          |
+| `service.port           `            | Kubernetes service port                                                                        | `8080`                               |
+| `serviceAccount.create`              | Creates a service account                                                                      | `true`                               |
+| `serviceAccount.name`                | Optional name for the service account                                                          | `{RELEASE_FULLNAME}`                 |
+| `nodeSelector`                       | Node labels for pod assignment                                                                 |                                      |
+| `affinity`                           | Affinity settings for pod assignment                                                           |                                      |
+| `tolerations`                        | Tolerations for pod assignment                                                                 |                                      |
+| `dashboard.persistence.enabled`      | Enable helm data persistene using PVC                                                          | `true`                               |
+| `dashboard.persistence.accessModes`  | Persistent Volume access modes                                                                 | `["ReadWriteOnce"]`                  |
+| `dashboard.persistence.storageClass` | Persistent Volume storage class                                                                | `""`                                 |
+| `dashboard.persistence.size`         | Persistent Volume size                                                                         | `2Gi`                                |
+| `dashboard.persistence.hostPath`     | Set path in case you want to use local host path volumes (not recommended in production)       | `""`                                 |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
