@@ -91,7 +91,7 @@ jobs:
 
   publish_chart:
     runs-on: ubuntu-latest
-    need: image
+    needs: image
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
