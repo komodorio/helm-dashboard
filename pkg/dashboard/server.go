@@ -29,6 +29,11 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 	data := subproc.DataLayer{
 		Namespace: s.Namespace,
 		Cache:     subproc.NewCache(),
+		StatusInfo: &subproc.StatusInfo{
+			CurVer:             s.Version,
+			Analytics:          false,
+			LimitedToNamespace: s.Namespace,
+		},
 	}
 	err := data.CheckConnectivity()
 	if err != nil {
@@ -36,12 +41,7 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 		os.Exit(1) // TODO: propagate error instead?
 	}
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
-	enableAnalytics := (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
-	data.StatusInfo = &subproc.StatusInfo{
-		CurVer:             s.Version,
-		Analytics:          enableAnalytics,
-		LimitedToNamespace: s.Namespace,
-	}
+	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
 	go checkUpgrade(data.StatusInfo)
 
 	discoverScanners(&data)
@@ -113,7 +113,7 @@ func discoverScanners(data *subproc.DataLayer) {
 	}
 }
 
-func checkUpgrade(d *subproc.StatusInfo) {
+func checkUpgrade(d *subproc.StatusInfo) { // TODO: check it once an hour
 	url := "https://api.github.com/repos/komodorio/helm-dashboard/releases/latest"
 	type GHRelease struct {
 		Name string `json:"name"`

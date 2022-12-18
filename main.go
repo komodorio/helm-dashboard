@@ -37,6 +37,7 @@ func main() {
 		opts.BindHost = host
 	}
 
+	opts.Verbose = opts.Verbose || os.Getenv("DEBUG") != ""
 	setupLogging(opts.Verbose)
 
 	server := dashboard.Server{

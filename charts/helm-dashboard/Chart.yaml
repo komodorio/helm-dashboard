@@ -1,0 +1,9 @@
+apiVersion: v2
+type: application
+
+name: helm-dashboard
+description: A GUI Dashboard for Helm by Komodor
+icon: "https://github.com/komodorio/helm-dashboard/blob/main/pkg/dashboard/static/logo.png"
+
+version: 0.1.0
+appVersion: "0.0.0"

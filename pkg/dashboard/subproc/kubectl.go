@@ -3,6 +3,7 @@ package subproc
 import (
 	"encoding/json"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -31,6 +32,12 @@ type KubeContext struct {
 }
 
 func (d *DataLayer) ListContexts() (res []KubeContext, err error) {
+	res = []KubeContext{}
+
+	if os.Getenv("HD_CLUSTER_MODE") != "" {
+		return res, nil
+	}
+
 	out, err := d.runCommandKubectl("config", "get-contexts")
 	if err != nil {
 		return nil, err

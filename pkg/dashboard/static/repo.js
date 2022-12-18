@@ -132,7 +132,8 @@ function repoChartClicked() {
         window.location.reload()
     } else {
         const contexts = $("body").data("contexts")
-        const contextNamespace = contexts.filter(obj => {return obj.Name === getHashParam("context")})[0].Namespace
+        const ctxFiltered = contexts.filter(obj => {return obj.Name === getHashParam("context")});
+        const contextNamespace = ctxFiltered.length?ctxFiltered[0].Namespace:""
         popUpUpgrade(elm, contextNamespace)
     }
 }
