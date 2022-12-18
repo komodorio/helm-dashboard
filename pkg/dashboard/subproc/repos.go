@@ -3,11 +3,12 @@ package subproc
 import (
 	"bytes"
 	"encoding/json"
+	"strings"
+
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
-	"strings"
 )
 
 func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
@@ -65,6 +66,11 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 	}
 
 	cmd := []string{"search", "repo", "--regexp", search, "--versions", "--output", "json"}
+
+	if d.Devel {
+		cmd = append(cmd, "--devel")
+	}
+
 	out, err := d.Cache.String(cacheTagRepoVers(chartName), []string{CacheKeyAllRepos}, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
@@ -85,6 +91,11 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 
 func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, err error) {
 	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
+
+	if d.Devel {
+		cmd = append(cmd, "--devel")
+	}
+
 	out, err := d.Cache.String(cacheTagRepoCharts(repoName), []string{CacheKeyAllRepos}, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
