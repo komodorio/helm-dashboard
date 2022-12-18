@@ -4,25 +4,23 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/hexops/gotextdiff"
+	"github.com/hexops/gotextdiff/myers"
+	"github.com/hexops/gotextdiff/span"
 	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/release"
+	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
-
-	"github.com/hexops/gotextdiff"
-	"github.com/hexops/gotextdiff/myers"
-	"github.com/hexops/gotextdiff/span"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
-	"helm.sh/helm/v3/pkg/release"
-	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
 
 type DataLayer struct {
@@ -162,35 +160,6 @@ func (d *DataLayer) GetStatus() *StatusInfo {
 	return d.StatusInfo
 }
 
-func (d *DataLayer) ReleaseHistory(namespace string, releaseName string) (res []*HistoryElement, err error) {
-	// TODO: there is `max` but there is no `offset`
-	ct := cacheTagRelease(namespace, releaseName)
-	out, err := d.Cache.String(CacheKeyRelHistory+ct, []string{ct}, func() (string, error) {
-		return d.runCommandHelm("history", releaseName, "--namespace", namespace, "--output", "json")
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal([]byte(out), &res)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, elm := range res {
-		chartRepoName, curVer, err := utils.ChartAndVersion(elm.Chart)
-		if err != nil {
-			return nil, err
-		}
-		elm.ChartName = chartRepoName // TODO: move it to frontend?
-		elm.ChartVer = curVer
-		elm.Updated.Time = elm.Updated.Time.Round(time.Second)
-	}
-
-	return res, nil
-}
-
 type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
 
 func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
@@ -200,20 +169,6 @@ func (d *DataLayer) RevisionManifests(namespace string, chartName string, revisi
 	return d.Cache.String(key, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
-}
-
-func (d *DataLayer) RevisionManifestsParsed(namespace string, chartName string, revision int) ([]*v1.Carp, error) {
-	out, err := d.RevisionManifests(namespace, chartName, revision, false)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := ParseManifests(out)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }
 
 func ParseManifests(out string) ([]*v1.Carp, error) {
@@ -264,20 +219,6 @@ func (d *DataLayer) RevisionValues(namespace string, chartName string, revision 
 	return d.Cache.String(key, nil, func() (string, error) {
 		return d.runCommandHelm(cmd...)
 	})
-}
-
-func (d *DataLayer) ReleaseUninstall(namespace string, name string) error {
-	d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
-
-	_, err := d.runCommandHelm("uninstall", name, "--namespace", namespace)
-	return err
-}
-
-func (d *DataLayer) Rollback(namespace string, name string, rev int) error {
-	d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
-
-	_, err := d.runCommandHelm("rollback", name, strconv.Itoa(rev), "--namespace", namespace)
-	return err
 }
 
 func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string, version string, justTemplate bool, values string, reuseVals bool) (string, error) {

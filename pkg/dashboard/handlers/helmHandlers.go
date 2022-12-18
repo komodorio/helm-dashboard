@@ -15,13 +15,33 @@ type HelmHandler struct {
 	*Contexted
 }
 
+func (h *HelmHandler) getRelease(c *gin.Context) (*subproc.Release, *utils.QueryProps) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return nil, nil
+	}
+
+	app := h.GetApp(c)
+	if app == nil {
+		return nil, qp // sets error inside
+	}
+
+	rel, err := app.Releases.ByName(qp.Namespace, qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return nil, qp
+	}
+	return rel, qp
+}
+
 func (h *HelmHandler) GetReleases(c *gin.Context) {
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	rels, err := app.GetReleases()
+	rels, err := app.Releases.List()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -36,24 +56,12 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 }
 
 func (h *HelmHandler) Uninstall(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
+	rel, _ := h.getRelease(c)
+	if rel == nil {
+		return // error state is set inside
 	}
 
-	app := h.GetApp(c)
-	if app == nil {
-		return // sets error inside
-	}
-
-	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	err = rel.Uninstall()
+	err := rel.Uninstall()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -62,24 +70,12 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 }
 
 func (h *HelmHandler) Rollback(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, true)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
+	rel, qp := h.getRelease(c)
+	if rel == nil {
+		return // error state is set inside
 	}
 
-	app := h.GetApp(c)
-	if app == nil {
-		return // sets error inside
-	}
-
-	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	err = rel.Rollback(qp.Revision)
+	err := rel.Rollback(qp.Revision)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -88,21 +84,9 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 }
 
 func (h *HelmHandler) History(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	app := h.GetApp(c)
-	if app == nil {
-		return // sets error inside
-	}
-
-	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
+	rel, _ := h.getRelease(c)
+	if rel == nil {
+		return // error state is set inside
 	}
 
 	revs, err := rel.History()
@@ -120,21 +104,9 @@ func (h *HelmHandler) History(c *gin.Context) {
 }
 
 func (h *HelmHandler) Resources(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, true)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	app := h.GetApp(c)
-	if app == nil {
-		return // sets error inside
-	}
-
-	rel, err := app.ReleaseByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
+	rel, _ := h.getRelease(c)
+	if rel == nil {
+		return // error state is set inside
 	}
 
 	res, err := subproc.ParseManifests(rel.Orig.Manifest)

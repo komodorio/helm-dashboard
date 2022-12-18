@@ -100,7 +100,7 @@ func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, e
 		return nil, err
 	}
 
-	ins, err := app.GetReleases()
+	ins, err := app.Releases.List()
 	if err != nil {
 		return nil, err
 	}
@@ -158,4 +158,8 @@ func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // 
 	}
 
 	return res, nil
+}
+
+type Repositories struct {
+	HelmConfig HelmNSConfigGetter
 }
