@@ -160,7 +160,7 @@ func (d *DataLayer) GetStatus() *StatusInfo {
 	return d.StatusInfo
 }
 
-type SectionFn = func(string, string, int, bool) (string, error) // TODO: rework it into struct-based argument?
+type SectionFn = func(bool) (string, error)
 
 func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
 	cmd := []string{"get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}

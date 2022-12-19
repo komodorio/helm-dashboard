@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"errors"
+	"github.com/joomcode/errorx"
+	"helm.sh/helm/v3/pkg/chartutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -211,15 +213,14 @@ func (h *HelmHandler) Install(c *gin.Context) {
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, true)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
+	rel, _ := h.getRelease(c)
+	if rel == nil {
+		return // error state is set inside
 	}
 
 	flag := c.Query("flag") == "true"
 	rDiff := c.Query("revisionDiff")
-	res, err := handleGetSection(h.Data, c.Param("section"), rDiff, qp, flag)
+	res, err := handleGetSection(h.Data, c.Param("section"), rDiff, rel, flag)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -269,11 +270,21 @@ func (h *HelmHandler) RepoDelete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp *utils.QueryProps, flag bool) (string, error) {
+func handleGetSection(rel *subproc.Release, section string, rDiff string, flag bool) (string, error) {
+	qp := rel.Orig
+
 	sections := map[string]subproc.SectionFn{
-		"manifests": data.RevisionManifests,
-		"values":    data.RevisionValues,
-		"notes":     data.RevisionNotes,
+		"manifests": func(b bool) (string, error) { return qp.Manifest, nil },
+		"notes":     func(b bool) (string, error) { return qp.Info.Notes, nil },
+		"values": func(b bool) (string, error) {
+			allVals := qp.Config
+			allVals, err := chartutil.CoalesceValues(qp.Chart, qp.Config)
+			if err != nil {
+				return "", errorx.Decorate(err, "failed to merge chart vals with user defined")
+			}
+
+			return allVals, nil
+		},
 	}
 
 	functor, found := sections[section]
@@ -292,14 +303,14 @@ func handleGetSection(data *subproc.DataLayer, section string, rDiff string, qp 
 			ext = ".txt"
 		}
 
-		res, err := subproc.RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Revision, flag)
+		res, err := subproc.RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Version, flag)
 		if err != nil {
 			return "", err
 		}
 		return res, nil
 	}
 
-	res, err := functor(qp.Namespace, qp.Name, qp.Revision, flag)
+	res, err := functor(flag)
 	if err != nil {
 		return "", err
 	}

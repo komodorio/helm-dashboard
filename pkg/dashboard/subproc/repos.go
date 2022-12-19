@@ -45,7 +45,7 @@ func (d *DataLayer) ChartRepoDelete(name string) (string, error) {
 }
 
 func (d *DataLayer) ChartRepoUpdate(name string) error {
-	d.Cache.Invalidate(cacheTagRepoName(name), CacheKeyAllRepos)
+	d.Cache.Invalidate(cacheTagRepoName(name), CacheKeyAllRepos, cacheTagRepoCharts(name))
 
 	cmd := []string{"repo", "update"}
 	if name != "" {
