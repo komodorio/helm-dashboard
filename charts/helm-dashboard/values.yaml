@@ -26,7 +26,7 @@ resources:
     memory: 1Gi
 
 dashboard:
-  allowWriteActions: false
+  allowWriteActions: true
   persistence:
     enabled: true
 
