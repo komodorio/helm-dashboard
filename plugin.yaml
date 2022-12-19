@@ -1,5 +1,5 @@
 name: "dashboard"
-version: "0.2.8"
+version: "0.3.0"
 usage: "A simplified way of working with Helm"
 description: "View HELM situation in nice web UI"
 command: "$HELM_PLUGIN_DIR/bin/helm-dashboard"
