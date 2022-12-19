@@ -3,7 +3,12 @@ name: release
 on:
   push:
     tags:
-      - "*"
+      - "v*"
+
+env:
+  HELM_REP: helm-charts
+  GH_OWNER: komodorio
+  CHART_DIR: charts/helm-dashboard
 
 jobs:
   pre_release:
@@ -52,3 +57,68 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Binary Versions
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
+
+  image:
+    runs-on: ubuntu-latest
+    needs: release
+    timeout-minutes: 60
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Docker meta
+        uses: docker/metadata-action@v3
+        id: meta
+        with:
+          images: komodorio/helm-dashboard
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        if: github.event_name != 'pull_request'
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        if: github.event_name != 'pull_request'
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ needs.pre_release.outputs.release_tag }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: VER=${{ needs.pre_release.outputs.release_tag }}
+
+  publish_chart:
+    runs-on: ubuntu-latest
+    need: image
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Bump versions
+        run: |
+          git config user.email komi@komodor.io
+          git config user.name komodor-bot
+          git fetch --tags
+          git checkout main
+          sh ./ci/bump-versions.sh
+          git add charts/helm-dashboard/Chart.yaml
+          git commit -m "Increment chart versions [skip ci]" || echo "Already up-to-date"
+          git push -f || echo "Nothing to push!"
+        env:
+          APP_VERSION: ${{ needs.pre_release.outputs.release_tag }}
+      - name: Push folder to helm-charts repository
+        uses: crykn/copy_folder_to_another_repo_action@v1.0.6
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.KOMI_WORKFLOW_TOKEN }}
+        with:
+          source_folder: "charts/helm-dashboard"
+          destination_repo: "komodorio/helm-charts"
+          destination_folder: "charts/helm-dashboard"
+          user_email: "komi@komodor.io"
+          user_name: "komodor-bot"
+          destination_branch: "master"
+          commit_msg: "feat(helm-dashboard): ${{ github.event.head_commit.message }}" #important!! don't change this commit message unless you change the condition in pipeline.yml on helm-charts repo
