@@ -60,7 +60,7 @@ jobs:
 
   image:
     runs-on: ubuntu-latest
-    needs: release
+    needs: [release, pre_release]
     timeout-minutes: 60
     steps:
       - name: Check out the repo
@@ -85,13 +85,13 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ needs.pre_release.outputs.release_tag }}
+          tags: komodorio/helm-dashboard:${{ needs.pre_release.outputs.release_tag }},komodorio/helm-dashboard:latest
           labels: ${{ steps.meta.outputs.labels }}
           build-args: VER=${{ needs.pre_release.outputs.release_tag }}
 
   publish_chart:
     runs-on: ubuntu-latest
-    need: image
+    needs: [image, pre_release]
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout

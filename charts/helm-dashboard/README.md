@@ -49,7 +49,7 @@ The following table lists the configurable parameters of the chart and their def
 | `image.tag`                          | Image tag                                                                                      |                                      |
 | `image.pullPolicy`                   | Image pull policy                                                                              | `IfNotPresent`                       |
 | `replicaCount`                       | Number of dashboard Pods to run                                                                | `1`                                  |
-| `dashboard.allowWriteActions`        | Enables write actions. Allow modifying, deleting and creating charts and kubernetes resources. | `false`                              |
+| `dashboard.allowWriteActions`        | Enables write actions. Allow modifying, deleting and creating charts and kubernetes resources. | `true`                               |
 | `resources.requests.cpu`             | CPU resource requests                                                                          | `200m`                               |
 | `resources.limits.cpu`               | CPU resource limits                                                                            | `1`                                  |
 | `resources.requests.memory`          | Memory resource requests                                                                       | `256Mi`                              |
