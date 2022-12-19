@@ -1,12 +1,10 @@
 # Stage - builder
 FROM golang as builder
 
-ARG VER
 
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV CGO_ENABLED=0
-ENV VERSION=0.0.0
 
 WORKDIR /build
 
@@ -14,6 +12,9 @@ COPY go.mod ./
 COPY go.sum ./
 COPY main.go ./
 RUN go mod download
+
+ARG VER=0.0.0
+ENV VERSION=${VER}
 
 ADD . src
 
@@ -24,15 +25,18 @@ RUN make build
 # Stage - runner
 FROM alpine/helm
 
-RUN curl -o /bin/kubectl -vf -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x /bin/kubectl && kubectl --help
+# Python
+RUN apk add --update --no-cache python3 && python3 -m ensurepip && pip3 install --upgrade pip setuptools
 
-# Checkov scanner
-RUN apk add --update --no-cache python3
-RUN python3 -m ensurepip
-RUN pip3 install checkov
+# kubectl
+RUN curl -o /bin/kubectl -vf -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x /bin/kubectl && kubectl --help
 
 # Trivy
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.18.3
+RUN trivy --version
+
+# Checkov scanner
+RUN pip3 install checkov packaging==21.3 && checkov --version
 
 COPY --from=builder /build/src/bin/dashboard /bin/helm-dashboard
 
