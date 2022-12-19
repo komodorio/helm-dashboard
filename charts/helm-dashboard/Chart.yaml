@@ -3,7 +3,7 @@ type: application
 
 name: helm-dashboard
 description: A GUI Dashboard for Helm by Komodor
-icon: "https://github.com/komodorio/helm-dashboard/blob/main/pkg/dashboard/static/logo.png"
+icon: "https://raw.githubusercontent.com/komodorio/helm-dashboard/main/pkg/dashboard/static/logo.svg"
 
 version: 0.1.1
-appVersion: "0.3.0" 
+appVersion: "0.3.0"
