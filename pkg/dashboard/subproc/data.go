@@ -16,7 +16,6 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
 	"os"
 	"strconv"
 	"strings"
@@ -35,7 +34,6 @@ type DataLayer struct {
 	ConfGen         HelmConfigGetter
 	appPerContext   map[string]*Application
 	appPerContextMx *sync.Mutex
-	KubeConfig      *api.Config // just used to query
 }
 
 type StatusInfo struct {
@@ -48,11 +46,6 @@ type StatusInfo struct {
 }
 
 func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
-	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get kubectl config")
-	}
-
 	return &DataLayer{
 		Namespace: ns,
 		Cache:     NewCache(),
@@ -65,8 +58,6 @@ func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error
 		ConfGen:         cg,
 		appPerContext:   map[string]*Application{},
 		appPerContextMx: new(sync.Mutex),
-
-		KubeConfig: cfg,
 	}, nil
 }
 
@@ -107,9 +98,14 @@ func (d *DataLayer) ListContexts() ([]KubeContext, error) {
 		return res, nil
 	}
 
-	for name, ctx := range d.KubeConfig.Contexts {
+	cfg, err := clientcmd.NewDefaultPathOptions().GetStartingConfig()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get kubectl config")
+	}
+
+	for name, ctx := range cfg.Contexts {
 		res = append(res, KubeContext{
-			IsCurrent: d.KubeConfig.CurrentContext == name,
+			IsCurrent: cfg.CurrentContext == name,
 			Name:      name,
 			Cluster:   ctx.Cluster,
 			AuthInfo:  ctx.AuthInfo,
@@ -140,11 +136,6 @@ func (d *DataLayer) CheckConnectivity() error {
 
 		log.Infof("Assuming k8s environment")
 		d.StatusInfo.ClusterMode = true
-	}
-
-	_, err = d.runCommandHelm("--help")
-	if err != nil {
-		return err
 	}
 
 	return nil
@@ -198,14 +189,6 @@ func ParseManifests(out string) ([]*v1.Carp, error) {
 		res = append(res, &doc)
 	}
 	return res, nil
-}
-
-func (d *DataLayer) RevisionNotes(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	cmd := []string{"get", "notes", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
-	key := CacheKeyRevNotes + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
-	return d.Cache.String(key, nil, func() (string, error) {
-		return d.runCommandHelm(cmd...)
-	})
 }
 
 func (d *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {

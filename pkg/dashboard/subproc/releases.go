@@ -132,6 +132,8 @@ func (r *Release) GetRev(revNo int) (*Release, error) {
 }
 
 func (r *Release) OrigFull() (*release.Release, error) {
+	return r.Orig, nil // FIXME: do we need it at all?
+
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
