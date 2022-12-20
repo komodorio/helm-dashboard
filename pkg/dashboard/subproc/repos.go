@@ -3,46 +3,15 @@ package subproc
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/joomcode/errorx"
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/repo"
+	"os"
 	"strings"
 )
-
-func (d *DataLayer) ChartRepoList() (res []RepositoryElement, err error) {
-	out, err := d.Cache.String(CacheKeyAllRepos, nil, func() (string, error) {
-		// TODO: do a bg check, if the state is changed - do reset some caches
-		return d.runCommandHelm("repo", "list", "--output", "json")
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal([]byte(out), &res)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func (d *DataLayer) ChartRepoAdd(name string, url string) (string, error) {
-	d.Cache.Invalidate(CacheKeyAllRepos)
-	out, err := d.runCommandHelm("repo", "add", "--force-update", name, url)
-	if err != nil {
-		return "", err
-	}
-
-	return out, nil
-}
-
-func (d *DataLayer) ChartRepoDelete(name string) (string, error) {
-	d.Cache.Invalidate(CacheKeyAllRepos)
-	out, err := d.runCommandHelm("repo", "remove", name)
-	if err != nil {
-		return "", err
-	}
-
-	return out, nil
-}
 
 func (d *DataLayer) ChartRepoUpdate(name string) error {
 	d.Cache.Invalidate(cacheTagRepoName(name), CacheKeyAllRepos, cacheTagRepoCharts(name))
@@ -161,5 +130,35 @@ func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // 
 }
 
 type Repositories struct {
-	HelmConfig HelmNSConfigGetter
+	Settings *cli.EnvSettings
+}
+
+func (r *Repositories) Load() (*repo.File, error) {
+	// copied from cmd/helm/repo_list.go
+	f, err := repo.LoadFile(r.Settings.RepositoryConfig)
+	if err != nil && !isNotExist(err) {
+		return nil, errorx.Decorate(err, "failed to load repository list")
+	}
+	return f, nil
+}
+
+func (r *Repositories) List() ([]*repo.Entry, error) {
+	f, err := r.Load()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to load repo information")
+	}
+	return f.Repositories, nil
+}
+
+func (r *Repositories) Add(name string, url string) error {
+	return errorx.NotImplemented.New("") // TODO
+}
+
+func (r *Repositories) Delete(name string) error {
+	return errorx.NotImplemented.New("") // TODO
+}
+
+// copied from cmd/helm/repo.go
+func isNotExist(err error) bool {
+	return os.IsNotExist(errors.Cause(err))
 }

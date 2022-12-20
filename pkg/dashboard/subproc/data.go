@@ -13,6 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
@@ -264,11 +265,14 @@ func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
 
 	app, ok := d.appPerContext[ctx]
 	if !ok {
+		settings := cli.New()
+		settings.KubeContext = ctx
+
 		cfgGetter := func(ns string) (*action.Configuration, error) {
-			return d.ConfGen(ctx, ns)
+			return d.ConfGen(settings, ns)
 		}
 
-		a, err := NewApplication(cfgGetter)
+		a, err := NewApplication(settings, cfgGetter)
 		if err != nil {
 			return nil, errorx.Decorate(err, "Failed to create application for context '%s'", ctx)
 		}

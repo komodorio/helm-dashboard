@@ -267,16 +267,36 @@ func (h *HelmHandler) RepoValues(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoList(c *gin.Context) {
-	out, err := h.Data.ChartRepoList()
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	repos, err := app.Repositories.List()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
+	out := []subproc.RepositoryElement{}
+	for _, r := range repos {
+		out = append(out, subproc.RepositoryElement{
+			Name: r.Name,
+			URL:  r.URL,
+		})
+	}
+
 	c.IndentedJSON(http.StatusOK, out)
 }
 
 func (h *HelmHandler) RepoAdd(c *gin.Context) {
-	_, err := h.Data.ChartRepoAdd(c.PostForm("name"), c.PostForm("url"))
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	// TODO: more repo options to accept
+	err := app.Repositories.Add(c.PostForm("name"), c.PostForm("url"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -291,7 +311,12 @@ func (h *HelmHandler) RepoDelete(c *gin.Context) {
 		return
 	}
 
-	_, err = h.Data.ChartRepoDelete(qp.Name)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	err = app.Repositories.Delete(qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

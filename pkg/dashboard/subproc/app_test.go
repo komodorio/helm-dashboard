@@ -9,7 +9,7 @@ import (
 func TestApplication_GetReleases(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
-	app, err := NewApplication(func(ns string) (*action.Configuration, error) {
+	app, err := NewApplication(nil, func(ns string) (*action.Configuration, error) {
 		return NewHelmConfig("", ns)
 	})
 	if err != nil {

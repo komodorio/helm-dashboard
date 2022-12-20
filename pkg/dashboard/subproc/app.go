@@ -16,10 +16,11 @@ import (
 // object wrappers for lazy loading
 // all in memory, no cache needed
 
-type HelmConfigGetter = func(ctx string, ns string) (*action.Configuration, error)
+type HelmConfigGetter = func(sett *cli.EnvSettings, ns string) (*action.Configuration, error)
 type HelmNSConfigGetter = func(ns string) (*action.Configuration, error)
 
 type Application struct {
+	Settings   *cli.EnvSettings
 	HelmConfig HelmNSConfigGetter
 
 	K8s *K8s
@@ -28,7 +29,7 @@ type Application struct {
 	Repositories *Repositories
 }
 
-func NewApplication(helmConfig HelmNSConfigGetter) (*Application, error) {
+func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter) (*Application, error) {
 	hc, err := helmConfig("") // TODO: are these the right options?
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -46,7 +47,7 @@ func NewApplication(helmConfig HelmNSConfigGetter) (*Application, error) {
 			HelmConfig: helmConfig,
 		},
 		Repositories: &Repositories{
-			HelmConfig: helmConfig,
+			Settings: settings,
 		},
 	}, nil
 }
@@ -64,11 +65,9 @@ func (a *Application) CheckConnectivity() error {
 	return nil
 }
 
-func NewHelmConfig(ctx string, ns string) (*action.Configuration, error) {
+func NewHelmConfig(settings *cli.EnvSettings, ns string) (*action.Configuration, error) {
 	// TODO: cache it into map
 	// TODO: I feel there should be more elegant way to organize this code
-	settings := cli.New()
-	settings.KubeContext = ctx
 	actionConfig := new(action.Configuration)
 
 	registryClient, err := registry.NewClient(
