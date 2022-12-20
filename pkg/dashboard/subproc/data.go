@@ -160,7 +160,7 @@ func (d *DataLayer) GetStatus() *StatusInfo {
 	return d.StatusInfo
 }
 
-type SectionFn = func(bool) (string, error)
+type SectionFn = func(*release.Release, bool) (string, error)
 
 func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
 	cmd := []string{"get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
@@ -296,23 +296,23 @@ func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
 	return app, nil
 }
 
-func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
-	if revision1 == 0 || revision2 == 0 {
-		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)
+func RevisionDiff(functor SectionFn, ext string, revision1 *release.Release, revision2 *release.Release, flag bool) (string, error) {
+	if revision1 == nil || revision2 == nil {
+		log.Debugf("One of revisions is nil: %d %d", revision1, revision2)
 		return "", nil
 	}
 
-	manifest1, err := functor(namespace, name, revision1, flag)
+	manifest1, err := functor(revision1, flag)
 	if err != nil {
 		return "", err
 	}
 
-	manifest2, err := functor(namespace, name, revision2, flag)
+	manifest2, err := functor(revision2, flag)
 	if err != nil {
 		return "", err
 	}
 
-	diff := GetDiff(manifest1, manifest2, strconv.Itoa(revision1)+ext, strconv.Itoa(revision2)+ext)
+	diff := GetDiff(manifest1, manifest2, strconv.Itoa(revision1.Version)+ext, strconv.Itoa(revision2.Version)+ext)
 	return diff, nil
 }
 

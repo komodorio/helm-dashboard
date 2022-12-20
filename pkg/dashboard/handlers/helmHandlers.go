@@ -3,8 +3,11 @@ package handlers
 import (
 	"errors"
 	"github.com/joomcode/errorx"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chartutil"
+	"helm.sh/helm/v3/pkg/release"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -101,6 +104,10 @@ func (h *HelmHandler) History(c *gin.Context) {
 	for _, r := range revs {
 		res = append(res, subproc.HReleaseToHistElem(r.Orig))
 	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].Revision < res[j].Revision
+	})
 
 	c.IndentedJSON(http.StatusOK, res)
 }
@@ -218,9 +225,25 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 		return // error state is set inside
 	}
 
+	var revDiff *subproc.Release
+	revS := c.Query("revisionDiff")
+	if revS != "" {
+		revN, err := strconv.Atoi(revS)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		revDiff, err = rel.GetRev(revN)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}
+
 	flag := c.Query("flag") == "true"
-	rDiff := c.Query("revisionDiff")
-	res, err := handleGetSection(h.Data, c.Param("section"), rDiff, rel, flag)
+
+	res, err := handleGetSection(rel, c.Param("section"), revDiff, flag)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -270,20 +293,27 @@ func (h *HelmHandler) RepoDelete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func handleGetSection(rel *subproc.Release, section string, rDiff string, flag bool) (string, error) {
-	qp := rel.Orig
-
+func handleGetSection(rel *subproc.Release, section string, rDiff *subproc.Release, flag bool) (string, error) {
 	sections := map[string]subproc.SectionFn{
-		"manifests": func(b bool) (string, error) { return qp.Manifest, nil },
-		"notes":     func(b bool) (string, error) { return qp.Info.Notes, nil },
-		"values": func(b bool) (string, error) {
+		"manifests": func(qp *release.Release, b bool) (string, error) { return qp.Manifest, nil },
+		"notes":     func(qp *release.Release, b bool) (string, error) { return qp.Info.Notes, nil },
+		"values": func(qp *release.Release, b bool) (string, error) {
 			allVals := qp.Config
-			allVals, err := chartutil.CoalesceValues(qp.Chart, qp.Config)
-			if err != nil {
-				return "", errorx.Decorate(err, "failed to merge chart vals with user defined")
+
+			if !b {
+				merged, err := chartutil.CoalesceValues(qp.Chart, qp.Config)
+				if err != nil {
+					return "", errorx.Decorate(err, "failed to merge chart vals with user defined")
+				}
+				allVals = merged
 			}
 
-			return allVals, nil
+			data, err := yaml.Marshal(allVals)
+			if err != nil {
+				return "", errorx.Decorate(err, "failed to serialize values into YAML")
+			}
+
+			return string(data), nil
 		},
 	}
 
@@ -292,25 +322,20 @@ func handleGetSection(rel *subproc.Release, section string, rDiff string, flag b
 		return "", errors.New("unsupported section: " + section)
 	}
 
-	if rDiff != "" {
-		cRevDiff, err := strconv.Atoi(rDiff)
-		if err != nil {
-			return "", err
-		}
-
+	if rDiff != nil {
 		ext := ".yaml"
 		if section == "notes" {
 			ext = ".txt"
 		}
 
-		res, err := subproc.RevisionDiff(functor, ext, qp.Namespace, qp.Name, cRevDiff, qp.Version, flag)
+		res, err := subproc.RevisionDiff(functor, ext, rDiff.Orig, rel.Orig, flag)
 		if err != nil {
 			return "", err
 		}
 		return res, nil
 	}
 
-	res, err := functor(flag)
+	res, err := functor(rel.Orig, flag)
 	if err != nil {
 		return "", err
 	}

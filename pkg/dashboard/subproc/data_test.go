@@ -82,7 +82,7 @@ func TestFlow(t *testing.T) {
 	}
 	wg.Wait()
 
-	diff, err := RevisionDiff(data.RevisionManifests, ".yaml", chart.Namespace, chart.Name, history[len(history)-1].Revision, history[len(history)-2].Revision, true)
+	diff, err := RevisionDiff(data.RevisionManifests, ".yaml", history[len(history)-1].Revision, history[len(history)-2].Revision, true)
 	if err != nil {
 		t.Fatal(err)
 	}

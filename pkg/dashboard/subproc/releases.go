@@ -115,3 +115,18 @@ func (r *Release) ParsedManifests() ([]*v1.Carp, error) {
 
 	return carps, err
 }
+
+func (r *Release) GetRev(revNo int) (*Release, error) {
+	hist, err := r.History()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get history")
+	}
+
+	for _, rev := range hist {
+		if rev.Orig.Version == revNo {
+			return rev, nil
+		}
+	}
+
+	return nil, errorx.InternalError.New("No revision found for number %s", revNo)
+}
