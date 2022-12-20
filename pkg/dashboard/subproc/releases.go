@@ -130,3 +130,19 @@ func (r *Release) GetRev(revNo int) (*Release, error) {
 
 	return nil, errorx.InternalError.New("No revision found for number %s", revNo)
 }
+
+func (r *Release) OrigFull() (*release.Release, error) {
+	hc, err := r.HelmConfig(r.Orig.Namespace)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	client := action.NewGet(hc)
+	client.Version = r.Orig.Version
+	full, err := client.Run(r.Orig.Name)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get full release information")
+	}
+
+	return full, nil
+}

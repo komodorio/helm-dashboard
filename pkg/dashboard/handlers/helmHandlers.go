@@ -220,9 +220,15 @@ func (h *HelmHandler) Install(c *gin.Context) {
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
-	rel, _ := h.getRelease(c)
+	rel, qp := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
+	}
+
+	rev, err := rel.GetRev(qp.Revision)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	var revDiff *subproc.Release
@@ -243,7 +249,7 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 
 	flag := c.Query("flag") == "true"
 
-	res, err := handleGetSection(rel, c.Param("section"), revDiff, flag)
+	res, err := handleGetSection(rev, c.Param("section"), revDiff, flag)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -322,22 +328,32 @@ func handleGetSection(rel *subproc.Release, section string, rDiff *subproc.Relea
 		return "", errors.New("unsupported section: " + section)
 	}
 
+	oRel, err := rel.OrigFull()
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to get full revision info")
+	}
+
 	if rDiff != nil {
 		ext := ".yaml"
 		if section == "notes" {
 			ext = ".txt"
 		}
 
-		res, err := subproc.RevisionDiff(functor, ext, rDiff.Orig, rel.Orig, flag)
+		oDiff, err := rDiff.OrigFull()
+		if err != nil {
+			return "", errorx.Decorate(err, "failed to get full diff revision info")
+		}
+
+		res, err := subproc.RevisionDiff(functor, ext, oDiff, oRel, flag)
 		if err != nil {
 			return "", err
 		}
 		return res, nil
 	}
 
-	res, err := functor(rel.Orig, flag)
+	res, err := functor(oRel, flag)
 	if err != nil {
-		return "", err
+		return "", errorx.Decorate(err, "failed to get section info")
 	}
 	return res, nil
 }
