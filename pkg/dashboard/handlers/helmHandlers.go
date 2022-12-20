@@ -139,12 +139,13 @@ func (h *HelmHandler) RepoSearch(c *gin.Context) {
 		return // sets error inside
 	}
 
-	res, err := h.Data.ChartRepoVersions(qp.Name)
+	rep, err := app.Repositories.Containing(qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+
+	c.IndentedJSON(http.StatusOK, rep)
 }
 
 func (h *HelmHandler) RepoCharts(c *gin.Context) {

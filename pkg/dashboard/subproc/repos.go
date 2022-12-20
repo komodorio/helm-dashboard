@@ -198,6 +198,18 @@ func (r *Repositories) Get(name string) (*Repository, error) {
 	return nil, errorx.DataUnavailable.New("Could not find reposiroty '%s'", name)
 }
 
+func (r *Repositories) Containing(name string) ([]bool, error) {
+	list, err := r.List()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get list of repos")
+	}
+
+	for _, rep := range list {
+		_ = rep
+	}
+	return nil, nil
+}
+
 type Repository struct {
 	Settings *cli.EnvSettings
 	Orig     *repo.Entry

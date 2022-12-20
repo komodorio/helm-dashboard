@@ -10,13 +10,15 @@ import (
 // unpleasant copy from Helm sources, where they have it non-public
 
 type ReleaseElement struct {
-	Name       string         `json:"name"`
-	Namespace  string         `json:"namespace"`
-	Revision   string         `json:"revision"`
-	Updated    helmtime.Time  `json:"updated"`
-	Status     release.Status `json:"status"`
-	Chart      string         `json:"chart"`
-	AppVersion string         `json:"app_version"`
+	Name        string         `json:"name"`
+	Namespace   string         `json:"namespace"`
+	Revision    string         `json:"revision"`
+	Updated     helmtime.Time  `json:"updated"`
+	Status      release.Status `json:"status"`
+	Chart       string         `json:"chart"`
+	AppVersion  string         `json:"app_version"`
+	Icon        string         `json:"icon"`
+	Description string
 }
 
 type HistoryElement struct {
@@ -48,13 +50,15 @@ type RepositoryElement struct {
 
 func HReleaseToJSON(o *release.Release) *ReleaseElement {
 	return &ReleaseElement{
-		Name:       o.Name,
-		Namespace:  o.Namespace,
-		Revision:   strconv.Itoa(o.Version),
-		Updated:    o.Info.LastDeployed,
-		Status:     o.Info.Status,
-		Chart:      fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
-		AppVersion: o.Chart.AppVersion(),
+		Name:        o.Name,
+		Namespace:   o.Namespace,
+		Revision:    strconv.Itoa(o.Version),
+		Updated:     o.Info.LastDeployed,
+		Status:      o.Info.Status,
+		Chart:       fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
+		AppVersion:  o.Chart.AppVersion(),
+		Icon:        o.Chart.Metadata.Icon,
+		Description: o.Chart.Metadata.Description,
 	}
 }
 
