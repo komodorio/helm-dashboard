@@ -42,6 +42,11 @@ function loadRepoView() {
                         <div class="col-1 py-2">` + elm.version + `</div>
                         <div class="col-1 action text-nowrap"><button class="btn btn-sm border-secondary bg-white">Install</button></div>
                     </li>`)
+
+                    if (elm.icon) {
+                        li.find("h6").prepend('<img src="'+elm.icon+'" class="me-1" style="height: 1rem"/>')
+                    }
+
                     li.data("item", elm)
 
                     if (elm.installed_namespace) {

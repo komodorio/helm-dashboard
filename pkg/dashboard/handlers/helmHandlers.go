@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
+	"helm.sh/helm/v3/pkg/repo"
 	"net/http"
 	"sort"
 	"strconv"
@@ -133,6 +134,11 @@ func (h *HelmHandler) RepoSearch(c *gin.Context) {
 		return
 	}
 
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
 	res, err := h.Data.ChartRepoVersions(qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
@@ -148,12 +154,50 @@ func (h *HelmHandler) RepoCharts(c *gin.Context) {
 		return
 	}
 
-	res, err := h.Data.ChartRepoCharts(qp.Name)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rep, err := app.Repositories.Get(qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+
+	charts, err := rep.Charts()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	installed, err := app.Releases.List()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	// TODO: enrich with installed
+	enrichRepoChartsWithInstalled(charts, installed)
+
+	sort.Slice(charts, func(i, j int) bool {
+		return charts[i].Name < charts[j].Name
+	})
+
+	c.IndentedJSON(http.StatusOK, charts)
+}
+
+func enrichRepoChartsWithInstalled(charts []*repo.ChartVersion, installed []*subproc.Release) {
+	for _, rchart := range charts {
+		for _, rel := range installed {
+			pieces := strings.Split(rchart.Name, "/")
+			if pieces[1] == rel.Orig.Chart.Name() {
+				// TODO: there can be more than one
+				//rchart.InstalledNamespace = rel.Orig.Namespace
+				//rchart.InstalledName = rel.Orig.Name
+			}
+		}
+	}
 }
 
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {

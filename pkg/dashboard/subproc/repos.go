@@ -53,48 +53,6 @@ func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement
 	return res, nil
 }
 
-func (d *DataLayer) ChartRepoCharts(repoName string) (res []*RepoChartElement, err error) {
-	cmd := []string{"search", "repo", "--regexp", "\v" + repoName + "/", "--output", "json"}
-	out, err := d.Cache.String(cacheTagRepoCharts(repoName), []string{CacheKeyAllRepos}, func() (string, error) {
-		return d.runCommandHelm(cmd...)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal([]byte(out), &res)
-	if err != nil {
-		return nil, err
-	}
-
-	app, err := d.AppForCtx(d.KubeContext)
-	if err != nil {
-		return nil, err
-	}
-
-	ins, err := app.Releases.List()
-	if err != nil {
-		return nil, err
-	}
-
-	enrichRepoChartsWithInstalled(res, ins)
-
-	return res, nil
-}
-
-func enrichRepoChartsWithInstalled(charts []*RepoChartElement, installed []*Release) {
-	for _, rchart := range charts {
-		for _, rel := range installed {
-			pieces := strings.Split(rchart.Name, "/")
-			if pieces[1] == rel.Orig.Chart.Name() {
-				// TODO: there can be more than one
-				rchart.InstalledNamespace = rel.Orig.Namespace
-				rchart.InstalledName = rel.Orig.Name
-			}
-		}
-	}
-}
-
 // ShowValues get values from repo chart, not from installed release
 func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
 	return d.Cache.String(CacheKeyRepoChartValues+"\v"+chart+"\v"+ver, nil, func() (string, error) {
@@ -220,6 +178,47 @@ func (r *Repositories) Delete(name string) error {
 		return err
 	}
 	return nil
+}
+
+func (r *Repositories) Get(name string) (*Repository, error) {
+	f, err := r.Load()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to load repo information")
+	}
+
+	for _, entry := range f.Repositories {
+		if entry.Name == name {
+			return &Repository{
+				Settings: r.Settings,
+				Orig:     entry,
+			}, nil
+		}
+	}
+
+	return nil, errorx.DataUnavailable.New("Could not find reposiroty '%s'", name)
+}
+
+type Repository struct {
+	Settings *cli.EnvSettings
+	Orig     *repo.Entry
+}
+
+func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
+	f := filepath.Join(r.Settings.RepositoryCache, helmpath.CacheIndexFile(r.Orig.Name))
+	ind, err := repo.LoadIndexFile(f)
+	if err != nil {
+		return nil, errorx.Decorate(err, "Repo index is corrupt or missing. Try 'helm repo update'.")
+	}
+
+	ind.SortEntries()
+	res := []*repo.ChartVersion{}
+	for _, v := range ind.Entries {
+		if len(v) > 0 {
+			res = append(res, v[0])
+		}
+	}
+
+	return res, nil
 }
 
 // copied from cmd/helm/repo.go
