@@ -131,6 +131,7 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.DELETE("/repo", h.RepoDelete)
 	api.GET("/repo/charts", h.RepoCharts)
 	api.GET("/repo/search", h.RepoSearch)
+	api.GET("/repo/versions", h.RepoVersions)
 	api.POST("/repo/update", h.RepoUpdate)
 	api.GET("/repo/values", h.RepoValues)
 }

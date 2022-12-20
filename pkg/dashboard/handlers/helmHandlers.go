@@ -127,6 +127,38 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
+func (h *HelmHandler) RepoVersions(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rep, err := app.Repositories.Containing(qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	res := []*subproc.RepoChartElement{}
+	for _, r := range rep {
+		res = append(res, &subproc.RepoChartElement{
+			Name:        r.Name,
+			Version:     r.Version,
+			AppVersion:  r.AppVersion,
+			Description: r.Description,
+			Repository:  r.Annotations[subproc.AnnRepo],
+		})
+	}
+
+	c.IndentedJSON(http.StatusOK, res)
+}
+
 func (h *HelmHandler) RepoSearch(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
@@ -326,8 +358,8 @@ func (h *HelmHandler) RepoList(c *gin.Context) {
 	out := []subproc.RepositoryElement{}
 	for _, r := range repos {
 		out = append(out, subproc.RepositoryElement{
-			Name: r.Name,
-			URL:  r.URL,
+			Name: r.Orig.Name,
+			URL:  r.Orig.URL,
 		})
 	}
 

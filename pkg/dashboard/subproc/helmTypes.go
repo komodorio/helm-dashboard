@@ -41,6 +41,7 @@ type RepoChartElement struct {
 
 	InstalledNamespace string `json:"installed_namespace"` // custom addition on top of Helm
 	InstalledName      string `json:"installed_name"`      // custom addition on top of Helm
+	Repository         string `json:"repository"`
 }
 
 type RepositoryElement struct {

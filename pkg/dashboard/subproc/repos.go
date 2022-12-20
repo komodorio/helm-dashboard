@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli"
@@ -16,6 +17,8 @@ import (
 	"strings"
 )
 
+const AnnRepo = "helm-dashboard/repository-name"
+
 func (d *DataLayer) ChartRepoUpdate(name string) error {
 	d.Cache.Invalidate(cacheTagRepoName(name), CacheKeyAllRepos, cacheTagRepoCharts(name))
 
@@ -26,31 +29,6 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 
 	_, err := d.runCommandHelm(cmd...)
 	return err
-}
-
-func (d *DataLayer) ChartRepoVersions(chartName string) (res []*RepoChartElement, err error) {
-	search := "/" + chartName + "\v"
-	if strings.Contains(chartName, "/") {
-		search = "\v" + chartName + "\v"
-	}
-
-	cmd := []string{"search", "repo", "--regexp", search, "--versions", "--output", "json"}
-	out, err := d.Cache.String(cacheTagRepoVers(chartName), []string{CacheKeyAllRepos}, func() (string, error) {
-		return d.runCommandHelm(cmd...)
-	})
-	if err != nil {
-		if strings.Contains(err.Error(), "no repositories configured") {
-			out = "[]"
-		} else {
-			return nil, err
-		}
-	}
-
-	err = json.Unmarshal([]byte(out), &res)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
 }
 
 // ShowValues get values from repo chart, not from installed release
@@ -103,12 +81,21 @@ func (r *Repositories) Load() (*repo.File, error) {
 	return f, nil
 }
 
-func (r *Repositories) List() ([]*repo.Entry, error) {
+func (r *Repositories) List() ([]*Repository, error) {
 	f, err := r.Load()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to load repo information")
 	}
-	return f.Repositories, nil
+
+	res := []*Repository{}
+	for _, item := range f.Repositories {
+		res = append(res, &Repository{
+			Settings: r.Settings,
+			Orig:     item,
+		})
+	}
+
+	return res, nil
 }
 
 func (r *Repositories) Add(name string, url string) error {
@@ -198,16 +185,31 @@ func (r *Repositories) Get(name string) (*Repository, error) {
 	return nil, errorx.DataUnavailable.New("Could not find reposiroty '%s'", name)
 }
 
-func (r *Repositories) Containing(name string) ([]bool, error) {
+func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 	list, err := r.List()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get list of repos")
 	}
 
+	res := repo.ChartVersions{}
 	for _, rep := range list {
-		_ = rep
+		vers, err := rep.ByName(name)
+		if err != nil {
+			log.Warnf("Failed to get data from repo '%s', updating it might help", rep.Orig.Name)
+			continue
+		}
+
+		for _, v := range vers {
+			if v.Annotations == nil {
+				v.Annotations = map[string]string{}
+			}
+
+			v.Annotations[AnnRepo] = rep.Orig.Name
+		}
+
+		res = append(res, vers...)
 	}
-	return nil, nil
+	return res, nil
 }
 
 type Repository struct {
@@ -215,14 +217,27 @@ type Repository struct {
 	Orig     *repo.Entry
 }
 
-func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
-	f := filepath.Join(r.Settings.RepositoryCache, helmpath.CacheIndexFile(r.Orig.Name))
+func (r *Repository) IndexFileName() string {
+	return filepath.Join(r.Settings.RepositoryCache, helmpath.CacheIndexFile(r.Orig.Name))
+}
+
+func (r *Repository) GetIndex() (*repo.IndexFile, error) {
+	f := r.IndexFileName()
 	ind, err := repo.LoadIndexFile(f)
 	if err != nil {
-		return nil, errorx.Decorate(err, "Repo index is corrupt or missing. Try 'helm repo update'.")
+		return nil, errorx.Decorate(err, "Repo index is corrupt or missing. Try updating repo")
 	}
 
 	ind.SortEntries()
+	return ind, nil
+}
+
+func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
+	ind, err := r.GetIndex()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get repo index")
+	}
+
 	res := []*repo.ChartVersion{}
 	for _, v := range ind.Entries {
 		if len(v) > 0 {
@@ -231,6 +246,19 @@ func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
 	}
 
 	return res, nil
+}
+
+func (r *Repository) ByName(name string) (repo.ChartVersions, error) {
+	ind, err := r.GetIndex()
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get repo index")
+	}
+
+	nx, ok := ind.Entries[name]
+	if ok {
+		return nx, nil
+	}
+	return repo.ChartVersions{}, nil
 }
 
 // copied from cmd/helm/repo.go

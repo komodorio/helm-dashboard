@@ -76,7 +76,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModal .rel-ns").prop("disabled", false).val(ns)
     }
 
-    $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
+    $.getJSON("/api/helm/repo/versions?name=" + elm.name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (vers) {
         // fill versions
