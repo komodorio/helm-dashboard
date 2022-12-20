@@ -200,6 +200,8 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 		}
 
 		for _, v := range vers {
+			// just using annotations here to attach a bit of information to the object
+			// it has nothing to do with k8s annotations and should not get into manifests
 			if v.Annotations == nil {
 				v.Annotations = map[string]string{}
 			}

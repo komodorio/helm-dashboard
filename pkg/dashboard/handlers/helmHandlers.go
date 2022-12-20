@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"github.com/joomcode/errorx"
+	"github.com/rogpeppe/go-internal/semver"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
@@ -159,7 +160,7 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
-func (h *HelmHandler) RepoSearch(c *gin.Context) {
+func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -177,7 +178,22 @@ func (h *HelmHandler) RepoSearch(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, rep)
+	res := []*subproc.RepoChartElement{}
+	for _, r := range rep {
+		res = append(res, &subproc.RepoChartElement{
+			Name:        r.Name,
+			Version:     r.Version,
+			AppVersion:  r.AppVersion,
+			Description: r.Description,
+			Repository:  r.Annotations[subproc.AnnRepo],
+		})
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return semver.Compare(res[i].Version, res[j].Version) > 0
+	})
+
+	c.IndentedJSON(http.StatusOK, res[:1])
 }
 
 func (h *HelmHandler) RepoCharts(c *gin.Context) {

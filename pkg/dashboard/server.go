@@ -139,7 +139,7 @@ func checkUpgrade(d *subproc.StatusInfo) { // TODO: check it once an hour
 
 	v2, err := version.NewVersion(d.LatestVer)
 	if err != nil {
-		log.Warnf("Failed to parse LatestVer: %s", err)
+		log.Warnf("Failed to parse RepoLatestVer: %s", err)
 	} else {
 		if v1.LessThan(v2) {
 			log.Warnf("Newer Helm Dashboard version is available: %s", d.LatestVer)
