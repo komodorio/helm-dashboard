@@ -8,8 +8,10 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -150,8 +152,53 @@ func (r *Repositories) List() ([]*repo.Entry, error) {
 	return f.Repositories, nil
 }
 
-func (r *Repositories) Add(name string, url string) error {
-	return errorx.NotImplemented.New("") // TODO
+func (rr *Repositories) Add(name string, url string) error {
+	// copied from cmd/helm/repo_add.go
+	repoFile := rr.Settings.RepositoryConfig
+
+	// Ensure the file directory exists as it is required for file locking
+	err := os.MkdirAll(filepath.Dir(repoFile), os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		return err
+	}
+
+	f, err := rr.Load()
+	if err != nil {
+		return errorx.Decorate(err, "Failed to load repo config")
+	}
+
+	c := repo.Entry{
+		Name: name,
+		URL:  url,
+		//Username:              o.username,
+		//Password:              o.password,
+		//PassCredentialsAll:    o.passCredentialsAll,
+		//CertFile:              o.certFile,
+		//KeyFile:               o.keyFile,
+		//CAFile:                o.caFile,
+		//InsecureSkipTLSverify: o.insecureSkipTLSverify,
+	}
+
+	// Check if the repo name is legal
+	if strings.Contains(c.Name, "/") {
+		return errors.Errorf("repository name (%s) contains '/', please specify a different name without '/'", c.Name)
+	}
+
+	r, err := repo.NewChartRepository(&c, getter.All(rr.Settings))
+	if err != nil {
+		return err
+	}
+
+	if _, err := r.DownloadIndexFile(); err != nil {
+		return errors.Wrapf(err, "looks like %q is not a valid chart repository or cannot be reached", url)
+	}
+
+	f.Update(&c)
+
+	if err := f.WriteFile(repoFile, 0644); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *Repositories) Delete(name string) error {

@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"embed"
+	"html"
 	"net/http"
 	"os"
 	"path"
@@ -31,7 +32,7 @@ func errorHandler(c *gin.Context) {
 	}
 
 	if errs != "" {
-		c.String(http.StatusInternalServerError, errs)
+		c.String(http.StatusInternalServerError, html.EscapeString(errs))
 	}
 }
 
