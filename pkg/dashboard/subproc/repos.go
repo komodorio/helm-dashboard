@@ -9,6 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/helmpath"
 	"helm.sh/helm/v3/pkg/repo"
 	"os"
 	"path/filepath"
@@ -152,9 +153,9 @@ func (r *Repositories) List() ([]*repo.Entry, error) {
 	return f.Repositories, nil
 }
 
-func (rr *Repositories) Add(name string, url string) error {
+func (r *Repositories) Add(name string, url string) error {
 	// copied from cmd/helm/repo_add.go
-	repoFile := rr.Settings.RepositoryConfig
+	repoFile := r.Settings.RepositoryConfig
 
 	// Ensure the file directory exists as it is required for file locking
 	err := os.MkdirAll(filepath.Dir(repoFile), os.ModePerm)
@@ -162,7 +163,7 @@ func (rr *Repositories) Add(name string, url string) error {
 		return err
 	}
 
-	f, err := rr.Load()
+	f, err := r.Load()
 	if err != nil {
 		return errorx.Decorate(err, "Failed to load repo config")
 	}
@@ -184,12 +185,12 @@ func (rr *Repositories) Add(name string, url string) error {
 		return errors.Errorf("repository name (%s) contains '/', please specify a different name without '/'", c.Name)
 	}
 
-	r, err := repo.NewChartRepository(&c, getter.All(rr.Settings))
+	rep, err := repo.NewChartRepository(&c, getter.All(r.Settings))
 	if err != nil {
 		return err
 	}
 
-	if _, err := r.DownloadIndexFile(); err != nil {
+	if _, err := rep.DownloadIndexFile(); err != nil {
 		return errors.Wrapf(err, "looks like %q is not a valid chart repository or cannot be reached", url)
 	}
 
@@ -202,10 +203,42 @@ func (rr *Repositories) Add(name string, url string) error {
 }
 
 func (r *Repositories) Delete(name string) error {
-	return errorx.NotImplemented.New("") // TODO
+	f, err := r.Load()
+	if err != nil {
+		return errorx.Decorate(err, "failed to load repo information")
+	}
+
+	// copied from cmd/helm/repo_remove.go
+	if !f.Remove(name) {
+		return errors.Errorf("no repo named %q found", name)
+	}
+	if err := f.WriteFile(r.Settings.RepositoryConfig, 0644); err != nil {
+		return err
+	}
+
+	if err := removeRepoCache(r.Settings.RepositoryCache, name); err != nil {
+		return err
+	}
+	return nil
 }
 
 // copied from cmd/helm/repo.go
 func isNotExist(err error) bool {
 	return os.IsNotExist(errors.Cause(err))
+}
+
+// copied from cmd/helm/repo_remove.go
+func removeRepoCache(root, name string) error {
+	idx := filepath.Join(root, helmpath.CacheChartsFile(name))
+	if _, err := os.Stat(idx); err == nil {
+		_ = os.Remove(idx)
+	}
+
+	idx = filepath.Join(root, helmpath.CacheIndexFile(name))
+	if _, err := os.Stat(idx); os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return errors.Wrapf(err, "can't remove index file %s", idx)
+	}
+	return os.Remove(idx)
 }
