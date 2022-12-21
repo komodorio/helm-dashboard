@@ -27,7 +27,7 @@ FROM alpine
 EXPOSE 8080
 
 # Python
-RUN apk add --update --no-cache python3 && python3 -m ensurepip && pip3 install --upgrade pip setuptools
+RUN apk add --update --no-cache python3 curl && python3 -m ensurepip && pip3 install --upgrade pip setuptools
 
 # Trivy
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.18.3
