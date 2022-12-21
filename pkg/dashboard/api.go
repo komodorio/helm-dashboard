@@ -18,7 +18,9 @@ import (
 var staticFS embed.FS
 
 func noCache(c *gin.Context) {
-	c.Header("Cache-Control", "no-cache")
+	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
+		c.Header("Cache-Control", "no-cache")
+	}
 	c.Next()
 }
 
@@ -122,7 +124,6 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.GET("/charts/history", h.History)
 	api.GET("/charts/resources", h.Resources)
 	api.GET("/charts/:section", h.GetInfoSection)
-	api.GET("/charts/show", h.Show)
 	api.POST("/charts/install", h.Install)
 	api.POST("/charts/rollback", h.Rollback)
 
@@ -150,6 +151,8 @@ func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
 
 func configureStatic(api *gin.Engine) {
 	fs := http.FS(staticFS)
+
+	// TODO: enable HTTP client cache for it?
 
 	// local dev speed-up
 	localDevPath := "pkg/dashboard/static"

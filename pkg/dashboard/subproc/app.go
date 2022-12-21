@@ -47,7 +47,8 @@ func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter) (*
 			HelmConfig: helmConfig,
 		},
 		Repositories: &Repositories{
-			Settings: settings,
+			Settings:   settings,
+			HelmConfig: hc,
 		},
 	}, nil
 }

@@ -7,7 +7,9 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
+	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/helmpath"
@@ -29,13 +31,6 @@ func (d *DataLayer) ChartRepoUpdate(name string) error {
 
 	_, err := d.runCommandHelm(cmd...)
 	return err
-}
-
-// ShowValues get values from repo chart, not from installed release
-func (d *DataLayer) ShowValues(chart string, ver string) (string, error) {
-	return d.Cache.String(CacheKeyRepoChartValues+"\v"+chart+"\v"+ver, nil, func() (string, error) {
-		return d.runCommandHelm("show", "values", chart, "--version", ver)
-	})
 }
 
 func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // TODO: add version parameter to method
@@ -69,7 +64,8 @@ func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // 
 }
 
 type Repositories struct {
-	Settings *cli.EnvSettings
+	Settings   *cli.EnvSettings
+	HelmConfig *action.Configuration
 }
 
 func (r *Repositories) Load() (*repo.File, error) {
@@ -212,6 +208,41 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 		res = append(res, vers...)
 	}
 	return res, nil
+}
+
+func (r *Repositories) GetChart(chart string, ver string) (*chart.Chart, error) {
+	// TODO: unused?
+	client := action.NewShowWithConfig(action.ShowAll, r.HelmConfig)
+	client.Version = ver
+
+	cp, err := client.ChartPathOptions.LocateChart(chart, r.Settings)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to locate chart '%s'", chart)
+	}
+
+	chrt, err := loader.Load(cp)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to load chart from '%s'", cp)
+	}
+
+	return chrt, nil
+}
+
+func (r *Repositories) GetChartValues(chart string, ver string) (string, error) {
+	// comes from cmd/helm/show.go
+	client := action.NewShowWithConfig(action.ShowValues, r.HelmConfig)
+	client.Version = ver
+
+	cp, err := client.ChartPathOptions.LocateChart(chart, r.Settings)
+	if err != nil {
+		return "", err
+	}
+
+	out, err := client.Run(cp)
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to get values for chart '%s'", chart)
+	}
+	return out, nil
 }
 
 type Repository struct {

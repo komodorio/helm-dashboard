@@ -25,3 +25,7 @@ func (h *Contexted) GetApp(c *gin.Context) *subproc.Application {
 
 	return app
 }
+
+func (h *Contexted) EnableClientCache(c *gin.Context) {
+	c.Header("Cache-Control", "max-age=43200")
+}

@@ -115,6 +115,8 @@ func (h *HelmHandler) History(c *gin.Context) {
 }
 
 func (h *HelmHandler) Resources(c *gin.Context) {
+	h.EnableClientCache(c)
+
 	rel, _ := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
@@ -264,22 +266,6 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (h *HelmHandler) Show(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	res, err := h.Data.ShowChart(qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, res)
-}
-
 func (h *HelmHandler) Install(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
@@ -351,11 +337,19 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoValues(c *gin.Context) {
-	out, err := h.Data.ShowValues(c.Query("chart"), c.Query("version"))
+	h.EnableClientCache(c)
+
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	out, err := app.Repositories.GetChartValues(c.Query("chart"), c.Query("version"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
 	c.String(http.StatusOK, out)
 }
 
