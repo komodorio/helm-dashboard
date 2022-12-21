@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/joomcode/errorx"
 	"github.com/rogpeppe/go-internal/semver"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
@@ -241,8 +242,8 @@ func (h *HelmHandler) RepoCharts(c *gin.Context) {
 func enrichRepoChartsWithInstalled(charts []*repo.ChartVersion, installed []*subproc.Release) {
 	for _, rchart := range charts {
 		for _, rel := range installed {
-			pieces := strings.Split(rchart.Name, "/")
-			if pieces[1] == rel.Orig.Chart.Name() {
+			if rchart.Metadata.Name == rel.Orig.Chart.Name() {
+				log.Debugf("Matched") // TODO: restore implementation
 				// TODO: there can be more than one
 				//rchart.InstalledNamespace = rel.Orig.Namespace
 				//rchart.InstalledName = rel.Orig.Name
@@ -299,6 +300,8 @@ func (h *HelmHandler) Install(c *gin.Context) {
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
+	h.EnableClientCache(c)
+
 	rel, qp := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
@@ -328,7 +331,7 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 
 	flag := c.Query("flag") == "true"
 
-	res, err := handleGetSection(rev, c.Param("section"), revDiff, flag)
+	res, err := h.handleGetSection(rev, c.Param("section"), revDiff, flag)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -411,7 +414,7 @@ func (h *HelmHandler) RepoDelete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func handleGetSection(rel *subproc.Release, section string, rDiff *subproc.Release, flag bool) (string, error) {
+func (h *HelmHandler) handleGetSection(rel *subproc.Release, section string, rDiff *subproc.Release, flag bool) (string, error) {
 	sections := map[string]subproc.SectionFn{
 		"manifests": func(qp *release.Release, b bool) (string, error) { return qp.Manifest, nil },
 		"notes":     func(qp *release.Release, b bool) (string, error) { return qp.Info.Notes, nil },
