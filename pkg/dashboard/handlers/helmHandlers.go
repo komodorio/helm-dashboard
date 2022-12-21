@@ -259,7 +259,18 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 		return
 	}
 
-	err = h.Data.ChartRepoUpdate(qp.Name)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	rep, err := app.Repositories.Get(qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = rep.Update()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

@@ -1,12 +1,9 @@
 package subproc
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -20,48 +17,6 @@ import (
 )
 
 const AnnRepo = "helm-dashboard/repository-name"
-
-func (d *DataLayer) ChartRepoUpdate(name string) error {
-	d.Cache.Invalidate(cacheTagRepoName(name), CacheKeyAllRepos, cacheTagRepoCharts(name))
-
-	cmd := []string{"repo", "update"}
-	if name != "" {
-		cmd = append(cmd, name)
-	}
-
-	_, err := d.runCommandHelm(cmd...)
-	return err
-}
-
-func (d *DataLayer) ShowChart(chartName string) ([]*chart.Metadata, error) { // TODO: add version parameter to method
-	out, err := d.Cache.String(CacheKeyShowChart+"\v"+chartName, []string{"chart\v" + chartName}, func() (string, error) {
-		return d.runCommandHelm("show", "chart", chartName)
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	deccoder := yaml.NewDecoder(bytes.NewReader([]byte(out)))
-	res := make([]*chart.Metadata, 0)
-	var tmp interface{}
-
-	for deccoder.Decode(&tmp) == nil {
-		jsoned, err := json.Marshal(tmp)
-		if err != nil {
-			return nil, err
-		}
-
-		var resjson chart.Metadata
-		err = json.Unmarshal(jsoned, &resjson)
-		if err != nil {
-			return nil, err
-		}
-		res = append(res, &resjson)
-	}
-
-	return res, nil
-}
 
 type Repositories struct {
 	Settings   *cli.EnvSettings
@@ -292,6 +247,25 @@ func (r *Repository) ByName(name string) (repo.ChartVersions, error) {
 		return nx, nil
 	}
 	return repo.ChartVersions{}, nil
+}
+
+func (r *Repository) Update() error {
+	// TODO: mutex it
+
+	// from cmd/helm/repo_update.go
+
+	// TODO: make this object to be an `Orig`?
+	rep, err := repo.NewChartRepository(r.Orig, getter.All(r.Settings))
+	if err != nil {
+		return errorx.Decorate(err, "could not create repository object")
+	}
+	rep.CachePath = r.Settings.RepositoryCache
+
+	_, err = rep.DownloadIndexFile()
+	if err != nil {
+		return errorx.Decorate(err, "failed to download repo index file")
+	}
+	return nil
 }
 
 // copied from cmd/helm/repo.go
