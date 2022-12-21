@@ -37,7 +37,7 @@ func (a *Releases) List() ([]*Release, error) {
 	}
 	releases := []*Release{}
 	for _, r := range rels {
-		releases = append(releases, &Release{HelmConfig: a.HelmConfig, Orig: r})
+		releases = append(releases, &Release{HelmConfig: a.HelmConfig, Orig: r, Settings: a.Settings})
 	}
 	return releases, nil
 }
@@ -65,20 +65,19 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 
 	cmd := action.NewInstall(hc)
 
-	if namespace == "" {
-		namespace = a.Settings.Namespace()
-	}
-
 	cmd.ReleaseName = name
 	cmd.CreateNamespace = true
 	cmd.Namespace = namespace
+	if cmd.Namespace == "" {
+		cmd.Namespace = a.Settings.Namespace()
+	}
 	cmd.Version = version
 
 	if justTemplate {
 		cmd.DryRun = true
 	}
 
-	chrt, err := a.locateChart(cmd, repoChart)
+	chrt, err := locateChart(cmd.ChartPathOptions, repoChart, a.Settings)
 	if err != nil {
 		return nil, err
 	}
@@ -91,16 +90,16 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 	return res, nil
 }
 
-func (a *Releases) locateChart(client *action.Install, chart string) (*chart.Chart, error) {
+func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.EnvSettings) (*chart.Chart, error) {
 	// from cmd/helm/install.go and cmd/helm/upgrade.go
-	cp, err := client.ChartPathOptions.LocateChart(chart, a.Settings)
+	cp, err := pathOpts.LocateChart(chart, settings)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Debugf("Located chart %s: %s\n", chart, cp)
 
-	p := getter.All(a.Settings)
+	p := getter.All(settings)
 
 	// Check chart dependencies to make sure all are present in /charts
 	chartRequested, err := loader.Load(cp)
@@ -118,16 +117,16 @@ func (a *Releases) locateChart(client *action.Install, chart string) (*chart.Cha
 		// https://github.com/helm/helm/issues/2209
 		if err := action.CheckDependencies(chartRequested, req); err != nil {
 			err = errorx.Decorate(err, "An error occurred while checking for chart dependencies. You may need to run `helm dependency build` to fetch missing dependencies")
-			if client.DependencyUpdate {
+			if true { // client.DependencyUpdate
 				man := &downloader.Manager{
 					Out:              ioutil.Discard,
 					ChartPath:        cp,
-					Keyring:          client.ChartPathOptions.Keyring,
+					Keyring:          pathOpts.Keyring,
 					SkipUpdate:       false,
 					Getters:          p,
-					RepositoryConfig: a.Settings.RepositoryConfig,
-					RepositoryCache:  a.Settings.RepositoryCache,
-					Debug:            a.Settings.Debug,
+					RepositoryConfig: settings.RepositoryConfig,
+					RepositoryCache:  settings.RepositoryCache,
+					Debug:            settings.Debug,
 				}
 				if err := man.Update(); err != nil {
 					return nil, err
@@ -146,6 +145,7 @@ func (a *Releases) locateChart(client *action.Install, chart string) (*chart.Cha
 }
 
 type Release struct {
+	Settings   *cli.EnvSettings
 	HelmConfig HelmNSConfigGetter
 	Orig       *release.Release
 	revisions  []*Release
@@ -165,7 +165,7 @@ func (r *Release) History() ([]*Release, error) {
 
 	r.revisions = []*Release{}
 	for _, rev := range revs {
-		r.revisions = append(r.revisions, &Release{HelmConfig: r.HelmConfig, Orig: rev})
+		r.revisions = append(r.revisions, &Release{HelmConfig: r.HelmConfig, Orig: rev, Settings: r.Settings})
 	}
 
 	return r.revisions, nil
@@ -224,6 +224,34 @@ func (r *Release) GetRev(revNo int) (*Release, error) {
 	}
 
 	return nil, errorx.InternalError.New("No revision found for number %s", revNo)
+}
+
+func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
+	hc, err := r.HelmConfig(r.Settings.Namespace())
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	cmd := action.NewUpgrade(hc)
+
+	cmd.Namespace = r.Settings.Namespace()
+	cmd.Version = version
+
+	if justTemplate {
+		cmd.DryRun = true
+	}
+
+	chrt, err := locateChart(cmd.ChartPathOptions, repoChart, r.Settings)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := cmd.Run(r.Orig.Name, chrt, values)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func checkIfInstallable(ch *chart.Chart) error {

@@ -310,10 +310,19 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		return
 	}
 
-	rel, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, values)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
+	var rel *release.Release
+	if existing != nil {
+		rel, err = existing.Upgrade(c.Query("chart"), c.Query("version"), justTemplate, values)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	} else {
+		rel, err = app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, values)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	out := ""
@@ -466,12 +475,14 @@ func (h *HelmHandler) handleGetSection(rel *subproc.Release, section string, rDi
 				allVals = merged
 			}
 
-			data, err := yaml.Marshal(allVals)
-			if err != nil {
-				return "", errorx.Decorate(err, "failed to serialize values into YAML")
+			if len(allVals) > 0 {
+				data, err := yaml.Marshal(allVals)
+				if err != nil {
+					return "", errorx.Decorate(err, "failed to serialize values into YAML")
+				}
+				return string(data), nil
 			}
-
-			return string(data), nil
+			return "", nil
 		},
 	}
 
