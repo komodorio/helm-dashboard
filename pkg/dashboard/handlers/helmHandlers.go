@@ -285,9 +285,31 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		return
 	}
 
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
 	justTemplate := c.Query("flag") != "true"
-	isInitial := c.Query("initial") != "true"
-	out, err := h.Data.ChartInstall(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, c.PostForm("values"), isInitial)
+	notInitial := c.Query("initial") != "true"
+
+	var existing *subproc.Release
+	if notInitial {
+		existing, err = app.Releases.ByName(qp.Namespace, qp.Name)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}
+
+	values := map[string]interface{}{}
+	err = yaml.Unmarshal([]byte(c.PostForm("values")), &values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	out, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -295,12 +317,8 @@ func (h *HelmHandler) Install(c *gin.Context) {
 
 	if justTemplate {
 		manifests := ""
-		if isInitial {
-			manifests, err = h.Data.RevisionManifests(qp.Namespace, qp.Name, 0, false)
-			if err != nil {
-				_ = c.AbortWithError(http.StatusInternalServerError, err)
-				return
-			}
+		if notInitial {
+			manifests = existing.Orig.Manifest
 		}
 		out = subproc.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
 	} else {
@@ -454,30 +472,20 @@ func (h *HelmHandler) handleGetSection(rel *subproc.Release, section string, rDi
 		return "", errors.New("unsupported section: " + section)
 	}
 
-	oRel, err := rel.OrigFull()
-	if err != nil {
-		return "", errorx.Decorate(err, "failed to get full revision info")
-	}
-
 	if rDiff != nil {
 		ext := ".yaml"
 		if section == "notes" {
 			ext = ".txt"
 		}
 
-		oDiff, err := rDiff.OrigFull()
-		if err != nil {
-			return "", errorx.Decorate(err, "failed to get full diff revision info")
-		}
-
-		res, err := subproc.RevisionDiff(functor, ext, oDiff, oRel, flag)
+		res, err := subproc.RevisionDiff(functor, ext, rDiff.Orig, rel.Orig, flag)
 		if err != nil {
 			return "", err
 		}
 		return res, nil
 	}
 
-	res, err := functor(oRel, flag)
+	res, err := functor(rel.Orig, flag)
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to get section info")
 	}

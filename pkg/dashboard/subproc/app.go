@@ -30,7 +30,7 @@ type Application struct {
 }
 
 func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter) (*Application, error) {
-	hc, err := helmConfig("") // TODO: are these the right options?
+	hc, err := helmConfig(settings.Namespace())
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
@@ -44,6 +44,7 @@ func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter) (*
 		HelmConfig: helmConfig,
 		K8s:        k8s,
 		Releases: &Releases{
+			Settings:   settings,
 			HelmConfig: helmConfig,
 		},
 		Repositories: &Repositories{
@@ -54,7 +55,7 @@ func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter) (*
 }
 
 func (a *Application) CheckConnectivity() error {
-	hc, err := a.HelmConfig("")
+	hc, err := a.HelmConfig("") // TODO: empty ns?
 	if err != nil {
 		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}

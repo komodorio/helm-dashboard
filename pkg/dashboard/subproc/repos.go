@@ -50,6 +50,10 @@ func (r *Repositories) List() ([]*Repository, error) {
 }
 
 func (r *Repositories) Add(name string, url string) error {
+	if name == "" || url == "" {
+		return errors.New("Name and URL are required parameters to add the repository")
+	}
+
 	// copied from cmd/helm/repo_add.go
 	repoFile := r.Settings.RepositoryConfig
 

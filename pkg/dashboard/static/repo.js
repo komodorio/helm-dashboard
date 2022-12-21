@@ -139,6 +139,7 @@ function repoChartClicked() {
         const contexts = $("body").data("contexts")
         const ctxFiltered = contexts.filter(obj => {return obj.Name === getHashParam("context")});
         const contextNamespace = ctxFiltered.length?ctxFiltered[0].Namespace:""
+        elm.repository=$("#sectionRepo .repo-details h2").text()
         popUpUpgrade(elm, contextNamespace)
     }
 }

@@ -16,7 +16,6 @@ $("#btnUpgradeCheck").click(function () {
     })
 })
 
-
 function checkUpgradeable(name) {
     $.getJSON("/api/helm/repo/latestver?name=" + name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
@@ -36,7 +35,6 @@ function checkUpgradeable(name) {
         $("#btnUpgradeCheck").text("Check for new version")
         const verCur = $("#specRev").data("last-chart-ver");
         const elm = data[0]
-        console.log(elm)
         $("#btnUpgradeCheck").data("repo", elm.repository)
         $("#btnUpgradeCheck").data("chart", elm.name)
 

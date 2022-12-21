@@ -4,11 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	"gopkg.in/yaml.v3"
 	"net/http"
 )
 
 type ScannersHandler struct {
-	Data *subproc.DataLayer
+	*Contexted
 }
 
 func (h *ScannersHandler) List(c *gin.Context) {
@@ -33,8 +34,19 @@ func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 		return
 	}
 
-	reuseVals := c.Query("initial") != "true"
-	mnf, err := h.Data.ChartInstall(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, c.PostForm("values"), reuseVals)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	values := map[string]interface{}{}
+	err = yaml.Unmarshal([]byte(c.PostForm("values")), &values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	mnf, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

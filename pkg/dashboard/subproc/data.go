@@ -8,7 +8,6 @@ import (
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -19,7 +18,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -60,30 +58,6 @@ func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error
 		appPerContext:   map[string]*Application{},
 		appPerContextMx: new(sync.Mutex),
 	}, nil
-}
-
-func (d *DataLayer) runCommand(cmd ...string) (string, error) {
-	for i, c := range cmd {
-		// TODO: remove namespace parameter if it's empty
-		if c == "--namespace" && i < len(cmd) { // TODO: in case it's not found - add it?
-			d.forceNamespace(&cmd[i+1])
-		}
-	}
-
-	return utils.RunCommand(cmd, map[string]string{"HELM_KUBECONTEXT": d.KubeContext})
-}
-
-func (d *DataLayer) runCommandHelm(cmd ...string) (string, error) {
-	if d.Helm == "" {
-		d.Helm = "helm"
-	}
-
-	cmd = append([]string{d.Helm}, cmd...)
-	if d.KubeContext != "" {
-		cmd = append(cmd, "--kube-context", d.KubeContext)
-	}
-
-	return d.runCommand(cmd...)
 }
 
 func (d *DataLayer) forceNamespace(s *string) {
@@ -154,15 +128,6 @@ func (d *DataLayer) GetStatus() *StatusInfo {
 
 type SectionFn = func(*release.Release, bool) (string, error)
 
-func (d *DataLayer) RevisionManifests(namespace string, chartName string, revision int, _ bool) (res string, err error) {
-	cmd := []string{"get", "manifest", chartName, "--namespace", namespace, "--revision", strconv.Itoa(revision)}
-
-	key := CacheKeyRevManifests + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision)
-	return d.Cache.String(key, nil, func() (string, error) {
-		return d.runCommandHelm(cmd...)
-	})
-}
-
 func ParseManifests(out string) ([]*v1.Carp, error) {
 	dec := yaml.NewDecoder(bytes.NewReader([]byte(out)))
 
@@ -192,60 +157,6 @@ func ParseManifests(out string) ([]*v1.Carp, error) {
 	return res, nil
 }
 
-func (d *DataLayer) RevisionValues(namespace string, chartName string, revision int, onlyUserDefined bool) (res string, err error) {
-	cmd := []string{"get", "values", chartName, "--namespace", namespace, "--output", "yaml", "--revision", strconv.Itoa(revision)}
-
-	if !onlyUserDefined {
-		cmd = append(cmd, "--all")
-	}
-
-	key := CacheKeyRevValues + "\v" + namespace + "\v" + chartName + "\v" + strconv.Itoa(revision) + "\v" + fmt.Sprintf("%v", onlyUserDefined)
-	return d.Cache.String(key, nil, func() (string, error) {
-		return d.runCommandHelm(cmd...)
-	})
-}
-
-func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string, version string, justTemplate bool, values string, reuseVals bool) (string, error) {
-	if values == "" && reuseVals {
-		oldVals, err := d.RevisionValues(namespace, name, 0, true)
-		if err != nil {
-			return "", err
-		}
-		values = oldVals
-	}
-
-	valsFile, close1, err := utils.TempFile(values)
-	defer close1()
-	if err != nil {
-		return "", err
-	}
-
-	cmd := []string{"upgrade", "--install", "--create-namespace", name, repoChart, "--version", version, "--namespace", namespace, "--values", valsFile, "--output", "json"}
-	if justTemplate {
-		cmd = append(cmd, "--dry-run")
-	}
-
-	out, err := d.runCommandHelm(cmd...)
-	if err != nil {
-		return "", err
-	}
-
-	if !justTemplate {
-		d.Cache.Invalidate(CacheKeyRelList, cacheTagRelease(namespace, name))
-	}
-
-	res := release.Release{}
-	err = json.Unmarshal([]byte(out), &res)
-	if err != nil {
-		return "", err
-	}
-	if justTemplate {
-		out = strings.TrimSpace(res.Manifest)
-	}
-
-	return out, nil
-}
-
 func (d *DataLayer) SetContext(ctx string) error {
 	if d.KubeContext != ctx {
 		err := d.Cache.Clear()
@@ -268,6 +179,8 @@ func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
 		settings := cli.New()
 		settings.KubeContext = ctx
 
+		settings.SetNamespace(d.nsForCtx(ctx))
+
 		cfgGetter := func(ns string) (*action.Configuration, error) {
 			return d.ConfGen(settings, ns)
 		}
@@ -281,6 +194,20 @@ func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
 		d.appPerContext[ctx] = app
 	}
 	return app, nil
+}
+
+func (d *DataLayer) nsForCtx(ctx string) string {
+	lst, err := d.ListContexts()
+	if err != nil {
+		log.Debugf("Failed to get contexts for NS lookup: %+v", err)
+	}
+	for _, c := range lst {
+		if c.Name == ctx {
+			return c.Namespace
+		}
+	}
+	log.Debugf("Strange: no context found for '%s'", ctx)
+	return ""
 }
 
 func RevisionDiff(functor SectionFn, ext string, revision1 *release.Release, revision2 *release.Release, flag bool) (string, error) {

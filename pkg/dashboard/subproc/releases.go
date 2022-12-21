@@ -3,19 +3,27 @@ package subproc
 import (
 	"fmt"
 	"github.com/joomcode/errorx"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/downloader"
+	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
+	"io/ioutil"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"strings"
 )
 
 type Releases struct {
 	HelmConfig HelmNSConfigGetter
-
-	//list []*Release
+	Settings   *cli.EnvSettings
 }
 
 func (a *Releases) List() ([]*Release, error) {
-	hc, err := a.HelmConfig("")
+	hc, err := a.HelmConfig("") // TODO: empty ns?
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
@@ -48,6 +56,94 @@ func (a *Releases) ByName(namespace string, name string) (*Release, error) {
 	}
 
 	return nil, errorx.DataUnavailable.New(fmt.Sprintf("release '%s' is not found in namespace '%s'", name, namespace))
+}
+
+func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (string, error) {
+	hc, err := a.HelmConfig("") // TODO: empty ns?
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+	}
+
+	cmd := action.NewInstall(hc)
+
+	if namespace == "" {
+		namespace = a.Settings.Namespace()
+	}
+
+	cmd.ReleaseName = name
+	cmd.CreateNamespace = true
+	cmd.Namespace = namespace
+	cmd.Version = version
+
+	if justTemplate {
+		cmd.DryRun = true
+	}
+
+	chrt, err := a.locateChart(cmd, repoChart)
+	if err != nil {
+		return "", err
+	}
+
+	res, err := cmd.Run(chrt, values)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(res.Manifest), nil
+}
+
+func (a *Releases) locateChart(client *action.Install, chart string) (*chart.Chart, error) {
+	// from cmd/helm/install.go and cmd/helm/upgrade.go
+	cp, err := client.ChartPathOptions.LocateChart(chart, a.Settings)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("Located chart %s: %s\n", chart, cp)
+
+	p := getter.All(a.Settings)
+
+	// Check chart dependencies to make sure all are present in /charts
+	chartRequested, err := loader.Load(cp)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := checkIfInstallable(chartRequested); err != nil {
+		return nil, err
+	}
+
+	if req := chartRequested.Metadata.Dependencies; req != nil {
+		// If CheckDependencies returns an error, we have unfulfilled dependencies.
+		// As of Helm 2.4.0, this is treated as a stopping condition:
+		// https://github.com/helm/helm/issues/2209
+		if err := action.CheckDependencies(chartRequested, req); err != nil {
+			err = errorx.Decorate(err, "An error occurred while checking for chart dependencies. You may need to run `helm dependency build` to fetch missing dependencies")
+			if client.DependencyUpdate {
+				man := &downloader.Manager{
+					Out:              ioutil.Discard,
+					ChartPath:        cp,
+					Keyring:          client.ChartPathOptions.Keyring,
+					SkipUpdate:       false,
+					Getters:          p,
+					RepositoryConfig: a.Settings.RepositoryConfig,
+					RepositoryCache:  a.Settings.RepositoryCache,
+					Debug:            a.Settings.Debug,
+				}
+				if err := man.Update(); err != nil {
+					return nil, err
+				}
+				// Reload the chart with the updated Chart.lock file.
+				if chartRequested, err = loader.Load(cp); err != nil {
+					return nil, errorx.Decorate(err, "failed reloading chart after repo update")
+				}
+			} else {
+				return nil, err
+			}
+		}
+	}
+
+	return chartRequested, nil
 }
 
 type Release struct {
@@ -131,20 +227,10 @@ func (r *Release) GetRev(revNo int) (*Release, error) {
 	return nil, errorx.InternalError.New("No revision found for number %s", revNo)
 }
 
-func (r *Release) OrigFull() (*release.Release, error) {
-	return r.Orig, nil // FIXME: do we need it at all?
-
-	hc, err := r.HelmConfig(r.Orig.Namespace)
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+func checkIfInstallable(ch *chart.Chart) error {
+	switch ch.Metadata.Type {
+	case "", "application":
+		return nil
 	}
-
-	client := action.NewGet(hc)
-	client.Version = r.Orig.Version
-	full, err := client.Run(r.Orig.Name)
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get full release information")
-	}
-
-	return full, nil
+	return errors.Errorf("%s charts are not installable", ch.Metadata.Type)
 }

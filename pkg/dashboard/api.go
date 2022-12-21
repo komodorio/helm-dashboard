@@ -182,7 +182,11 @@ func configureStatic(api *gin.Engine) {
 }
 
 func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.ScannersHandler{Data: data}
+	h := handlers.ScannersHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 	api.GET("", h.List)
 	api.POST("/manifests", h.ScanDraftManifest)
 	api.GET("/resource/:kind", h.ScanResource)
