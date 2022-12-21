@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/joomcode/errorx"
 	"github.com/rogpeppe/go-internal/semver"
@@ -309,12 +310,13 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		return
 	}
 
-	out, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, values)
+	rel, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
+	out := ""
 	if justTemplate {
 		manifests := ""
 		if notInitial {
@@ -323,6 +325,12 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		out = subproc.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
 	} else {
 		c.Header("Content-Type", "application/json")
+		enc, err := json.Marshal(rel)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		out = strings.TrimSpace(string(enc))
 	}
 
 	c.String(http.StatusAccepted, out)

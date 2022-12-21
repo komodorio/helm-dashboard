@@ -14,7 +14,6 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"io/ioutil"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"strings"
 )
 
 type Releases struct {
@@ -58,10 +57,10 @@ func (a *Releases) ByName(namespace string, name string) (*Release, error) {
 	return nil, errorx.DataUnavailable.New(fmt.Sprintf("release '%s' is not found in namespace '%s'", name, namespace))
 }
 
-func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (string, error) {
+func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
 	hc, err := a.HelmConfig(a.Settings.Namespace())
 	if err != nil {
-		return "", errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
 
 	cmd := action.NewInstall(hc)
@@ -81,15 +80,15 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 
 	chrt, err := a.locateChart(cmd, repoChart)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	res, err := cmd.Run(chrt, values)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return strings.TrimSpace(res.Manifest), nil
+	return res, nil
 }
 
 func (a *Releases) locateChart(client *action.Install, chart string) (*chart.Chart, error) {

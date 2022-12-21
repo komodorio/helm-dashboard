@@ -54,7 +54,7 @@ func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 
 	reps := map[string]*subproc.ScanResults{}
 	for _, scanner := range h.Data.Scanners {
-		sr, err := scanner.ScanManifests(mnf)
+		sr, err := scanner.ScanManifests(mnf.Manifest)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
