@@ -59,7 +59,7 @@ func (a *Releases) ByName(namespace string, name string) (*Release, error) {
 }
 
 func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (string, error) {
-	hc, err := a.HelmConfig("") // TODO: empty ns?
+	hc, err := a.HelmConfig(a.Settings.Namespace())
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
