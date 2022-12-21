@@ -1,5 +1,8 @@
 replicaCount: 1
 
+# Flag for setting environment to debug mode 
+debug: false
+
 image:
   repository: komodorio/helm-dashboard
   pullPolicy: IfNotPresent
@@ -26,7 +29,7 @@ resources:
     memory: 1Gi
 
 dashboard:
-  allowWriteActions: false
+  allowWriteActions: true
   persistence:
     enabled: true
 

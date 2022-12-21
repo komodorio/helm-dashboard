@@ -40,6 +40,8 @@ spec:
             value: /opt/dashboard/helm/config
           - name: HELM_DATA_HOME
             value: /opt/dashboard/helm/data
+          - name: DEBUG
+            value: {{- ternary " 1" "" .Values.debug }}
           ports:
             - name: http
               containerPort: 8080
