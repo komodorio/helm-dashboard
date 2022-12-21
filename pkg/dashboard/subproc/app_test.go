@@ -3,6 +3,7 @@ package subproc
 import (
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/cli"
 	"testing"
 )
 
@@ -10,13 +11,13 @@ func TestApplication_GetReleases(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
 	app, err := NewApplication(nil, func(ns string) (*action.Configuration, error) {
-		return NewHelmConfig("", ns)
+		return NewHelmConfig(&cli.EnvSettings{}, ns)
 	})
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
 
-	rels, err := app.GetReleases()
+	rels, err := app.Releases.List()
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
