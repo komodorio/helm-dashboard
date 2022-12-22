@@ -3,6 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/hexops/gotextdiff"
+	"github.com/hexops/gotextdiff/myers"
+	"github.com/hexops/gotextdiff/span"
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/rogpeppe/go-internal/semver"
@@ -11,13 +15,13 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
+	helmtime "helm.sh/helm/v3/pkg/time"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 )
 
@@ -57,9 +61,9 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 		return
 	}
 
-	res := []*subproc.ReleaseElement{}
+	res := []*ReleaseElement{}
 	for _, r := range rels {
-		res = append(res, subproc.HReleaseToJSON(r.Orig))
+		res = append(res, HReleaseToJSON(r.Orig))
 	}
 
 	c.IndentedJSON(http.StatusOK, res)
@@ -105,9 +109,9 @@ func (h *HelmHandler) History(c *gin.Context) {
 		return
 	}
 
-	res := []*subproc.HistoryElement{}
+	res := []*HistoryElement{}
 	for _, r := range revs {
-		res = append(res, subproc.HReleaseToHistElem(r.Orig))
+		res = append(res, HReleaseToHistElem(r.Orig))
 	}
 
 	sort.Slice(res, func(i, j int) bool {
@@ -151,9 +155,9 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 		return
 	}
 
-	res := []*subproc.RepoChartElement{}
+	res := []*RepoChartElement{}
 	for _, r := range rep {
-		res = append(res, &subproc.RepoChartElement{
+		res = append(res, &RepoChartElement{
 			Name:        r.Name,
 			Version:     r.Version,
 			AppVersion:  r.AppVersion,
@@ -183,9 +187,9 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 		return
 	}
 
-	res := []*subproc.RepoChartElement{}
+	res := []*RepoChartElement{}
 	for _, r := range rep {
-		res = append(res, &subproc.RepoChartElement{
+		res = append(res, &RepoChartElement{
 			Name:        r.Name,
 			Version:     r.Version,
 			AppVersion:  r.AppVersion,
@@ -332,7 +336,7 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		if notInitial {
 			manifests = existing.Orig.Manifest
 		}
-		out = objects.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
+		out = GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
 	} else {
 		c.Header("Content-Type", "application/json")
 		enc, err := json.Marshal(rel)
@@ -415,9 +419,9 @@ func (h *HelmHandler) RepoList(c *gin.Context) {
 		return
 	}
 
-	out := []subproc.RepositoryElement{}
+	out := []RepositoryElement{}
 	for _, r := range repos {
-		out = append(out, subproc.RepositoryElement{
+		out = append(out, RepositoryElement{
 			Name: r.Orig.Name,
 			URL:  r.Orig.URL,
 		})
@@ -498,7 +502,7 @@ func (h *HelmHandler) handleGetSection(rel *objects.Release, section string, rDi
 			ext = ".txt"
 		}
 
-		res, err := objects.RevisionDiff(functor, ext, rDiff.Orig, rel.Orig, flag)
+		res, err := RevisionDiff(functor, ext, rDiff.Orig, rel.Orig, flag)
 		if err != nil {
 			return "", err
 		}
@@ -510,4 +514,99 @@ func (h *HelmHandler) handleGetSection(rel *objects.Release, section string, rDi
 		return "", errorx.Decorate(err, "failed to get section info")
 	}
 	return res, nil
+}
+
+type RepoChartElement struct {
+	Name        string `json:"name"`
+	Version     string `json:"version"`
+	AppVersion  string `json:"app_version"`
+	Description string `json:"description"`
+
+	InstalledNamespace string `json:"installed_namespace"` // custom addition on top of Helm
+	InstalledName      string `json:"installed_name"`      // custom addition on top of Helm
+	Repository         string `json:"repository"`
+}
+
+func HReleaseToJSON(o *release.Release) *ReleaseElement {
+	return &ReleaseElement{
+		Name:        o.Name,
+		Namespace:   o.Namespace,
+		Revision:    strconv.Itoa(o.Version),
+		Updated:     o.Info.LastDeployed,
+		Status:      o.Info.Status,
+		Chart:       fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
+		AppVersion:  o.Chart.AppVersion(),
+		Icon:        o.Chart.Metadata.Icon,
+		Description: o.Chart.Metadata.Description,
+	}
+}
+
+type ReleaseElement struct {
+	Name        string         `json:"name"`
+	Namespace   string         `json:"namespace"`
+	Revision    string         `json:"revision"`
+	Updated     helmtime.Time  `json:"updated"`
+	Status      release.Status `json:"status"`
+	Chart       string         `json:"chart"`
+	AppVersion  string         `json:"app_version"`
+	Icon        string         `json:"icon"`
+	Description string
+}
+
+type RepositoryElement struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
+type HistoryElement struct {
+	Revision    int            `json:"revision"`
+	Updated     helmtime.Time  `json:"updated"`
+	Status      release.Status `json:"status"`
+	Chart       string         `json:"chart"`
+	AppVersion  string         `json:"app_version"`
+	Description string         `json:"description"`
+
+	ChartName string `json:"chart_name"` // custom addition on top of Helm
+	ChartVer  string `json:"chart_ver"`  // custom addition on top of Helm
+}
+
+func HReleaseToHistElem(o *release.Release) *HistoryElement {
+	return &HistoryElement{
+		Revision:    o.Version,
+		Updated:     o.Info.LastDeployed,
+		Status:      o.Info.Status,
+		Chart:       fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
+		AppVersion:  o.Chart.AppVersion(),
+		Description: o.Info.Description,
+		ChartName:   o.Chart.Name(),
+		ChartVer:    o.Chart.Metadata.Version,
+	}
+}
+
+func RevisionDiff(functor objects.SectionFn, ext string, revision1 *release.Release, revision2 *release.Release, flag bool) (string, error) {
+	if revision1 == nil || revision2 == nil {
+		log.Debugf("One of revisions is nil: %v %v", revision1, revision2)
+		return "", nil
+	}
+
+	manifest1, err := functor(revision1, flag)
+	if err != nil {
+		return "", err
+	}
+
+	manifest2, err := functor(revision2, flag)
+	if err != nil {
+		return "", err
+	}
+
+	diff := GetDiff(manifest1, manifest2, strconv.Itoa(revision1.Version)+ext, strconv.Itoa(revision2.Version)+ext)
+	return diff, nil
+}
+
+func GetDiff(text1 string, text2 string, name1 string, name2 string) string {
+	edits := myers.ComputeEdits(span.URIFromPath(""), text1, text2)
+	unified := gotextdiff.ToUnified(name1, name2, text1, edits)
+	diff := fmt.Sprint(unified)
+	log.Debugf("The diff is: %s", diff)
+	return diff
 }

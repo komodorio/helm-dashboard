@@ -3,10 +3,6 @@ package objects
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"github.com/hexops/gotextdiff"
-	"github.com/hexops/gotextdiff/myers"
-	"github.com/hexops/gotextdiff/span"
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/pkg/errors"
@@ -18,7 +14,6 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
-	"strconv"
 	"sync"
 )
 
@@ -29,7 +24,7 @@ type DataLayer struct {
 	Scanners    []subproc.Scanner
 	StatusInfo  *StatusInfo
 	Namespace   string
-	Cache       *subproc.Cache
+	Cache       *Cache
 
 	ConfGen         HelmConfigGetter
 	appPerContext   map[string]*Application
@@ -40,7 +35,7 @@ type StatusInfo struct {
 	CurVer             string
 	LatestVer          string
 	Analytics          bool
-	LimitedToNamespace string
+	LimitedToNamespace string // FIXME: we're not limiting it anymore
 	CacheHitRatio      float64
 	ClusterMode        bool
 }
@@ -48,7 +43,7 @@ type StatusInfo struct {
 func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
 	return &DataLayer{
 		Namespace: ns,
-		Cache:     subproc.NewCache(),
+		Cache:     NewCache(),
 		StatusInfo: &StatusInfo{
 			CurVer:             ver,
 			Analytics:          false,
@@ -59,12 +54,6 @@ func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error
 		appPerContext:   map[string]*Application{},
 		appPerContextMx: new(sync.Mutex),
 	}, nil
-}
-
-func (d *DataLayer) forceNamespace(s *string) {
-	if d.Namespace != "" {
-		*s = d.Namespace
-	}
 }
 
 func (d *DataLayer) ListContexts() ([]KubeContext, error) {
@@ -199,32 +188,4 @@ func (d *DataLayer) nsForCtx(ctx string) string {
 	}
 	log.Debugf("Strange: no context found for '%s'", ctx)
 	return ""
-}
-
-func RevisionDiff(functor SectionFn, ext string, revision1 *release.Release, revision2 *release.Release, flag bool) (string, error) {
-	if revision1 == nil || revision2 == nil {
-		log.Debugf("One of revisions is nil: %v %v", revision1, revision2)
-		return "", nil
-	}
-
-	manifest1, err := functor(revision1, flag)
-	if err != nil {
-		return "", err
-	}
-
-	manifest2, err := functor(revision2, flag)
-	if err != nil {
-		return "", err
-	}
-
-	diff := GetDiff(manifest1, manifest2, strconv.Itoa(revision1.Version)+ext, strconv.Itoa(revision2.Version)+ext)
-	return diff, nil
-}
-
-func GetDiff(text1 string, text2 string, name1 string, name2 string) string {
-	edits := myers.ComputeEdits(span.URIFromPath(""), text1, text2)
-	unified := gotextdiff.ToUnified(name1, name2, text1, edits)
-	diff := fmt.Sprint(unified)
-	log.Debugf("The diff is: %s", diff)
-	return diff
 }
