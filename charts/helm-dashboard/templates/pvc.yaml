@@ -1,0 +1,48 @@
+{{- if .Values.dashboard.persistence.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "helm-dashboard.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "helm-dashboard.labels" . | nindent 4 }}
+  {{- with .Values.dashboard.persistence.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.dashboard.persistence.hostPath }}
+  storageClassName: ""
+  {{- end }}
+  accessModes:
+  {{- if not (empty .Values.dashboard.persistence.accessModes) }}
+  {{- range .Values.dashboard.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.dashboard.persistence.size | quote }}
+{{- end }}
+
+---
+{{- if and .Values.dashboard.persistence.enabled .Values.dashboard.persistence.hostPath -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "helm-dashboard.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "helm-dashboard.labels" . | nindent 4 }}
+  {{- with .Values.dashboard.persistence.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.dashboard.persistence.accessMode | quote }}
+  capacity:
+    storage: {{ .Values.dashboard.persistence.size | quote }}
+  hostPath:
+    path: {{ .Values.dashboard.persistence.hostPath | quote }}
+{{- end -}}

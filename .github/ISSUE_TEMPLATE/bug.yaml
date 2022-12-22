@@ -1,0 +1,59 @@
+name: 🐛 Bug
+
+description: Report an issue to help improve the project.
+
+labels: ["🛠 goal: fix"]
+
+body:
+
+  - type: textarea
+
+    id: description
+
+    attributes:
+
+      label: Description
+
+      description: A brief description of the question or issue, also include what you tried and what didn't work
+
+    validations:
+
+      required: true
+
+  - type: textarea
+
+    id: screenshots
+
+    attributes:
+
+      label: Screenshots
+
+      description: Please add screenshots if applicable
+
+    validations:
+
+      required: false
+
+  - type: textarea
+
+    id: extrainfo
+
+    attributes:
+
+      label: Additional information
+
+      description: Is there anything else we should know about this bug?
+
+    validations:
+
+      required: false
+
+  - type: markdown
+
+    attributes:
+
+      value: |
+
+        You can also join our slack community [here](https://join.slack.com/t/komodorkommunity/shared_invite/zt-1dm3cnkue-ov1Yh~_95teA35QNx5yuMg)
+
+        Feel free to check out other cool repositories of the [komodorio](https://github.com/komodorio)

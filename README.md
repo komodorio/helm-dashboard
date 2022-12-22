@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="pkg/dashboard/static/logo-readme.svg" width="200" />
+  # ![Helm Dashboard](pkg/dashboard/static/logo-header.svg#gh-light-mode-only) ![Helm Dashboard](pkg/dashboard/static/logo-header-inverted.svg#gh-dark-mode-only)
   <br/>
 </p>
 
@@ -26,9 +26,11 @@ Some of the key capabilities of the tool:
 - Integration with popular problem scanners
 - Easy switch between multiple clusters
 
-## Installing
+## Setup
 
-To install it, simply run Helm command:
+### Using Helm plugin manager
+
+To install the plugin, simply run Helm command:
 
 ```shell
 helm plugin install https://github.com/komodorio/helm-dashboard.git
@@ -45,10 +47,6 @@ To uninstall, run:
 ```shell
 helm plugin uninstall dashboard
 ```
-
-> In case standard Helm plugin way did not work for you, you can just download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
-
-## Running
 
 To use the plugin, your machine needs to have working `helm` and also `kubectl` commands. Helm version 3.4.0+ is required.
 
@@ -78,6 +76,14 @@ If you don't want browser tab to automatically open, add `--no-browser` flag in 
 If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
 
 > Disclaimer: For the sake of improving the project quality, there is user analytics collected by the tool. You can disable this collecting with `--no-analytics` option. The collection is done via DataDog RUM and Heap Analytics. Only the anonymous data is collected, no sensitive information is used.
+
+### Deploying Helm Dashboard on Kubernetes
+
+The official helm chart is [available here](https://github.com/komodorio/helm-charts/blob/master/charts/helm-dashboard)
+
+### Manual Installation
+
+Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
 
 ## Scanner Integrations
 

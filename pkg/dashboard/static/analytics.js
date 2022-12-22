@@ -5,7 +5,7 @@ xhr.onload = function () {
         const version = status.CurVer
         if (status.Analytics) {
             enableDD(version)
-            enableHeap(version)
+            enableHeap(version, status.ClusterMode)
         }
     }
 }
@@ -42,7 +42,7 @@ function enableDD(version) {
     })
 }
 
-function enableHeap(version) {
+function enableHeap(version, inCluster) {
     window.heap = window.heap || [], heap.load = function (e, t) {
         window.heap.appid = e, window.heap.config = t = t || {};
         let r = document.createElement("script");
@@ -56,7 +56,10 @@ function enableHeap(version) {
         }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], o = 0; o < p.length; o++) heap[p[o]] = n(p[o])
     };
     heap.load("4249623943");
-    window.heap.addEventProperties({'version': version});
+    window.heap.addEventProperties({
+        'version': version,
+        'installationMode': inCluster?"cluster":"local"
+    });
 }
 
 function sendStats(name, prop){

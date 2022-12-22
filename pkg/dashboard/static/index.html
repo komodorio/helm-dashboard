@@ -75,24 +75,6 @@
             </div>
             <div class="separator-vertical"><span></span></div>
             <i class="btn bi-power text-muted p-2 m-1 mx-2" title="Shut down the Helm Dashboard application"></i>
-            
-            <!-- Modal -->
-            <div class="modal fade" id="PowerOffModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="ModalLabel">Message</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Close this browser tab now.
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div>
-            </div>
         </div>
     </nav>
     <!-- /TOP BAR -->
@@ -144,9 +126,11 @@
             <!-- FILTER BLOCK -->
             <div class="p-2 ps-2 bg-white rounded-1 b-shadow" id="filters">
                 <form>
-                    <h4>Clusters</h4>
-                    <ul class="list-unstyled" id="cluster">
-                    </ul>
+                    <div id="clusterFilterBlock">
+                        <h4>Clusters</h4>
+                        <ul class="list-unstyled" id="cluster">
+                        </ul>
+                    </div>
 
                     <h4 class="mt-4">Namespaces</h4>
                     <p id="limitNamespace" class="display-none ps-3"><span class="fw-bold"></span> (forced)</p>
@@ -165,7 +149,8 @@
                     <h2 class="m-0 p-1"><img class="m-2 mx-3 me-2" src="static/helm-gray.svg" alt="Installed Charts">Installed
                         Charts (<span></span>)</h2>
                     <div class="form-outline w-25">
-                        <input type="text" id="installedSearch" class="form-control form-control-sm" placeholder="Filter..." />
+                        <input type="text" id="installedSearch" class="form-control form-control-sm"
+                               placeholder="Filter..."/>
                     </div>
                 </div>
                 <div class="bg-secondary rounded-bottom m-0 row p-2">
@@ -182,7 +167,8 @@
             <div class="bg-white rounded shadow p-3 display-none no-charts">Looks like you don't have any charts
                 installed. "Repository" section may be a good place to start.
             </div>
-            <div class="bg-white rounded shadow p-3 display-none all-filtered">There are no releases matching your filter criteria. Reset your filters or install more charts.
+            <div class="bg-white rounded shadow p-3 display-none all-filtered">There are no releases matching your
+                filter criteria. Reset your filters or install more charts.
             </div>
         </div>
         <!-- /INSTALLED LIST -->
@@ -430,6 +416,21 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="PowerOffModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel">Session Ended</h5>
+            </div>
+            <div class="modal-body">
+                The Helm Dashboard application has been shut down. You can now close the browser tab.
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
