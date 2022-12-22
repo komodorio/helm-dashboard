@@ -1,6 +1,9 @@
 <p align="center">
-  # ![Helm Dashboard](pkg/dashboard/static/logo-header.svg#gh-light-mode-only) ![Helm Dashboard](pkg/dashboard/static/logo-header-inverted.svg#gh-dark-mode-only)
-  <br/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="pkg/dashboard/static/logo-header-inverted.svg">
+    <source media="(prefers-color-scheme: light)" srcset="pkg/dashboard/static/logo-header.svg#gh-light-mode-only">
+    <img alt="Helm Dashboard" src="pkg/dashboard/static/logo-header.svg#gh-light-mode-only">
+  </picture>
 </p>
 
 <p align="center">A simplified way of working with Helm.</p>
