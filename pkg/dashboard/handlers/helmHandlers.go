@@ -550,7 +550,7 @@ type ReleaseElement struct {
 	Chart       string         `json:"chart"`
 	AppVersion  string         `json:"app_version"`
 	Icon        string         `json:"icon"`
-	Description string
+	Description string         `json:"description"`
 }
 
 type RepositoryElement struct {
