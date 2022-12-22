@@ -16,9 +16,8 @@ $("#btnUpgradeCheck").click(function () {
     })
 })
 
-
 function checkUpgradeable(name) {
-    $.getJSON("/api/helm/repo/search?name=" + name).fail(function (xhr) {
+    $.getJSON("/api/helm/repo/latestver?name=" + name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
         if (!data || !data.length) {
@@ -36,8 +35,8 @@ function checkUpgradeable(name) {
         $("#btnUpgradeCheck").text("Check for new version")
         const verCur = $("#specRev").data("last-chart-ver");
         const elm = data[0]
-        $("#btnUpgradeCheck").data("repo", elm.name.split('/').shift())
-        $("#btnUpgradeCheck").data("chart", elm.name.split('/').pop())
+        $("#btnUpgradeCheck").data("repo", elm.repository)
+        $("#btnUpgradeCheck").data("chart", elm.name)
 
         const canUpgrade = isNewerVersion(verCur, elm.version);
         $("#btnUpgradeCheck").prop("disabled", false)
@@ -58,7 +57,7 @@ function checkUpgradeable(name) {
 function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     $("#upgradeModal .btn-confirm").prop("disabled", true)
 
-    $('#upgradeModal').data("chart", elm.name).data("initial", !verCur)
+    $('#upgradeModal').data("chart", elm.repository + "/" + elm.name).data("initial", !verCur)
 
     $("#upgradeModalLabel .name").text(elm.name)
 
@@ -76,7 +75,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModal .rel-ns").prop("disabled", false).val(ns)
     }
 
-    $.getJSON("/api/helm/repo/search?name=" + elm.name).fail(function (xhr) {
+    $.getJSON("/api/helm/repo/versions?name=" + elm.name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (vers) {
         // fill versions

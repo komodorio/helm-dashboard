@@ -2,13 +2,14 @@ package dashboard
 
 import (
 	"embed"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"html"
 	"net/http"
 	"os"
 	"path"
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -17,7 +18,9 @@ import (
 var staticFS embed.FS
 
 func noCache(c *gin.Context) {
-	c.Header("Cache-Control", "no-cache")
+	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
+		c.Header("Cache-Control", "no-cache")
+	}
 	c.Next()
 }
 
@@ -26,33 +29,40 @@ func errorHandler(c *gin.Context) {
 
 	errs := ""
 	for _, err := range c.Errors {
-		log.Debugf("Error: %s", err)
+		log.Debugf("Error: %+v", err)
 		errs += err.Error() + "\n"
 	}
 
 	if errs != "" {
-		c.String(http.StatusInternalServerError, errs)
+		c.String(http.StatusInternalServerError, html.EscapeString(errs))
 	}
 }
 
-func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
+func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctxName := ""
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
 			log.Debugf("Setting current context to: %s", ctx)
-			if data.KubeContext != ctx[0] {
-				err := data.Cache.Clear()
-				if err != nil {
-					_ = c.AbortWithError(http.StatusBadRequest, err)
-					return
-				}
+			ctxName = ctx[0]
+			if err := data.SetContext(ctxName); err != nil {
+				c.String(http.StatusInternalServerError, err.Error())
+				return
 			}
-			data.KubeContext = ctx[0]
 		}
+
+		app, err := data.AppForCtx(ctxName)
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.Set(handlers.APP, app)
+
 		c.Next()
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) *gin.Engine {
+func NewRouter(abortWeb utils.ControlChan, data *objects.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
 	if debug {
 		api = gin.New()
@@ -71,7 +81,7 @@ func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) 
 	return api
 }
 
-func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb utils.ControlChan, data *objects.DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -101,16 +111,19 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 	configureScanners(api.Group("/api/scanners"), data)
 }
 
-func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.HelmHandler{Data: data}
+func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
+	h := handlers.HelmHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 
-	api.GET("/charts", h.GetCharts)
+	api.GET("/charts", h.GetReleases)
 	api.DELETE("/charts", h.Uninstall)
 
 	api.GET("/charts/history", h.History)
 	api.GET("/charts/resources", h.Resources)
 	api.GET("/charts/:section", h.GetInfoSection)
-	api.GET("/charts/show", h.Show)
 	api.POST("/charts/install", h.Install)
 	api.POST("/charts/rollback", h.Rollback)
 
@@ -118,13 +131,18 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.POST("/repo", h.RepoAdd)
 	api.DELETE("/repo", h.RepoDelete)
 	api.GET("/repo/charts", h.RepoCharts)
-	api.GET("/repo/search", h.RepoSearch)
+	api.GET("/repo/latestver", h.RepoLatestVer)
+	api.GET("/repo/versions", h.RepoVersions)
 	api.POST("/repo/update", h.RepoUpdate)
 	api.GET("/repo/values", h.RepoValues)
 }
 
-func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.KubeHandler{Data: data}
+func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
+	h := handlers.KubeHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 	api.GET("/contexts", h.GetContexts)
 	api.GET("/resources/:kind", h.GetResourceInfo)
 	api.GET("/describe/:kind", h.Describe)
@@ -133,6 +151,8 @@ func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
 
 func configureStatic(api *gin.Engine) {
 	fs := http.FS(staticFS)
+
+	// TODO: enable HTTP client cache for it?
 
 	// local dev speed-up
 	localDevPath := "pkg/dashboard/static"
@@ -161,8 +181,12 @@ func configureStatic(api *gin.Engine) {
 	}
 }
 
-func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.ScannersHandler{Data: data}
+func configureScanners(api *gin.RouterGroup, data *objects.DataLayer) {
+	h := handlers.ScannersHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 	api.GET("", h.List)
 	api.POST("/manifests", h.ScanDraftManifest)
 	api.GET("/resource/:kind", h.ScanResource)

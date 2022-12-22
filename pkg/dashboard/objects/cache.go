@@ -1,4 +1,4 @@
-package subproc
+package objects
 
 import (
 	"context"
@@ -11,15 +11,6 @@ import (
 )
 
 type CacheKey = string
-
-const CacheKeyRelList CacheKey = "installed-releases-list"
-const CacheKeyShowChart CacheKey = "show-chart"
-const CacheKeyRelHistory CacheKey = "release-history"
-const CacheKeyRevManifests CacheKey = "rev-manifests"
-const CacheKeyRevNotes CacheKey = "rev-notes"
-const CacheKeyRevValues CacheKey = "rev-values"
-const CacheKeyRepoChartValues CacheKey = "chart-values"
-const CacheKeyAllRepos CacheKey = "all-repos"
 
 type Cache struct {
 	Marshaler *marshaler.Marshaler `json:"-"`
@@ -82,19 +73,4 @@ func (c *Cache) Clear() error {
 	c.HitCount = 0
 	c.MissCount = 0
 	return c.Marshaler.Clear(context.Background())
-}
-
-func cacheTagRelease(namespace string, name string) CacheKey {
-	return "release" + "\v" + namespace + "\v" + name
-}
-func cacheTagRepoVers(chartName string) CacheKey {
-	return "repo-versions" + "\v" + chartName
-}
-
-func cacheTagRepoCharts(name string) CacheKey {
-	return "repo-charts" + "\v" + name
-}
-
-func cacheTagRepoName(name string) CacheKey {
-	return "repo-name" + "\v" + name
 }
