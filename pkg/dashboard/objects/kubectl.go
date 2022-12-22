@@ -1,4 +1,4 @@
-package subproc
+package objects
 
 import (
 	"context"
@@ -55,27 +55,21 @@ func (p *cfgProxyObject) ToRawKubeConfigLoader() clientcmd.ClientConfig {
 }
 
 type K8s struct {
-	KubectlClient    *kube.Client
+	Factory          kube.Factory
 	RestClientGetter genericclioptions.RESTClientGetter
 }
 
 func NewK8s(helmConfig *action.Configuration) (*K8s, error) {
-	client, ok := helmConfig.KubeClient.(*kube.Client)
-	if !ok {
-		return nil, errors.New("Failed to cast Helm's KubeClient into kube.Client")
-	}
-
-	//ConfigFlags:
 	factory := cmdutil.NewFactory(&cfgProxyObject{Impl: helmConfig.RESTClientGetter})
 
 	return &K8s{
-		KubectlClient:    client,
+		Factory:          factory,
 		RestClientGetter: factory,
 	}, nil
 }
 
 func (k *K8s) GetNameSpaces() (res *corev1.NamespaceList, err error) {
-	clientset, err := k.KubectlClient.Factory.KubernetesClientSet()
+	clientset, err := k.Factory.KubernetesClientSet()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get KubernetesClientSet")
 	}
@@ -103,7 +97,7 @@ func (k *K8s) DescribeResource(kind string, ns string, name string) (string, err
 
 		IOStreams: streams,
 
-		NewBuilder: k.KubectlClient.Factory.NewBuilder,
+		NewBuilder: k.Factory.NewBuilder,
 	}
 
 	o.Namespace = ns
@@ -118,7 +112,7 @@ func (k *K8s) DescribeResource(kind string, ns string, name string) (string, err
 }
 
 func (k *K8s) GetResource(kind string, namespace string, name string) (*runtime.Object, error) {
-	builder := k.KubectlClient.Factory.NewBuilder()
+	builder := k.Factory.NewBuilder()
 	resp := builder.Unstructured().NamespaceParam(namespace).Flatten().ResourceNames(kind, name).Do()
 	if resp.Err() != nil {
 		return nil, errorx.Decorate(resp.Err(), "failed to get k8s resource")

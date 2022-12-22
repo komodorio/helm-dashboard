@@ -1,4 +1,4 @@
-package subproc
+package objects
 
 import (
 	"github.com/joomcode/errorx"

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"net/http"
 	"os"
 	"strings"
@@ -27,7 +28,7 @@ type Server struct {
 }
 
 func (s Server) StartServer() (string, utils.ControlChan, error) {
-	data, err := subproc.NewDataLayer(s.Namespace, s.Version, subproc.NewHelmConfig)
+	data, err := objects.NewDataLayer(s.Namespace, s.Version, objects.NewHelmConfig)
 	if err != nil {
 		return "", nil, errorx.Decorate(err, "Failed to create data layer")
 	}
@@ -95,7 +96,7 @@ func (s Server) itIsUs() bool {
 	return strings.HasPrefix(r.Header.Get("X-Application-Name"), "Helm Dashboard")
 }
 
-func discoverScanners(data *subproc.DataLayer) {
+func discoverScanners(data *objects.DataLayer) {
 	potential := []subproc.Scanner{
 		&scanners.Checkov{Data: data},
 		&scanners.Trivy{Data: data},
@@ -109,7 +110,7 @@ func discoverScanners(data *subproc.DataLayer) {
 	}
 }
 
-func checkUpgrade(d *subproc.StatusInfo) { // TODO: check it once an hour
+func checkUpgrade(d *objects.StatusInfo) { // TODO: check it once an hour
 	url := "https://api.github.com/repos/komodorio/helm-dashboard/releases/latest"
 	type GHRelease struct {
 		Name string `json:"name"`

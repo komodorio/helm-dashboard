@@ -1,13 +1,29 @@
-package subproc
+package objects
 
 import (
+	log "github.com/sirupsen/logrus"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chartutil"
+	kubefake "helm.sh/helm/v3/pkg/kube/fake"
+	"helm.sh/helm/v3/pkg/registry"
+	"helm.sh/helm/v3/pkg/storage"
+	"helm.sh/helm/v3/pkg/storage/driver"
+	"io/ioutil"
 	"testing"
 )
 
 func TestK8s(t *testing.T) {
-	helmConfig, err := NewHelmConfig("", "")
+	registryClient, err := registry.NewClient()
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	helmConfig := &action.Configuration{
+		Releases:       storage.Init(driver.NewMemory()),
+		KubeClient:     &kubefake.FailingKubeClient{PrintingKubeClient: kubefake.PrintingKubeClient{Out: ioutil.Discard}},
+		Capabilities:   chartutil.DefaultCapabilities,
+		RegistryClient: registryClient,
+		Log:            log.Debugf,
 	}
 
 	k8s, err := NewK8s(helmConfig)

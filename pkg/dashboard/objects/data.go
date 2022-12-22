@@ -1,4 +1,4 @@
-package subproc
+package objects
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
 	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -25,10 +26,10 @@ type DataLayer struct {
 	KubeContext string
 	Helm        string
 	Kubectl     string
-	Scanners    []Scanner
+	Scanners    []subproc.Scanner
 	StatusInfo  *StatusInfo
 	Namespace   string
-	Cache       *Cache
+	Cache       *subproc.Cache
 
 	ConfGen         HelmConfigGetter
 	appPerContext   map[string]*Application
@@ -47,7 +48,7 @@ type StatusInfo struct {
 func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
 	return &DataLayer{
 		Namespace: ns,
-		Cache:     NewCache(),
+		Cache:     subproc.NewCache(),
 		StatusInfo: &StatusInfo{
 			CurVer:             ver,
 			Analytics:          false,
@@ -98,17 +99,7 @@ func (d *DataLayer) CheckConnectivity() error {
 	}
 
 	if len(contexts) < 1 {
-		log.Debugf("Did not find any contexts, will try checking k8s")
-		app, err := d.AppForCtx("")
-		if err != nil {
-			return errors.New("did not find any kubectl contexts configured")
-		}
-
-		err = app.K8s.KubectlClient.IsReachable()
-		if err != nil {
-			return errorx.Decorate(err, "failed to access k8s cluster")
-		}
-
+		// TODO: conflicts with env var?
 		log.Infof("Assuming k8s environment")
 		d.StatusInfo.ClusterMode = true
 	}
@@ -212,7 +203,7 @@ func (d *DataLayer) nsForCtx(ctx string) string {
 
 func RevisionDiff(functor SectionFn, ext string, revision1 *release.Release, revision2 *release.Release, flag bool) (string, error) {
 	if revision1 == nil || revision2 == nil {
-		log.Debugf("One of revisions is nil: %d %d", revision1, revision2)
+		log.Debugf("One of revisions is nil: %v %v", revision1, revision2)
 		return "", nil
 	}
 

@@ -1,4 +1,4 @@
-package subproc
+package objects
 
 import (
 	"github.com/joomcode/errorx"
@@ -12,9 +12,6 @@ import (
 	// From https://github.com/kubernetes/client-go/issues/242
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
-
-// object wrappers for lazy loading
-// all in memory, no cache needed
 
 type HelmConfigGetter = func(sett *cli.EnvSettings, ns string) (*action.Configuration, error)
 type HelmNSConfigGetter = func(ns string) (*action.Configuration, error)

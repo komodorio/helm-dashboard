@@ -3,6 +3,7 @@ package scanners
 import (
 	"encoding/json"
 	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/olekukonko/tablewriter"
@@ -12,7 +13,7 @@ import (
 )
 
 type Checkov struct {
-	Data *subproc.DataLayer
+	Data *objects.DataLayer
 }
 
 func (c *Checkov) ManifestIsScannable() bool {

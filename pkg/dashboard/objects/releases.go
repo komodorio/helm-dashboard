@@ -1,4 +1,4 @@
-package subproc
+package objects
 
 import (
 	"fmt"
@@ -223,7 +223,7 @@ func (r *Release) GetRev(revNo int) (*Release, error) {
 		}
 	}
 
-	return nil, errorx.InternalError.New("No revision found for number %s", revNo)
+	return nil, errorx.InternalError.New("No revision found for number %d", revNo)
 }
 
 func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {

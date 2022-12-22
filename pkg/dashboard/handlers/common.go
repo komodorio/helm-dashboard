@@ -3,20 +3,20 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"net/http"
 )
 
 const APP = "app"
 
 type Contexted struct {
-	Data *subproc.DataLayer
+	Data *objects.DataLayer
 }
 
-func (h *Contexted) GetApp(c *gin.Context) *subproc.Application {
-	var app *subproc.Application
+func (h *Contexted) GetApp(c *gin.Context) *objects.Application {
+	var app *objects.Application
 	if a, ok := c.Get(APP); ok {
-		app = a.(*subproc.Application)
+		app = a.(*objects.Application)
 	} else {
 		err := errorx.IllegalState.New("No application context found")
 		_ = c.AbortWithError(http.StatusBadRequest, err)

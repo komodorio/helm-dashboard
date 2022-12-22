@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/rogpeppe/go-internal/semver"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -24,7 +25,7 @@ type HelmHandler struct {
 	*Contexted
 }
 
-func (h *HelmHandler) getRelease(c *gin.Context) (*subproc.Release, *utils.QueryProps) {
+func (h *HelmHandler) getRelease(c *gin.Context) (*objects.Release, *utils.QueryProps) {
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -124,7 +125,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 		return // error state is set inside
 	}
 
-	res, err := subproc.ParseManifests(rel.Orig.Manifest)
+	res, err := objects.ParseManifests(rel.Orig.Manifest)
 	if err != nil {
 		return
 	}
@@ -157,7 +158,7 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 			Version:     r.Version,
 			AppVersion:  r.AppVersion,
 			Description: r.Description,
-			Repository:  r.Annotations[subproc.AnnRepo],
+			Repository:  r.Annotations[objects.AnnRepo],
 		})
 	}
 
@@ -189,7 +190,7 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 			Version:     r.Version,
 			AppVersion:  r.AppVersion,
 			Description: r.Description,
-			Repository:  r.Annotations[subproc.AnnRepo],
+			Repository:  r.Annotations[objects.AnnRepo],
 		})
 	}
 
@@ -240,7 +241,7 @@ func (h *HelmHandler) RepoCharts(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, charts)
 }
 
-func enrichRepoChartsWithInstalled(charts []*repo.ChartVersion, installed []*subproc.Release) {
+func enrichRepoChartsWithInstalled(charts []*repo.ChartVersion, installed []*objects.Release) {
 	for _, rchart := range charts {
 		for _, rel := range installed {
 			if rchart.Metadata.Name == rel.Orig.Chart.Name() {
@@ -294,7 +295,7 @@ func (h *HelmHandler) Install(c *gin.Context) {
 	justTemplate := c.Query("flag") != "true"
 	notInitial := c.Query("initial") != "true"
 
-	var existing *subproc.Release
+	var existing *objects.Release
 	if notInitial {
 		existing, err = app.Releases.ByName(qp.Namespace, qp.Name)
 		if err != nil {
@@ -331,7 +332,7 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		if notInitial {
 			manifests = existing.Orig.Manifest
 		}
-		out = subproc.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
+		out = objects.GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
 	} else {
 		c.Header("Content-Type", "application/json")
 		enc, err := json.Marshal(rel)
@@ -359,7 +360,7 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 		return
 	}
 
-	var revDiff *subproc.Release
+	var revDiff *objects.Release
 	revS := c.Query("revisionDiff")
 	if revS != "" {
 		revN, err := strconv.Atoi(revS)
@@ -460,8 +461,8 @@ func (h *HelmHandler) RepoDelete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (h *HelmHandler) handleGetSection(rel *subproc.Release, section string, rDiff *subproc.Release, flag bool) (string, error) {
-	sections := map[string]subproc.SectionFn{
+func (h *HelmHandler) handleGetSection(rel *objects.Release, section string, rDiff *objects.Release, flag bool) (string, error) {
+	sections := map[string]objects.SectionFn{
 		"manifests": func(qp *release.Release, b bool) (string, error) { return qp.Manifest, nil },
 		"notes":     func(qp *release.Release, b bool) (string, error) { return qp.Info.Notes, nil },
 		"values": func(qp *release.Release, b bool) (string, error) {
@@ -497,7 +498,7 @@ func (h *HelmHandler) handleGetSection(rel *subproc.Release, section string, rDi
 			ext = ".txt"
 		}
 
-		res, err := subproc.RevisionDiff(functor, ext, rDiff.Orig, rel.Orig, flag)
+		res, err := objects.RevisionDiff(functor, ext, rDiff.Orig, rel.Orig, flag)
 		if err != nil {
 			return "", err
 		}

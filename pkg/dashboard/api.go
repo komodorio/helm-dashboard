@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"embed"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"html"
 	"net/http"
 	"os"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -38,7 +38,7 @@ func errorHandler(c *gin.Context) {
 	}
 }
 
-func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
+func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctxName := ""
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
@@ -62,7 +62,7 @@ func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) *gin.Engine {
+func NewRouter(abortWeb utils.ControlChan, data *objects.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
 	if debug {
 		api = gin.New()
@@ -81,7 +81,7 @@ func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) 
 	return api
 }
 
-func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb utils.ControlChan, data *objects.DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb <- struct{}{}
@@ -111,7 +111,7 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 	configureScanners(api.Group("/api/scanners"), data)
 }
 
-func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
+func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 	h := handlers.HelmHandler{
 		Contexted: &handlers.Contexted{
 			Data: data,
@@ -137,7 +137,7 @@ func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
 	api.GET("/repo/values", h.RepoValues)
 }
 
-func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
+func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
 	h := handlers.KubeHandler{
 		Contexted: &handlers.Contexted{
 			Data: data,
@@ -181,7 +181,7 @@ func configureStatic(api *gin.Engine) {
 	}
 }
 
-func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
+func configureScanners(api *gin.RouterGroup, data *objects.DataLayer) {
 	h := handlers.ScannersHandler{
 		Contexted: &handlers.Contexted{
 			Data: data,
