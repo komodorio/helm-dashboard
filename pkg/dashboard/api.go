@@ -2,7 +2,6 @@ package dashboard
 
 import (
 	"embed"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"html"
 	"net/http"
 	"os"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 )
