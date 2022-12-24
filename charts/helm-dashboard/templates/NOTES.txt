@@ -1,0 +1,16 @@
+Thank you for installing Helm Dashboard.
+Helm Dashboard can be accessed:
+  * Within your cluster, at the following DNS name at port {{ .Values.service.port }}:
+
+    {{ template "helm-dashboard.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+
+  * From outside the cluster, run these commands in the same shell:
+
+    export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "helm-dashboard.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+    export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+    echo "Visit http://127.0.0.1:8080 to use your application"
+    kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+Visit our repo at:
+https://github.com/komodorio/helm-dashboard
+

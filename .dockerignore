@@ -1,0 +1,4 @@
+Dockerfile
+*.md
+bin
+.idea

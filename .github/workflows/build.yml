@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: main
   pull_request:
-    branches: [ "main" ]
+    branches: main
 
 jobs:
   build:
@@ -41,3 +41,30 @@ jobs:
           skip-pkg-cache: true
           skip-build-cache: true
           # args: --timeout=15m
+
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          outputs: local
+          build-args: VER=0.0.0-dev
+
+  helm_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Helm Template Check For Sanity
+        uses: igabaydulin/helm-check-action@0.1.4
+        env:
+          CHART_LOCATION: ./charts/helm-dashboard
+          CHART_VALUES: ./charts/helm-dashboard/values.yaml

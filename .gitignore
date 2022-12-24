@@ -24,3 +24,6 @@ go.work
 
 /bin
 /.idea/
+
+.DS_Store
+.vscode/

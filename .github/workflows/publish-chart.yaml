@@ -1,0 +1,43 @@
+name: publish helm chart
+
+# for manual running in case we need to update the chart without releasing the dashboard app
+on:
+  workflow_dispatch:
+
+env:
+  HELM_REP: helm-charts
+  GH_OWNER: komodorio
+  CHART_DIR: charts/helm-dashboard
+
+jobs:
+  publish_chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Bump versions
+        run: |
+          git config user.email komi@komodor.io
+          git config user.name komodor-bot
+          git fetch --tags
+          git checkout main
+          sh ./ci/bump-versions.sh
+          git add charts/helm-dashboard/Chart.yaml
+          git commit -m "Increment chart versions [skip ci]" || echo "Already up-to-date"
+          git push -f || echo "Nothing to push!"
+        env:
+          APP_VERSION: ${{ needs.pre_release.outputs.release_tag }}
+      - name: Push folder to helm-charts repository
+        uses: crykn/copy_folder_to_another_repo_action@v1.0.6
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.KOMI_WORKFLOW_TOKEN }}
+        with:
+          source_folder: "charts/helm-dashboard"
+          destination_repo: "komodorio/helm-charts"
+          destination_folder: "charts/helm-dashboard"
+          user_email: "komi@komodor.io"
+          user_name: "komodor-bot"
+          destination_branch: "master"
+          commit_msg: "feat(helm-dashboard): update chart" #important!! don't change this commit message unless you change the condition in pipeline.yml on helm-charts repo

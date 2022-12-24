@@ -162,7 +162,9 @@ function showResources(namespace, chart, revision) {
         }
 
         resBody.empty();
-        data = data.sort(function(a, b){return interestingResources.indexOf(a.kind.toUpperCase()) - interestingResources.indexOf(b.kind.toUpperCase())}).reverse();
+        data = data.sort(function (a, b) {
+            return interestingResources.indexOf(a.kind.toUpperCase()) - interestingResources.indexOf(b.kind.toUpperCase())
+        }).reverse();
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
             const resBlock = $(`
