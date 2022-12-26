@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"gotest.tools/v3/assert"
 )
 
@@ -20,23 +22,25 @@ func GetTestGinContext(w *httptest.ResponseRecorder) *gin.Context {
 	return ctx
 }
 
-func TestNoCacheBeforeSetting(t *testing.T) {
+func TestNoCacheMiddleware(t *testing.T) {
 	w := httptest.NewRecorder()
 	con := GetTestGinContext(w)
 	noCache(con)
 	assert.Equal(t, w.Header().Get("Cache-Control"), "no-cache")
 }
 
-func TestNoCacheAfterSetting(t *testing.T) {
+func TestEnableCacheControl(t *testing.T) {
 	w := httptest.NewRecorder()
 	con := GetTestGinContext(w)
 
-	// Set value to default value defined in `EnableClientCache` (reference to below file)
-	// https://github.com/komodorio/helm-dashboard/blob/features-1.0/pkg/dashboard/handlers/common.go
-	w.Header().Set("Cache-Control", "max-age=43200")
-	assert.Equal(t, w.Header().Get("Cache-Control"), "max-age=43200")
-
-	// Now manipulate the value with `noCache()`
+	// Sets deafault policy to `no-cache`
 	noCache(con)
-	assert.Equal(t, w.Header().Get("Cache-Control"), "no-cache")
+
+	h := handlers.HelmHandler{
+		Contexted: &handlers.Contexted{
+			Data: &objects.DataLayer{},
+		},
+	}
+	h.EnableClientCache(con)
+	assert.Equal(t, w.Header().Get("Cache-Control"), "max-age=43200")
 }
