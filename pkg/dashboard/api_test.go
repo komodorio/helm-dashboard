@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"gotest.tools/v3/assert"
 )
 
@@ -58,6 +59,33 @@ func TestConfigureStatic(t *testing.T) {
 
 	// Configure static routes
 	configureStatic(api)
+
+	// Start the server
+	api.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, http.StatusOK)
+}
+
+func TestConfigureRoutes(t *testing.T) {
+	w := httptest.NewRecorder()
+
+	req, err := http.NewRequest("GET", "/status", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a API Engine
+	api := gin.Default()
+
+	// Required arguements for route configuration
+	abortWeb := make(utils.ControlChan)
+	data := &objects.DataLayer{
+		StatusInfo: &objects.StatusInfo{},
+		Cache:      objects.NewCache(),
+	}
+
+	// Configure routes to API engine
+	configureRoutes(abortWeb, data, api)
 
 	// Start the server
 	api.ServeHTTP(w, req)
