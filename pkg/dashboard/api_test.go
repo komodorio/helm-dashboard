@@ -92,3 +92,20 @@ func TestConfigureRoutes(t *testing.T) {
 
 	assert.Equal(t, w.Code, http.StatusOK)
 }
+
+func TestContextSetter(t *testing.T) {
+	w := httptest.NewRecorder()
+	con := GetTestGinContext(w)
+
+	// Required arguements
+	data, _ := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	// Set the context
+	ctxHandler := contextSetter(data)
+	ctxHandler(con)
+
+	appName, _ := con.Get("app")
+	tmp := handlers.Contexted{Data: data}
+
+	assert.Equal(t, appName, tmp.GetApp(con))
+}
