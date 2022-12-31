@@ -119,3 +119,26 @@ func TestContextSetter(t *testing.T) {
 
 	assert.Equal(t, appName, tmp.GetApp(con))
 }
+
+func TestNewRouter(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/status", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Required arguemnets
+	abortWeb := make(utils.ControlChan)
+	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new router with the function
+	newRouter := NewRouter(abortWeb, data, false)
+
+	newRouter.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, http.StatusOK)
+}
