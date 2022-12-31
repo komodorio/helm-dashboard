@@ -79,9 +79,10 @@ func TestConfigureRoutes(t *testing.T) {
 
 	// Required arguements for route configuration
 	abortWeb := make(utils.ControlChan)
-	data := &objects.DataLayer{
-		StatusInfo: &objects.StatusInfo{},
-		Cache:      objects.NewCache(),
+	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	// Configure routes to API engine
@@ -98,13 +99,22 @@ func TestContextSetter(t *testing.T) {
 	con := GetTestGinContext(w)
 
 	// Required arguements
-	data, _ := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Set the context
 	ctxHandler := contextSetter(data)
 	ctxHandler(con)
 
-	appName, _ := con.Get("app")
+	appName, exists := con.Get("app")
+
+	if !exists {
+		t.Fatal("Value app doesn't exist in context")
+	}
+
 	tmp := handlers.Contexted{Data: data}
 
 	assert.Equal(t, appName, tmp.GetApp(con))
