@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"gotest.tools/v3/assert"
 )
 
@@ -63,4 +64,58 @@ func TestConfigureStatic(t *testing.T) {
 	api.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
+}
+
+func TestConfigureRoutes(t *testing.T) {
+	w := httptest.NewRecorder()
+
+	req, err := http.NewRequest("GET", "/status", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a API Engine
+	api := gin.Default()
+
+	// Required arguements for route configuration
+	abortWeb := make(utils.ControlChan)
+	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Configure routes to API engine
+	configureRoutes(abortWeb, data, api)
+
+	// Start the server
+	api.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, http.StatusOK)
+}
+
+func TestContextSetter(t *testing.T) {
+	w := httptest.NewRecorder()
+	con := GetTestGinContext(w)
+
+	// Required arguements
+	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Set the context
+	ctxHandler := contextSetter(data)
+	ctxHandler(con)
+
+	appName, exists := con.Get("app")
+
+	if !exists {
+		t.Fatal("Value app doesn't exist in context")
+	}
+
+	tmp := handlers.Contexted{Data: data}
+
+	assert.Equal(t, appName, tmp.GetApp(con))
 }
