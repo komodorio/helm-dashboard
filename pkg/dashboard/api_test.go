@@ -142,3 +142,26 @@ func TestNewRouter(t *testing.T) {
 
 	assert.Equal(t, w.Code, http.StatusOK)
 }
+
+func TestConfigureScanners(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/api/scanners", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Required arguemnets
+	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	apiEngine := gin.Default()
+
+	configureScanners(apiEngine.Group("/api/scanners"), data)
+
+	apiEngine.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, http.StatusOK)
+}
