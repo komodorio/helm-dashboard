@@ -165,3 +165,29 @@ func TestConfigureScanners(t *testing.T) {
 
 	assert.Equal(t, w.Code, http.StatusOK)
 }
+
+func TestConfigureKubectls(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/api/kube/contexts", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Required arguemnets
+	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	apiEngine := gin.Default()
+
+	// Required middleware for kubectl api configuration
+	apiEngine.Use(contextSetter(data))
+
+	configureKubectls(apiEngine.Group("/api/kube"), data)
+
+	apiEngine.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, http.StatusOK)
+}
