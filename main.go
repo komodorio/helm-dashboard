@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	version = "0.3.1"
-	commit  = "eef3cd94b7d3d144331c03294fc3395f4e53a939"
-	date    = "2022-12-19"
+	version = "0.0.0"
+	commit  = "none"
+	date    = "unknown"
 )
 
 type options struct {
@@ -38,7 +38,6 @@ func main() {
 	}
 
 	opts.Verbose = opts.Verbose || os.Getenv("DEBUG") != ""
-	// opts.Version = opts.Version || version
 	setupLogging(opts.Verbose)
 
 	server := dashboard.Server{
