@@ -38,6 +38,7 @@ func main() {
 	}
 
 	opts.Verbose = opts.Verbose || os.Getenv("DEBUG") != ""
+	// opts.Version = opts.Version || version
 	setupLogging(opts.Verbose)
 
 	server := dashboard.Server{

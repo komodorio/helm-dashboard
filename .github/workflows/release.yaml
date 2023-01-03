@@ -24,15 +24,9 @@ jobs:
       - name: Get tag name
         id: get_tag_name
         run: echo "TAG_NAME=$(echo ${{ github.ref_name }} | cut -d 'v' -f2)" >> $GITHUB_OUTPUT
-      - name: get_tag_sha
-        run: echo "TAG_SHA=$(echo ${{ github.sha }})" >> $GITHUB_OUTPUT
-      - name: get_tag_date
-        run: echo "TAG_DATE=$(echo $(date +'%Y-%m-%d'))" >> $GITHUB_OUTPUT
     outputs:
       plugin_version: ${{ steps.get_plugin_version.outputs.PLUGIN_VERSION }}
       release_tag: ${{ steps.get_tag_name.outputs.TAG_NAME }}
-      tag_sha: ${{ steps.get_tag_sha.outputs.TAG_SHA }}
-      tag_date: ${{ steps.get_tag_date.outputs.TAG_DATE }}
 
   release:
     needs: pre_release
@@ -116,8 +110,6 @@ jobs:
           git push -f || echo "Nothing to push!"
         env:
           APP_VERSION: ${{ needs.pre_release.outputs.release_tag }}
-          TAG_SHA: ${{ needs.pre_release.outputs.tag_sha }}
-          TAG_DATE: ${{ needs.pre_release.outputs.tag_date }}
       - name: Push folder to helm-charts repository
         uses: crykn/copy_folder_to_another_repo_action@v1.0.6
         env:
