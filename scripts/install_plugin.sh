@@ -7,6 +7,7 @@
 name="helm-dashboard"
 repo="https://github.com/komodorio/${name}"
 api_repo="https://api.github.com/repos/komodorio/${name}/releases/latest"
+naming_cutover_version=0.3.2
 
 if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
     echo "Development mode: not downloading versioned release."
@@ -47,17 +48,30 @@ case $(uname -m) in
     ;;
 esac
 
+os_darwin=""
+os_linux=""
+if [ $version \< $naming_cutover_version ]; then
+  os_darwin="Darwin"
+  os_linux="Linux"
+else
+  os_darwin="darwin"
+  os_linux="linux"
+
+  # This is to match with goarch naming convention
+  if [ "$arch" = "x86_64" ]; then
+    arch="amd64"
+  fi
+fi
 
 if [ "$(uname)" = "Darwin" ]; then
-    url="${repo}/releases/download/v${version}/${name}_${version}_Darwin_${arch}.tar.gz"
+    url="${repo}/releases/download/v${version}/${name}_${version}_${os_darwin}_${arch}.tar.gz"
 elif [ "$(uname)" = "Linux" ] ; then
-    url="${repo}/releases/download/v${version}/${name}_${version}_Linux_${arch}.tar.gz"
+    url="${repo}/releases/download/v${version}/${name}_${version}_${os_linux}_${arch}.tar.gz"
 else
     url="${repo}/releases/download/v${version}/${name}_${version}_windows_${arch}.tar.gz"
 fi
 
 echo $url
-
 mkdir -p "bin"
 mkdir -p "releases/v${version}"
 
