@@ -11,7 +11,7 @@ if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
     exit 0
 fi
 
-version="$(curl -X GET --header \"Accept: application/json\" ${api_repo} | jq -r '.name' | cut -d 'v' -f 2)"
+version="$(curl -X GET --header \"Accept: application/json\" ${api_repo} | grep '\"name\": "v.*\"' | cut -d 'v' -f 2 | cut -d '"' -f 1)"
 [ -z "$version" ] && {
   version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
 }
