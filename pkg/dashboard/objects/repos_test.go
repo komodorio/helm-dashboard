@@ -32,7 +32,10 @@ func TestLoadRepo(t *testing.T) {
 		t.Fatal(err, "failed to create YAML bytes")
 	}
 
-	ioutil.WriteFile(path.Join(tmpDir, fileName), yamlData, 0644)
+	err = ioutil.WriteFile(path.Join(tmpDir, fileName), yamlData, 0644)
+	if err != nil {
+		t.Fatal(err, "failed to create a test file")
+	}
 
 	filePath := envOr("HELM_REPOSITORY_CONFIG", helmpath.ConfigPath(fileName))
 	res, err := repo.LoadFile(filePath)
