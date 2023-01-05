@@ -1,9 +1,12 @@
 package objects
 
 import (
+	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 
+	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/helmpath"
@@ -19,7 +22,19 @@ func envOr(name, def string) string {
 
 func TestLoadRepo(t *testing.T) {
 
-	filePath := envOr("HELM_REPOSITORY_CONFIG", helmpath.ConfigPath("repositories.yaml"))
+	fileName := "repositories.yaml"
+	tmpDir := t.TempDir()
+
+	os.Setenv("HELM_CONFIG_HOME", tmpDir)
+
+	yamlData, err := yaml.Marshal(repo.NewFile())
+	if err != nil {
+		t.Fatal(err, "failed to create YAML bytes")
+	}
+
+	ioutil.WriteFile(path.Join(tmpDir, fileName), yamlData, 0644)
+
+	filePath := envOr("HELM_REPOSITORY_CONFIG", helmpath.ConfigPath(fileName))
 	res, err := repo.LoadFile(filePath)
 	if err != nil {
 		t.Fatal(err)
