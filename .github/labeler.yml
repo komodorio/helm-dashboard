@@ -1,0 +1,63 @@
+# This configures label matching for PR's.
+#
+# The keys are labels, and the values are lists of minimatch patterns
+# to which those labels apply.
+#
+# NOTE: This can only add labels, not remove them.
+# NOTE: Due to YAML syntax limitations, patterns or labels which start
+# with a character that is part of the standard YAML syntax must be
+# quoted.
+#
+# Please keep the labels sorted and deduplicated.
+
+api:
+  - pkg/dashboard/api.go
+
+app:
+  - main.go
+  - pkg/dashboard/server.go
+  - pkg/dashboard/subproc/*
+  - pkg/dashboard/utils/*
+
+backend:
+  - pkg/dashboard/handlers/*
+  - pkg/dashboard/scanners/*
+
+ci:
+  - .github/workflow/build.yml
+  - ci/*
+  - Makefile
+  - scripts/*
+
+docs:
+  - CODE_OF_CONDUCT.md
+  - CONTRIBUTING.md
+  - LICENSE
+  - README.md
+  - screenshot*.png
+  - screenshot*.svg
+
+docker:
+  - .dockerignore
+  - Dockerfile
+
+helm-charts:
+  - charts/*
+
+github-actions:
+  - .github/ISSUE_TEMPLATE/*
+  - .github/labeler.yml
+  - .github/pull_request_template
+
+release:
+  - .github/workflows/publish-chart.yaml
+  - .github/workflows/release.yaml
+  - .goreleaser.yml
+  - artifacthub-repo.yml
+  - plugin.yaml
+
+scanners:
+  - pkg/dashboard/scanners/*
+
+frontend:
+  - pkg/dashboard/static/*
