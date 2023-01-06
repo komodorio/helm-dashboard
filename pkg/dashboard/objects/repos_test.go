@@ -8,14 +8,8 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-func TestLoadRepo(t *testing.T) {
-
-	filePath := "./testdata/repositories.yaml"
-
-	res, err := repo.LoadFile(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
+func initRepository(t *testing.T, filePath string) *Repositories {
+	t.Helper()
 
 	settings := cli.New()
 
@@ -31,10 +25,43 @@ func TestLoadRepo(t *testing.T) {
 		HelmConfig: hc,
 	}
 
+	return testRepository
+}
+
+func TestLoadRepo(t *testing.T) {
+
+	filePath := "./testdata/repositories.yaml"
+
+	res, err := repo.LoadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testRepository := initRepository(t, filePath)
+
 	file, err := testRepository.Load()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.Equal(t, file.Generated, res.Generated)
+}
+
+func TestList(t *testing.T) {
+	filePath := "./testdata/repositories.yaml"
+
+	res, err := repo.LoadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testRepository := initRepository(t, filePath)
+
+	repos, err := testRepository.List()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, len(repos), len(res.Repositories))
 }
