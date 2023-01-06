@@ -1,3 +1,9 @@
 apiVersion: ""
 generated: "0001-01-01T00:00:00Z"
-repositories: []
+repositories:
+  - name: charts
+    url: "https://charts.helm.sh/stable"
+  - name: firstexample
+    url: "http://firstexample.com"
+  - name: secondexample
+    url: "http://secondexample.com"
