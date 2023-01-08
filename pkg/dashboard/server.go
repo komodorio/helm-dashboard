@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"net/http"
 	"os"
 	"strings"
@@ -12,7 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-version"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -25,32 +27,27 @@ type Server struct {
 	NoTracking bool
 }
 
-func (s Server) StartServer() (string, utils.ControlChan) {
-	data := subproc.DataLayer{
-		Namespace: s.Namespace,
-		Cache:     subproc.NewCache(),
-		StatusInfo: &subproc.StatusInfo{
-			CurVer:             s.Version,
-			Analytics:          false,
-			LimitedToNamespace: s.Namespace,
-		},
-	}
-	err := data.CheckConnectivity()
+func (s Server) StartServer() (string, utils.ControlChan, error) {
+	data, err := objects.NewDataLayer(s.Namespace, s.Version, objects.NewHelmConfig)
 	if err != nil {
-		log.Errorf("Failed to check that Helm is operational, cannot continue. The error was: %s", err)
-		os.Exit(1) // TODO: propagate error instead?
+		return "", nil, errorx.Decorate(err, "Failed to create data layer")
+	}
+
+	err = data.CheckConnectivity()
+	if err != nil {
+		return "", nil, errorx.Decorate(err, "Failed to check that Helm is operational")
 	}
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
 	go checkUpgrade(data.StatusInfo)
 
-	discoverScanners(&data)
+	discoverScanners(data)
 
 	abort := make(utils.ControlChan)
-	api := NewRouter(abort, &data, s.Debug)
+	api := NewRouter(abort, data, s.Debug)
 	done := s.startBackgroundServer(api, abort)
 
-	return "http://" + s.Address, done
+	return "http://" + s.Address, done, nil
 }
 
 func (s Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {
@@ -99,7 +96,7 @@ func (s Server) itIsUs() bool {
 	return strings.HasPrefix(r.Header.Get("X-Application-Name"), "Helm Dashboard")
 }
 
-func discoverScanners(data *subproc.DataLayer) {
+func discoverScanners(data *objects.DataLayer) {
 	potential := []subproc.Scanner{
 		&scanners.Checkov{Data: data},
 		&scanners.Trivy{Data: data},
@@ -113,7 +110,7 @@ func discoverScanners(data *subproc.DataLayer) {
 	}
 }
 
-func checkUpgrade(d *subproc.StatusInfo) { // TODO: check it once an hour
+func checkUpgrade(d *objects.StatusInfo) { // TODO: check it once an hour
 	url := "https://api.github.com/repos/komodorio/helm-dashboard/releases/latest"
 	type GHRelease struct {
 		Name string `json:"name"`
@@ -143,7 +140,7 @@ func checkUpgrade(d *subproc.StatusInfo) { // TODO: check it once an hour
 
 	v2, err := version.NewVersion(d.LatestVer)
 	if err != nil {
-		log.Warnf("Failed to parse LatestVer: %s", err)
+		log.Warnf("Failed to parse RepoLatestVer: %s", err)
 	} else {
 		if v1.LessThan(v2) {
 			log.Warnf("Newer Helm Dashboard version is available: %s", d.LatestVer)

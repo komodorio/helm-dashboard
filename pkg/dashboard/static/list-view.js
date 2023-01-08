@@ -44,37 +44,13 @@ function buildChartCard(elm) {
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
 
-    let chartName = elm.chart
-    // semver2 regex , add optional v prefix
-    const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
-    const match = elm.chart.match(chartNameRegex);
-    if (match) {
-        chartName = elm.chart.substring(0, match.index - 1)
-    } else {
-        // fall back to simple substr
-        chartName = elm.chart.substring(0, elm.chart.lastIndexOf("-"))
+    if (elm.icon) {
+        card.find(".rel-name").attr("style", "background-image: url(" + elm.icon + ")")
     }
-    $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
-        // we're ok if we can't show icon and description
-        console.log("Failed to get repo name for charts", xhr)
-    }).done(function (data) {
-        if (data.length > 0) {
-            $.getJSON("/api/helm/charts/show?name=" + data[0].name).fail(function (xhr) {
-                console.log("Failed to get chart", xhr)
-            }).done(function (data) {
-                if (data) {
-                    const res = data[0];
-                    if (res.icon) {
-                        card.find(".rel-name").attr("style", "background-image: url(" + res.icon + ")")
-                    }
-                    if (res.description) {
-                        card.find(".rel-name div").text(res.description)
-                    }
-                }
 
-            })
-        }
-    })
+    if (elm.description) {
+        card.find(".rel-name div").text(elm.description)
+    }
 
     card.find(".rel-name span").text(elm.name)
     card.find(".rel-rev span").text("#" + elm.revision)

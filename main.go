@@ -23,8 +23,8 @@ type options struct {
 	NoBrowser  bool   `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
 	NoTracking bool   `long:"no-analytics" description:"Disable user analytics (GA, DataDog etc.)"`
 	BindHost   string `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
-	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`  // TODO: better default port to clash less?
-	Namespace  string `short:"n" long:"namespace" description:"Limit operations to a specific namespace"`
+	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`
+	Namespace  string `short:"n" long:"namespace" description:"Namespace for HELM operations"`
 }
 
 func main() {
@@ -47,7 +47,10 @@ func main() {
 		Debug:      opts.Verbose,
 		NoTracking: opts.NoTracking,
 	}
-	address, webServerDone := server.StartServer()
+	address, webServerDone, err := server.StartServer()
+	if err != nil {
+		log.Fatalf("Failed to start Helm Dashboard: %+v", err)
+	}
 
 	if !opts.NoTracking {
 		log.Infof("User analytics is collected to improve the quality, disable it with --no-analytics")
@@ -92,7 +95,8 @@ func parseFlags() options {
 	}
 
 	if len(args) > 0 {
-		panic("The program does not take argumants, see --help for usage")
+		fmt.Println("The program does not take arguments, see --help for usage")
+		os.Exit(1)
 	}
 	return opts
 }
