@@ -25,7 +25,7 @@ backend:
   - pkg/dashboard/scanners/*
 
 ci:
-  - .github/workflow/build.yml
+  - .github/workflow/*
   - ci/*
   - Makefile
   - scripts/*
