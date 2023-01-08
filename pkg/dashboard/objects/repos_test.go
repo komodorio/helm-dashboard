@@ -98,7 +98,10 @@ func TestAdd(t *testing.T) {
 		if removed != true {
 			t.Log("Failed to clean the test repository file")
 		}
-		res.WriteFile(filePath, 0644)
+		err = res.WriteFile(filePath, 0644)
+		if err != nil {
+			t.Log("Failed to write the file while cleaning test repo")
+		}
 	})
 }
 
@@ -113,7 +116,10 @@ func TestDelete(t *testing.T) {
 
 	// Add a test entry
 	res.Add(&repo.Entry{Name: testRepoName, URL: testRepoUrl})
-	res.WriteFile(filePath, 0644)
+	err = res.WriteFile(filePath, 0644)
+	if err != nil {
+		t.Fatal("Failed to write the file while creating test repo")
+	}
 
 	testRepository := initRepository(t, filePath)
 
