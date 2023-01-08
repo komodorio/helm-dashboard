@@ -8,6 +8,8 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
+var filePath = "./testdata/repositories.yaml"
+
 func initRepository(t *testing.T, filePath string) *Repositories {
 	t.Helper()
 
@@ -30,8 +32,6 @@ func initRepository(t *testing.T, filePath string) *Repositories {
 
 func TestLoadRepo(t *testing.T) {
 
-	filePath := "./testdata/repositories.yaml"
-
 	res, err := repo.LoadFile(filePath)
 	if err != nil {
 		t.Fatal(err)
@@ -48,8 +48,6 @@ func TestLoadRepo(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	filePath := "./testdata/repositories.yaml"
-
 	res, err := repo.LoadFile(filePath)
 	if err != nil {
 		t.Fatal(err)
@@ -64,4 +62,33 @@ func TestList(t *testing.T) {
 	}
 
 	assert.Equal(t, len(repos), len(res.Repositories))
+}
+
+func TestAdd(t *testing.T) {
+	testRepoName := "TEST"
+	testRepoUrl := "https://helm.github.io/examples"
+
+	res, err := repo.LoadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Delete the repository if already exist
+	res.Remove(testRepoName)
+
+	testRepository := initRepository(t, filePath)
+
+	err = testRepository.Add(testRepoName, testRepoUrl)
+
+	if err != nil {
+		t.Fatal(err, "Failed to add repo")
+	}
+
+	// Reload the file
+	res, err = repo.LoadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, res.Has(testRepoName), true)
 }
