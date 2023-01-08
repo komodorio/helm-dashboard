@@ -91,4 +91,42 @@ func TestAdd(t *testing.T) {
 	}
 
 	assert.Equal(t, res.Has(testRepoName), true)
+
+	// Removes test repository which is added for testing
+	t.Cleanup(func() {
+		removed := res.Remove(testRepoName)
+		if removed != true {
+			t.Log("Failed to clean the test repository file")
+		}
+		res.WriteFile(filePath, 0644)
+	})
+}
+
+func TestDelete(t *testing.T) {
+	testRepoName := "TEST DELETE"
+	testRepoUrl := "https://helm.github.io/examples"
+
+	res, err := repo.LoadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Add a test entry
+	res.Add(&repo.Entry{Name: testRepoName, URL: testRepoUrl})
+	res.WriteFile(filePath, 0644)
+
+	testRepository := initRepository(t, filePath)
+
+	err = testRepository.Delete(testRepoName)
+	if err != nil {
+		t.Fatal(err, "Failed to delete the repo")
+	}
+
+	// Reload the file
+	res, err = repo.LoadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, res.Has(testRepoName), false)
 }
