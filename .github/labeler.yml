@@ -48,6 +48,7 @@ github-actions:
   - .github/ISSUE_TEMPLATE/*
   - .github/labeler.yml
   - .github/pull_request_template
+  - .github/workflow/pull-request-labeler.yaml
 
 release:
   - .github/workflows/publish-chart.yaml
