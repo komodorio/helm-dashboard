@@ -136,3 +136,17 @@ func TestDelete(t *testing.T) {
 
 	assert.Equal(t, res.Has(testRepoName), false)
 }
+
+func TestGet(t *testing.T) {
+	// Initial repositiry name in test file
+	repoName := "charts"
+
+	testRepository := initRepository(t, filePath)
+
+	repo, err := testRepository.Get(repoName)
+	if err != nil {
+		t.Fatal(err, "Failed to get th repo")
+	}
+
+	assert.Equal(t, repo.Orig.Name, repoName)
+}
