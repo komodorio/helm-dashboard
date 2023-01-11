@@ -349,10 +349,8 @@ $("#btnTest").click(function() {
         type: 'POST',
         url: "/api/helm/charts/tests" + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart")
     }).fail(function (xhr) {
-        reportError("Failed to upgrade the chart", xhr)
+        reportError("Failed to execute test for chart", xhr)
     }).done(function (data) {
-        console.log("data: ", data)
-        
         $("#testModal .test-result").html(data.replaceAll("\n", "<br>"))
     })
 
