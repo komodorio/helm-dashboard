@@ -343,3 +343,19 @@ $("#btnAddRepository").click(function () {
     setHashParam("section", "repository")
     window.location.reload()
 })
+
+$("#btnTest").click(function() {
+    $.ajax({
+        type: 'POST',
+        url: "/api/helm/charts/tests" + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart")
+    }).fail(function (xhr) {
+        reportError("Failed to upgrade the chart", xhr)
+    }).done(function (data) {
+        console.log("data: ", data)
+        
+        $("#testModal .test-result").html(data.replaceAll("\n", "<br>"))
+    })
+
+    const myModal = new bootstrap.Modal(document.getElementById('testModal'), {});
+    myModal.show()
+})
