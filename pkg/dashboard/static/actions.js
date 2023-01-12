@@ -346,7 +346,6 @@ $("#btnAddRepository").click(function () {
 
 $("#btnTest").click(function() {
     $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    // $("#testModal .test-result").prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: 'POST',
         url: "/api/helm/charts/tests" + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart")
@@ -354,7 +353,6 @@ $("#btnTest").click(function() {
         reportError("Failed to execute test for chart", xhr)
     }).done(function (data) {
         $("#testModal .test-result").empty().html(data.replaceAll("\n", "<br>"))
-        // $("#testModal .test-result").html(data.replaceAll("\n", "<br>"))
     })
 
     const myModal = new bootstrap.Modal(document.getElementById('testModal'), {});
