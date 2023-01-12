@@ -23,7 +23,7 @@ jobs:
           git config user.name komodor-bot
           git fetch --tags
           git checkout main
-          sh ./ci/bump-versions.sh
+          sh ./ci/bump-chart-versions.sh
           git add charts/helm-dashboard/Chart.yaml
           git commit -m "Increment chart versions [skip ci]" || echo "Already up-to-date"
           git push -f || echo "Nothing to push!"
