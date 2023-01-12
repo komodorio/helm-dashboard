@@ -279,7 +279,7 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 }
 
 func (d *DataLayer) RunTests(namespace string, name string) (string, error) {
-	cmd := []string{"test", name, "--namespace", namespace}
+	cmd := []string{"test", name, "--namespace", namespace, "--logs"}
 
 	out, err := d.runCommandHelm(cmd...)
 	if err != nil {
