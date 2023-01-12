@@ -52,4 +52,4 @@ By contributing, you agree that your contributions will be licensed under its Ap
 
 ## Questions?
 
-Contact us on [Slack](https://join.slack.com/t/komodorkommunity/shared_invite/zt-1dm3cnkue-ov1Yh~_95teA35QNx5yuMg).
+Contact us on [Slack](https://komodorkommunity.slack.com).
