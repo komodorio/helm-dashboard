@@ -23,6 +23,7 @@ type Server struct {
 	Address    string
 	Debug      bool
 	NoTracking bool
+	Devel      bool
 }
 
 func (s Server) StartServer() (string, utils.ControlChan) {
@@ -34,6 +35,7 @@ func (s Server) StartServer() (string, utils.ControlChan) {
 			Analytics:          false,
 			LimitedToNamespace: s.Namespace,
 		},
+		Devel: s.Devel,
 	}
 	err := data.CheckConnectivity()
 	if err != nil {

@@ -27,6 +27,7 @@ type DataLayer struct {
 	StatusInfo  *StatusInfo
 	Namespace   string
 	Cache       *Cache
+	Devel       bool
 }
 
 type StatusInfo struct {
