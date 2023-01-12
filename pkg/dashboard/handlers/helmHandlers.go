@@ -189,7 +189,7 @@ func (h *HelmHandler) Tests(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusAccepted, out)
+	c.String(http.StatusOK, out)
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
