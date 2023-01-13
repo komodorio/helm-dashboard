@@ -88,6 +88,16 @@ The official helm chart is [available here](https://github.com/komodorio/helm-ch
 
 Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
 
+## Execute Helm tests
+
+For all the release(s) (istalled helm charts), you can execute helm tests for that release. For the tests to execute successfully, you need to have existing tests for that helm chart
+
+You can execute `helm test` for the specific release as below:
+![](screenshot_run_test.png)
+
+The result of executed `helm test` for the release will be disapled as below:
+![](screenshot_run_test_result.png)
+
 ## Scanner Integrations
 
 Upon startup, Helm Dashboard detects the presence of [Trivy](https://github.com/aquasecurity/trivy)
@@ -104,7 +114,7 @@ button at the bottom of the dialog:
 ## Support Channels
 
 We have two main channels for supporting the Helm Dashboard
-users: [Slack community](https://join.slack.com/t/komodorkommunity/shared_invite/zt-1dm3cnkue-ov1Yh~_95teA35QNx5yuMg) for general conversations
+users: [Slack community](https://komodorkommunity.slack.com) for general conversations
 and [GitHub issues](https://github.com/komodorio/helm-dashboard/issues) for real bugs.
 
 ## Contributing

@@ -176,6 +176,22 @@ func (h *HelmHandler) Install(c *gin.Context) {
 	c.String(http.StatusAccepted, out)
 }
 
+func (h *HelmHandler) Tests(c *gin.Context) {
+	qp, err := utils.GetQueryProps(c, false)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	out, err := h.Data.RunTests(qp.Namespace, qp.Name)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.String(http.StatusOK, out)
+}
+
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c, true)
 	if err != nil {

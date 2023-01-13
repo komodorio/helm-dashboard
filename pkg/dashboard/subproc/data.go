@@ -278,6 +278,17 @@ func (d *DataLayer) ChartInstall(namespace string, name string, repoChart string
 	return out, nil
 }
 
+func (d *DataLayer) RunTests(namespace string, name string) (string, error) {
+	cmd := []string{"test", name, "--namespace", namespace, "--logs"}
+
+	out, err := d.runCommandHelm(cmd...)
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
+}
+
 func RevisionDiff(functor SectionFn, ext string, namespace string, name string, revision1 int, revision2 int, flag bool) (string, error) {
 	if revision1 == 0 || revision2 == 0 {
 		log.Debugf("One of revisions is zero: %d %d", revision1, revision2)

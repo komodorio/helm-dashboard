@@ -296,3 +296,7 @@ nav .nav-tabs .nav-link.active {
 #sectionRepo .repo-details ul .row:hover .btn {
     visibility: visible;
 }
+
+.test-result {
+    font-size: 1rem;
+}

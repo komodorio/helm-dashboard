@@ -42,7 +42,7 @@
                     </a>
                     <ul class="dropdown-menu fs-80">
                         <li><a class="dropdown-item"
-                               href="https://join.slack.com/t/komodorkommunity/shared_invite/zt-1dm3cnkue-ov1Yh~_95teA35QNx5yuMg"
+                               href="https://komodorkommunity.slack.com"
                                target="_blank"><i class="bi-slack"></i> Support Chat</a></li>
                         <li><a class="dropdown-item" href="https://github.com/komodorio/helm-dashboard" target="_blank"><i
                                 class="bi-github"></i> Project Page</a></li>
@@ -193,6 +193,9 @@
 
                     <button id="btnRollback" class="btn btn-sm  btn-light bg-white border border-secondary me-2"
                             title="Rollback to this revision"><i class="bi-arrow-repeat"></i> <span>Rollback</span>
+                    </button>
+                    <button id="btnTest" class="btn btn-sm btn-light bg-white  border border-secondary"
+                            title="Run tests for this chart"><i class="bi-check-circle"></i> <span>Run tests</span>
                     </button>
                     <button id="btnUninstall" class="btn btn-sm btn-light bg-white  border border-secondary"
                             title="Uninstall the chart"><i class="bi-trash3"></i> Uninstall
@@ -412,6 +415,26 @@
                 <button type="button" class="btn btn-scan bg-white border-secondary display-none">Scan for Problems
                 </button>
                 <button type="button" class="btn btn-primary btn-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="testModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="testModalLabel">
+                    <span class="type">Test results</span>
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body border-bottom fs-5">
+                <div class="row">
+                    <div class="col">
+                        <span class="test-result"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
