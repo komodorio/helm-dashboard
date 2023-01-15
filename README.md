@@ -90,7 +90,7 @@ Download the appropriate [release package](https://github.com/komodorio/helm-das
 
 ## Execute Helm tests
 
-For all the release(s) (istalled helm charts), you can execute helm tests for that release. For the tests to execute successfully, you need to have existing tests for that helm chart
+For all the release(s) (installed helm charts), you can execute helm tests for that release. For the tests to execute successfully, you need to have existing tests for that helm chart.
 
 You can execute `helm test` for the specific release as below:
 ![](screenshot_run_test.png)
