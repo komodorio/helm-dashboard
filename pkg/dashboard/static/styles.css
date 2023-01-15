@@ -89,10 +89,11 @@ body > .container-fluid {
 
 #filters {
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
     font-size: 0.8rem;
     line-height: 175%;
+    inline-size: auto;
+    overflow-wrap: break-word;
 }
 
 #cluster input, #cluster span {
