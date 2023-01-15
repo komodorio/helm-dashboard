@@ -45,9 +45,15 @@ function buildChartCard(elm) {
         </div>`)
 
     let chartName = elm.chart
+    let match = null
     // semver2 regex , add optional v prefix
     const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
-    const match = elm.chart.match(chartNameRegex);
+    if (!new RegExp(chartNameRegex).test(chartName)) {
+        alert('Chart name does not match chart name regex.')
+    } else {
+        match = chartName.match(chartNameRegex);
+    }
+
     if (match) {
         chartName = elm.chart.substring(0, match.index - 1)
     } else {
