@@ -4,6 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"sort"
+	"strconv"
+	"strings"
+
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
@@ -16,10 +21,6 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
-	"net/http"
-	"sort"
-	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
@@ -352,22 +353,17 @@ func (h *HelmHandler) Install(c *gin.Context) {
 	c.String(http.StatusAccepted, out)
 }
 
-func (h *HelmHandler) Tests(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
+func (h *HelmHandler) RunTests(c *gin.Context) {
+	rel, _ := h.getRelease(c)
+	if rel == nil {
+		return // error state is set inside
 	}
 
-	panic("Needs implementing")
-	out, _ := "", qp
-
-	//out, err := h.Data.RunTests(qp.Namespace, qp.Name)
+	out, err := rel.RunTests()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
 	c.String(http.StatusOK, out)
 }
 

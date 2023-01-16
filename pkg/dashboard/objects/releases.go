@@ -1,7 +1,10 @@
 package objects
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -12,7 +15,6 @@ import (
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
-	"io/ioutil"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
 
@@ -192,6 +194,27 @@ func (r *Release) Rollback(toRevision int) error {
 	client := action.NewRollback(hc)
 	client.Version = toRevision
 	return client.Run(r.Orig.Name)
+}
+
+func (r *Release) RunTests() (string, error) {
+	hc, err := r.HelmConfig(r.Orig.Namespace)
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.Orig.Namespace)
+	}
+
+	client := action.NewReleaseTesting(hc)
+	client.Namespace = r.Orig.Namespace
+
+	rel, err := client.Run(r.Orig.Name)
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to execute 'helm test' for release '%s'", r.Orig.Name)
+	}
+
+	var buf bytes.Buffer
+	if err := client.GetPodLogs(&buf, rel); err != nil {
+		return "", errorx.Decorate(err, "failed to fetch logs for 'helm test' command")
+	}
+	return buf.String(), nil
 }
 
 func (r *Release) ParsedManifests() ([]*v1.Carp, error) {
