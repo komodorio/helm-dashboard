@@ -11,7 +11,7 @@
 # Please keep the labels sorted and deduplicated.
 
 api:
-  - pkg/dashboard/api*.go
+  - pkg/dashboard/api.go
 
 app:
   - main.go
@@ -20,12 +20,11 @@ app:
   - pkg/dashboard/utils/*
 
 backend:
-  - pkg/dashboard/objects/*
   - pkg/dashboard/handlers/*
   - pkg/dashboard/scanners/*
 
 ci:
-  - .github/workflow/*
+  - .github/workflow/build.yml
   - ci/*
   - Makefile
   - scripts/*

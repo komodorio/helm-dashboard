@@ -4,14 +4,17 @@
 
 name="helm-dashboard"
 repo="https://github.com/komodorio/${name}"
+api_repo="https://api.github.com/repos/komodorio/${name}/releases/latest"
 
 if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
     echo "Development mode: not downloading versioned release."
     exit 0
 fi
 
-version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
-# TODO: if no version provided, get it from https://api.github.com/repos/komodorio/helm-dashboard/releases/latest
+version="$(curl -X GET --header \"Accept: application/json\" ${api_repo} | grep '\"name\": "v.*\"' | cut -d 'v' -f 2 | cut -d '"' -f 1)"
+[ -z "$version" ] && {
+  version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
+}
 echo "Downloading and installing ${name} v${version} ..."
 
 url=""

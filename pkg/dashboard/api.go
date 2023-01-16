@@ -125,6 +125,7 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 	api.GET("/charts/resources", h.Resources)
 	api.GET("/charts/:section", h.GetInfoSection)
 	api.POST("/charts/install", h.Install)
+	api.POST("/charts/tests", h.Tests)
 	api.POST("/charts/rollback", h.Rollback)
 
 	api.GET("/repo", h.RepoList)
