@@ -30,6 +30,10 @@ resources:
 
 dashboard:
   allowWriteActions: true
+
+  # default namespace for Helm operations
+  namespace: ""
+
   persistence:
     enabled: true
 
