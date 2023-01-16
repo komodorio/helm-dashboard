@@ -357,7 +357,10 @@ func (h *HelmHandler) Tests(c *gin.Context) {
 		return
 	}
 
-	out, err := h.Data.RunTests(qp.Namespace, qp.Name)
+	panic("Needs implementing")
+	out, _ := "", qp
+
+	//out, err := h.Data.RunTests(qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
