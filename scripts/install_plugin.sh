@@ -2,6 +2,10 @@
 
 # Copied w/ love from the chartmuseum/helm-push :)
 
+if [ -n "$HELM_DEBUG" ]; then
+  set -x
+fi
+
 name="helm-dashboard"
 repo="https://github.com/komodorio/${name}"
 api_repo="https://api.github.com/repos/komodorio/${name}/releases/latest"
@@ -11,9 +15,11 @@ if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
     exit 0
 fi
 
-version="$(curl -X GET --header \"Accept: application/json\" ${api_repo} | grep '\"name\": "v.*\"' | cut -d 'v' -f 2 | cut -d '"' -f 1)"
+version="$(curl -X GET ${api_repo} | grep '\"name\": "v.*\"' | cut -d 'v' -f 2 | cut -d '"' -f 1)"
+echo Tried to autodetect latest version: $version
 [ -z "$version" ] && {
   version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
+  echo Defaulted to version: $version
 }
 echo "Downloading and installing ${name} v${version} ..."
 
