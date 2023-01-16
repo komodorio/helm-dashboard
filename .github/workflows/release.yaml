@@ -64,7 +64,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Docker meta
         uses: docker/metadata-action@v3
@@ -95,7 +95,7 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Bump versions
