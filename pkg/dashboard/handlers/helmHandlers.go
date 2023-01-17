@@ -335,6 +335,8 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		manifests := ""
 		if notInitial {
 			manifests = existing.Orig.Manifest
+		} else {
+			out = rel.Manifest
 		}
 		out = GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
 	} else {

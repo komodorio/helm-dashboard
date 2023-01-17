@@ -73,9 +73,7 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 	}
 	cmd.Version = version
 
-	if justTemplate {
-		cmd.DryRun = true
-	}
+	cmd.DryRun = justTemplate
 
 	chrt, err := locateChart(cmd.ChartPathOptions, repoChart, a.Settings)
 	if err != nil {
@@ -227,7 +225,12 @@ func (r *Release) GetRev(revNo int) (*Release, error) {
 }
 
 func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
-	hc, err := r.HelmConfig(r.Settings.Namespace())
+	ns := r.Settings.Namespace()
+	if r.Orig != nil {
+		ns = r.Orig.Namespace
+	}
+
+	hc, err := r.HelmConfig(ns)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
