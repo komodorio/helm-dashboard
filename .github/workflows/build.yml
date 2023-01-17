@@ -68,3 +68,6 @@ jobs:
         env:
           CHART_LOCATION: ./charts/helm-dashboard
           CHART_VALUES: ./charts/helm-dashboard/values.yaml
+      - name: Test Helm plugin install script is runnable
+        run: |
+          scripts/install_plugin.sh
