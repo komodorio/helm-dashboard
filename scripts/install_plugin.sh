@@ -15,7 +15,7 @@ if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
     exit 0
 fi
 
-version="$(curl -X GET ${api_repo} | grep '\"name\": "v.*\"' | cut -d 'v' -f 2 | cut -d '"' -f 1)"
+version="$(curl -s ${api_repo} | grep '\"name\": "v.*\"' | cut -d 'v' -f 2 | cut -d '"' -f 1)"
 echo Tried to autodetect latest version: $version
 [ -z "$version" ] && {
   version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
