@@ -1,15 +1,27 @@
 package dashboard
 
 import (
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	log "github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chartutil"
+	"helm.sh/helm/v3/pkg/cli"
+	kubefake "helm.sh/helm/v3/pkg/kube/fake"
+	"helm.sh/helm/v3/pkg/registry"
+	"helm.sh/helm/v3/pkg/storage"
+	"helm.sh/helm/v3/pkg/storage/driver"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
 )
 
 func GetTestGinContext(w *httptest.ResponseRecorder) *gin.Context {
@@ -54,7 +66,7 @@ func TestConfigureStatic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Create a API Engine
+	// Create an API Engine
 	api := gin.Default()
 
 	// Configure static routes
@@ -190,4 +202,79 @@ func TestConfigureKubectls(t *testing.T) {
 	apiEngine.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
+}
+
+func TestE2E(t *testing.T) {
+	// Initialize data layer
+	data, err := objects.NewDataLayer("", "0.0.0-test", getFakeHelmConfig)
+	assert.NilError(t, err)
+
+	// Create a new router with the function
+	abortWeb := make(utils.ControlChan)
+	newRouter := NewRouter(abortWeb, data, false)
+
+	// initially, we don't have any releases
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/api/helm/charts", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	assert.Equal(t, w.Body.String(), "[]")
+
+	// initially, we don't have any repositories
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/repo", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	assert.Equal(t, w.Body.String(), "[]")
+
+	// then we add one repository
+	w = httptest.NewRecorder()
+	form := url.Values{}
+	form.Add("name", "komodorio")
+	form.Add("url", "https://helm-charts.komodor.io")
+	req, err = http.NewRequest("POST", "/api/helm/repo", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusNoContent)
+	assert.Equal(t, w.Body.String(), "")
+
+	// now, we have one repo
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/repo", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	assert.Equal(t, w.Body.String(), `[
+    {
+        "name": "komodorio",
+        "url": "https://helm-charts.komodor.io"
+    }
+]`)
+}
+
+func getFakeHelmConfig(settings *cli.EnvSettings, ns string) (*action.Configuration, error) {
+	if strings.HasSuffix(settings.RepositoryConfig, "/helm/repositories.yaml") {
+		d, err := ioutil.TempDir("", "helm")
+		if err != nil {
+			return nil, err
+		}
+		repoFile := filepath.Join(d, "repositories.yaml")
+		settings.RepositoryConfig = repoFile
+	}
+
+	registryClient, err := registry.NewClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return &action.Configuration{
+		Releases:       storage.Init(driver.NewMemory()),
+		KubeClient:     &kubefake.FailingKubeClient{PrintingKubeClient: kubefake.PrintingKubeClient{Out: os.Stderr}},
+		Capabilities:   chartutil.DefaultCapabilities,
+		RegistryClient: registryClient,
+		Log:            log.Infof,
+	}, nil
 }
