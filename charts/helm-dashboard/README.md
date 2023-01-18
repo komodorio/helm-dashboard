@@ -39,6 +39,12 @@ helm uninstall my-release
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
+## Adding Authentication
+
+The task of authentication and user control is out of scope for Helm Dashboard. Luckily, there are third-party solutions which are dedicated to provide that functionality.
+
+For instance, you can place authentication proxy in front of Helm Dashboard, like this one: https://github.com/oauth2-proxy/oauth2-proxy
+
 ## Parameters
 
 The following table lists the configurable parameters of the chart and their default values.
