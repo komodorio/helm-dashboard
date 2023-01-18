@@ -18,7 +18,7 @@ jobs:
           go-version: 1.18
       - name: Unit tests
         run: |
-          go test -v -race ./... # Run all the tests with the race detector enabled
+          go test -v -race ./... -covermode=atomic # Run all the tests with the race detector enabled
       - name: Static analysis
         run: |
           go vet ./... # go vet is the official Go static analyzer

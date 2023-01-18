@@ -277,14 +277,14 @@ func TestE2E(t *testing.T) {
 
 	// generate template for potential release
 	w = httptest.NewRecorder()
-	req, err = http.NewRequest("POST", "/api/helm/charts/install?flag=true&initial=true&namespace=test1&name=release1&chart=komodorio/helm-dashboard", nil)
+	req, err = http.NewRequest("POST", "/api/helm/charts/install?initial=true&namespace=test1&name=release1&chart=komodorio/helm-dashboard", nil)
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusAccepted)
 
 	// install the release
 	w = httptest.NewRecorder()
-	req, err = http.NewRequest("POST", "/api/helm/charts/install?initial=true&namespace=test1&name=release1&chart=komodorio/helm-dashboard", nil)
+	req, err = http.NewRequest("POST", "/api/helm/charts/install?initial=true&namespace=test1&name=release1&chart=komodorio/helm-dashboard&flag=true", nil)
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusAccepted)
@@ -298,10 +298,31 @@ func TestE2E(t *testing.T) {
 	//assert.Equal(t, w.Body.String(), "[]")
 
 	// upgrade/reconfigure release
+	w = httptest.NewRecorder()
+	form = url.Values{}
+	form.Add("values", "dashboard:\n  allowWriteActions: true\n")
+	req, err = http.NewRequest("POST", "/api/helm/charts/install?namespace=test1&name=release1&chart=komodorio/helm-dashboard&flag=true", strings.NewReader(form.Encode()))
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusAccepted)
+	t.Logf("Upgraded: %s", w.Body.String())
 
 	// get history of revisions for release
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/charts/history?namespace=test1&name=release1", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	t.Logf("Revs: %s", w.Body.String())
+	//assert.Equal(t, w.Body.String(), "[]")
 
-	// get manifest diff for release
+	// get values for revision
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/charts/values?namespace=test1&name=release1&revision=2&flag=true", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	//assert.Equal(t, w.Body.String(), "[]")
 
 	// rollback
 	w = httptest.NewRecorder()
@@ -309,6 +330,14 @@ func TestE2E(t *testing.T) {
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusAccepted)
+
+	// get manifest diff for release
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/charts/manifests?namespace=test1&name=release1&revision=1&revisionDiff=2", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	//assert.Equal(t, w.Body.String(), "[]")
 
 	// uninstall
 	w = httptest.NewRecorder()

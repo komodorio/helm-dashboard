@@ -153,8 +153,6 @@ func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
 func configureStatic(api *gin.Engine) {
 	fs := http.FS(staticFS)
 
-	// TODO: enable HTTP client cache for it?
-
 	// local dev speed-up
 	localDevPath := "pkg/dashboard/static"
 	if _, err := os.Stat(localDevPath); err == nil {
