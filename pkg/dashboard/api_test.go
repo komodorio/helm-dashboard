@@ -353,6 +353,13 @@ func TestE2E(t *testing.T) {
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusOK)
 	assert.Equal(t, w.Body.String(), "[]")
+
+	// delete repo
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("DELETE", "/api/helm/repo?name=komodorio", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusNoContent)
 }
 
 func getFakeHelmConfig(settings *cli.EnvSettings, _ string) (*action.Configuration, error) {
