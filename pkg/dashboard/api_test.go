@@ -24,6 +24,27 @@ import (
 	"testing"
 )
 
+var inMemStorage *storage.Storage
+var repoFile string
+
+func TestMain(m *testing.M) { // fixture to set logging level via env variable
+	if os.Getenv("DEBUG") != "" {
+		log.SetLevel(log.DebugLevel)
+		log.Debugf("Set logging level")
+	}
+
+	inMemStorage = storage.Init(driver.NewMemory())
+	d, err := ioutil.TempDir("", "helm")
+	if err != nil {
+		panic(err)
+	}
+	repoFile = filepath.Join(d, "repositories.yaml")
+
+	m.Run()
+	inMemStorage = nil
+	repoFile = ""
+}
+
 func GetTestGinContext(w *httptest.ResponseRecorder) *gin.Context {
 	gin.SetMode(gin.TestMode)
 
@@ -253,17 +274,60 @@ func TestE2E(t *testing.T) {
         "url": "https://helm-charts.komodor.io"
     }
 ]`)
+
+	// generate template for potential release
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("POST", "/api/helm/charts/install?flag=true&initial=true&namespace=test1&name=release1&chart=komodorio/helm-dashboard", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusAccepted)
+
+	// install the release
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("POST", "/api/helm/charts/install?initial=true&namespace=test1&name=release1&chart=komodorio/helm-dashboard", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusAccepted)
+
+	// get list of releases
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/charts", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	//assert.Equal(t, w.Body.String(), "[]")
+
+	// upgrade/reconfigure release
+
+	// get history of revisions for release
+
+	// get manifest diff for release
+
+	// rollback
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("POST", "/api/helm/charts/rollback?namespace=test1&name=release1&revision=1", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusAccepted)
+
+	// uninstall
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("DELETE", "/api/helm/charts?namespace=test1&name=release1", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusAccepted)
+
+	// check we don't have releases again
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/charts", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
+	assert.Equal(t, w.Body.String(), "[]")
 }
 
-func getFakeHelmConfig(settings *cli.EnvSettings, ns string) (*action.Configuration, error) {
-	if strings.HasSuffix(settings.RepositoryConfig, "/helm/repositories.yaml") {
-		d, err := ioutil.TempDir("", "helm")
-		if err != nil {
-			return nil, err
-		}
-		repoFile := filepath.Join(d, "repositories.yaml")
-		settings.RepositoryConfig = repoFile
-	}
+func getFakeHelmConfig(settings *cli.EnvSettings, _ string) (*action.Configuration, error) {
+	settings.RepositoryConfig = repoFile
 
 	registryClient, err := registry.NewClient()
 	if err != nil {
@@ -271,7 +335,7 @@ func getFakeHelmConfig(settings *cli.EnvSettings, ns string) (*action.Configurat
 	}
 
 	return &action.Configuration{
-		Releases:       storage.Init(driver.NewMemory()),
+		Releases:       inMemStorage,
 		KubeClient:     &kubefake.FailingKubeClient{PrintingKubeClient: kubefake.PrintingKubeClient{Out: os.Stderr}},
 		Capabilities:   chartutil.DefaultCapabilities,
 		RegistryClient: registryClient,
