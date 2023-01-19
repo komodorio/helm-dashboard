@@ -27,7 +27,7 @@ type Server struct {
 	NoTracking bool
 }
 
-func (s Server) StartServer() (string, utils.ControlChan, error) {
+func (s *Server) StartServer() (string, utils.ControlChan, error) {
 	data, err := objects.NewDataLayer(s.Namespace, s.Version, objects.NewHelmConfig)
 	if err != nil {
 		return "", nil, errorx.Decorate(err, "Failed to create data layer")
@@ -52,7 +52,7 @@ func (s Server) StartServer() (string, utils.ControlChan, error) {
 	return "http://" + s.Address, done, nil
 }
 
-func (s Server) detectClusterMode(data *objects.DataLayer) error {
+func (s *Server) detectClusterMode(data *objects.DataLayer) error {
 	data.StatusInfo.ClusterMode = os.Getenv("HD_CLUSTER_MODE") != ""
 	if data.StatusInfo.ClusterMode {
 		return nil
@@ -79,7 +79,7 @@ func (s Server) detectClusterMode(data *objects.DataLayer) error {
 	return err
 }
 
-func (s Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {
+func (s *Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {
 	done := make(utils.ControlChan)
 	server := &http.Server{
 		Addr:    s.Address,
@@ -110,7 +110,7 @@ func (s Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlCha
 	return done
 }
 
-func (s Server) itIsUs() bool {
+func (s *Server) itIsUs() bool {
 	url := fmt.Sprintf("http://%s/status", s.Address)
 	var myClient = &http.Client{
 		Timeout: 5 * time.Second,
