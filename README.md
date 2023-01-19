@@ -31,9 +31,15 @@ Some of the key capabilities of the tool:
 
 ## Setup
 
+### Standalone Binary
+
+Since version 1.0, the recommended install method is to just use standalone binary. It does not require Helm or kubectl to be installed. 
+
+Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
+
 ### Using Helm plugin manager
 
-To install the plugin, simply run Helm command:
+To install dashboard as Helm plugin, simply run Helm command:
 
 ```shell
 helm plugin install https://github.com/komodorio/helm-dashboard.git
@@ -84,9 +90,6 @@ If you want to increase the logging verbosity and see all the debug info, use th
 
 The official helm chart is [available here](https://github.com/komodorio/helm-charts/blob/master/charts/helm-dashboard)
 
-### Manual Installation
-
-Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
 
 ## Execute Helm tests
 

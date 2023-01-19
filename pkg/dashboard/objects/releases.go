@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"sync"
 
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
@@ -21,9 +22,13 @@ import (
 type Releases struct {
 	HelmConfig HelmNSConfigGetter
 	Settings   *cli.EnvSettings
+	mx         sync.Mutex
 }
 
 func (a *Releases) List() ([]*Release, error) {
+	a.mx.Lock()
+	defer a.mx.Unlock()
+
 	hc, err := a.HelmConfig("") // TODO: empty ns?
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -60,6 +65,9 @@ func (a *Releases) ByName(namespace string, name string) (*Release, error) {
 }
 
 func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
+	a.mx.Lock()
+	defer a.mx.Unlock()
+
 	hc, err := a.HelmConfig(a.Settings.Namespace())
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -149,9 +157,13 @@ type Release struct {
 	HelmConfig HelmNSConfigGetter
 	Orig       *release.Release
 	revisions  []*Release
+	mx         sync.Mutex
 }
 
 func (r *Release) History() ([]*Release, error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -172,6 +184,9 @@ func (r *Release) History() ([]*Release, error) {
 }
 
 func (r *Release) Uninstall() error {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
 		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -186,6 +201,9 @@ func (r *Release) Uninstall() error {
 }
 
 func (r *Release) Rollback(toRevision int) error {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
 		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -197,6 +215,9 @@ func (r *Release) Rollback(toRevision int) error {
 }
 
 func (r *Release) RunTests() (string, error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.Orig.Namespace)
@@ -248,6 +269,9 @@ func (r *Release) GetRev(revNo int) (*Release, error) {
 }
 
 func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	ns := r.Settings.Namespace()
 	if r.Orig != nil {
 		ns = r.Orig.Namespace

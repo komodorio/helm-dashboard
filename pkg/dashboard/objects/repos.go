@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 const AnnRepo = "helm-dashboard/repository-name"
@@ -21,9 +22,13 @@ const AnnRepo = "helm-dashboard/repository-name"
 type Repositories struct {
 	Settings   *cli.EnvSettings
 	HelmConfig *action.Configuration
+	mx         sync.Mutex
 }
 
 func (r *Repositories) Load() (*repo.File, error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	// copied from cmd/helm/repo_list.go
 	f, err := repo.LoadFile(r.Settings.RepositoryConfig)
 	if err != nil && !isNotExist(err) {
@@ -68,6 +73,9 @@ func (r *Repositories) Add(name string, url string) error {
 		return errorx.Decorate(err, "Failed to load repo config")
 	}
 
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	c := repo.Entry{
 		Name: name,
 		URL:  url,
@@ -107,6 +115,9 @@ func (r *Repositories) Delete(name string) error {
 	if err != nil {
 		return errorx.Decorate(err, "failed to load repo information")
 	}
+
+	r.mx.Lock()
+	defer r.mx.Unlock()
 
 	// copied from cmd/helm/repo_remove.go
 	if !f.Remove(name) {
@@ -170,7 +181,7 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 }
 
 func (r *Repositories) GetChart(chart string, ver string) (*chart.Chart, error) {
-	// TODO: unused?
+	// TODO: unused method?
 	client := action.NewShowWithConfig(action.ShowAll, r.HelmConfig)
 	client.Version = ver
 
@@ -207,6 +218,7 @@ func (r *Repositories) GetChartValues(chart string, ver string) (string, error) 
 type Repository struct {
 	Settings *cli.EnvSettings
 	Orig     *repo.Entry
+	mx       sync.Mutex
 }
 
 func (r *Repository) IndexFileName() string {
@@ -214,6 +226,9 @@ func (r *Repository) IndexFileName() string {
 }
 
 func (r *Repository) GetIndex() (*repo.IndexFile, error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	f := r.IndexFileName()
 	ind, err := repo.LoadIndexFile(f)
 	if err != nil {
@@ -254,7 +269,8 @@ func (r *Repository) ByName(name string) (repo.ChartVersions, error) {
 }
 
 func (r *Repository) Update() error {
-	// TODO: mutex it
+	r.mx.Lock()
+	defer r.mx.Unlock()
 
 	// from cmd/helm/repo_update.go
 
