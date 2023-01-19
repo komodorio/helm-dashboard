@@ -33,12 +33,14 @@ func (s Server) StartServer() (string, utils.ControlChan, error) {
 		return "", nil, errorx.Decorate(err, "Failed to create data layer")
 	}
 
-	err = data.CheckConnectivity()
-	if err != nil {
-		return "", nil, errorx.Decorate(err, "Failed to check that Helm is operational")
-	}
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
+
+	err = s.detectClusterMode(data)
+	if err != nil {
+		return "", nil, err
+	}
+
 	go checkUpgrade(data.StatusInfo)
 
 	discoverScanners(data)
@@ -48,6 +50,33 @@ func (s Server) StartServer() (string, utils.ControlChan, error) {
 	done := s.startBackgroundServer(api, abort)
 
 	return "http://" + s.Address, done, nil
+}
+
+func (s Server) detectClusterMode(data *objects.DataLayer) error {
+	data.StatusInfo.ClusterMode = os.Getenv("HD_CLUSTER_MODE") != ""
+	if data.StatusInfo.ClusterMode {
+		return nil
+	}
+
+	ctxs, err := data.ListContexts()
+	if err != nil {
+		return err
+	}
+
+	if len(ctxs) == 0 {
+		log.Infof("Got no kubectl config contexts, will attempt to detect if we're inside cluster...")
+		app, err := data.AppForCtx("")
+		if err != nil {
+			return err
+		}
+		ns, err := app.K8s.GetNameSpaces()
+		if err != nil { // no point in continuing without kubectl context and k8s connection
+			return err
+		}
+		log.Debugf("Got %d namespaces listed", len(ns.Items))
+		data.StatusInfo.ClusterMode = true
+	}
+	return err
 }
 
 func (s Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {

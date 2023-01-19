@@ -51,19 +51,6 @@ func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter) (*
 	}, nil
 }
 
-func (a *Application) CheckConnectivity() error {
-	hc, err := a.HelmConfig("") // TODO: empty ns?
-	if err != nil {
-		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
-	}
-
-	err = hc.KubeClient.IsReachable() // TODO: test it on cluster with limited access
-	if err != nil {
-		return errorx.Decorate(err, "failed to validate k8s cluster connectivity")
-	}
-	return nil
-}
-
 func NewHelmConfig(settings *cli.EnvSettings, ns string) (*action.Configuration, error) {
 	// TODO: cache it into map
 	// TODO: I feel there should be more elegant way to organize this code

@@ -13,14 +13,11 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
 	"sync"
 )
 
 type DataLayer struct {
 	KubeContext string
-	Helm        string
-	Kubectl     string
 	Scanners    []subproc.Scanner
 	StatusInfo  *StatusInfo
 	Namespace   string
@@ -59,7 +56,7 @@ func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error
 func (d *DataLayer) ListContexts() ([]KubeContext, error) {
 	res := []KubeContext{}
 
-	if os.Getenv("HD_CLUSTER_MODE") != "" {
+	if d.StatusInfo.ClusterMode {
 		return res, nil
 	}
 
@@ -79,21 +76,6 @@ func (d *DataLayer) ListContexts() ([]KubeContext, error) {
 	}
 
 	return res, nil
-}
-
-func (d *DataLayer) CheckConnectivity() error {
-	contexts, err := d.ListContexts()
-	if err != nil {
-		return err
-	}
-
-	if len(contexts) < 1 {
-		// TODO: conflicts with env var?
-		log.Infof("Assuming k8s environment")
-		d.StatusInfo.ClusterMode = true
-	}
-
-	return nil
 }
 
 func (d *DataLayer) GetStatus() *StatusInfo {
