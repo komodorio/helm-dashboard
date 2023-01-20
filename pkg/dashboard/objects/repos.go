@@ -162,6 +162,7 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 		vers, err := rep.ByName(name)
 		if err != nil {
 			log.Warnf("Failed to get data from repo '%s', updating it might help", rep.Orig.Name)
+			log.Debugf("The error was: %v", err)
 			continue
 		}
 
