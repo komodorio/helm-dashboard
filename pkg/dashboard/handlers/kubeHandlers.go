@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"k8s.io/apimachinery/pkg/api/errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +40,11 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 	}
 
 	res, err := app.K8s.GetResourceInfo(c.Param("kind"), qp.Namespace, qp.Name)
-	if err != nil {
+	if errors.IsNotFound(err) {
+		res = &v12.Carp{Status: v12.CarpStatus{Phase: "NotFound", Message: err.Error()}}
+		//_ = c.AbortWithError(http.StatusNotFound, err)
+		//return
+	} else if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
