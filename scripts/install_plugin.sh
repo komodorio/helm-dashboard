@@ -2,9 +2,7 @@
 
 # Copied w/ love from the chartmuseum/helm-push :)
 
-if [ -n "$HELM_DEBUG" ]; then
-  set -x
-fi
+[ -z "$HELM_DEBUG" ] || set -x
 
 name="helm-dashboard"
 repo="https://github.com/komodorio/${name}"
