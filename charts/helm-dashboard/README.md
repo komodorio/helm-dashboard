@@ -71,7 +71,8 @@ The following table lists the configurable parameters of the chart and their def
 | `dashboard.persistence.accessModes`  | Persistent Volume access modes                                                                 | `["ReadWriteOnce"]`                  |
 | `dashboard.persistence.storageClass` | Persistent Volume storage class                                                                | `""`                                 |
 | `dashboard.persistence.size`         | Persistent Volume size                                                                         | `100M`                               |
-| `dashboard.persistence.hostPath`     | Set path in case you want to use local host path volumes (not recommended in production)       | `""`                                 |
+| `dashboard.persistence.hostPath`     | Set path in case you want to use local host path volumes (not recommended in production)       | `""`
+| `updateStrategy.type`                | Set up update strategy for helm-dashboard installation.                                        | `RollingUpdate`                    |             
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
