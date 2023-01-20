@@ -2,6 +2,7 @@ package objects
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
@@ -14,6 +15,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
 	"sync"
+	"time"
 )
 
 type DataLayer struct {
@@ -168,4 +170,48 @@ func (d *DataLayer) nsForCtx(ctx string) string {
 	}
 	log.Debugf("Strange: no context found for '%s'", ctx)
 	return ""
+}
+
+func (d *DataLayer) PeriodicTasks(ctx context.Context) {
+	if !d.StatusInfo.ClusterMode { // TODO: maybe have a separate flag for that?
+		log.Debugf("Not in cluster mode, not starting background tasks")
+		return
+	}
+
+	// auto-update repos
+	go d.loopUpdateRepos(ctx, 10*time.Minute) // TODO: parameterize interval?
+
+	// auto-scan
+}
+
+func (d *DataLayer) loopUpdateRepos(ctx context.Context, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	for {
+		app, err := d.AppForCtx("")
+		if err != nil {
+			log.Warnf("Failed to get app object while in background repo update: %v", err)
+			break // no point in retrying
+		} else {
+			repos, err := app.Repositories.List()
+			if err != nil {
+				log.Warnf("Failed to get list of repos while in background update: %v", err)
+			}
+
+			for _, repo := range repos {
+				err := repo.Update()
+				if err != nil {
+					log.Warnf("Failed to update repo %s: %v", repo.Orig.Name, err)
+				}
+			}
+		}
+
+		select {
+		case <-ctx.Done():
+			ticker.Stop()
+			return
+		case <-ticker.C:
+			continue
+		}
+	}
+	log.Debugf("Update repo loop done.")
 }

@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"embed"
 	"html"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -62,7 +62,7 @@ func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *objects.DataLayer, debug bool) *gin.Engine {
+func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
 	if debug {
 		api = gin.New()
@@ -81,10 +81,10 @@ func NewRouter(abortWeb utils.ControlChan, data *objects.DataLayer, debug bool) 
 	return api
 }
 
-func configureRoutes(abortWeb utils.ControlChan, data *objects.DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
-		abortWeb <- struct{}{}
+		abortWeb()
 		c.Status(http.StatusAccepted)
 	})
 

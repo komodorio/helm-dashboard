@@ -30,7 +30,7 @@ type Server struct {
 	NoTracking bool
 }
 
-func (s *Server) StartServer() (string, utils.ControlChan, error) {
+func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (string, utils.ControlChan, error) {
 	data, err := objects.NewDataLayer(s.Namespaces, s.Version, NewHelmConfig)
 	if err != nil {
 		return "", nil, errorx.Decorate(err, "Failed to create data layer")
@@ -48,9 +48,10 @@ func (s *Server) StartServer() (string, utils.ControlChan, error) {
 
 	discoverScanners(data)
 
-	abort := make(utils.ControlChan)
-	api := NewRouter(abort, data, s.Debug)
-	done := s.startBackgroundServer(api, abort)
+	go data.PeriodicTasks(ctx)
+
+	api := NewRouter(cancel, data, s.Debug)
+	done := s.startBackgroundServer(api, ctx)
 
 	return "http://" + s.Address, done, nil
 }
@@ -82,12 +83,21 @@ func (s *Server) detectClusterMode(data *objects.DataLayer) error {
 	return err
 }
 
-func (s *Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlChan) utils.ControlChan {
+func (s *Server) startBackgroundServer(routes *gin.Engine, ctx context.Context) utils.ControlChan {
 	done := make(utils.ControlChan)
 	server := &http.Server{
 		Addr:    s.Address,
 		Handler: routes,
 	}
+
+	go func() {
+		<-ctx.Done()
+		err := server.Shutdown(context.Background())
+		if err != nil {
+			log.Warnf("Had problems shutting down the server: %s", err)
+		}
+		log.Infof("Web server has been shut down.")
+	}()
 
 	go func() {
 		err := server.ListenAndServe()
@@ -100,14 +110,6 @@ func (s *Server) startBackgroundServer(routes *gin.Engine, abort utils.ControlCh
 			}
 		}
 		done <- struct{}{}
-	}()
-
-	go func() {
-		<-abort
-		err := server.Shutdown(context.Background())
-		if err != nil {
-			log.Warnf("Had problems shutting down the server: %s", err)
-		}
 	}()
 
 	return done

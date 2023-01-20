@@ -272,6 +272,7 @@ func (r *Repository) ByName(name string) (repo.ChartVersions, error) {
 func (r *Repository) Update() error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
+	log.Infof("Updating repository: %s", r.Orig.Name)
 
 	// from cmd/helm/repo_update.go
 

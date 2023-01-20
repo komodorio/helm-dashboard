@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
@@ -48,7 +51,18 @@ func main() {
 		Debug:      opts.Verbose,
 		NoTracking: opts.NoTracking,
 	}
-	address, webServerDone, err := server.StartServer()
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	osSignal := make(chan os.Signal, 1)
+	signal.Notify(osSignal, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		oscall := <-osSignal
+		log.Warnf("Stopping on signal: %s\n", oscall)
+		cancel()
+	}()
+
+	address, webServerDone, err := server.StartServer(ctx, cancel)
 	if err != nil {
 		log.Fatalf("Failed to start Helm Dashboard: %+v", err)
 	}
