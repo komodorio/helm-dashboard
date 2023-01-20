@@ -345,6 +345,23 @@ func TestE2E(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 	//assert.Equal(t, w.Body.String(), "[]")
 
+	// delete repo
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("DELETE", "/api/helm/repo?name=komodorio", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusNoContent)
+
+	// reconfigure release without repo connection
+	w = httptest.NewRecorder()
+	form = url.Values{}
+	form.Add("values", "dashboard:\n  allowWriteActions: false\n")
+	req, err = http.NewRequest("POST", "/api/helm/charts/install?namespace=test1&name=release1&flag=true", strings.NewReader(form.Encode()))
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusAccepted)
+	t.Logf("Upgraded: %s", w.Body.String())
+
 	// uninstall
 	w = httptest.NewRecorder()
 	req, err = http.NewRequest("DELETE", "/api/helm/charts?namespace=test1&name=release1", nil)
@@ -360,12 +377,6 @@ func TestE2E(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 	assert.Equal(t, w.Body.String(), "[]")
 
-	// delete repo
-	w = httptest.NewRecorder()
-	req, err = http.NewRequest("DELETE", "/api/helm/repo?name=komodorio", nil)
-	assert.NilError(t, err)
-	newRouter.ServeHTTP(w, req)
-	assert.Equal(t, w.Code, http.StatusNoContent)
 }
 
 func getFakeHelmConfig(settings *cli.EnvSettings, _ string) (*action.Configuration, error) {

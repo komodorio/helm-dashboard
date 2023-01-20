@@ -20,26 +20,25 @@ function checkUpgradeable(name) {
     $.getJSON("/api/helm/repo/latestver?name=" + name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
+        let elm = {name: "", version: "0"}
+        const btnUpgradeCheck = $("#btnUpgradeCheck");
         if (!data || !data.length) {
-            $("#btnUpgrade span").text("No upgrades")
-            $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-x-octagon")
-            $("#btnUpgrade").prop("disabled", true)
-            $("#btnUpgradeCheck").prop("disabled", true)
+            btnUpgradeCheck.prop("disabled", true)
+            btnUpgradeCheck.text("")
             $("#btnAddRepository").text("Add repository for it")
-            $("#btnUpgradeCheck").text("")
-            return
+        } else {
+            $("#btnAddRepository").text("")
+            btnUpgradeCheck.text("Check for new version")
+            elm = data[0]
         }
 
-        $("#btnUpgrade .icon").removeClass("bi-x-octagon").addClass("bi-hourglass-split")
-        $("#btnAddRepository").text("")
-        $("#btnUpgradeCheck").text("Check for new version")
+        $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
         const verCur = $("#specRev").data("last-chart-ver");
-        const elm = data[0]
-        $("#btnUpgradeCheck").data("repo", elm.repository)
-        $("#btnUpgradeCheck").data("chart", elm.name)
+        btnUpgradeCheck.data("repo", elm.repository)
+        btnUpgradeCheck.data("chart", elm.name)
 
         const canUpgrade = isNewerVersion(verCur, elm.version);
-        $("#btnUpgradeCheck").prop("disabled", false)
+        btnUpgradeCheck.prop("disabled", false)
         if (canUpgrade) {
             $("#btnUpgrade span").text("Upgrade to " + elm.version)
             $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-arrow-up")
@@ -57,7 +56,12 @@ function checkUpgradeable(name) {
 function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     $("#upgradeModal .btn-confirm").prop("disabled", true)
 
-    $('#upgradeModal').data("chart", elm.repository + "/" + elm.name).data("initial", !verCur)
+    let chart = elm.repository + "/" + elm.name;
+    if (!elm.name) {
+        chart=""
+    }
+
+    $('#upgradeModal').data("chart", chart).data("initial", !verCur)
 
     $("#upgradeModalLabel .name").text(elm.name)
 
@@ -75,37 +79,45 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModal .rel-ns").prop("disabled", false).val(ns)
     }
 
-    $.getJSON("/api/helm/repo/versions?name=" + elm.name).fail(function (xhr) {
-        reportError("Failed to find chart in repo", xhr)
-    }).done(function (vers) {
-        // fill versions
-        $('#upgradeModal select').empty()
-        for (let i = 0; i < vers.length; i++) {
-            const opt = $("<option value='" + vers[i].version + "'></option>");
-            if (vers[i].version === verCur) {
-                opt.html(vers[i].version + " &middot;")
-            } else {
-                opt.html(vers[i].version)
+    if (elm.name) {
+        $.getJSON("/api/helm/repo/versions?name=" + elm.name).fail(function (xhr) {
+            reportError("Failed to find chart in repo", xhr)
+        }).done(function (vers) {
+            // fill versions
+            $('#upgradeModal select').empty()
+            for (let i = 0; i < vers.length; i++) {
+                const opt = $("<option value='" + vers[i].version + "'></option>");
+                if (vers[i].version === verCur) {
+                    opt.html(vers[i].version + " &middot;")
+                } else {
+                    opt.html(vers[i].version)
+                }
+                $('#upgradeModal select').append(opt)
             }
-            $('#upgradeModal select').append(opt)
-        }
 
-        $('#upgradeModal select').val(elm.version).trigger("change")
+            $('#upgradeModal select').val(elm.version).trigger("change").parent().show()
+            upgrPopUpCommon(verCur, ns, lastRev, name)
+        })
+    } else { // chart without repo reconfigure
+        $('#upgradeModal select').empty().trigger("change").parent().hide()
+        upgrPopUpCommon(verCur, ns, lastRev, name)
+    }
+}
 
-        const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
-        myModal.show()
+function upgrPopUpCommon(verCur, ns, lastRev, name) {
+    const myModal = new bootstrap.Modal(document.getElementById('upgradeModal'), {});
+    myModal.show()
 
-        if (verCur) {
-            // fill current values
-            $.get("/api/helm/charts/values?namespace=" + ns + "&revision=" + lastRev + "&name=" + name + "&flag=true").fail(function (xhr) {
-                reportError("Failed to get charts values info", xhr)
-            }).done(function (data) {
-                $("#upgradeModal textarea").val(data).data("dirty", false)
-            })
-        } else {
-            $("#upgradeModal textarea").val("").data("dirty", true)
-        }
-    })
+    if (verCur) {
+        // fill current values
+        $.get("/api/helm/charts/values?namespace=" + ns + "&revision=" + lastRev + "&name=" + name + "&flag=true").fail(function (xhr) {
+            reportError("Failed to get charts values info", xhr)
+        }).done(function (data) {
+            $("#upgradeModal textarea").val(data).data("dirty", false)
+        })
+    } else {
+        $("#upgradeModal textarea").val("").data("dirty", true)
+    }
 }
 
 $("#upgradeModal .btn-confirm").click(function () {
@@ -155,12 +167,18 @@ $('#upgradeModal select').change(function () {
 
     // fill reference values
     $("#upgradeModal .ref-vals").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    $.get("/api/helm/repo/values?chart=" + $("#upgradeModal").data("chart") + "&version=" + self.val()).fail(function (xhr) {
-        reportError("Failed to get upgrade info", xhr)
-    }).done(function (data) {
-        data = hljs.highlight(data, {language: 'yaml'}).value
-        $("#upgradeModal .ref-vals").html(data)
-    })
+    const chart = $("#upgradeModal").data("chart");
+    // TODO: if chart is empty, query different URL that will restore values without repo
+    if (chart) {
+        $.get("/api/helm/repo/values?chart=" + chart + "&version=" + self.val()).fail(function (xhr) {
+            reportError("Failed to get upgrade info", xhr)
+        }).done(function (data) {
+            data = hljs.highlight(data, {language: 'yaml'}).value
+            $("#upgradeModal .ref-vals").html(data)
+        })
+    } else {
+        $("#upgradeModal .ref-vals").html("No original values information found")
+    }
 })
 
 $('#upgradeModal .btn-scan').click(function () {
@@ -343,7 +361,7 @@ $("#btnAddRepository").click(function () {
     window.location.reload()
 })
 
-$("#btnTest").click(function() {
+$("#btnTest").click(function () {
     $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: 'POST',

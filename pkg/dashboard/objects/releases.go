@@ -3,7 +3,10 @@ package objects
 import (
 	"bytes"
 	"fmt"
+	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"os"
+	"path"
 	"sync"
 
 	"github.com/joomcode/errorx"
@@ -29,7 +32,7 @@ type Releases struct {
 func (a *Releases) List() ([]*Release, error) {
 	a.mx.Lock()
 	defer a.mx.Unlock()
-	
+
 	releases := []*Release{}
 	for _, ns := range a.Namespaces {
 		log.Debugf("Listing releases in namespace: %s", ns)
@@ -158,11 +161,12 @@ func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.E
 }
 
 type Release struct {
-	Settings   *cli.EnvSettings
-	HelmConfig HelmNSConfigGetter
-	Orig       *release.Release
-	revisions  []*Release
-	mx         sync.Mutex
+	Settings          *cli.EnvSettings
+	HelmConfig        HelmNSConfigGetter
+	Orig              *release.Release
+	revisions         []*Release
+	mx                sync.Mutex
+	restoredChartPath string
 }
 
 func (r *Release) History() ([]*Release, error) {
@@ -277,6 +281,15 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
+	// if repo chart is not passed, let's try to restore it from secret
+	if repoChart == "" {
+		var err error
+		repoChart, err = r.restoreChart()
+		if err != nil {
+			return nil, errorx.Decorate(err, "failed to revive chart for release")
+		}
+	}
+
 	ns := r.Settings.Namespace()
 	if r.Orig != nil {
 		ns = r.Orig.Namespace
@@ -284,7 +297,7 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 
 	hc, err := r.HelmConfig(ns)
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", ns)
 	}
 
 	cmd := action.NewUpgrade(hc)
@@ -307,6 +320,59 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 	}
 
 	return res, nil
+}
+
+func (r *Release) restoreChart() (string, error) {
+	if r.restoredChartPath != "" {
+		return r.restoredChartPath, nil
+	}
+
+	// we're unlikely to have the original chart, let's try the cheesy thing...
+
+	log.Infof("Attempting to restore the chart for %s", r.Orig.Name)
+	dir, err := ioutil.TempDir("", "khd-*")
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to get temporary directory")
+	}
+
+	//restore Chart.yaml
+	cdata, err := yaml.Marshal(r.Orig.Chart.Metadata)
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to restore Chart.yaml")
+	}
+	err = ioutil.WriteFile(path.Join(dir, "Chart.yaml"), cdata, 0644)
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to write file Chart.yaml")
+	}
+
+	//restore known values
+	vdata, err := yaml.Marshal(r.Orig.Chart.Values)
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to restore values.yaml")
+	}
+	err = ioutil.WriteFile(path.Join(dir, "values.yaml"), vdata, 0644)
+	if err != nil {
+		return "", errorx.Decorate(err, "failed to write file values.yaml")
+	}
+
+	// if possible, overwrite files with better alternatives
+	for _, f := range append(r.Orig.Chart.Raw, r.Orig.Chart.Templates...) {
+		fname := path.Join(dir, f.Name)
+		log.Debugf("Restoring file: %s", fname)
+		err := os.MkdirAll(path.Dir(fname), 0755)
+		if err != nil {
+			return "", errorx.Decorate(err, "failed to create directory for file: %s", fname)
+		}
+
+		err = ioutil.WriteFile(fname, f.Data, 0644)
+		if err != nil {
+			return "", errorx.Decorate(err, "failed to write file to restore chart: %s", fname)
+		}
+	}
+
+	r.restoredChartPath = dir
+
+	return dir, nil
 }
 
 func checkIfInstallable(ch *chart.Chart) error {

@@ -341,9 +341,9 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		if notInitial {
 			manifests = existing.Orig.Manifest
 		} else {
-			out = rel.Manifest
 		}
-		out = GetDiff(strings.TrimSpace(manifests), out, "current.yaml", "upgraded.yaml")
+		out = rel.Manifest
+		out = GetDiff(strings.TrimSpace(manifests), strings.TrimSpace(out), "current.yaml", "upgraded.yaml")
 	} else {
 		c.Header("Content-Type", "application/json")
 		enc, err := json.Marshal(rel)
