@@ -20,7 +20,7 @@ type DataLayer struct {
 	KubeContext string
 	Scanners    []subproc.Scanner
 	StatusInfo  *StatusInfo
-	Namespace   string
+	Namespaces  []string
 	Cache       *Cache
 
 	ConfGen         HelmConfigGetter
@@ -29,22 +29,20 @@ type DataLayer struct {
 }
 
 type StatusInfo struct {
-	CurVer             string
-	LatestVer          string
-	Analytics          bool
-	LimitedToNamespace string // FIXME: we're not limiting it anymore
-	CacheHitRatio      float64
-	ClusterMode        bool
+	CurVer        string
+	LatestVer     string
+	Analytics     bool
+	CacheHitRatio float64
+	ClusterMode   bool
 }
 
-func NewDataLayer(ns string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
+func NewDataLayer(ns []string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
 	return &DataLayer{
-		Namespace: ns,
-		Cache:     NewCache(),
+		Namespaces: ns,
+		Cache:      NewCache(),
 		StatusInfo: &StatusInfo{
-			CurVer:             ver,
-			Analytics:          false,
-			LimitedToNamespace: ns,
+			CurVer:    ver,
+			Analytics: false,
 		},
 
 		ConfGen:         cg,
@@ -147,7 +145,7 @@ func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
 			return d.ConfGen(settings, ns)
 		}
 
-		a, err := NewApplication(settings, cfgGetter)
+		a, err := NewApplication(settings, cfgGetter, d.Namespaces)
 		if err != nil {
 			return nil, errorx.Decorate(err, "Failed to create application for context '%s'", ctx)
 		}

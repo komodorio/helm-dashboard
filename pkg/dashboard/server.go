@@ -7,6 +7,9 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/registry"
 	"net/http"
 	"os"
 	"strings"
@@ -21,14 +24,14 @@ import (
 
 type Server struct {
 	Version    string
-	Namespace  string
+	Namespaces []string
 	Address    string
 	Debug      bool
 	NoTracking bool
 }
 
 func (s *Server) StartServer() (string, utils.ControlChan, error) {
-	data, err := objects.NewDataLayer(s.Namespace, s.Version, objects.NewHelmConfig)
+	data, err := objects.NewDataLayer(s.Namespaces, s.Version, NewHelmConfig)
 	if err != nil {
 		return "", nil, errorx.Decorate(err, "Failed to create data layer")
 	}
@@ -178,4 +181,31 @@ func checkUpgrade(d *objects.StatusInfo) { // TODO: check it once an hour
 			log.Debugf("Got latest version from GH: %s", d.LatestVer)
 		}
 	}
+}
+
+func NewHelmConfig(settings *cli.EnvSettings, ns string) (*action.Configuration, error) {
+	// TODO: cache it into map
+	// TODO: I feel there should be more elegant way to organize this code
+	actionConfig := new(action.Configuration)
+
+	registryClient, err := registry.NewClient(
+		registry.ClientOptDebug(false),
+		registry.ClientOptEnableCache(true),
+		//registry.ClientOptWriter(out),
+		registry.ClientOptCredentialsFile(settings.RegistryConfig),
+	)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to crete helm config object")
+	}
+	actionConfig.RegistryClient = registryClient
+
+	helmDriver := os.Getenv("HELM_DRIVER")
+	if err := actionConfig.Init(
+		settings.RESTClientGetter(),
+		ns,
+		helmDriver, log.Debugf); err != nil {
+		return nil, errorx.Decorate(err, "failed to init Helm action config")
+	}
+
+	return actionConfig, nil
 }

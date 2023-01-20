@@ -203,7 +203,11 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 		return semver.Compare(res[i].Version, res[j].Version) > 0
 	})
 
-	c.IndentedJSON(http.StatusOK, res[:1])
+	if len(res) > 0 {
+		c.IndentedJSON(http.StatusOK, res[:1])
+	} else {
+		c.Status(http.StatusNoContent)
+	}
 }
 
 func (h *HelmHandler) RepoCharts(c *gin.Context) {

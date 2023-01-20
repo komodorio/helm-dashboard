@@ -78,7 +78,7 @@ This can also be specified using flag `--bind <host>`, for example `--bind=0.0.0
 
 If your port 8080 is busy, you can specify a different port to use via `--port <number>` command-line flag.
 
-If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line.
+If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line. You can specify multiple namespaces, separated by commas.
 
 If you don't want browser tab to automatically open, add `--no-browser` flag in your command line.
 

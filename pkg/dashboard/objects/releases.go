@@ -20,6 +20,7 @@ import (
 )
 
 type Releases struct {
+	Namespaces []string
 	HelmConfig HelmNSConfigGetter
 	Settings   *cli.EnvSettings
 	mx         sync.Mutex
@@ -28,23 +29,26 @@ type Releases struct {
 func (a *Releases) List() ([]*Release, error) {
 	a.mx.Lock()
 	defer a.mx.Unlock()
-
-	hc, err := a.HelmConfig("") // TODO: empty ns?
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
-	}
-
-	client := action.NewList(hc)
-	client.All = true
-	client.AllNamespaces = true
-	client.Limit = 0
-	rels, err := client.Run()
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get list of releases")
-	}
+	
 	releases := []*Release{}
-	for _, r := range rels {
-		releases = append(releases, &Release{HelmConfig: a.HelmConfig, Orig: r, Settings: a.Settings})
+	for _, ns := range a.Namespaces {
+		log.Debugf("Listing releases in namespace: %s", ns)
+		hc, err := a.HelmConfig(ns)
+		if err != nil {
+			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		}
+
+		client := action.NewList(hc)
+		client.All = true
+		client.AllNamespaces = true
+		client.Limit = 0
+		rels, err := client.Run()
+		if err != nil {
+			return nil, errorx.Decorate(err, "failed to get list of releases")
+		}
+		for _, r := range rels {
+			releases = append(releases, &Release{HelmConfig: a.HelmConfig, Orig: r, Settings: a.Settings})
+		}
 	}
 	return releases, nil
 }
@@ -68,7 +72,11 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 	a.mx.Lock()
 	defer a.mx.Unlock()
 
-	hc, err := a.HelmConfig(a.Settings.Namespace())
+	if namespace == "" {
+		namespace = a.Settings.Namespace()
+	}
+
+	hc, err := a.HelmConfig(namespace)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
@@ -78,9 +86,6 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 	cmd.ReleaseName = name
 	cmd.CreateNamespace = true
 	cmd.Namespace = namespace
-	if cmd.Namespace == "" {
-		cmd.Namespace = a.Settings.Namespace()
-	}
 	cmd.Version = version
 
 	cmd.DryRun = justTemplate

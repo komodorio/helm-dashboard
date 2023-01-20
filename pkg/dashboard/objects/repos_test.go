@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"helm.sh/helm/v3/pkg/action"
 	"testing"
 
 	"gotest.tools/v3/assert"
@@ -18,13 +19,9 @@ func initRepository(t *testing.T, filePath string) *Repositories {
 	// Sets the repository file path
 	settings.RepositoryConfig = filePath
 
-	hc, err := NewHelmConfig(settings, "TEST")
-	if err != nil {
-		t.Fatal(err, "Failed to create Helm Configuration")
-	}
 	testRepository := &Repositories{
 		Settings:   settings,
-		HelmConfig: hc,
+		HelmConfig: &action.Configuration{}, // maybe use copy of getFakeHelmConfig from api_test.go
 	}
 
 	return testRepository

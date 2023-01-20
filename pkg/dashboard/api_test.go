@@ -112,7 +112,7 @@ func TestConfigureRoutes(t *testing.T) {
 
 	// Required arguements for route configuration
 	abortWeb := make(utils.ControlChan)
-	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
 
 	if err != nil {
 		t.Fatal(err)
@@ -132,7 +132,7 @@ func TestContextSetter(t *testing.T) {
 	con := GetTestGinContext(w)
 
 	// Required arguements
-	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
 
 	if err != nil {
 		t.Fatal(err)
@@ -162,7 +162,7 @@ func TestNewRouter(t *testing.T) {
 
 	// Required arguemnets
 	abortWeb := make(utils.ControlChan)
-	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
 
 	if err != nil {
 		t.Fatal(err)
@@ -184,7 +184,7 @@ func TestConfigureScanners(t *testing.T) {
 	}
 
 	// Required arguemnets
-	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
 
 	if err != nil {
 		t.Fatal(err)
@@ -207,7 +207,7 @@ func TestConfigureKubectls(t *testing.T) {
 	}
 
 	// Required arguemnets
-	data, err := objects.NewDataLayer("TestSpace", "T-1", objects.NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
 
 	if err != nil {
 		t.Fatal(err)
@@ -227,7 +227,7 @@ func TestConfigureKubectls(t *testing.T) {
 
 func TestE2E(t *testing.T) {
 	// Initialize data layer
-	data, err := objects.NewDataLayer("", "0.0.0-test", getFakeHelmConfig)
+	data, err := objects.NewDataLayer([]string{""}, "0.0.0-test", getFakeHelmConfig)
 	assert.NilError(t, err)
 
 	// Create a new router with the function
@@ -274,6 +274,13 @@ func TestE2E(t *testing.T) {
         "url": "https://helm-charts.komodor.io"
     }
 ]`)
+
+	// what's the latest version of that chart
+	w = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "/api/helm/repo/latestver?name=helm-dashboard", nil)
+	assert.NilError(t, err)
+	newRouter.ServeHTTP(w, req)
+	assert.Equal(t, w.Code, http.StatusOK)
 
 	// generate template for potential release
 	w = httptest.NewRecorder()

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
@@ -42,7 +43,7 @@ func main() {
 
 	server := dashboard.Server{
 		Version:    version,
-		Namespace:  opts.Namespace,
+		Namespaces: strings.Split(opts.Namespace, ","),
 		Address:    fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
 		Debug:      opts.Verbose,
 		NoTracking: opts.NoTracking,
@@ -72,7 +73,7 @@ func main() {
 
 func parseFlags() options {
 	ns := os.Getenv("HELM_NAMESPACE")
-	if ns == "default" {
+	if ns == "default" { // it's how Helm passes to plugin the empty NS, we have to reset it back
 		ns = ""
 	}
 

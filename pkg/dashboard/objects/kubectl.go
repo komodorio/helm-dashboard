@@ -22,6 +22,7 @@ import (
 	describecmd "k8s.io/kubectl/pkg/cmd/describe"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/describe"
+	"k8s.io/utils/strings/slices"
 	"sort"
 )
 
@@ -55,14 +56,16 @@ func (p *cfgProxyObject) ToRawKubeConfigLoader() clientcmd.ClientConfig {
 }
 
 type K8s struct {
+	Namespaces       []string
 	Factory          kube.Factory
 	RestClientGetter genericclioptions.RESTClientGetter
 }
 
-func NewK8s(helmConfig *action.Configuration) (*K8s, error) {
+func NewK8s(helmConfig *action.Configuration, namespaces []string) (*K8s, error) {
 	factory := cmdutil.NewFactory(&cfgProxyObject{Impl: helmConfig.RESTClientGetter})
 
 	return &K8s{
+		Namespaces:       namespaces,
 		Factory:          factory,
 		RestClientGetter: factory,
 	}, nil
@@ -77,6 +80,16 @@ func (k *K8s) GetNameSpaces() (res *corev1.NamespaceList, err error) {
 	lst, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get list of namespaces")
+	}
+
+	if !slices.Contains(k.Namespaces, "") {
+		filtered := []corev1.Namespace{}
+		for _, ns := range lst.Items {
+			if slices.Contains(k.Namespaces, ns.Name) {
+				filtered = append(filtered, ns)
+			}
+		}
+		lst.Items = filtered
 	}
 
 	return lst, nil
