@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 	"helm.sh/helm/v3/pkg/action"
@@ -111,7 +110,7 @@ func TestConfigureRoutes(t *testing.T) {
 	api := gin.Default()
 
 	// Required arguements for route configuration
-	abortWeb := make(utils.ControlChan)
+	abortWeb := func() {}
 	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
 
 	if err != nil {
@@ -161,7 +160,7 @@ func TestNewRouter(t *testing.T) {
 	}
 
 	// Required arguemnets
-	abortWeb := make(utils.ControlChan)
+	abortWeb := func() {}
 	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
 
 	if err != nil {
@@ -231,7 +230,7 @@ func TestE2E(t *testing.T) {
 	assert.NilError(t, err)
 
 	// Create a new router with the function
-	abortWeb := make(utils.ControlChan)
+	abortWeb := func() {}
 	newRouter := NewRouter(abortWeb, data, false)
 
 	// initially, we don't have any releases
