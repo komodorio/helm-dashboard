@@ -186,13 +186,25 @@
           "name": "kind",
           "in": "path",
           "description": "Kind of kubernetes resource"
+        },
+        {
+          "name": "name",
+          "in": "query",
+          "description": "Name of kubernetes resource",
+          "required": true
+        },
+        {
+          "name": "namespace",
+          "in": "query",
+          "description": "Namespace of kubernetes resource",
+          "required": true
         }
       ],
       "get": {
         "tags": ["K8s"],
         "responses": {
           "200": {
-            "description": "Returns list of resources"
+            "description": "Returns resources information"
           }
         }
       }
@@ -218,6 +230,36 @@
       }
     },
     "/api/k8s/{kind}/describe": {
+      "parameters": [
+        {
+          "name": "kind",
+          "in": "path",
+          "description": "Kind of kubernetes resource"
+        },
+        {
+          "name": "name",
+          "in": "query",
+          "description": "Name of kubernetes resource",
+          "required": true
+        },
+        {
+          "name": "namespace",
+          "in": "query",
+          "description": "Namespace of kubernetes resource",
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": ["K8s"],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {}
+            },
+            "description": "Returns describe text"
+          }
+        }
+      }
     },
     "/api/scanners": {
     },
