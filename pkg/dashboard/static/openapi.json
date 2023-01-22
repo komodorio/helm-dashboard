@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Helm Dashboard API",
+    "version": ""
+  },
+  "tags": [
+    {
+      "name": "Releases"
+    },
+    {
+      "name": "Repositories"
+    },
+    {
+      "name": "K8s"
+    },
+    {
+      "name": "Scanners"
+    },
+    {
+      "name": "Miscellaneous"
+    }
+  ],
+  "paths": {
+    "/api/helm/releases": {
+      "get": {
+        "tags": [
+          "Releases"
+        ],
+        "description": "Get list of installed releases",
+        "responses": {
+          "200": {
+            "description": "Returns list of installed releases"
+          }
+        }
+      }
+    },
+    "/api/helm/releases/:name": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Releases"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Releases"
+        ],
+        "description": "Uninstall",
+        "responses": {
+          "202": {}
+        }
+      }
+    },
+    "/api/helm/releases/:name/history": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ]
+    },
+    "/api/helm/releases/:name/resources": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ]
+    },
+    "/api/helm/releases/:name/rollback": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ]
+    },
+    "/api/helm/releases/:name/manifest": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ]
+    },
+    "/api/helm/releases/:name/values": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ]
+    },
+    "/api/helm/releases/:name/notes": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ]
+    },
+    "/api/helm/repositories": {
+    },
+    "/api/helm/repositories/:repo": {
+      "parameters": [
+        {
+          "name": "repo",
+          "in": "path",
+          "description": "Name of Helm repository"
+        }
+      ]
+    },
+    "/api/helm/repositories/:repo/update": {
+      "parameters": [
+        {
+          "name": "repo",
+          "in": "path",
+          "description": "Name of Helm repository"
+        }
+      ]
+    },
+    "/api/helm/repositories/:repo/charts": {
+      "parameters": [
+        {
+          "name": "repo",
+          "in": "path",
+          "description": "Name of Helm repository"
+        }
+      ]
+    },
+    "/api/helm/repositories/:repo/charts/:chart/latest": {
+      "parameters": [
+        {
+          "name": "repo",
+          "in": "path",
+          "description": "Name of Helm repository"
+        },
+        {
+          "name": "chart",
+          "in": "path",
+          "description": "Name of Helm chart"
+        }
+      ]
+    },
+    "/api/helm/repositories/:repo/charts/:chart/values": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        },
+        {
+          "name": "chart",
+          "in": "path",
+          "description": "Name of Helm chart"
+        }
+      ]
+    },
+    "/api/k8s/contexts": {
+    },
+    "/api/k8s/:kind/list": {
+    },
+    "/api/k8s/:kind/describe": {
+    },
+    "/api/scanners": {
+    },
+    "/api/scanners/manifest": {
+    },
+    "/api/scanners/resource/:kind": {
+    },
+    "/": {
+      "delete": {
+        "tags": [
+          "Miscellaneous"
+        ],
+        "description": "Shuts down the Helm Dashboard application",
+        "responses": {
+          "202": {
+            "description": "Shutdown command has been accepted"
+          }
+        }
+      }
+    }
+  }
+}

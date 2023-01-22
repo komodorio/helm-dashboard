@@ -106,6 +106,10 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 		c.Status(http.StatusAccepted)
 	})
 
+	api.GET("/api-docs", func(c *gin.Context) { // https://github.com/OAI/OpenAPI-Specification/search?q=api-docs
+		c.Redirect(http.StatusFound, "static/api-docs.html")
+	})
+
 	configureHelms(api.Group("/api/helm"), data)
 	configureKubectls(api.Group("/api/kube"), data)
 	configureScanners(api.Group("/api/scanners"), data)
