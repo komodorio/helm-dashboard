@@ -93,11 +93,11 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 		c.IndentedJSON(http.StatusOK, data.GetStatus())
 	})
 
-	api.GET("/api/cache", func(c *gin.Context) {
+	api.GET("/api/cache", func(c *gin.Context) { // TODO: included into OpenAPI or not?
 		c.IndentedJSON(http.StatusOK, data.Cache)
 	})
 
-	api.DELETE("/api/cache", func(c *gin.Context) {
+	api.DELETE("/api/cache", func(c *gin.Context) { // TODO: included into OpenAPI or not?
 		err := data.Cache.Clear()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -111,7 +111,7 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 	})
 
 	configureHelms(api.Group("/api/helm"), data)
-	configureKubectls(api.Group("/api/kube"), data)
+	configureKubectls(api.Group("/api/k8s"), data)
 	configureScanners(api.Group("/api/scanners"), data)
 }
 

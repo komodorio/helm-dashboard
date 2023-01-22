@@ -193,6 +193,24 @@
           }
         }
       }
+    },
+    "/status": {
+      "get": {
+        "tags": [
+          "Miscellaneous"
+        ],
+        "description": "Gets application status",
+        "responses": {
+          "200": {
+            "description": "Returns JSON with some options",
+            "headers": {
+              "X-Application-Name": {
+                "description": "A string to self-identify the application"
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

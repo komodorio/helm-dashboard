@@ -182,7 +182,7 @@ function showResources(namespace, chart, revision) {
 
             resBody.append(resBlock)
             let ns = res.metadata.namespace ? res.metadata.namespace : namespace
-            $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
+            $.getJSON("/api/k8s/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
                 //reportError("Failed to get list of resources")
             }).done(function (data) {
                 const badge = $("<span class='badge me-2 fw-normal'></span>").text(data.status.phase);
@@ -239,7 +239,7 @@ function showDescribe(ns, kind, name, badge) {
 
     const myModal = new bootstrap.Offcanvas(document.getElementById('describeModal'));
     myModal.show()
-    $.get("/api/kube/describe/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
+    $.get("/api/k8s/describe/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
         reportError("Failed to describe resource", xhr)
     }).done(function (data) {
         data = hljs.highlight(data, {language: 'yaml'}).value
