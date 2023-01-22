@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/joomcode/errorx"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net/http"
 
@@ -92,6 +93,11 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
+	if c.Param("kind") != "namespaces" {
+		_ = c.AbortWithError(http.StatusBadRequest, errorx.AssertionFailed.New("Only 'namespaces' kind is allowed for listing"))
+		return
+	}
+
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside

@@ -35,7 +35,7 @@
         }
       }
     },
-    "/api/helm/releases/:name": {
+    "/api/helm/releases/{name}": {
       "parameters": [
         {
           "name": "name",
@@ -58,7 +58,7 @@
         }
       }
     },
-    "/api/helm/releases/:name/history": {
+    "/api/helm/releases/{name}/history": {
       "parameters": [
         {
           "name": "name",
@@ -67,7 +67,7 @@
         }
       ]
     },
-    "/api/helm/releases/:name/resources": {
+    "/api/helm/releases/{name}/resources": {
       "parameters": [
         {
           "name": "name",
@@ -76,7 +76,7 @@
         }
       ]
     },
-    "/api/helm/releases/:name/rollback": {
+    "/api/helm/releases/{name}/rollback": {
       "parameters": [
         {
           "name": "name",
@@ -85,7 +85,7 @@
         }
       ]
     },
-    "/api/helm/releases/:name/manifest": {
+    "/api/helm/releases/{name}/manifest": {
       "parameters": [
         {
           "name": "name",
@@ -94,7 +94,7 @@
         }
       ]
     },
-    "/api/helm/releases/:name/values": {
+    "/api/helm/releases/{name}/values": {
       "parameters": [
         {
           "name": "name",
@@ -103,7 +103,7 @@
         }
       ]
     },
-    "/api/helm/releases/:name/notes": {
+    "/api/helm/releases/{name}/notes": {
       "parameters": [
         {
           "name": "name",
@@ -170,16 +170,60 @@
       ]
     },
     "/api/k8s/contexts": {
+      "get": {
+        "tags": ["K8s"],
+        "description": "Get list of kubectl contexts configured locally",
+        "responses": {
+          "200": {
+            "description": "Returns list of contexts"
+          }
+        }
+      }
     },
-    "/api/k8s/:kind/list": {
+    "/api/k8s/{kind}/get": {
+      "parameters": [
+        {
+          "name": "kind",
+          "in": "path",
+          "description": "Kind of kubernetes resource"
+        }
+      ],
+      "get": {
+        "tags": ["K8s"],
+        "responses": {
+          "200": {
+            "description": "Returns list of resources"
+          }
+        }
+      }
     },
-    "/api/k8s/:kind/describe": {
+    "/api/k8s/{kind}/list": {
+      "parameters": [
+        {
+          "name": "kind",
+          "in": "path",
+          "description": "Kind of kubernetes resource",
+          "schema": {
+            "enum": ["namespaces"]
+          }
+        }
+      ],
+      "get": {
+        "tags": ["K8s"],
+        "responses": {
+          "200": {
+            "description": "Returns list of resources"
+          }
+        }
+      }
+    },
+    "/api/k8s/{kind}/describe": {
     },
     "/api/scanners": {
     },
     "/api/scanners/manifest": {
     },
-    "/api/scanners/resource/:kind": {
+    "/api/scanners/resource/{kind}": {
     },
     "/": {
       "delete": {

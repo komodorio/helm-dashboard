@@ -149,9 +149,9 @@ func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
 		},
 	}
 	api.GET("/contexts", h.GetContexts)
-	api.GET("/resources/:kind", h.GetResourceInfo)
-	api.GET("/describe/:kind", h.Describe)
-	api.GET("/namespaces", h.GetNameSpaces)
+	api.GET("/:kind/get", h.GetResourceInfo)
+	api.GET("/:kind/describe", h.Describe)
+	api.GET("/:kind/list", h.GetNameSpaces)
 }
 
 func configureStatic(api *gin.Engine) {
