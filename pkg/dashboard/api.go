@@ -42,7 +42,6 @@ func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctxName := ""
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
-			log.Debugf("Setting current context to: %s", ctx)
 			ctxName = ctx[0]
 			if err := data.SetContext(ctxName); err != nil {
 				c.String(http.StatusInternalServerError, err.Error())
@@ -132,14 +131,15 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 	api.POST("/charts/tests", h.RunTests)
 	api.POST("/charts/rollback", h.Rollback)
 
-	api.GET("/repo", h.RepoList)
-	api.POST("/repo", h.RepoAdd)
-	api.DELETE("/repo", h.RepoDelete)
-	api.GET("/repo/charts", h.RepoCharts)
-	api.GET("/repo/latestver", h.RepoLatestVer)
-	api.GET("/repo/versions", h.RepoVersions)
-	api.POST("/repo/update", h.RepoUpdate)
-	api.GET("/repo/values", h.RepoValues)
+	repos := api.Group("/repositories")
+	repos.GET("", h.RepoList)
+	repos.POST("", h.RepoAdd)
+	repos.GET("/:name", h.RepoCharts)
+	repos.POST("/:name", h.RepoUpdate)
+	repos.DELETE("/:name", h.RepoDelete)
+	repos.GET("/latestver", h.RepoLatestVer) // TODO: use /versions in client insted and remove this?
+	repos.GET("/versions", h.RepoVersions)
+	repos.GET("/values", h.RepoValues)
 }
 
 func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {

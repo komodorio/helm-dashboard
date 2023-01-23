@@ -150,14 +150,14 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 		return // sets error inside
 	}
 
-	rep, err := app.Repositories.Containing(qp.Name)
+	repos, err := app.Repositories.Containing(qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	res := []*RepoChartElement{}
-	for _, r := range rep {
+	for _, r := range repos {
 		res = append(res, &RepoChartElement{
 			Name:        r.Name,
 			Version:     r.Version,
@@ -211,18 +211,12 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoCharts(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	rep, err := app.Repositories.Get(qp.Name)
+	rep, err := app.Repositories.Get(c.Param("name"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -264,18 +258,12 @@ func enrichRepoChartsWithInstalled(charts []*repo.ChartVersion, installed []*obj
 }
 
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	rep, err := app.Repositories.Get(qp.Name)
+	rep, err := app.Repositories.Get(c.Param("name"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

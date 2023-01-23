@@ -5,7 +5,7 @@ $("#btnUpgradeCheck").click(function () {
     const repoName = self.data("repo")
     $("#btnUpgrade span").text("Checking...")
     $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
-    $.post("/api/helm/repo/update?name=" + repoName).fail(function (xhr) {
+    $.post("/api/helm/repositories/" + repoName + "/update").fail(function (xhr) {
         reportError("Failed to update chart repo", xhr)
     }).done(function () {
         self.find(".spinner-border").hide()
@@ -17,7 +17,7 @@ $("#btnUpgradeCheck").click(function () {
 })
 
 function checkUpgradeable(name) {
-    $.getJSON("/api/helm/repo/latestver?name=" + name).fail(function (xhr) {
+    $.getJSON("/api/helm/repositories/latestver?name=" + name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
         let elm = {name: "", version: "0"}
@@ -58,7 +58,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
 
     let chart = elm.repository + "/" + elm.name;
     if (!elm.name) {
-        chart=""
+        chart = ""
     }
 
     $('#upgradeModal').data("chart", chart).data("initial", !verCur)
@@ -80,7 +80,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     }
 
     if (elm.name) {
-        $.getJSON("/api/helm/repo/versions?name=" + elm.name).fail(function (xhr) {
+        $.getJSON("/api/helm/repositories/versions?name=" + elm.name).fail(function (xhr) {
             reportError("Failed to find chart in repo", xhr)
         }).done(function (vers) {
             // fill versions
@@ -170,7 +170,7 @@ $('#upgradeModal select').change(function () {
     const chart = $("#upgradeModal").data("chart");
     // TODO: if chart is empty, query different URL that will restore values without repo
     if (chart) {
-        $.get("/api/helm/repo/values?chart=" + chart + "&version=" + self.val()).fail(function (xhr) {
+        $.get("/api/helm/repositories/values?chart=" + chart + "&version=" + self.val()).fail(function (xhr) {
             reportError("Failed to get upgrade info", xhr)
         }).done(function (data) {
             data = hljs.highlight(data, {language: 'yaml'}).value
