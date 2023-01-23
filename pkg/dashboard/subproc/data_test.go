@@ -1,12 +1,13 @@
 package subproc
 
 import (
+	"sync"
+	"testing"
+
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"sync"
-	"testing"
 )
 
 func TestFlow(t *testing.T) {
@@ -14,7 +15,8 @@ func TestFlow(t *testing.T) {
 
 	var _ release.Status
 	data := DataLayer{
-		Cache: NewCache(),
+		Cache:      NewCache(),
+		StatusInfo: &StatusInfo{},
 	}
 	err := data.CheckConnectivity()
 	if err != nil {
@@ -87,4 +89,8 @@ func TestFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = diff
+
+	status := data.GetStatus()
+	_ = status
+
 }
