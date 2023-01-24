@@ -121,7 +121,8 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 		},
 	}
 
-	api.GET("/charts", h.GetReleases) // TODO: api path is misleading!
+	rels := api.Group("/releases")
+	rels.GET("", h.GetReleases)
 	api.DELETE("/charts", h.Uninstall)
 
 	api.GET("/charts/history", h.History)
