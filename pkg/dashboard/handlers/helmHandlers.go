@@ -132,6 +132,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 
 	res, err := objects.ParseManifests(rel.Orig.Manifest)
 	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
