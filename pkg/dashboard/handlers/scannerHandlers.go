@@ -46,6 +46,7 @@ func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 		return
 	}
 
+	// TODO: should just accept the manifest instead of generating it itself
 	mnf, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)

@@ -114,7 +114,9 @@
     },
     "/api/helm/repositories": {
       "get": {
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "description": "Get list of Helm repositories",
         "responses": {
           "200": {
@@ -123,7 +125,9 @@
         }
       },
       "post": {
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "description": "Adds new repository",
         "requestBody": {
           "content": {
@@ -162,7 +166,9 @@
         }
       ],
       "get": {
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "description": "Get list of charts in repository",
         "responses": {
           "200": {
@@ -171,7 +177,9 @@
         }
       },
       "post": {
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "description": "Update repository from remote",
         "responses": {
           "204": {
@@ -180,7 +188,9 @@
         }
       },
       "delete": {
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "description": "Remove repository",
         "responses": {
           "204": {
@@ -200,7 +210,9 @@
       ],
       "description": "Find the latest available version of specified chart through all the repositories",
       "get": {
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "responses": {
           "200": {
             "description": "The object with latest available version is returned"
@@ -222,7 +234,9 @@
       ],
       "get": {
         "description": "Get the list of versions for specified chart across the repositories",
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "responses": {
           "200": {
             "description": "The list if chart versions is returned"
@@ -230,7 +244,7 @@
         }
       }
     },
-     "/api/helm/repositories/values": {
+    "/api/helm/repositories/values": {
       "parameters": [
         {
           "name": "chart",
@@ -247,7 +261,9 @@
       ],
       "get": {
         "description": "Get the original values.yaml file for the chart",
-        "tags": ["Repositories"],
+        "tags": [
+          "Repositories"
+        ],
         "responses": {
           "200": {
             "description": "The content of values.yaml"
@@ -255,7 +271,6 @@
         }
       }
     },
-
     "/api/k8s/contexts": {
       "get": {
         "tags": [
@@ -359,10 +374,96 @@
       }
     },
     "/api/scanners": {
+      "get": {
+        "tags": [
+          "Scanners"
+        ],
+        "description": "Get list of discovered scanners",
+        "responses": {
+          "200": {
+            "description": "List of scanners"
+          }
+        }
+      }
     },
-    "/api/scanners/manifest": {
+    "/api/scanners/manifests": {
+      "post": {
+        "tags": [
+          "Scanners"
+        ],
+        "description": "Generate manifests for specified configuration and scan using all applicable scanners",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "chart",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "values": {
+                    "type": "string",
+                    "description": "Text of values.yaml to use"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Map of problems per scanner type"
+          }
+        }
+      }
     },
     "/api/scanners/resource/{kind}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "kind"
+        },
+        {
+          "in": "query",
+          "name": "namespace",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "name",
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "Scanners"
+        ],
+        "description": "Scan specified k8s resource in cluster",
+        "responses": {
+          "200": {
+            "description": "Information with scan results per scanner type"
+          }
+        }
+      }
     },
     "/": {
       "delete": {
