@@ -2,8 +2,7 @@ name: release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
 
 env:
   HELM_REP: helm-charts
@@ -11,56 +10,100 @@ env:
   CHART_DIR: charts/helm-dashboard
 
 jobs:
-  pre_release:
+  prepare:
+    name: prepare
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
         with:
-          fetch-depth: 0
-      - name: Get plugin version
-        id: get_plugin_version
-        run: echo "PLUGIN_VERSION=$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)" >> $GITHUB_OUTPUT
-      - name: Get tag name
-        id: get_tag_name
-        run: echo "TAG_NAME=$(echo ${{ github.ref_name }} | cut -d 'v' -f2)" >> $GITHUB_OUTPUT
-    outputs:
-      plugin_version: ${{ steps.get_plugin_version.outputs.PLUGIN_VERSION }}
-      release_tag: ${{ steps.get_tag_name.outputs.TAG_NAME }}
+          go-version: "^1.17"
+
+      - name: Calculate next release version
+        id: version
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} > token
+          gh auth login --with-token < token
+          go install github.com/davidrjonas/semver-cli@latest
+          commit=$(git log --format="%H" -n 1)
+          last_pr=$(gh api -X GET search/issues -f q="repo:${{ github.repository }} is:closed is:pr sort:created-desc $commit" --jq '.items[0].number')
+          if  [[ $last_pr = ""  ]]; then echo "No pull request found" && exit 0; fi;
+
+          bump=$(gh pr view $last_pr --json labels --jq '.labels | map(select(.name | contains("release")) | .name) | .[0]' | sed s/release-//g)
+          if ! [[ "$bump" =~ ^(major|minor|patch) ]]; then echo "Not a release commit" && exit 0; fi;        
+          echo $bump > bump.txt
+          cat bump.txt
+          current=$(gh release list | awk '{print $1}' | awk 'NR==1' | sed s/v//g)
+
+          next_version=$(semver-cli inc $bump $current)
+          echo "next_version is now $next_version"
+          echo "::set-output name=version::$next_version"
 
   release:
-    needs: pre_release
+    name: release
+    needs: [prepare]
+    if: needs.prepare.outputs.version
+    outputs:
+      tag-name: ${{ steps.commit.outputs.tag-name }}
     runs-on: ubuntu-latest
     steps:
-      - name: Plugin version/Tag name Check
-        if: needs.pre_release.outputs.release_tag != needs.pre_release.outputs.plugin_version
-        uses: actions/github-script@v3
+      - uses: actions/checkout@v3
         with:
-          script: |
-            core.setFailed('Plugin version and tag name are not equivalent!')
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
+          persist-credentials: false
           fetch-depth: 0
-      - name: Set up Go
-        uses: actions/setup-go@v3
+
+      - name: Update plugin.yaml
+        uses: fjogeleit/yaml-update-action@main
         with:
-          go-version: 1.18
-      - name: git cleanup
-        run: git clean -f
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+          valueFile: plugin.yaml
+          propertyPath: version
+          value: ${{ needs.prepare.outputs.version }}
+          commitChange: false
+
+      - name: Commit files
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "bumping release v${{ needs.prepare.outputs.version }} [skip ci]"
+
+          tag_name=v${{ needs.prepare.outputs.version }}
+          git tag $tag_name
+          echo "::set-output name=tag-name::$tag_name"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
         with:
-          version: latest
-          args: release --rm-dist
+          github_token: ${{ secrets.ADMIN_KOMI_GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
+
+      - name: Changelog
+        uses: Bullrich/generate-release-changelog@master
+        id: changelog
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.commit.outputs.tag-name }}
+          release_name: ${{ steps.commit.outputs.tag-name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+
       - name: Test Binary Versions
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
 
   image:
     runs-on: ubuntu-latest
-    needs: [release, pre_release]
+    needs: [release, prepare]
     timeout-minutes: 60
     steps:
       - name: Check out the repo
@@ -85,13 +128,13 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: komodorio/helm-dashboard:${{ needs.pre_release.outputs.release_tag }},komodorio/helm-dashboard:latest
+          tags: komodorio/helm-dashboard:${{ needs.prepare.outputs.version }},komodorio/helm-dashboard:latest
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: VER=${{ needs.pre_release.outputs.release_tag }}
+          build-args: VER=${{ needs.prepare.outputs.version }}
 
   publish_chart:
     runs-on: ubuntu-latest
-    needs: [image, pre_release]
+    needs: [release, image, prepare]
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
@@ -109,7 +152,7 @@ jobs:
           git commit -m "Increment chart versions [skip ci]" || echo "Already up-to-date"
           git push -f || echo "Nothing to push!"
         env:
-          APP_VERSION: ${{ needs.pre_release.outputs.release_tag }}
+          APP_VERSION: ${{ needs.prepare.outputs.version }}
       - name: Push folder to helm-charts repository
         uses: crykn/copy_folder_to_another_repo_action@v1.0.6
         env:
