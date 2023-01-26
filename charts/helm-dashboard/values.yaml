@@ -111,6 +111,10 @@ autoscaling:
 
 nodeSelector: {}
 
+extraArgs:
+  - --no-browser
+  - --bind=0.0.0.0
+
 tolerations: []
 
 affinity: {}
