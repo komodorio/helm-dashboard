@@ -130,7 +130,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: komodorio/helm-dashboard:${{ needs.prepare.outputs.version }},komodorio/helm-dashboard:latest
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: VER=${{ needs.release.outputs.tag-name }}
+          build-args: VER=${{ needs.prepare.outputs.version }}
 
   publish_chart:
     runs-on: ubuntu-latest
@@ -152,7 +152,7 @@ jobs:
           git commit -m "Increment chart versions [skip ci]" || echo "Already up-to-date"
           git push -f || echo "Nothing to push!"
         env:
-          APP_VERSION: ${{ needs.release.outputs.tag-name }}
+          APP_VERSION: ${{ needs.prepare.outputs.version }}
       - name: Push folder to helm-charts repository
         uses: crykn/copy_folder_to_another_repo_action@v1.0.6
         env:
