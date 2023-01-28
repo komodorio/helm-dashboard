@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"sync"
+	"time"
+
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/pkg/errors"
@@ -15,8 +18,6 @@ import (
 	"io"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	"sync"
-	"time"
 )
 
 type DataLayer struct {
@@ -40,6 +41,10 @@ type StatusInfo struct {
 }
 
 func NewDataLayer(ns []string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
+	if cg == nil {
+		return nil, errors.New("HelmConfigGetter can't be nil")
+	}
+
 	return &DataLayer{
 		Namespaces: ns,
 		Cache:      NewCache(),
