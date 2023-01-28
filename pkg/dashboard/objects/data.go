@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"sync"
+	"time"
+
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/pkg/errors"
@@ -12,10 +15,9 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
+	"io"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	"sync"
-	"time"
 )
 
 type DataLayer struct {
@@ -39,6 +41,10 @@ type StatusInfo struct {
 }
 
 func NewDataLayer(ns []string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
+	if cg == nil {
+		return nil, errors.New("HelmConfigGetter can't be nil")
+	}
+
 	return &DataLayer{
 		Namespaces: ns,
 		Cache:      NewCache(),
@@ -95,7 +101,16 @@ func ParseManifests(out string) ([]*v1.Carp, error) {
 
 	res := make([]*v1.Carp, 0)
 	var tmp interface{}
-	for dec.Decode(&tmp) == nil {
+	for {
+		err := dec.Decode(&tmp)
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return nil, errorx.Decorate(err, "failed to parse manifest document #%d", len(res)+1)
+		}
+
 		// k8s libs uses only JSON tags defined, say hello to https://github.com/go-yaml/yaml/issues/424
 		// we can juggle it
 		jsoned, err := json.Marshal(tmp)

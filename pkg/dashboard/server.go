@@ -185,10 +185,14 @@ func checkUpgrade(d *objects.StatusInfo) { // TODO: check it once an hour
 	}
 }
 
-func NewHelmConfig(settings *cli.EnvSettings, ns string) (*action.Configuration, error) {
+func NewHelmConfig(origSettings *cli.EnvSettings, ns string) (*action.Configuration, error) {
 	// TODO: cache it into map
 	// TODO: I feel there should be more elegant way to organize this code
 	actionConfig := new(action.Configuration)
+
+	settings := cli.New()
+	settings.KubeContext = origSettings.KubeContext
+	settings.SetNamespace(ns) // important for RESTClientGetter to have correct namespace
 
 	registryClient, err := registry.NewClient(
 		registry.ClientOptDebug(false),
