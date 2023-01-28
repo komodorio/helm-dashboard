@@ -235,7 +235,7 @@ func TestE2E(t *testing.T) {
 
 	// initially, we don't have any releases
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/api/helm/charts", nil)
+	req, err := http.NewRequest("GET", "/api/helm/releases", nil)
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -243,7 +243,7 @@ func TestE2E(t *testing.T) {
 
 	// initially, we don't have any repositories
 	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/helm/repo", nil)
+	req, err = http.NewRequest("GET", "/api/helm/repositories", nil)
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -254,7 +254,7 @@ func TestE2E(t *testing.T) {
 	form := url.Values{}
 	form.Add("name", "komodorio")
 	form.Add("url", "https://helm-charts.komodor.io")
-	req, err = http.NewRequest("POST", "/api/helm/repo", strings.NewReader(form.Encode()))
+	req, err = http.NewRequest("POST", "/api/helm/repositories", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
@@ -263,7 +263,7 @@ func TestE2E(t *testing.T) {
 
 	// now, we have one repo
 	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/helm/repo", nil)
+	req, err = http.NewRequest("GET", "/api/helm/repositories", nil)
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -276,7 +276,7 @@ func TestE2E(t *testing.T) {
 
 	// what's the latest version of that chart
 	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/helm/repo/latestver?name=helm-dashboard", nil)
+	req, err = http.NewRequest("GET", "/api/helm/repositories/latestver?name=helm-dashboard", nil)
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -297,7 +297,7 @@ func TestE2E(t *testing.T) {
 
 	// get list of releases
 	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/helm/charts", nil)
+	req, err = http.NewRequest("GET", "/api/helm/releases", nil)
 	assert.NilError(t, err)
 	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusOK)

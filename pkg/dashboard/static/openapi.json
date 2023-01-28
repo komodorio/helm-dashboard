@@ -33,6 +33,62 @@
             "description": "Returns list of installed releases"
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Releases"
+        ],
+        "description": "Install or upgrade release",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "chart",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "flag",
+            "description": "When set to true, performs actual install. Otherwise, generates manifest preview"
+          },
+          {
+            "in": "query",
+            "name": "initial",
+            "description": "When set to true, performs actual install. Otherwise, generates manifest preview"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "values": {
+                    "type": "string",
+                    "description": "Text of values.yaml to use"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+
+        }
       }
     },
     "/api/helm/releases/{name}": {

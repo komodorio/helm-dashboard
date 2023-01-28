@@ -123,6 +123,8 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 
 	rels := api.Group("/releases")
 	rels.GET("", h.GetReleases)
+	//rels.POST("", h.InstallNew)
+
 	api.DELETE("/charts", h.Uninstall)
 
 	api.GET("/charts/history", h.History)

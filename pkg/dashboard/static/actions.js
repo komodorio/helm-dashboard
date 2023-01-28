@@ -5,7 +5,7 @@ $("#btnUpgradeCheck").click(function () {
     const repoName = self.data("repo")
     $("#btnUpgrade span").text("Checking...")
     $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
-    $.post("/api/helm/repositories/" + repoName + "/update").fail(function (xhr) {
+    $.post("/api/helm/repositories/" + repoName).fail(function (xhr) {
         reportError("Failed to update chart repo", xhr)
     }).done(function () {
         self.find(".spinner-border").hide()
