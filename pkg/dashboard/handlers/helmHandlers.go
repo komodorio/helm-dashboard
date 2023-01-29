@@ -466,18 +466,12 @@ func (h *HelmHandler) RepoAdd(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoDelete(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	err = app.Repositories.Delete(qp.Name)
+	err := app.Repositories.Delete(c.Param("name"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
