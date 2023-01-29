@@ -50,6 +50,20 @@ func (h *HelmHandler) getRelease(c *gin.Context) (*objects.Release, *utils.Query
 	return rel, qp
 }
 
+func (h *HelmHandler) getReleaseNew(c *gin.Context) *objects.Release {
+	app := h.GetApp(c)
+	if app == nil {
+		return nil
+	}
+
+	rel, err := app.Releases.ByName(c.Param("ns"), c.Param("name"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, err)
+		return nil
+	}
+	return rel
+}
+
 func (h *HelmHandler) GetReleases(c *gin.Context) {
 	app := h.GetApp(c)
 	if app == nil {
@@ -71,7 +85,7 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 }
 
 func (h *HelmHandler) Uninstall(c *gin.Context) {
-	rel, _ := h.getRelease(c)
+	rel := h.getReleaseNew(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -279,27 +293,42 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 }
 
 func (h *HelmHandler) Install(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	justTemplate := c.Query("flag") != "true"
-	notInitial := c.Query("initial") != "true"
+	values := map[string]interface{}{}
+	err := yaml.Unmarshal([]byte(c.PostForm("values")), &values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
-	var existing *objects.Release
-	if notInitial {
-		existing, err = app.Releases.ByName(qp.Namespace, qp.Name)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
+	justTemplate := c.PostForm("preview") == "true"
+	ns := c.Param("ns")
+	if ns == "[empty]" {
+		ns = ""
+	}
+	rel, err := app.Releases.Install(ns, c.PostForm("name"), c.PostForm("chart"), c.PostForm("version"), justTemplate, values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	h.iuCommon(c, rel, justTemplate, "")
+}
+
+func (h *HelmHandler) Upgrade(c *gin.Context) {
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	existing, err := app.Releases.ByName(c.Param("ns"), c.Param("name"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	values := map[string]interface{}{}
@@ -309,29 +338,21 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		return
 	}
 
-	var rel *release.Release
-	if existing != nil {
-		rel, err = existing.Upgrade(c.Query("chart"), c.Query("version"), justTemplate, values)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-	} else {
-		rel, err = app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, values)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
+	justTemplate := c.PostForm("preview") == "true"
+	rel, err := existing.Upgrade(c.PostForm("chart"), c.PostForm("version"), justTemplate, values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
-	out := ""
+	h.iuCommon(c, rel, justTemplate, existing.Orig.Manifest)
+}
+
+func (h *HelmHandler) iuCommon(c *gin.Context, rel *release.Release, justTemplate bool, manifests string) {
 	if justTemplate {
-		manifests := ""
-		if notInitial {
-			manifests = existing.Orig.Manifest
-		}
-		out = rel.Manifest
-		out = GetDiff(strings.TrimSpace(manifests), strings.TrimSpace(out), "current.yaml", "upgraded.yaml")
+		out := GetDiff(strings.TrimSpace(manifests), strings.TrimSpace(rel.Manifest), "current.yaml", "upgraded.yaml")
+		c.Header("Content-Type", "text/plain")
+		c.String(http.StatusOK, out)
 	} else {
 		c.Header("Content-Type", "application/json")
 		enc, err := json.Marshal(rel)
@@ -339,10 +360,8 @@ func (h *HelmHandler) Install(c *gin.Context) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		out = strings.TrimSpace(string(enc))
+		c.String(http.StatusAccepted, string(enc))
 	}
-
-	c.String(http.StatusAccepted, out)
 }
 
 func (h *HelmHandler) RunTests(c *gin.Context) {

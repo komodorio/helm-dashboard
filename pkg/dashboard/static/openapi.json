@@ -33,53 +33,35 @@
             "description": "Returns list of installed releases"
           }
         }
-      },
+      }
+    },
+    "/api/helm/releases/{ns}": {
       "post": {
         "tags": [
           "Releases"
         ],
-        "description": "Install or upgrade release",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "namespace",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "name",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "chart",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "flag",
-            "description": "When set to true, performs actual install. Otherwise, generates manifest preview"
-          },
-          {
-            "in": "query",
-            "name": "initial",
-            "description": "When set to true, performs actual install. Otherwise, generates manifest preview"
-          }
-        ],
+        "description": "Install new release",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "chart": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  },
                   "values": {
                     "type": "string",
                     "description": "Text of values.yaml to use"
+                  },
+                  "preview": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -87,12 +69,28 @@
           }
         },
         "responses": {
-
+          "200": {
+            "description": "In case preview=true, the preview diff is generated",
+            "content": {
+              "text/plain": {}
+            }
+          },
+          "202": {
+            "description": "In case preview=false, the actial install is performed and resulting release object is returned",
+            "content": {
+              "application/json": {}
+            }
+          }
         }
       }
     },
-    "/api/helm/releases/{name}": {
+    "/api/helm/releases/{ns}/{name}": {
       "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
         {
           "name": "name",
           "in": "path",

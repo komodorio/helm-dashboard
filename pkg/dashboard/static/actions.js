@@ -62,6 +62,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     }
 
     $('#upgradeModal').data("chart", chart).data("initial", !verCur)
+    $('#upgradeModal form .chart-name').val(chart)
 
     $("#upgradeModalLabel .name").text(elm.name)
 
@@ -123,10 +124,11 @@ function upgrPopUpCommon(verCur, ns, lastRev, name) {
 $("#upgradeModal .btn-confirm").click(function () {
     const btnConfirm = $("#upgradeModal .btn-confirm")
     btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    $('#upgradeModal form .preview-mode').val("false")
     $.ajax({
         type: 'POST',
-        url: "/api/helm/charts/install" + upgradeModalQstr() + "&flag=true",
-        data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
+        url: upgradeModalURL(),
+        data: $("#upgradeModal form").serialize(),
     }).fail(function (xhr) {
         reportError("Failed to upgrade the chart", xhr)
     }).done(function (data) {
@@ -187,7 +189,7 @@ $('#upgradeModal .btn-scan').click(function () {
     self.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: "POST",
-        url: "/api/scanners/manifests" + upgradeModalQstr(),
+        url: "/api/scanners/manifests" + upgradeModalURL(), // FIXME: broken
         data: $("#upgradeModal form").serialize(),
     }).fail(function (xhr) {
         reportError("Failed to scan the manifest", xhr)
@@ -220,10 +222,10 @@ function requestChangeDiff() {
     diffBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating diff...')
     $("#upgradeModal .btn-confirm").prop("disabled", true)
 
-    let values = null;
+    $('#upgradeModal form .preview-mode').val("true")
+    let form = $("#upgradeModal form").serialize();
     if ($("#upgradeModal textarea").data("dirty")) {
         $("#upgradeModal .invalid-feedback").hide()
-        values = $("#upgradeModal form").serialize()
 
         try {
             jsyaml.load($("#upgradeModal textarea").val())
@@ -236,10 +238,10 @@ function requestChangeDiff() {
 
     $.ajax({
         type: "POST",
-        url: "/api/helm/charts/install" + upgradeModalQstr(),
-        data: values,
+        url: upgradeModalURL(),
+        data: form,
     }).fail(function (xhr) {
-        $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info:     " + xhr.responseText + "</p>")
+        $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info: " + xhr.responseText + "</p>")
     }).done(function (data) {
         diffBody.empty();
         $("#upgradeModal .btn-confirm").prop("disabled", false)
@@ -257,15 +259,15 @@ function requestChangeDiff() {
     })
 }
 
-function upgradeModalQstr() {
-    let qstr = "?" +
-        "namespace=" + $("#upgradeModal .rel-ns").val() +
-        "&name=" + $("#upgradeModal .rel-name").val() +
-        "&chart=" + $("#upgradeModal").data("chart") +
-        "&version=" + $('#upgradeModal select').val()
+function upgradeModalURL() {
+    let ns = $("#upgradeModal .rel-ns").val();
+    if (!ns) {
+        ns = "[empty]"
+    }
 
-    if ($("#upgradeModal").data("initial")) {
-        qstr += "&initial=true"
+    let qstr = "/api/helm/releases/" + ns;
+    if (!$("#upgradeModal").data("initial")) {
+        qstr += "/" + $("#upgradeModal .rel-name").val()
     }
 
     return qstr
@@ -280,7 +282,7 @@ $("#btnUninstall").click(function () {
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     btnConfirm.prop("disabled", true).off('click').click(function () {
         btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        const url = "/api/helm/charts?namespace=" + namespace + "&name=" + chart;
+        const url = "/api/helm/releases/" + namespace + "/" + chart;
         $.ajax({
             url: url,
             type: 'DELETE',
