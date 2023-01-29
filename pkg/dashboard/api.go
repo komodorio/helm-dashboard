@@ -127,9 +127,9 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 	rels.POST(":ns/:name", h.Upgrade)
 	rels.DELETE(":ns/:name", h.Uninstall)
 	rels.GET(":ns/:name/history", h.History)
+	rels.GET(":ns/:name/:section", h.GetInfoSection)
 
 	api.GET("/charts/resources", h.Resources)
-	api.GET("/charts/:section", h.GetInfoSection)
 	api.POST("/charts/tests", h.RunTests)
 	api.POST("/charts/rollback", h.Rollback)
 

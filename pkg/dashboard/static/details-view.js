@@ -55,17 +55,17 @@ function loadContentWrapper() {
     loadContent(getHashParam("tab"), getHashParam("namespace"), getHashParam("chart"), revision, revDiff, flag)
 }
 
-function loadContent(mode, namespace, name, revision, revDiff, flag) {
-    let qstr = "name=" + name + "&namespace=" + namespace + "&revision=" + revision
+function loadContent(mode, namespace, name, revision, revDiff, userDefined) {
+    let qstr = "revision=" + revision
     if (revDiff) {
         qstr += "&revisionDiff=" + revDiff
     }
 
-    if (flag) {
-        qstr += "&flag=" + flag
+    if (userDefined) {
+        qstr += "&userDefined=" + userDefined
     }
 
-    let url = "/api/helm/charts/" + mode
+    let url = "/api/helm/releases/" + namespace + "/" + name + "/" + mode
     url += "?" + qstr
     const diffDisplay = $("#manifestText");
     diffDisplay.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
@@ -228,7 +228,7 @@ function getStatusMessage(status) {
     }
     if (status.conditions) {
         return status.conditions[0].message || status.conditions[0].reason
-    } 
+    }
     return status.message || status.reason
 }
 

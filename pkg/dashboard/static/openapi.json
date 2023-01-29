@@ -178,6 +178,108 @@
         }
       }
     },
+    "/api/helm/releases/{ns}/{name}/manifest": {
+      "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        },
+        {
+          "name": "revision",
+          "in": "query",
+          "description": "Revision to get data from"
+        },
+        {
+          "name": "revisionDiff",
+          "in": "query",
+          "description": "Revision to diff against"
+        }
+      ],
+      "get": {
+        "description": "Get manifest for release",
+        "responses": {
+          "200": {
+            "description": "Manifest text, or diff if revisionDiff is specified"
+          }
+        }
+      }
+    },
+    "/api/helm/releases/{ns}/{name}/values": {
+      "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        },
+        {
+          "name": "revision",
+          "in": "query",
+          "description": "Revision to get data from"
+        },
+        {
+          "name": "revisionDiff",
+          "in": "query",
+          "description": "Revision to diff against"
+        },
+        {
+          "name": "userDefined",
+          "in": "query",
+          "description": "If set, only user-defined values will be listed"
+        }
+      ],
+      "get": {
+        "description": "Get values for release",
+        "responses": {
+          "200": {
+            "description": "Values YAML text, or diff if revisionDiff is specified"
+          }
+        }
+      }
+    },
+    "/api/helm/releases/{ns}/{name}/notes": {
+      "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        },
+        {
+          "name": "revision",
+          "in": "query",
+          "description": "Revision to get data from"
+        },
+        {
+          "name": "revisionDiff",
+          "in": "query",
+          "description": "Revision to diff against"
+        }
+      ],
+      "get": {
+        "description": "Get textual notes for release",
+        "responses": {
+          "200": {
+            "description": "Notes text, or diff if revisionDiff is specified"
+          }
+        }
+      }
+    },
+
     "/api/helm/releases/{name}/resources": {
       "parameters": [
         {
@@ -188,33 +290,6 @@
       ]
     },
     "/api/helm/releases/{name}/rollback": {
-      "parameters": [
-        {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
-      ]
-    },
-    "/api/helm/releases/{name}/manifest": {
-      "parameters": [
-        {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
-      ]
-    },
-    "/api/helm/releases/{name}/values": {
-      "parameters": [
-        {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
-      ]
-    },
-    "/api/helm/releases/{name}/notes": {
       "parameters": [
         {
           "name": "name",

@@ -381,12 +381,18 @@ func (h *HelmHandler) RunTests(c *gin.Context) {
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 	h.EnableClientCache(c)
 
-	rel, qp := h.getReleaseOld(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
 
-	rev, err := rel.GetRev(qp.Revision)
+	revn, err := strconv.Atoi(c.Query("revision"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	rev, err := rel.GetRev(revn)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -408,7 +414,7 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 		}
 	}
 
-	flag := c.Query("flag") == "true"
+	flag := c.Query("userDefined") == "true"
 
 	res, err := h.handleGetSection(rev, c.Param("section"), revDiff, flag)
 	if err != nil {
