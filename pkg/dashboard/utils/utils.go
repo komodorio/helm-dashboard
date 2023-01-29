@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -105,7 +104,6 @@ func RunCommand(cmd []string, env map[string]string) (string, error) {
 type QueryProps struct {
 	Namespace string
 	Name      string
-	Revision  int
 }
 
 func GetQueryProps(c *gin.Context, revRequired bool) (*QueryProps, error) {
@@ -116,12 +114,6 @@ func GetQueryProps(c *gin.Context, revRequired bool) (*QueryProps, error) {
 	if qp.Name == "" {
 		return nil, errors.New("missing required query string parameter: name")
 	}
-
-	cRev, err := strconv.Atoi(c.Query("revision"))
-	if err != nil && revRequired {
-		return nil, err
-	}
-	qp.Revision = cRev
 
 	return &qp, nil
 }
