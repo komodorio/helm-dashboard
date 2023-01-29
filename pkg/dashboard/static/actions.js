@@ -318,10 +318,13 @@ $("#btnRollback").click(function () {
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     btnConfirm.prop("disabled", true).off('click').click(function () {
         btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&name=" + chart + "&revision=" + revisionNew;
+        const url = "/api/helm/releases/" + namespace + "/" + chart + "/rollback";
         $.ajax({
             url: url,
             type: 'POST',
+            data: {
+                revision: revisionNew
+            }
         }).fail(function (xhr) {
             reportError("Failed to rollback the chart", xhr)
         }).done(function () {
@@ -333,7 +336,7 @@ $("#btnRollback").click(function () {
     myModal.show()
 
     let qstr = "revision=" + revisionNew + "&revisionDiff=" + revisionCur
-    let url = "/api/helm/releases/"+namespace+"/"+chart+"/manifests"
+    let url = "/api/helm/releases/" + namespace + "/" + chart + "/manifests"
     url += "?" + qstr
     $.get(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)

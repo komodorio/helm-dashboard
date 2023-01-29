@@ -319,14 +319,41 @@
         }
       }
     },
-    "/api/helm/releases/{name}/rollback": {
+    "/api/helm/releases/{ns}/{name}/rollback": {
       "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
         {
           "name": "name",
           "in": "path",
           "description": "Name of Helm release"
         }
-      ]
+      ],
+      "post": {
+        "description": "Rollback the release to a previous revision",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "revision": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Rolled back successfully"
+          }
+        }
+      }
     },
     "/api/helm/repositories": {
       "get": {

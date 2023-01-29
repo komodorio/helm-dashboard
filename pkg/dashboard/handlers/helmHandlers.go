@@ -99,12 +99,18 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 }
 
 func (h *HelmHandler) Rollback(c *gin.Context) {
-	rel, qp := h.getReleaseOld(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
 
-	err := rel.Rollback(qp.Revision)
+	revn, err := strconv.Atoi(c.PostForm("revision"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = rel.Rollback(revn)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
