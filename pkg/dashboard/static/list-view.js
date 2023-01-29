@@ -3,7 +3,7 @@ function loadChartsList() {
     $("#sectionList").show()
     const chartsCards = $("#installedList .body")
     chartsCards.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Loading...</div>")
-    $.getJSON("/api/helm/charts").fail(function (xhr) {
+    $.getJSON("/api/helm/releases").fail(function (xhr) {
         sendStats('Get releases', {'status': 'failed'});
         reportError("Failed to get list of charts", xhr)
         chartsCards.empty().append("<div class=\"row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start\"><div class=\"col\">Failed to get list of charts</div></div>")

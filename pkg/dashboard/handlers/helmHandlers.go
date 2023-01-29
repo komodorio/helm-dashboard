@@ -30,24 +30,18 @@ type HelmHandler struct {
 	*Contexted
 }
 
-func (h *HelmHandler) getRelease(c *gin.Context) (*objects.Release, *utils.QueryProps) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return nil, nil
-	}
-
+func (h *HelmHandler) getRelease(c *gin.Context) *objects.Release {
 	app := h.GetApp(c)
 	if app == nil {
-		return nil, qp // sets error inside
+		return nil
 	}
 
-	rel, err := app.Releases.ByName(qp.Namespace, qp.Name)
+	rel, err := app.Releases.ByName(c.Param("ns"), c.Param("name"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return nil, qp
+		return nil
 	}
-	return rel, qp
+	return rel
 }
 
 func (h *HelmHandler) GetReleases(c *gin.Context) {
@@ -71,7 +65,7 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 }
 
 func (h *HelmHandler) Uninstall(c *gin.Context) {
-	rel, _ := h.getRelease(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -85,12 +79,18 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 }
 
 func (h *HelmHandler) Rollback(c *gin.Context) {
-	rel, qp := h.getRelease(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
 
-	err := rel.Rollback(qp.Revision)
+	revn, err := strconv.Atoi(c.PostForm("revision"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = rel.Rollback(revn)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -99,7 +99,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 }
 
 func (h *HelmHandler) History(c *gin.Context) {
-	rel, _ := h.getRelease(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -125,7 +125,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 func (h *HelmHandler) Resources(c *gin.Context) {
 	h.EnableClientCache(c)
 
-	rel, _ := h.getRelease(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -140,7 +140,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoVersions(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -151,14 +151,14 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 		return // sets error inside
 	}
 
-	rep, err := app.Repositories.Containing(qp.Name)
+	repos, err := app.Repositories.Containing(qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	res := []*RepoChartElement{}
-	for _, r := range rep {
+	for _, r := range repos {
 		res = append(res, &RepoChartElement{
 			Name:        r.Name,
 			Version:     r.Version,
@@ -172,7 +172,7 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -212,18 +212,12 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoCharts(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	rep, err := app.Repositories.Get(qp.Name)
+	rep, err := app.Repositories.Get(c.Param("name"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -265,18 +259,12 @@ func enrichRepoChartsWithInstalled(charts []*repo.ChartVersion, installed []*obj
 }
 
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	rep, err := app.Repositories.Get(qp.Name)
+	rep, err := app.Repositories.Get(c.Param("name"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -291,27 +279,42 @@ func (h *HelmHandler) RepoUpdate(c *gin.Context) {
 }
 
 func (h *HelmHandler) Install(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	justTemplate := c.Query("flag") != "true"
-	notInitial := c.Query("initial") != "true"
+	values := map[string]interface{}{}
+	err := yaml.Unmarshal([]byte(c.PostForm("values")), &values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
-	var existing *objects.Release
-	if notInitial {
-		existing, err = app.Releases.ByName(qp.Namespace, qp.Name)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
+	justTemplate := c.PostForm("preview") == "true"
+	ns := c.Param("ns")
+	if ns == "[empty]" {
+		ns = ""
+	}
+	rel, err := app.Releases.Install(ns, c.PostForm("name"), c.PostForm("chart"), c.PostForm("version"), justTemplate, values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	h.iuCommon(c, rel, justTemplate, "")
+}
+
+func (h *HelmHandler) Upgrade(c *gin.Context) {
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	existing, err := app.Releases.ByName(c.Param("ns"), c.Param("name"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	values := map[string]interface{}{}
@@ -321,29 +324,21 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		return
 	}
 
-	var rel *release.Release
-	if existing != nil {
-		rel, err = existing.Upgrade(c.Query("chart"), c.Query("version"), justTemplate, values)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-	} else {
-		rel, err = app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), justTemplate, values)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
+	justTemplate := c.PostForm("preview") == "true"
+	rel, err := existing.Upgrade(c.PostForm("chart"), c.PostForm("version"), justTemplate, values)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
-	out := ""
+	h.iuCommon(c, rel, justTemplate, existing.Orig.Manifest)
+}
+
+func (h *HelmHandler) iuCommon(c *gin.Context, rel *release.Release, justTemplate bool, manifests string) {
 	if justTemplate {
-		manifests := ""
-		if notInitial {
-			manifests = existing.Orig.Manifest
-		}
-		out = rel.Manifest
-		out = GetDiff(strings.TrimSpace(manifests), strings.TrimSpace(out), "current.yaml", "upgraded.yaml")
+		out := GetDiff(strings.TrimSpace(manifests), strings.TrimSpace(rel.Manifest), "current.yaml", "upgraded.yaml")
+		c.Header("Content-Type", "text/plain")
+		c.String(http.StatusOK, out)
 	} else {
 		c.Header("Content-Type", "application/json")
 		enc, err := json.Marshal(rel)
@@ -351,14 +346,12 @@ func (h *HelmHandler) Install(c *gin.Context) {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		out = strings.TrimSpace(string(enc))
+		c.String(http.StatusAccepted, string(enc))
 	}
-
-	c.String(http.StatusAccepted, out)
 }
 
 func (h *HelmHandler) RunTests(c *gin.Context) {
-	rel, _ := h.getRelease(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -374,12 +367,18 @@ func (h *HelmHandler) RunTests(c *gin.Context) {
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 	h.EnableClientCache(c)
 
-	rel, qp := h.getRelease(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
 
-	rev, err := rel.GetRev(qp.Revision)
+	revn, err := strconv.Atoi(c.Query("revision"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	rev, err := rel.GetRev(revn)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -401,7 +400,7 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 		}
 	}
 
-	flag := c.Query("flag") == "true"
+	flag := c.Query("userDefined") == "true"
 
 	res, err := h.handleGetSection(rev, c.Param("section"), revDiff, flag)
 	if err != nil {
@@ -467,18 +466,12 @@ func (h *HelmHandler) RepoAdd(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoDelete(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
 	}
 
-	err = app.Repositories.Delete(qp.Name)
+	err := app.Repositories.Delete(c.Param("name"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

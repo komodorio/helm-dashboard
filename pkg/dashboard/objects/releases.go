@@ -103,6 +103,10 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 		return nil, err
 	}
 
+	if !justTemplate {
+		log.Infof("Installed new release: %s/%s", namespace, name)
+	}
+
 	return res, nil
 }
 
@@ -220,7 +224,12 @@ func (r *Release) Rollback(toRevision int) error {
 
 	client := action.NewRollback(hc)
 	client.Version = toRevision
-	return client.Run(r.Orig.Name)
+	err = client.Run(r.Orig.Name)
+	if err != nil {
+		return errorx.Decorate(err, "failed to rollback the release")
+	}
+	log.Infof("Rolled back %s/%s to %d=>%d", r.Orig.Namespace, r.Orig.Name, r.Orig.Version, toRevision)
+	return nil
 }
 
 func (r *Release) RunTests() (string, error) {
@@ -305,9 +314,7 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 	cmd.Namespace = r.Settings.Namespace()
 	cmd.Version = version
 
-	if justTemplate {
-		cmd.DryRun = true
-	}
+	cmd.DryRun = justTemplate
 
 	chrt, err := locateChart(cmd.ChartPathOptions, repoChart, r.Settings)
 	if err != nil {
@@ -317,6 +324,10 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 	res, err := cmd.Run(r.Orig.Name, chrt, values)
 	if err != nil {
 		return nil, err
+	}
+
+	if !justTemplate {
+		log.Infof("Upgraded release: %s/%s#%d", res.Namespace, res.Name, res.Version)
 	}
 
 	return res, nil

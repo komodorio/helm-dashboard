@@ -28,7 +28,7 @@ func (h *ScannersHandler) List(c *gin.Context) {
 }
 
 func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -46,6 +46,7 @@ func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 		return
 	}
 
+	// TODO: should just accept the manifest instead of generating it itself
 	mnf, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
@@ -67,7 +68,7 @@ func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 }
 
 func (h *ScannersHandler) ScanResource(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return

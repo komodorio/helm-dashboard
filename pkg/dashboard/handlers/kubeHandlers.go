@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/joomcode/errorx"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net/http"
 
@@ -28,7 +29,7 @@ func (h *KubeHandler) GetContexts(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -71,7 +72,7 @@ func EnhanceStatus(res *v12.Carp) {
 }
 
 func (h *KubeHandler) Describe(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -92,6 +93,11 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
+	if c.Param("kind") != "namespaces" {
+		_ = c.AbortWithError(http.StatusBadRequest, errorx.AssertionFailed.New("Only 'namespaces' kind is allowed for listing"))
+		return
+	}
+
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside

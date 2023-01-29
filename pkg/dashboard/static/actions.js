@@ -5,7 +5,7 @@ $("#btnUpgradeCheck").click(function () {
     const repoName = self.data("repo")
     $("#btnUpgrade span").text("Checking...")
     $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
-    $.post("/api/helm/repo/update?name=" + repoName).fail(function (xhr) {
+    $.post("/api/helm/repositories/" + repoName).fail(function (xhr) {
         reportError("Failed to update chart repo", xhr)
     }).done(function () {
         self.find(".spinner-border").hide()
@@ -17,7 +17,7 @@ $("#btnUpgradeCheck").click(function () {
 })
 
 function checkUpgradeable(name) {
-    $.getJSON("/api/helm/repo/latestver?name=" + name).fail(function (xhr) {
+    $.getJSON("/api/helm/repositories/latestver?name=" + name).fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
         let elm = {name: "", version: "0"}
@@ -58,10 +58,11 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
 
     let chart = elm.repository + "/" + elm.name;
     if (!elm.name) {
-        chart=""
+        chart = ""
     }
 
     $('#upgradeModal').data("chart", chart).data("initial", !verCur)
+    $('#upgradeModal form .chart-name').val(chart)
 
     $("#upgradeModalLabel .name").text(elm.name)
 
@@ -80,7 +81,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     }
 
     if (elm.name) {
-        $.getJSON("/api/helm/repo/versions?name=" + elm.name).fail(function (xhr) {
+        $.getJSON("/api/helm/repositories/versions?name=" + elm.name).fail(function (xhr) {
             reportError("Failed to find chart in repo", xhr)
         }).done(function (vers) {
             // fill versions
@@ -110,7 +111,7 @@ function upgrPopUpCommon(verCur, ns, lastRev, name) {
 
     if (verCur) {
         // fill current values
-        $.get("/api/helm/charts/values?namespace=" + ns + "&revision=" + lastRev + "&name=" + name + "&flag=true").fail(function (xhr) {
+        $.get("/api/helm/releases/" + ns + "/" + name + "/values?userDefined=true&revision=" + lastRev).fail(function (xhr) {
             reportError("Failed to get charts values info", xhr)
         }).done(function (data) {
             $("#upgradeModal textarea").val(data).data("dirty", false)
@@ -123,10 +124,11 @@ function upgrPopUpCommon(verCur, ns, lastRev, name) {
 $("#upgradeModal .btn-confirm").click(function () {
     const btnConfirm = $("#upgradeModal .btn-confirm")
     btnConfirm.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    $('#upgradeModal form .preview-mode').val("false")
     $.ajax({
         type: 'POST',
-        url: "/api/helm/charts/install" + upgradeModalQstr() + "&flag=true",
-        data: $("#upgradeModal textarea").data("dirty") ? $("#upgradeModal form").serialize() : null,
+        url: upgradeModalURL(),
+        data: $("#upgradeModal form").serialize(),
     }).fail(function (xhr) {
         reportError("Failed to upgrade the chart", xhr)
     }).done(function (data) {
@@ -170,7 +172,7 @@ $('#upgradeModal select').change(function () {
     const chart = $("#upgradeModal").data("chart");
     // TODO: if chart is empty, query different URL that will restore values without repo
     if (chart) {
-        $.get("/api/helm/repo/values?chart=" + chart + "&version=" + self.val()).fail(function (xhr) {
+        $.get("/api/helm/repositories/values?chart=" + chart + "&version=" + self.val()).fail(function (xhr) {
             reportError("Failed to get upgrade info", xhr)
         }).done(function (data) {
             data = hljs.highlight(data, {language: 'yaml'}).value
@@ -187,7 +189,7 @@ $('#upgradeModal .btn-scan').click(function () {
     self.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: "POST",
-        url: "/api/scanners/manifests" + upgradeModalQstr(),
+        url: "/api/scanners/manifests" + upgradeModalURL(), // FIXME: broken
         data: $("#upgradeModal form").serialize(),
     }).fail(function (xhr) {
         reportError("Failed to scan the manifest", xhr)
@@ -220,10 +222,10 @@ function requestChangeDiff() {
     diffBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating diff...')
     $("#upgradeModal .btn-confirm").prop("disabled", true)
 
-    let values = null;
+    $('#upgradeModal form .preview-mode').val("true")
+    let form = $("#upgradeModal form").serialize();
     if ($("#upgradeModal textarea").data("dirty")) {
         $("#upgradeModal .invalid-feedback").hide()
-        values = $("#upgradeModal form").serialize()
 
         try {
             jsyaml.load($("#upgradeModal textarea").val())
@@ -236,10 +238,10 @@ function requestChangeDiff() {
 
     $.ajax({
         type: "POST",
-        url: "/api/helm/charts/install" + upgradeModalQstr(),
-        data: values,
+        url: upgradeModalURL(),
+        data: form,
     }).fail(function (xhr) {
-        $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info:     " + xhr.responseText + "</p>")
+        $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info: " + xhr.responseText + "</p>")
     }).done(function (data) {
         diffBody.empty();
         $("#upgradeModal .btn-confirm").prop("disabled", false)
@@ -257,15 +259,15 @@ function requestChangeDiff() {
     })
 }
 
-function upgradeModalQstr() {
-    let qstr = "?" +
-        "namespace=" + $("#upgradeModal .rel-ns").val() +
-        "&name=" + $("#upgradeModal .rel-name").val() +
-        "&chart=" + $("#upgradeModal").data("chart") +
-        "&version=" + $('#upgradeModal select').val()
+function upgradeModalURL() {
+    let ns = $("#upgradeModal .rel-ns").val();
+    if (!ns) {
+        ns = "[empty]"
+    }
 
-    if ($("#upgradeModal").data("initial")) {
-        qstr += "&initial=true"
+    let qstr = "/api/helm/releases/" + ns;
+    if (!$("#upgradeModal").data("initial")) {
+        qstr += "/" + $("#upgradeModal .rel-name").val()
     }
 
     return qstr
@@ -280,7 +282,7 @@ $("#btnUninstall").click(function () {
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     btnConfirm.prop("disabled", true).off('click').click(function () {
         btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        const url = "/api/helm/charts?namespace=" + namespace + "&name=" + chart;
+        const url = "/api/helm/releases/" + namespace + "/" + chart;
         $.ajax({
             url: url,
             type: 'DELETE',
@@ -294,9 +296,7 @@ $("#btnUninstall").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'));
     myModal.show()
 
-    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
-    let url = "/api/helm/charts/resources"
-    url += "?" + qstr
+    let url = "/api/helm/releases/" + namespace + "/" + chart + "/resources"
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
@@ -318,10 +318,13 @@ $("#btnRollback").click(function () {
     $("#confirmModalBody").empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     btnConfirm.prop("disabled", true).off('click').click(function () {
         btnConfirm.prop("disabled", true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-        const url = "/api/helm/charts/rollback?namespace=" + namespace + "&name=" + chart + "&revision=" + revisionNew;
+        const url = "/api/helm/releases/" + namespace + "/" + chart + "/rollback";
         $.ajax({
             url: url,
             type: 'POST',
+            data: {
+                revision: revisionNew
+            }
         }).fail(function (xhr) {
             reportError("Failed to rollback the chart", xhr)
         }).done(function () {
@@ -332,8 +335,8 @@ $("#btnRollback").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
     myModal.show()
 
-    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
-    let url = "/api/helm/charts/manifests"
+    let qstr = "revision=" + revisionNew + "&revisionDiff=" + revisionCur
+    let url = "/api/helm/releases/" + namespace + "/" + chart + "/manifests"
     url += "?" + qstr
     $.get(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
@@ -365,7 +368,7 @@ $("#btnTest").click(function () {
     $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: 'POST',
-        url: "/api/helm/charts/tests" + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart")
+        url: "/api/helm/releases/" + getHashParam("namespace") + "/" + getHashParam("chart") + "/test"
     }).fail(function (xhr) {
         reportError("Failed to execute test for chart", xhr)
     }).done(function (data) {

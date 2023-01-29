@@ -5,7 +5,7 @@ function loadChartHistory(namespace, name) {
     $("#sectionDetails").show()
     $("#sectionDetails .name").text(name)
     revRow.empty().append("<li><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span></li>")
-    $.getJSON("/api/helm/charts/history?name=" + name + "&namespace=" + namespace).fail(function (xhr) {
+    $.getJSON("/api/helm/releases/" + namespace + "/" + name + "/history").fail(function (xhr) {
         reportError("Failed to get chart details", xhr)
     }).done(function (data) {
         fillChartHistory(data, namespace, name);

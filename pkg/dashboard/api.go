@@ -42,7 +42,6 @@ func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctxName := ""
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
-			log.Debugf("Setting current context to: %s", ctx)
 			ctxName = ctx[0]
 			if err := data.SetContext(ctxName); err != nil {
 				c.String(http.StatusInternalServerError, err.Error())
@@ -93,11 +92,11 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 		c.IndentedJSON(http.StatusOK, data.GetStatus())
 	})
 
-	api.GET("/api/cache", func(c *gin.Context) {
+	api.GET("/api/cache", func(c *gin.Context) { // TODO: included into OpenAPI or not?
 		c.IndentedJSON(http.StatusOK, data.Cache)
 	})
 
-	api.DELETE("/api/cache", func(c *gin.Context) {
+	api.DELETE("/api/cache", func(c *gin.Context) { // TODO: included into OpenAPI or not?
 		err := data.Cache.Clear()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -106,8 +105,12 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 		c.Status(http.StatusAccepted)
 	})
 
+	api.GET("/api-docs", func(c *gin.Context) { // https://github.com/OAI/OpenAPI-Specification/search?q=api-docs
+		c.Redirect(http.StatusFound, "static/api-docs.html")
+	})
+
 	configureHelms(api.Group("/api/helm"), data)
-	configureKubectls(api.Group("/api/kube"), data)
+	configureKubectls(api.Group("/api/k8s"), data)
 	configureScanners(api.Group("/api/scanners"), data)
 }
 
@@ -118,24 +121,26 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 		},
 	}
 
-	api.GET("/charts", h.GetReleases) // TODO: api path is misleading!
-	api.DELETE("/charts", h.Uninstall)
+	rels := api.Group("/releases")
+	rels.GET("", h.GetReleases)
+	rels.POST(":ns", h.Install)
+	rels.POST(":ns/:name", h.Upgrade)
+	rels.DELETE(":ns/:name", h.Uninstall)
+	rels.GET(":ns/:name/history", h.History)
+	rels.GET(":ns/:name/:section", h.GetInfoSection)
+	rels.GET(":ns/:name/resources", h.Resources)
+	rels.POST(":ns/:name/rollback", h.Rollback)
+	rels.POST(":ns/:name/test", h.RunTests)
 
-	api.GET("/charts/history", h.History)
-	api.GET("/charts/resources", h.Resources)
-	api.GET("/charts/:section", h.GetInfoSection)
-	api.POST("/charts/install", h.Install)
-	api.POST("/charts/tests", h.RunTests)
-	api.POST("/charts/rollback", h.Rollback)
-
-	api.GET("/repo", h.RepoList)
-	api.POST("/repo", h.RepoAdd)
-	api.DELETE("/repo", h.RepoDelete)
-	api.GET("/repo/charts", h.RepoCharts)
-	api.GET("/repo/latestver", h.RepoLatestVer)
-	api.GET("/repo/versions", h.RepoVersions)
-	api.POST("/repo/update", h.RepoUpdate)
-	api.GET("/repo/values", h.RepoValues)
+	repos := api.Group("/repositories")
+	repos.GET("", h.RepoList)
+	repos.POST("", h.RepoAdd)
+	repos.GET("/:name", h.RepoCharts)
+	repos.POST("/:name", h.RepoUpdate)
+	repos.DELETE("/:name", h.RepoDelete)
+	repos.GET("/latestver", h.RepoLatestVer) // TODO: use /versions in client insted and remove this?
+	repos.GET("/versions", h.RepoVersions)
+	repos.GET("/values", h.RepoValues)
 }
 
 func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
@@ -145,9 +150,9 @@ func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
 		},
 	}
 	api.GET("/contexts", h.GetContexts)
-	api.GET("/resources/:kind", h.GetResourceInfo)
-	api.GET("/describe/:kind", h.Describe)
-	api.GET("/namespaces", h.GetNameSpaces)
+	api.GET("/:kind/get", h.GetResourceInfo)
+	api.GET("/:kind/describe", h.Describe)
+	api.GET("/:kind/list", h.GetNameSpaces)
 }
 
 func configureStatic(api *gin.Engine) {
