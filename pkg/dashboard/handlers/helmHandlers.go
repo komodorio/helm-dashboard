@@ -139,7 +139,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 func (h *HelmHandler) Resources(c *gin.Context) {
 	h.EnableClientCache(c)
 
-	rel, _ := h.getReleaseOld(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}

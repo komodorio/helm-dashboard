@@ -149,9 +149,7 @@ function showResources(namespace, chart, revision) {
     const resBody = $("#nav-resources .body");
     const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
     resBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
-    let url = "/api/helm/charts/resources"
-    url += "?" + qstr
+    let url = "/api/helm/releases/" + namespace + "/" + chart + "/resources"
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {

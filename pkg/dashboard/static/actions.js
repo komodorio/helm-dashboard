@@ -111,7 +111,7 @@ function upgrPopUpCommon(verCur, ns, lastRev, name) {
 
     if (verCur) {
         // fill current values
-        $.get("/api/helm/charts/values?namespace=" + ns + "&revision=" + lastRev + "&name=" + name + "&flag=true").fail(function (xhr) {
+        $.get("/api/helm/releases/" + ns + "/" + name + "/values?userDefined=true&revision=" + lastRev).fail(function (xhr) {
             reportError("Failed to get charts values info", xhr)
         }).done(function (data) {
             $("#upgradeModal textarea").val(data).data("dirty", false)
@@ -296,9 +296,7 @@ $("#btnUninstall").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'));
     myModal.show()
 
-    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
-    let url = "/api/helm/charts/resources"
-    url += "?" + qstr
+    let url = "/api/helm/releases/" + namespace + "/" + chart + "/resources"
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
@@ -334,8 +332,8 @@ $("#btnRollback").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmModal'), {});
     myModal.show()
 
-    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revisionNew + "&revisionDiff=" + revisionCur
-    let url = "/api/helm/charts/manifests"
+    let qstr = "revision=" + revisionNew + "&revisionDiff=" + revisionCur
+    let url = "/api/helm/releases/"+namespace+"/"+chart+"/manifests"
     url += "?" + qstr
     $.get(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)

@@ -128,8 +128,8 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 	rels.DELETE(":ns/:name", h.Uninstall)
 	rels.GET(":ns/:name/history", h.History)
 	rels.GET(":ns/:name/:section", h.GetInfoSection)
+	rels.GET(":ns/:name/resources", h.Resources)
 
-	api.GET("/charts/resources", h.Resources)
 	api.POST("/charts/tests", h.RunTests)
 	api.POST("/charts/rollback", h.Rollback)
 

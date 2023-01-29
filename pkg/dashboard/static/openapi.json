@@ -170,6 +170,9 @@
         }
       ],
       "get": {
+        "tags": [
+          "Releases"
+        ],
         "description": "Get revision history for release",
         "responses": {
           "200": {
@@ -202,6 +205,9 @@
         }
       ],
       "get": {
+        "tags": [
+          "Releases"
+        ],
         "description": "Get manifest for release",
         "responses": {
           "200": {
@@ -239,6 +245,9 @@
         }
       ],
       "get": {
+        "tags": [
+          "Releases"
+        ],
         "description": "Get values for release",
         "responses": {
           "200": {
@@ -271,6 +280,9 @@
         }
       ],
       "get": {
+        "tags": [
+          "Releases"
+        ],
         "description": "Get textual notes for release",
         "responses": {
           "200": {
@@ -279,15 +291,33 @@
         }
       }
     },
-
-    "/api/helm/releases/{name}/resources": {
+    "/api/helm/releases/{ns}/{name}/resources": {
       "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
         {
           "name": "name",
           "in": "path",
           "description": "Name of Helm release"
         }
-      ]
+      ],
+      "get": {
+        "tags": [
+          "Releases"
+        ],
+        "description": "List of installed k8s resources for this release",
+        "responses": {
+          "200": {
+            "description": "Structured list of resources",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
     },
     "/api/helm/releases/{name}/rollback": {
       "parameters": [
