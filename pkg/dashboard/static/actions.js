@@ -368,7 +368,7 @@ $("#btnTest").click(function () {
     $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: 'POST',
-        url: "/api/helm/charts/tests" + "?namespace=" + getHashParam("namespace") + "&name=" + getHashParam("chart")
+        url: "/api/helm/releases/" + getHashParam("namespace") + "/" + getHashParam("chart") + "/test"
     }).fail(function (xhr) {
         reportError("Failed to execute test for chart", xhr)
     }).done(function (data) {

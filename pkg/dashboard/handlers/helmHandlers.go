@@ -30,26 +30,6 @@ type HelmHandler struct {
 	*Contexted
 }
 
-func (h *HelmHandler) getReleaseOld(c *gin.Context) (*objects.Release, *utils.QueryProps) { // FIXME: remove
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return nil, nil
-	}
-
-	app := h.GetApp(c)
-	if app == nil {
-		return nil, qp // sets error inside
-	}
-
-	rel, err := app.Releases.ByName(qp.Namespace, qp.Name)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return nil, qp
-	}
-	return rel, qp
-}
-
 func (h *HelmHandler) getRelease(c *gin.Context) *objects.Release {
 	app := h.GetApp(c)
 	if app == nil {
@@ -371,7 +351,7 @@ func (h *HelmHandler) iuCommon(c *gin.Context, rel *release.Release, justTemplat
 }
 
 func (h *HelmHandler) RunTests(c *gin.Context) {
-	rel, _ := h.getReleaseOld(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}

@@ -355,6 +355,28 @@
         }
       }
     },
+    "/api/helm/releases/{ns}/{name}/test": {
+      "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of Helm release"
+        }
+      ],
+      "post": {
+        "description": "Run the tests on a release",
+        "responses": {
+          "200": {
+            "description": "Logs of a test run"
+          }
+        }
+      }
+    },
     "/api/helm/repositories": {
       "get": {
         "tags": [
@@ -400,7 +422,7 @@
         }
       }
     },
-    "/api/helm/repositories/:repo": {
+    "/api/helm/repositories/{repo}": {
       "parameters": [
         {
           "name": "repo",
