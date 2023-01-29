@@ -29,7 +29,7 @@ func (h *KubeHandler) GetContexts(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -72,7 +72,7 @@ func EnhanceStatus(res *v12.Carp) {
 }
 
 func (h *KubeHandler) Describe(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return

@@ -106,7 +106,7 @@ type QueryProps struct {
 	Name      string
 }
 
-func GetQueryProps(c *gin.Context, revRequired bool) (*QueryProps, error) {
+func GetQueryProps(c *gin.Context) (*QueryProps, error) {
 	qp := QueryProps{}
 
 	qp.Namespace = c.Query("namespace")

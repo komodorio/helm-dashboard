@@ -140,7 +140,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoVersions(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -172,7 +172,7 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
