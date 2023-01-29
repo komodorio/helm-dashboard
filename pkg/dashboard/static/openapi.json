@@ -333,6 +333,9 @@
         }
       ],
       "post": {
+        "tags": [
+          "Releases"
+        ],
         "description": "Rollback the release to a previous revision",
         "requestBody": {
           "content": {
@@ -369,6 +372,9 @@
         }
       ],
       "post": {
+        "tags": [
+          "Releases"
+        ],
         "description": "Run the tests on a release",
         "responses": {
           "200": {
