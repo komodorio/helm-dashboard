@@ -36,6 +36,13 @@
       }
     },
     "/api/helm/releases/{ns}": {
+      "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace, use '[emtpy]' if you want to use k8s context default"
+        }
+      ],
       "post": {
         "tags": [
           "Releases"
@@ -48,10 +55,12 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "required": true
                   },
                   "chart": {
-                    "type": "string"
+                    "type": "string",
+                    "required": true
                   },
                   "version": {
                     "type": "string"
@@ -100,26 +109,74 @@
       "post": {
         "tags": [
           "Releases"
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Releases"
         ],
-        "description": "Uninstall",
+        "description": "Upgrade/reconfigure existing release",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "required": true
+                  },
+                  "chart": {
+                    "type": "string",
+                    "required": true
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "values": {
+                    "type": "string",
+                    "description": "Text of values.yaml to use"
+                  },
+                  "preview": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "202": {}
+          "200": {
+            "description": "In case preview=true, the preview diff is generated",
+            "content": {
+              "text/plain": {}
+            }
+          },
+          "202": {
+            "description": "In case preview=false, the actial install is performed and resulting release object is returned",
+            "content": {
+              "application/json": {}
+            }
+          }
         }
       }
     },
-    "/api/helm/releases/{name}/history": {
+    "/api/helm/releases/{ns}/{name}/history": {
       "parameters": [
+        {
+          "name": "ns",
+          "in": "path",
+          "description": "Name of kubernetes namespace"
+        },
         {
           "name": "name",
           "in": "path",
           "description": "Name of Helm release"
         }
-      ]
+      ],
+      "get": {
+        "description": "Get revision history for release",
+        "responses": {
+          "200": {
+            "description": "List of release revisions"
+          }
+        }
+      }
     },
     "/api/helm/releases/{name}/resources": {
       "parameters": [

@@ -30,7 +30,7 @@ type HelmHandler struct {
 	*Contexted
 }
 
-func (h *HelmHandler) getRelease(c *gin.Context) (*objects.Release, *utils.QueryProps) {
+func (h *HelmHandler) getReleaseOld(c *gin.Context) (*objects.Release, *utils.QueryProps) { // FIXME: remove
 	qp, err := utils.GetQueryProps(c, false)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -50,7 +50,7 @@ func (h *HelmHandler) getRelease(c *gin.Context) (*objects.Release, *utils.Query
 	return rel, qp
 }
 
-func (h *HelmHandler) getReleaseNew(c *gin.Context) *objects.Release {
+func (h *HelmHandler) getRelease(c *gin.Context) *objects.Release {
 	app := h.GetApp(c)
 	if app == nil {
 		return nil
@@ -85,7 +85,7 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 }
 
 func (h *HelmHandler) Uninstall(c *gin.Context) {
-	rel := h.getReleaseNew(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -99,7 +99,7 @@ func (h *HelmHandler) Uninstall(c *gin.Context) {
 }
 
 func (h *HelmHandler) Rollback(c *gin.Context) {
-	rel, qp := h.getRelease(c)
+	rel, qp := h.getReleaseOld(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -113,7 +113,7 @@ func (h *HelmHandler) Rollback(c *gin.Context) {
 }
 
 func (h *HelmHandler) History(c *gin.Context) {
-	rel, _ := h.getRelease(c)
+	rel := h.getRelease(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -139,7 +139,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 func (h *HelmHandler) Resources(c *gin.Context) {
 	h.EnableClientCache(c)
 
-	rel, _ := h.getRelease(c)
+	rel, _ := h.getReleaseOld(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -365,7 +365,7 @@ func (h *HelmHandler) iuCommon(c *gin.Context, rel *release.Release, justTemplat
 }
 
 func (h *HelmHandler) RunTests(c *gin.Context) {
-	rel, _ := h.getRelease(c)
+	rel, _ := h.getReleaseOld(c)
 	if rel == nil {
 		return // error state is set inside
 	}
@@ -381,7 +381,7 @@ func (h *HelmHandler) RunTests(c *gin.Context) {
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 	h.EnableClientCache(c)
 
-	rel, qp := h.getRelease(c)
+	rel, qp := h.getReleaseOld(c)
 	if rel == nil {
 		return // error state is set inside
 	}
