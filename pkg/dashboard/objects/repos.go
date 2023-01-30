@@ -176,7 +176,7 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 			v.Annotations[AnnRepo] = rep.Orig.Name
 		}
 
-		res = append(res, vers...)
+		res = append(res, vers...) // TODO filter dev versions here, relates to #139
 	}
 	return res, nil
 }
@@ -222,15 +222,15 @@ type Repository struct {
 	mx       sync.Mutex
 }
 
-func (r *Repository) IndexFileName() string {
+func (r *Repository) indexFileName() string {
 	return filepath.Join(r.Settings.RepositoryCache, helmpath.CacheIndexFile(r.Orig.Name))
 }
 
-func (r *Repository) GetIndex() (*repo.IndexFile, error) {
+func (r *Repository) getIndex() (*repo.IndexFile, error) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
-	f := r.IndexFileName()
+	f := r.indexFileName()
 	ind, err := repo.LoadIndexFile(f)
 	if err != nil {
 		return nil, errorx.Decorate(err, "Repo index is corrupt or missing. Try updating repo")
@@ -241,14 +241,14 @@ func (r *Repository) GetIndex() (*repo.IndexFile, error) {
 }
 
 func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
-	ind, err := r.GetIndex()
+	ind, err := r.getIndex()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get repo index")
 	}
 
 	res := []*repo.ChartVersion{}
 	for _, v := range ind.Entries {
-		if len(v) > 0 {
+		if len(v) > 0 { // TODO filter dev versions here, relates to #139
 			res = append(res, v[0])
 		}
 	}
@@ -257,7 +257,7 @@ func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
 }
 
 func (r *Repository) ByName(name string) (repo.ChartVersions, error) {
-	ind, err := r.GetIndex()
+	ind, err := r.getIndex()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get repo index")
 	}
