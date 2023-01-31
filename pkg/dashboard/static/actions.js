@@ -63,6 +63,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
 
     $('#upgradeModal').data("chart", chart).data("initial", !verCur)
     $('#upgradeModal form .chart-name').val(chart)
+    $('#upgradeModal').data("newManifest", "")
 
     $("#upgradeModalLabel .name").text(elm.name)
 
@@ -73,11 +74,19 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $("#upgradeModal .ver-old").show().find("span").text(verCur)
         $("#upgradeModal .rel-name").prop("disabled", true).val(name)
         $("#upgradeModal .rel-ns").prop("disabled", true).val(ns)
+
+        $.get("/api/helm/releases/" + ns + "/" + name + "/manifests").fail(function (xhr) {
+            reportError("Failed to get current manifest", xhr)
+        }).done(function (text) {
+            $('#upgradeModal').data("curManifest", text)
+        })
+
     } else {
         $("#upgradeModalLabel .type").text("Install")
         $("#upgradeModal .ver-old").hide()
         $("#upgradeModal .rel-name").prop("disabled", false).val(elm.name.split("/").pop())
         $("#upgradeModal .rel-ns").prop("disabled", false).val(ns)
+        $('#upgradeModal').data("curManifest", "")
     }
 
     if (elm.name) {
@@ -187,10 +196,15 @@ $('#upgradeModal .btn-scan').click(function () {
     const self = $(this)
 
     self.prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+
+    const form = new FormData();
+    form.append('manifest', $('#upgradeModal').data("newManifest"));
     $.ajax({
         type: "POST",
-        url: "/api/scanners/manifests" + upgradeModalURL(), // FIXME: broken
-        data: $("#upgradeModal form").serialize(),
+        url: "/api/scanners/manifests",
+        processData: false,
+        contentType: false,
+        data: form,
     }).fail(function (xhr) {
         reportError("Failed to scan the manifest", xhr)
     }).done(function (data) {
@@ -204,7 +218,7 @@ $('#upgradeModal .btn-scan').click(function () {
                 continue
             }
 
-            const pre = $("<pre></pre>").text(res.OrigReport)
+            const pre = $("<pre></pre>").text(JSON.stringify(res.OrigReport, null, 2))
 
             container.append("<h2>" + name + " Scan Results</h2>")
             container.append(pre)
@@ -243,19 +257,35 @@ function requestChangeDiff() {
     }).fail(function (xhr) {
         $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info: " + xhr.responseText + "</p>")
     }).done(function (data) {
-        diffBody.empty();
-        $("#upgradeModal .btn-confirm").prop("disabled", false)
+        $('#upgradeModal').data("newManifest", data.manifest)
 
-        const targetElement = document.getElementById('upgradeModalBody');
-        const configuration = {
-            inputFormat: 'diff', outputFormat: 'side-by-side',
-            drawFileList: false, showFiles: false, highlight: true,
-        };
-        const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
-        diff2htmlUi.draw()
-        if (!data) {
-            diffBody.html("No changes will happen to the cluster")
-        }
+        const form = new FormData();
+        form.append('a', $('#upgradeModal').data("curManifest"));
+        form.append('b', data.manifest);
+
+        $.ajax({
+            type: "POST",
+            url: "/diff",
+            processData: false,
+            contentType: false,
+            data: form,
+        }).fail(function (xhr) {
+            $("#upgradeModalBody").html("<p class='text-danger'>Failed to get upgrade info: " + xhr.responseText + "</p>")
+        }).done(function (data) {
+            diffBody.empty();
+            $("#upgradeModal .btn-confirm").prop("disabled", false)
+
+            const targetElement = document.getElementById('upgradeModalBody');
+            const configuration = {
+                inputFormat: 'diff', outputFormat: 'side-by-side',
+                drawFileList: false, showFiles: false, highlight: true,
+            };
+            const diff2htmlUi = new Diff2HtmlUI(targetElement, data, configuration);
+            diff2htmlUi.draw()
+            if (!data) {
+                diffBody.html("No changes will happen to the cluster")
+            }
+        })
     })
 }
 

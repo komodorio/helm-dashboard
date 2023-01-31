@@ -3,15 +3,14 @@ package dashboard
 import (
 	"context"
 	"embed"
-	"html"
-	"net/http"
-	"os"
-	"path"
-
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	log "github.com/sirupsen/logrus"
+	"html"
+	"net/http"
+	"os"
+	"path"
 )
 
 //go:embed static/*
@@ -105,6 +104,15 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 		c.Status(http.StatusAccepted)
 	})
 
+	api.POST("/diff", func(c *gin.Context) { // TODO: included into OpenAPI or not?
+		a := c.PostForm("a")
+		b := c.PostForm("b")
+
+		out := handlers.GetDiff(a, b, "current.yaml", "upgraded.yaml")
+		c.Header("Content-Type", "text/plain")
+		c.String(http.StatusOK, out)
+	})
+
 	api.GET("/api-docs", func(c *gin.Context) { // https://github.com/OAI/OpenAPI-Specification/search?q=api-docs
 		c.Redirect(http.StatusFound, "static/api-docs.html")
 	})
@@ -192,6 +200,6 @@ func configureScanners(api *gin.RouterGroup, data *objects.DataLayer) {
 		},
 	}
 	api.GET("", h.List)
-	api.POST("/manifests", h.ScanDraftManifest)
+	api.POST("/manifests", h.ScanManifest)
 	api.GET("/resource/:kind", h.ScanResource)
 }

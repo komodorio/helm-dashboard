@@ -1,14 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"sort"
-	"strconv"
-	"strings"
-
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
@@ -21,6 +15,9 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
+	"net/http"
+	"sort"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
@@ -302,7 +299,11 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		return
 	}
 
-	h.iuCommon(c, rel, justTemplate, "")
+	if justTemplate {
+		c.IndentedJSON(http.StatusOK, rel)
+	} else {
+		c.IndentedJSON(http.StatusAccepted, rel)
+	}
 }
 
 func (h *HelmHandler) Upgrade(c *gin.Context) {
@@ -331,22 +332,10 @@ func (h *HelmHandler) Upgrade(c *gin.Context) {
 		return
 	}
 
-	h.iuCommon(c, rel, justTemplate, existing.Orig.Manifest)
-}
-
-func (h *HelmHandler) iuCommon(c *gin.Context, rel *release.Release, justTemplate bool, manifests string) {
 	if justTemplate {
-		out := GetDiff(strings.TrimSpace(manifests), strings.TrimSpace(rel.Manifest), "current.yaml", "upgraded.yaml")
-		c.Header("Content-Type", "text/plain")
-		c.String(http.StatusOK, out)
+		c.IndentedJSON(http.StatusOK, rel)
 	} else {
-		c.Header("Content-Type", "application/json")
-		enc, err := json.Marshal(rel)
-		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.String(http.StatusAccepted, string(enc))
+		c.IndentedJSON(http.StatusAccepted, rel)
 	}
 }
 
@@ -365,7 +354,9 @@ func (h *HelmHandler) RunTests(c *gin.Context) {
 }
 
 func (h *HelmHandler) GetInfoSection(c *gin.Context) {
-	h.EnableClientCache(c)
+	if c.Query("revision") != "" { // don't cache if latest is requested
+		h.EnableClientCache(c)
+	}
 
 	rel := h.getRelease(c)
 	if rel == nil {
@@ -373,7 +364,7 @@ func (h *HelmHandler) GetInfoSection(c *gin.Context) {
 	}
 
 	revn, err := strconv.Atoi(c.Query("revision"))
-	if err != nil {
+	if c.Query("revision") != "" && err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

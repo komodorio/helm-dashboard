@@ -662,38 +662,16 @@
         "tags": [
           "Scanners"
         ],
-        "description": "Generate manifests for specified configuration and scan using all applicable scanners",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "namespace",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "name",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "chart",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": true
-          }
-        ],
+        "description": "Scan manifests using all applicable scanners",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "values": {
+                  "manifest": {
                     "type": "string",
-                    "description": "Text of values.yaml to use"
+                    "description": "Text of manifest to scan"
                   }
                 }
               }
@@ -702,7 +680,7 @@
         },
         "responses": {
           "200": {
-            "description": "Map of problems per scanner type"
+            "description": "Map of scan results per scanner type"
           }
         }
       }

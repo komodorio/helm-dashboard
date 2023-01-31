@@ -272,6 +272,10 @@ func (r *Release) ParsedManifests() ([]*v1.Carp, error) {
 }
 
 func (r *Release) GetRev(revNo int) (*Release, error) {
+	if revNo == 0 {
+		revNo = r.Orig.Version
+	}
+
 	hist, err := r.History()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get history")

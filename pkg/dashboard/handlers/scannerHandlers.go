@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	"gopkg.in/yaml.v3"
 	"net/http"
 )
 
@@ -27,35 +26,10 @@ func (h *ScannersHandler) List(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
-func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	app := h.GetApp(c)
-	if app == nil {
-		return // sets error inside
-	}
-
-	values := map[string]interface{}{}
-	err = yaml.Unmarshal([]byte(c.PostForm("values")), &values)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	// TODO: should just accept the manifest instead of generating it itself
-	mnf, err := app.Releases.Install(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, values)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
+func (h *ScannersHandler) ScanManifest(c *gin.Context) {
 	reps := map[string]*subproc.ScanResults{}
 	for _, scanner := range h.Data.Scanners {
-		sr, err := scanner.ScanManifests(mnf.Manifest)
+		sr, err := scanner.ScanManifests(c.PostForm("manifest"))
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
