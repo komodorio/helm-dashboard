@@ -13,6 +13,8 @@ metadata:
 spec:
   {{- if .Values.dashboard.persistence.hostPath }}
   storageClassName: ""
+  {{- else }}
+  storageClassName: "{{ .Values.dashboard.persistence.storageClass }}"
   {{- end }}
   accessModes:
   {{- if not (empty .Values.dashboard.persistence.accessModes) }}
