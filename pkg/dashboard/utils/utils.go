@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"errors"
+	"helm.sh/helm/v3/pkg/release"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -116,4 +117,15 @@ func GetQueryProps(c *gin.Context) (*QueryProps, error) {
 	}
 
 	return &qp, nil
+}
+
+func ReleaseHasTests(o *release.Release) bool {
+	for _, h := range o.Hooks {
+		for _, e := range h.Events {
+			if e == release.HookTest {
+				return true
+			}
+		}
+	}
+	return false
 }

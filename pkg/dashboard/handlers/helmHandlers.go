@@ -543,6 +543,7 @@ func HReleaseToJSON(o *release.Release) *ReleaseElement {
 		AppVersion:  o.Chart.AppVersion(),
 		Icon:        o.Chart.Metadata.Icon,
 		Description: o.Chart.Metadata.Description,
+		HasTests:    utils.ReleaseHasTests(o),
 	}
 }
 
@@ -556,6 +557,7 @@ type ReleaseElement struct {
 	AppVersion  string         `json:"app_version"`
 	Icon        string         `json:"icon"`
 	Description string         `json:"description"`
+	HasTests    bool           `json:"has_tests"`
 }
 
 type RepositoryElement struct {
