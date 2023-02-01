@@ -20,14 +20,16 @@ version.
 This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision of
 helping Kubernetes users to navigate and troubleshoot their clusters, the project is **NOT** an offical project by the [helm team](https://helm.sh/).
 
-Some of the key capabilities of the tool:
+Key capabilities of the tool:
 
-- See all installed charts and their revision history
+- See all installed charts and their revision history 
 - See manifest diff of the past revisions
 - Browse k8s resources resulting from the chart
 - Easy rollback or upgrade version with a clear and easy manifest diff
 - Integration with popular problem scanners
 - Easy switch between multiple clusters
+- Can be used locally, or installed into Kubernetes cluster
+- Does not require Helm or Kubectl installed
 
 ## Setup
 
