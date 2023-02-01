@@ -54,7 +54,8 @@
                             <button class="dropdown-item" id="cacheClear"><i
                                     class="bi-arrow-repeat"></i> Reset Cache
                             </button>
-                        </li>
+                        <li><a class="dropdown-item" href="api-docs" target="_blank"><i
+                                class="bi-braces"></i> REST API</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -194,7 +195,7 @@
                     <button id="btnRollback" class="btn btn-sm  btn-light bg-white border border-secondary me-2"
                             title="Rollback to this revision"><i class="bi-arrow-repeat"></i> <span>Rollback</span>
                     </button>
-                    <button id="btnTest" class="btn btn-sm btn-light bg-white  border border-secondary"
+                    <button id="btnTest" class="btn btn-sm btn-light bg-white  border border-secondary me-2 display-none"
                             title="Run tests for this chart"><i class="bi-check-circle"></i> <span>Run tests</span>
                     </button>
                     <button id="btnUninstall" class="btn btn-sm btn-light bg-white  border border-secondary"
@@ -367,14 +368,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form class="modal-body border-bottom fs-5" enctype="multipart/form-data">
+                <input name="preview" type="hidden" class="preview-mode"/>
+                <input name="chart" type="hidden" class="chart-name"/>
                 <div class="input-group mb-3 text-muted">
                     <label class="form-label me-4 text-dark">Version to install: <select
-                            class='fw-bold text-success ver-new'></select></label> <span class="ver-old">(current version is <span
+                            class='fw-bold text-success ver-new' name="version"></select></label> <span class="ver-old">(current version is <span
                         class='text-success ms-1'>0.0.0</span>)</span>
                 </div>
                 <div class="input-group mb-3 text-muted">
                     <label class="form-label me-4 text-dark">
-                        Release Name: <input class="form-control rel-name">
+                        Release Name: <input class="form-control rel-name" name="name">
                     </label>
                     <label class="form-label me-4 text-dark">
                         Namespace (optional):

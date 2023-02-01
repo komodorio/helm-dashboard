@@ -2,6 +2,8 @@ package scanners
 
 import (
 	"encoding/json"
+	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/olekukonko/tablewriter"
@@ -11,7 +13,7 @@ import (
 )
 
 type Checkov struct {
-	Data *subproc.DataLayer
+	Data *objects.DataLayer
 }
 
 func (c *Checkov) ManifestIsScannable() bool {
@@ -77,7 +79,7 @@ func (c *Checkov) ScanManifests(mnf string) (*subproc.ScanResults, error) {
 
 	res := &subproc.ScanResults{}
 
-	err = json.Unmarshal([]byte(out), res.OrigReport)
+	err = json.Unmarshal([]byte(out), &res.OrigReport)
 	if err != nil {
 		return nil, err
 	}
@@ -89,14 +91,19 @@ func (c *Checkov) ScanResource(ns string, kind string, name string) (*subproc.Sc
 	carp := v1.Carp{}
 	carp.Kind = kind
 	carp.Name = name
-	mnf, err := c.Data.GetResourceYAML(ns, &carp)
+	app, err := c.Data.AppForCtx(c.Data.KubeContext)
 	if err != nil {
-		return nil, err
+		return nil, errorx.Decorate(err, "failed to get app for context")
+	}
+
+	mnf, err := app.K8s.GetResourceYAML(kind, ns, name)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get YAML for resource")
 	}
 
 	fname, fclose, err := utils.TempFile(mnf)
 	if err != nil {
-		return nil, err
+		return nil, errorx.Decorate(err, "failed to create temporary file")
 	}
 	defer fclose()
 

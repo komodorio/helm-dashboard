@@ -2,13 +2,13 @@ function loadRepoView() {
     $("#sectionRepo .repo-details").hide()
     $("#sectionRepo").show()
 
-    $.getJSON("/api/helm/repo").fail(function (xhr) {
+    $.getJSON("/api/helm/repositories").fail(function (xhr) {
         reportError("Failed to get list of repositories", xhr)
         sendStats('Get repo', {'status': 'fail'});
     }).done(function (data) {
         const items = $("#sectionRepo .repo-list ul").empty()
         data.sort((a, b) => (a.name > b.name) - (a.name < b.name))
-        
+
         data.forEach(function (elm) {
             let opt = $('<li class="mb-2"><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
             opt.attr('title', elm.url)
@@ -20,7 +20,7 @@ function loadRepoView() {
         if (!data.length) {
             items.text("No repositories found, try adding one")
         }
-        sendStats('Get repo', {'status': 'success', length:data.length});
+        sendStats('Get repo', {'status': 'success', length: data.length});
         items.find("input").click(function () {
             $("#inputSearch").val('')
             const self = $(this)
@@ -31,7 +31,7 @@ function loadRepoView() {
             $("#sectionRepo .repo-details .url").text(elm.url)
 
             $("#sectionRepo .repo-details ul").html('<span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true"></span>')
-            $.getJSON("/api/helm/repo/charts?name=" + elm.name).fail(function (xhr) {
+            $.getJSON("/api/helm/repositories/" + elm.name).fail(function (xhr) {
                 reportError("Failed to get list of charts in repo", xhr)
             }).done(function (data) {
                 $("#sectionRepo .repo-details ul").empty()
@@ -42,6 +42,11 @@ function loadRepoView() {
                         <div class="col-1 py-2">` + elm.version + `</div>
                         <div class="col-1 action text-nowrap"><button class="btn btn-sm border-secondary bg-white">Install</button></div>
                     </li>`)
+
+                    if (elm.icon) {
+                        li.find("h6").prepend('<img src="' + elm.icon + '" class="me-1" style="height: 1rem"/>')
+                    }
+
                     li.data("item", elm)
 
                     if (elm.installed_namespace) {
@@ -86,7 +91,7 @@ $("#repoAddModal .btn-confirm").click(function () {
     $("#repoAddModal .btn-confirm").prop("disabled", true).prepend('<span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: 'POST',
-        url: "/api/helm/repo",
+        url: "/api/helm/repositories",
         data: $("#repoAddModal form").serialize(),
     }).fail(function (xhr) {
         reportError("Failed to add repo", xhr)
@@ -100,7 +105,7 @@ $("#sectionRepo .btn-remove").click(function () {
     if (confirm("Confirm removing repository?")) {
         $.ajax({
             type: 'DELETE',
-            url: "/api/helm/repo?name=" + $("#sectionRepo .repo-details h2").text(),
+            url: "/api/helm/repositories/" + $("#sectionRepo .repo-details h2").text(),
         }).fail(function (xhr) {
             reportError("Failed to add repo", xhr)
         }).done(function () {
@@ -114,7 +119,7 @@ $("#sectionRepo .btn-update").click(function () {
     $("#sectionRepo .btn-update i").removeClass("bi-arrow-repeat").append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
     $.ajax({
         type: 'POST',
-        url: "/api/helm/repo/update?name=" + $("#sectionRepo .repo-details h2").text(),
+        url: "/api/helm/repositories/" + $("#sectionRepo .repo-details h2").text(),
     }).fail(function (xhr) {
         reportError("Failed to add repo", xhr)
     }).done(function () {
@@ -132,8 +137,11 @@ function repoChartClicked() {
         window.location.reload()
     } else {
         const contexts = $("body").data("contexts")
-        const ctxFiltered = contexts.filter(obj => {return obj.Name === getHashParam("context")});
-        const contextNamespace = ctxFiltered.length?ctxFiltered[0].Namespace:""
+        const ctxFiltered = contexts.filter(obj => {
+            return obj.Name === getHashParam("context")
+        });
+        const contextNamespace = ctxFiltered.length ? ctxFiltered[0].Namespace : ""
+        elm.repository = $("#sectionRepo .repo-details h2").text()
         popUpUpgrade(elm, contextNamespace)
     }
 }

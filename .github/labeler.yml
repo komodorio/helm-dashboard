@@ -60,5 +60,9 @@ release:
 scanners:
   - pkg/dashboard/scanners/*
 
+tests:
+  - pkg/dashboard/**/*_test.go
+  - pkg/dashboard/objects/testdata/*
+
 frontend:
   - pkg/dashboard/static/*

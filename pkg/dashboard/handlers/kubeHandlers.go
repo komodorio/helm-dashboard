@@ -1,20 +1,25 @@
 package handlers
 
 import (
+	"github.com/joomcode/errorx"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
 
 type KubeHandler struct {
-	Data *subproc.DataLayer
+	*Contexted
 }
 
 func (h *KubeHandler) GetContexts(c *gin.Context) {
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
 	res, err := h.Data.ListContexts()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
@@ -24,21 +29,33 @@ func (h *KubeHandler) GetContexts(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	res, err := h.Data.GetResource(qp.Namespace, &v12.Carp{
-		TypeMeta:   v1.TypeMeta{Kind: c.Param("kind")},
-		ObjectMeta: v1.ObjectMeta{Name: qp.Name},
-	})
-	if err != nil {
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	res, err := app.K8s.GetResourceInfo(c.Param("kind"), qp.Namespace, qp.Name)
+	if errors.IsNotFound(err) {
+		res = &v12.Carp{Status: v12.CarpStatus{Phase: "NotFound", Message: err.Error()}}
+		//_ = c.AbortWithError(http.StatusNotFound, err)
+		//return
+	} else if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
+	EnhanceStatus(res)
+
+	c.IndentedJSON(http.StatusOK, res)
+}
+
+func EnhanceStatus(res *v12.Carp) {
 	// custom logic to provide most meaningful status for the resource
 	if res.Status.Phase == "Active" || res.Status.Phase == "Error" {
 		_ = res.Name + ""
@@ -52,18 +69,21 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 	} else if res.Status.Phase == "" {
 		res.Status.Phase = "Exists"
 	}
-
-	c.IndentedJSON(http.StatusOK, res)
 }
 
 func (h *KubeHandler) Describe(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	res, err := h.Data.DescribeResource(qp.Namespace, c.Param("kind"), qp.Name)
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	res, err := app.K8s.DescribeResource(c.Param("kind"), qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -73,11 +93,21 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 }
 
 func (h *KubeHandler) GetNameSpaces(c *gin.Context) {
-	res, err := h.Data.GetNameSpaces()
+	if c.Param("kind") != "namespaces" {
+		_ = c.AbortWithError(http.StatusBadRequest, errorx.AssertionFailed.New("Only 'namespaces' kind is allowed for listing"))
+		return
+	}
+
+	app := h.GetApp(c)
+	if app == nil {
+		return // sets error inside
+	}
+
+	res, err := app.K8s.GetNameSpaces()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.IndentedJSON(http.StatusOK, res)
 }

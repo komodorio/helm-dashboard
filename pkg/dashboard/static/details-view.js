@@ -55,17 +55,17 @@ function loadContentWrapper() {
     loadContent(getHashParam("tab"), getHashParam("namespace"), getHashParam("chart"), revision, revDiff, flag)
 }
 
-function loadContent(mode, namespace, name, revision, revDiff, flag) {
-    let qstr = "name=" + name + "&namespace=" + namespace + "&revision=" + revision
+function loadContent(mode, namespace, name, revision, revDiff, userDefined) {
+    let qstr = "revision=" + revision
     if (revDiff) {
         qstr += "&revisionDiff=" + revDiff
     }
 
-    if (flag) {
-        qstr += "&flag=" + flag
+    if (userDefined) {
+        qstr += "&userDefined=" + userDefined
     }
 
-    let url = "/api/helm/charts/" + mode
+    let url = "/api/helm/releases/" + namespace + "/" + name + "/" + mode
     url += "?" + qstr
     const diffDisplay = $("#manifestText");
     diffDisplay.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
@@ -149,9 +149,7 @@ function showResources(namespace, chart, revision) {
     const resBody = $("#nav-resources .body");
     const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
     resBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-    let qstr = "name=" + chart + "&namespace=" + namespace + "&revision=" + revision
-    let url = "/api/helm/charts/resources"
-    url += "?" + qstr
+    let url = "/api/helm/releases/" + namespace + "/" + chart + "/resources"
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
@@ -182,7 +180,7 @@ function showResources(namespace, chart, revision) {
 
             resBody.append(resBlock)
             let ns = res.metadata.namespace ? res.metadata.namespace : namespace
-            $.getJSON("/api/kube/resources/" + res.kind.toLowerCase() + "?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
+            $.getJSON("/api/k8s/" + res.kind.toLowerCase() + "/get?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
                 //reportError("Failed to get list of resources")
             }).done(function (data) {
                 const badge = $("<span class='badge me-2 fw-normal'></span>").text(data.status.phase);
@@ -228,7 +226,7 @@ function getStatusMessage(status) {
     }
     if (status.conditions) {
         return status.conditions[0].message || status.conditions[0].reason
-    } 
+    }
     return status.message || status.reason
 }
 
@@ -239,7 +237,7 @@ function showDescribe(ns, kind, name, badge) {
 
     const myModal = new bootstrap.Offcanvas(document.getElementById('describeModal'));
     myModal.show()
-    $.get("/api/kube/describe/" + kind.toLowerCase() + "?name=" + name + "&namespace=" + ns).fail(function (xhr) {
+    $.get("/api/k8s/" + kind.toLowerCase() + "/describe?name=" + name + "&namespace=" + ns).fail(function (xhr) {
         reportError("Failed to describe resource", xhr)
     }).done(function (data) {
         data = hljs.highlight(data, {language: 'yaml'}).value

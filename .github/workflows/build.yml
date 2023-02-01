@@ -4,7 +4,7 @@ on:
   push:
     branches: main
   pull_request:
-    branches: main
+    branches: "*"
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
           go-version: 1.18
       - name: Unit tests
         run: |
-          go test -v -race ./... # Run all the tests with the race detector enabled
+          go test -v -race ./... -covermode=atomic # Run all the tests with the race detector enabled
       - name: Static analysis
         run: |
           go vet ./... # go vet is the official Go static analyzer
@@ -34,7 +34,7 @@ jobs:
       - name: Test Binary is Runnable
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3.2.0
+        uses: golangci/golangci-lint-action@v3.3.1
         with:
           # version: latest
           # skip-go-installation: true

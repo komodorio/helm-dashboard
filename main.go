@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
@@ -23,8 +27,8 @@ type options struct {
 	NoBrowser  bool   `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
 	NoTracking bool   `long:"no-analytics" description:"Disable user analytics (GA, DataDog etc.)"`
 	BindHost   string `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
-	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`  // TODO: better default port to clash less?
-	Namespace  string `short:"n" long:"namespace" description:"Limit operations to a specific namespace"`
+	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`
+	Namespace  string `short:"n" long:"namespace" description:"Namespace for HELM operations"`
 }
 
 func main() {
@@ -42,12 +46,26 @@ func main() {
 
 	server := dashboard.Server{
 		Version:    version,
-		Namespace:  opts.Namespace,
+		Namespaces: strings.Split(opts.Namespace, ","),
 		Address:    fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
 		Debug:      opts.Verbose,
 		NoTracking: opts.NoTracking,
 	}
-	address, webServerDone := server.StartServer()
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	osSignal := make(chan os.Signal, 1)
+	signal.Notify(osSignal, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		oscall := <-osSignal
+		log.Warnf("Stopping on signal: %s\n", oscall)
+		cancel()
+	}()
+
+	address, webServerDone, err := server.StartServer(ctx, cancel)
+	if err != nil {
+		log.Fatalf("Failed to start Helm Dashboard: %+v", err)
+	}
 
 	if !opts.NoTracking {
 		log.Infof("User analytics is collected to improve the quality, disable it with --no-analytics")
@@ -69,7 +87,7 @@ func main() {
 
 func parseFlags() options {
 	ns := os.Getenv("HELM_NAMESPACE")
-	if ns == "default" {
+	if ns == "default" { // it's how Helm passes to plugin the empty NS, we have to reset it back
 		ns = ""
 	}
 
@@ -92,7 +110,8 @@ func parseFlags() options {
 	}
 
 	if len(args) > 0 {
-		panic("The program does not take argumants, see --help for usage")
+		fmt.Println("The program does not take arguments, see --help for usage")
+		os.Exit(1)
 	}
 	return opts
 }

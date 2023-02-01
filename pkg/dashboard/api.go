@@ -1,23 +1,25 @@
 package dashboard
 
 import (
+	"context"
 	"embed"
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	log "github.com/sirupsen/logrus"
+	"html"
 	"net/http"
 	"os"
 	"path"
-
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	log "github.com/sirupsen/logrus"
 )
 
 //go:embed static/*
 var staticFS embed.FS
 
 func noCache(c *gin.Context) {
-	c.Header("Cache-Control", "no-cache")
+	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
+		c.Header("Cache-Control", "no-cache")
+	}
 	c.Next()
 }
 
@@ -26,33 +28,39 @@ func errorHandler(c *gin.Context) {
 
 	errs := ""
 	for _, err := range c.Errors {
-		log.Debugf("Error: %s", err)
+		log.Debugf("Error: %+v", err)
 		errs += err.Error() + "\n"
 	}
 
 	if errs != "" {
-		c.String(http.StatusInternalServerError, errs)
+		c.String(http.StatusInternalServerError, html.EscapeString(errs))
 	}
 }
 
-func contextSetter(data *subproc.DataLayer) gin.HandlerFunc {
+func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctxName := ""
 		if ctx, ok := c.Request.Header["X-Kubecontext"]; ok {
-			log.Debugf("Setting current context to: %s", ctx)
-			if data.KubeContext != ctx[0] {
-				err := data.Cache.Clear()
-				if err != nil {
-					_ = c.AbortWithError(http.StatusBadRequest, err)
-					return
-				}
+			ctxName = ctx[0]
+			if err := data.SetContext(ctxName); err != nil {
+				c.String(http.StatusInternalServerError, err.Error())
+				return
 			}
-			data.KubeContext = ctx[0]
 		}
+
+		app, err := data.AppForCtx(ctxName)
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.Set(handlers.APP, app)
+
 		c.Next()
 	}
 }
 
-func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) *gin.Engine {
+func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
 	if debug {
 		api = gin.New()
@@ -71,10 +79,10 @@ func NewRouter(abortWeb utils.ControlChan, data *subproc.DataLayer, debug bool) 
 	return api
 }
 
-func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *gin.Engine) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
-		abortWeb <- struct{}{}
+		abortWeb()
 		c.Status(http.StatusAccepted)
 	})
 
@@ -83,11 +91,11 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 		c.IndentedJSON(http.StatusOK, data.GetStatus())
 	})
 
-	api.GET("/api/cache", func(c *gin.Context) {
+	api.GET("/api/cache", func(c *gin.Context) { // TODO: included into OpenAPI or not?
 		c.IndentedJSON(http.StatusOK, data.Cache)
 	})
 
-	api.DELETE("/api/cache", func(c *gin.Context) {
+	api.DELETE("/api/cache", func(c *gin.Context) { // TODO: included into OpenAPI or not?
 		err := data.Cache.Clear()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
@@ -96,40 +104,63 @@ func configureRoutes(abortWeb utils.ControlChan, data *subproc.DataLayer, api *g
 		c.Status(http.StatusAccepted)
 	})
 
+	api.POST("/diff", func(c *gin.Context) { // TODO: included into OpenAPI or not?
+		a := c.PostForm("a")
+		b := c.PostForm("b")
+
+		out := handlers.GetDiff(a, b, "current.yaml", "upgraded.yaml")
+		c.Header("Content-Type", "text/plain")
+		c.String(http.StatusOK, out)
+	})
+
+	api.GET("/api-docs", func(c *gin.Context) { // https://github.com/OAI/OpenAPI-Specification/search?q=api-docs
+		c.Redirect(http.StatusFound, "static/api-docs.html")
+	})
+
 	configureHelms(api.Group("/api/helm"), data)
-	configureKubectls(api.Group("/api/kube"), data)
+	configureKubectls(api.Group("/api/k8s"), data)
 	configureScanners(api.Group("/api/scanners"), data)
 }
 
-func configureHelms(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.HelmHandler{Data: data}
+func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
+	h := handlers.HelmHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 
-	api.GET("/charts", h.GetCharts)
-	api.DELETE("/charts", h.Uninstall)
+	rels := api.Group("/releases")
+	rels.GET("", h.GetReleases)
+	rels.POST(":ns", h.Install)
+	rels.POST(":ns/:name", h.Upgrade)
+	rels.DELETE(":ns/:name", h.Uninstall)
+	rels.GET(":ns/:name/history", h.History)
+	rels.GET(":ns/:name/:section", h.GetInfoSection)
+	rels.GET(":ns/:name/resources", h.Resources)
+	rels.POST(":ns/:name/rollback", h.Rollback)
+	rels.POST(":ns/:name/test", h.RunTests)
 
-	api.GET("/charts/history", h.History)
-	api.GET("/charts/resources", h.Resources)
-	api.GET("/charts/:section", h.GetInfoSection)
-	api.GET("/charts/show", h.Show)
-	api.POST("/charts/install", h.Install)
-	api.POST("/charts/tests", h.Tests)
-	api.POST("/charts/rollback", h.Rollback)
-
-	api.GET("/repo", h.RepoList)
-	api.POST("/repo", h.RepoAdd)
-	api.DELETE("/repo", h.RepoDelete)
-	api.GET("/repo/charts", h.RepoCharts)
-	api.GET("/repo/search", h.RepoSearch)
-	api.POST("/repo/update", h.RepoUpdate)
-	api.GET("/repo/values", h.RepoValues)
+	repos := api.Group("/repositories")
+	repos.GET("", h.RepoList)
+	repos.POST("", h.RepoAdd)
+	repos.GET("/:name", h.RepoCharts)
+	repos.POST("/:name", h.RepoUpdate)
+	repos.DELETE("/:name", h.RepoDelete)
+	repos.GET("/latestver", h.RepoLatestVer) // TODO: use /versions in client insted and remove this?
+	repos.GET("/versions", h.RepoVersions)
+	repos.GET("/values", h.RepoValues)
 }
 
-func configureKubectls(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.KubeHandler{Data: data}
+func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
+	h := handlers.KubeHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 	api.GET("/contexts", h.GetContexts)
-	api.GET("/resources/:kind", h.GetResourceInfo)
-	api.GET("/describe/:kind", h.Describe)
-	api.GET("/namespaces", h.GetNameSpaces)
+	api.GET("/:kind/get", h.GetResourceInfo)
+	api.GET("/:kind/describe", h.Describe)
+	api.GET("/:kind/list", h.GetNameSpaces)
 }
 
 func configureStatic(api *gin.Engine) {
@@ -162,9 +193,13 @@ func configureStatic(api *gin.Engine) {
 	}
 }
 
-func configureScanners(api *gin.RouterGroup, data *subproc.DataLayer) {
-	h := handlers.ScannersHandler{Data: data}
+func configureScanners(api *gin.RouterGroup, data *objects.DataLayer) {
+	h := handlers.ScannersHandler{
+		Contexted: &handlers.Contexted{
+			Data: data,
+		},
+	}
 	api.GET("", h.List)
-	api.POST("/manifests", h.ScanDraftManifest)
+	api.POST("/manifests", h.ScanManifest)
 	api.GET("/resource/:kind", h.ScanResource)
 }

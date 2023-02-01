@@ -1,6 +1,7 @@
 package scanners
 
 import (
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
@@ -9,7 +10,7 @@ import (
 )
 
 type Trivy struct {
-	Data *subproc.DataLayer
+	Data *objects.DataLayer
 }
 
 func (c *Trivy) ManifestIsScannable() bool {

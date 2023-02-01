@@ -12,6 +12,8 @@ helm upgrade --install my-release komodorio/helm-dashboard
 
 This chart bootstraps a Helm Dashboard deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
+While installed inside cluster, Helm Dashboard will run some additional backgroud actions, for example, will automatically update Helm repositories. To enable that behavior locally, set `HD_CLUSTER_MODE` env variable.
+
 ## Prerequisites
 
 - Kubernetes 1.16+

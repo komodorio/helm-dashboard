@@ -4,7 +4,7 @@ VERSION ?= $(git describe --tags --always --dirty --match=v* 2> /dev/null || \
 
 .PHONY: test
 test: ; $(info $(M) start unit testing...) @
-	@go test $$(go list ./... | grep -v /mocks/) --race -v -short -coverprofile=profile.cov
+	@go test $$(go list ./... | grep -v /mocks/) --race -v -short -coverpkg=./... -coverprofile=profile.cov
 	@echo "\n*****************************"
 	@echo "**  TOTAL COVERAGE: $$(go tool cover -func profile.cov | grep total | grep -Eo '[0-9]+\.[0-9]+')%  **"
 	@echo "*****************************\n"

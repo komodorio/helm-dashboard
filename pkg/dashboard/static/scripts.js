@@ -45,7 +45,7 @@ function fillClusters(limNS) {
         filterInstalledList($("#installedList .body .row"))
     })
 
-    $.getJSON("/api/kube/contexts").fail(function (xhr) {
+    $.getJSON("/api/k8s/contexts").fail(function (xhr) {
         sendStats('contexts', {'status': 'fail'});
         reportError("Failed to get list of clusters", xhr)
     }).done(function (data) {
@@ -54,7 +54,7 @@ function fillClusters(limNS) {
         data.sort((a, b) => (getCleanClusterName(a.Name) > getCleanClusterName(b.Name)) - (getCleanClusterName(a.Name) < getCleanClusterName(b.Name)))
         fillClusterList(data, context);
         sendStats('contexts', {'status': 'success', length: data.length});
-        $.getJSON("/api/kube/namespaces").fail(function (xhr) {
+        $.getJSON("/api/k8s/namespaces/list").fail(function (xhr) {
             reportError("Failed to get namespaces", xhr)
         }).done(function (res) {
             const ns = res.items.map(i => i.metadata.name)

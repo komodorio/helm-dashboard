@@ -8,7 +8,7 @@ import (
 )
 
 type ScannersHandler struct {
-	Data *subproc.DataLayer
+	*Contexted
 }
 
 func (h *ScannersHandler) List(c *gin.Context) {
@@ -26,23 +26,10 @@ func (h *ScannersHandler) List(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
-func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	reuseVals := c.Query("initial") != "true"
-	mnf, err := h.Data.ChartInstall(qp.Namespace, qp.Name, c.Query("chart"), c.Query("version"), true, c.PostForm("values"), reuseVals)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
+func (h *ScannersHandler) ScanManifest(c *gin.Context) {
 	reps := map[string]*subproc.ScanResults{}
 	for _, scanner := range h.Data.Scanners {
-		sr, err := scanner.ScanManifests(mnf)
+		sr, err := scanner.ScanManifests(c.PostForm("manifest"))
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -55,7 +42,7 @@ func (h *ScannersHandler) ScanDraftManifest(c *gin.Context) {
 }
 
 func (h *ScannersHandler) ScanResource(c *gin.Context) {
-	qp, err := utils.GetQueryProps(c, false)
+	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 		return

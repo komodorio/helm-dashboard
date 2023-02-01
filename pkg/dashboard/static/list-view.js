@@ -3,7 +3,7 @@ function loadChartsList() {
     $("#sectionList").show()
     const chartsCards = $("#installedList .body")
     chartsCards.empty().append("<div><span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Loading...</div>")
-    $.getJSON("/api/helm/charts").fail(function (xhr) {
+    $.getJSON("/api/helm/releases").fail(function (xhr) {
         sendStats('Get releases', {'status': 'failed'});
         reportError("Failed to get list of charts", xhr)
         chartsCards.empty().append("<div class=\"row m-0 py-4 bg-white rounded-1 b-shadow border-4 border-start\"><div class=\"col\">Failed to get list of charts</div></div>")
@@ -44,43 +44,13 @@ function buildChartCard(elm) {
             <div class="col-1 rel-date text-nowrap"><span>today</span><div>Updated</div></div>
         </div>`)
 
-    let chartName = elm.chart
-    let match = null
-    // semver2 regex , add optional v prefix
-    const chartNameRegex = 'v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'
-    if (!new RegExp(chartNameRegex).test(chartName)) {
-        alert('Chart name does not match chart name regex.')
-    } else {
-        match = chartName.match(chartNameRegex);
+    if (elm.icon) {
+        card.find(".rel-name").attr("style", "background-image: url(" + elm.icon + ")")
     }
 
-    if (match) {
-        chartName = elm.chart.substring(0, match.index - 1)
-    } else {
-        // fall back to simple substr
-        chartName = elm.chart.substring(0, elm.chart.lastIndexOf("-"))
+    if (elm.description) {
+        card.find(".rel-name div").text(elm.description)
     }
-    $.getJSON("/api/helm/repo/search?name=" + chartName).fail(function (xhr) {
-        // we're ok if we can't show icon and description
-        console.log("Failed to get repo name for charts", xhr)
-    }).done(function (data) {
-        if (data.length > 0) {
-            $.getJSON("/api/helm/charts/show?name=" + data[0].name).fail(function (xhr) {
-                console.log("Failed to get chart", xhr)
-            }).done(function (data) {
-                if (data) {
-                    const res = data[0];
-                    if (res.icon) {
-                        card.find(".rel-name").attr("style", "background-image: url(" + res.icon + ")")
-                    }
-                    if (res.description) {
-                        card.find(".rel-name div").text(res.description)
-                    }
-                }
-
-            })
-        }
-    })
 
     card.find(".rel-name span").text(elm.name)
     card.find(".rel-rev span").text("#" + elm.revision)
