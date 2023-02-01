@@ -195,7 +195,8 @@
                     <button id="btnRollback" class="btn btn-sm  btn-light bg-white border border-secondary me-2"
                             title="Rollback to this revision"><i class="bi-arrow-repeat"></i> <span>Rollback</span>
                     </button>
-                    <button id="btnTest" class="btn btn-sm btn-light bg-white  border border-secondary me-2 display-none"
+                    <button id="btnTest"
+                            class="btn btn-sm btn-light bg-white  border border-secondary me-2 display-none"
                             title="Run tests for this chart"><i class="bi-check-circle"></i> <span>Run tests</span>
                     </button>
                     <button id="btnUninstall" class="btn btn-sm btn-light bg-white  border border-secondary"
@@ -477,6 +478,48 @@
 <script src="static/details-view.js"></script>
 <script src="static/actions.js"></script>
 <script src="static/scripts.js"></script>
+
+<!-- BANNER START -->
+<a id="banner"
+   href="https://helm-dashboard-survey.komodor.com/"
+   class="display-none position-absolute top-0 start-50 translate-middle-x bg-primary text-light rounded px-2 mt-1 text-decoration-none py-1">Help
+    shaping the future by participating in user survey <b class="bi-x-lg"></b></a>
+<script>
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            const c = ca[i].trim();
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length, c.length)
+            }
+        }
+        return null;
+    }
+
+    const cookie = getCookie("hideBanner");
+    if (cookie == null) {
+        console.log("show")
+        $("#banner").show()
+    }
+
+    $("#banner b").click(function (evt) {
+        evt.preventDefault()
+        setCookie("hideBanner", "1", 365);
+        $("#banner").hide()
+    })
+</script>
+<!-- /BANNER END -->
 
 </body>
 </html>
