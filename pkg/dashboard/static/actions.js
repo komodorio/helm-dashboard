@@ -394,17 +394,24 @@ $("#btnAddRepository").click(function () {
     window.location.reload()
 })
 
-$("#btnTest").click(function () {
+$("#btnTest").click(function() {
+    const myModal = new bootstrap.Modal(document.getElementById('testModal'), {});
     $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Waiting for completion...')
+    myModal.show()
     $.ajax({
         type: 'POST',
         url: "/api/helm/releases/" + getHashParam("namespace") + "/" + getHashParam("chart") + "/test"
     }).fail(function (xhr) {
         reportError("Failed to execute test for chart", xhr)
+        myModal.hide()
     }).done(function (data) {
-        $("#testModal .test-result").empty().html(data.replaceAll("\n", "<br>"))
+        var output;
+        if(data.length == 0 || data == null || data == "") {
+            output = "<div>Tests executed successfully<br><br><pre>Empty response from API<pre></div>"
+        } else {
+            output = data.replaceAll("\n", "<br>")
+        }
+        $("#testModal .test-result").empty().html(output)
+        myModal.show()
     })
-
-    const myModal = new bootstrap.Modal(document.getElementById('testModal'), {});
-    myModal.show()
 })
