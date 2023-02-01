@@ -18,26 +18,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Get plugin version
-        id: get_plugin_version
-        run: echo "PLUGIN_VERSION=$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)" >> $GITHUB_OUTPUT
       - name: Get tag name
         id: get_tag_name
         run: echo "TAG_NAME=$(echo ${{ github.ref_name }} | cut -d 'v' -f2)" >> $GITHUB_OUTPUT
     outputs:
-      plugin_version: ${{ steps.get_plugin_version.outputs.PLUGIN_VERSION }}
       release_tag: ${{ steps.get_tag_name.outputs.TAG_NAME }}
 
   release:
     needs: pre_release
     runs-on: ubuntu-latest
     steps:
-      - name: Plugin version/Tag name Check
-        if: needs.pre_release.outputs.release_tag != needs.pre_release.outputs.plugin_version
-        uses: actions/github-script@v3
-        with:
-          script: |
-            core.setFailed('Plugin version and tag name are not equivalent!')
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -106,6 +96,7 @@ jobs:
           git checkout main
           sh ./ci/bump-versions.sh
           git add charts/helm-dashboard/Chart.yaml
+          git add plugin.yaml
           git commit -m "Increment chart versions [skip ci]" || echo "Already up-to-date"
           git push -f || echo "Nothing to push!"
         env:
