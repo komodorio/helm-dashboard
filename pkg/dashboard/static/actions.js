@@ -395,7 +395,7 @@ $("#btnAddRepository").click(function () {
 })
 
 $("#btnTest").click(function () {
-    $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+    $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Waiting for completion...')
     $.ajax({
         type: 'POST',
         url: "/api/helm/releases/" + getHashParam("namespace") + "/" + getHashParam("chart") + "/test"

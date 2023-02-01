@@ -543,7 +543,6 @@ func HReleaseToJSON(o *release.Release) *ReleaseElement {
 		AppVersion:  o.Chart.AppVersion(),
 		Icon:        o.Chart.Metadata.Icon,
 		Description: o.Chart.Metadata.Description,
-		HasTests:    utils.ReleaseHasTests(o),
 	}
 }
 
@@ -557,7 +556,6 @@ type ReleaseElement struct {
 	AppVersion  string         `json:"app_version"`
 	Icon        string         `json:"icon"`
 	Description string         `json:"description"`
-	HasTests    bool           `json:"has_tests"`
 }
 
 type RepositoryElement struct {
@@ -575,6 +573,7 @@ type HistoryElement struct {
 
 	ChartName string `json:"chart_name"` // custom addition on top of Helm
 	ChartVer  string `json:"chart_ver"`  // custom addition on top of Helm
+	HasTests  bool   `json:"has_tests"`
 }
 
 func HReleaseToHistElem(o *release.Release) *HistoryElement {
@@ -587,6 +586,7 @@ func HReleaseToHistElem(o *release.Release) *HistoryElement {
 		Description: o.Info.Description,
 		ChartName:   o.Chart.Name(),
 		ChartVer:    o.Chart.Metadata.Version,
+		HasTests:    releaseHasTests(o),
 	}
 }
 
@@ -616,4 +616,15 @@ func GetDiff(text1 string, text2 string, name1 string, name2 string) string {
 	diff := fmt.Sprint(unified)
 	log.Debugf("The diff is: %s", diff)
 	return diff
+}
+
+func releaseHasTests(o *release.Release) bool {
+	for _, h := range o.Hooks {
+		for _, e := range h.Events {
+			if e == release.HookTest {
+				return true
+			}
+		}
+	}
+	return false
 }

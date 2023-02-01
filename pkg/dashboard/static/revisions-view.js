@@ -10,7 +10,9 @@ function loadChartHistory(namespace, name) {
     }).done(function (data) {
         fillChartHistory(data, namespace, name);
 
-        checkUpgradeable(data[data.length - 1].chart_name)
+        checkUpgradeable(data[0].chart_name)
+
+        $("#btnTest").toggle(data[0].has_tests)
 
         const rev = getHashParam("revision")
         if (rev) {
