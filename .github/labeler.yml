@@ -50,7 +50,7 @@ github-actions:
   - .github/pull_request_template
   - .github/workflow/pull-request-labeler.yaml
 
-publish:
+release:
   - .github/workflows/publish-chart.yaml
   - .github/workflows/release.yaml
   - .goreleaser.yml
