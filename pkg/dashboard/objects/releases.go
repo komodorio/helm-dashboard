@@ -45,6 +45,7 @@ func (a *Releases) List() ([]*Release, error) {
 		client.All = true
 		client.AllNamespaces = true
 		client.Limit = 0
+		client.SetStateMask() // required to apply proper filtering
 		rels, err := client.Run()
 		if err != nil {
 			return nil, errorx.Decorate(err, "failed to get list of releases")
