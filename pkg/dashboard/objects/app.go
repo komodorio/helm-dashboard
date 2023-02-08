@@ -4,6 +4,7 @@ import (
 	"github.com/joomcode/errorx"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
+
 	// Import to initialize client auth plugins.
 	// From https://github.com/kubernetes/client-go/issues/242
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -22,7 +23,7 @@ type Application struct {
 	Repositories *Repositories
 }
 
-func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter, namespaces []string) (*Application, error) {
+func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter, namespaces []string, devel bool) (*Application, error) {
 	hc, err := helmConfig(settings.Namespace())
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -31,6 +32,11 @@ func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter, na
 	k8s, err := NewK8s(hc, namespaces)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get k8s client")
+	}
+
+	semVerConstraint, err := versionConstaint(devel)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to create semantic version constraint")
 	}
 
 	return &Application{
@@ -42,8 +48,9 @@ func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter, na
 			HelmConfig: helmConfig,
 		},
 		Repositories: &Repositories{
-			Settings:   settings,
-			HelmConfig: hc,
+			Settings:          settings,
+			HelmConfig:        hc,
+			versionConstraint: semVerConstraint,
 		},
 	}, nil
 }

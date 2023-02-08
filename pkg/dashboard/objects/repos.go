@@ -1,6 +1,12 @@
 package objects
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+
+	"github.com/Masterminds/semver/v3"
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -11,18 +17,15 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/helmpath"
 	"helm.sh/helm/v3/pkg/repo"
-	"os"
-	"path/filepath"
-	"strings"
-	"sync"
 )
 
 const AnnRepo = "helm-dashboard/repository-name"
 
 type Repositories struct {
-	Settings   *cli.EnvSettings
-	HelmConfig *action.Configuration
-	mx         sync.Mutex
+	Settings          *cli.EnvSettings
+	HelmConfig        *action.Configuration
+	mx                sync.Mutex
+	versionConstraint *semver.Constraints
 }
 
 func (r *Repositories) Load() (*repo.File, error) {
@@ -142,8 +145,9 @@ func (r *Repositories) Get(name string) (*Repository, error) {
 	for _, entry := range f.Repositories {
 		if entry.Name == name {
 			return &Repository{
-				Settings: r.Settings,
-				Orig:     entry,
+				Settings:          r.Settings,
+				Orig:              entry,
+				versionConstraint: r.versionConstraint,
 			}, nil
 		}
 	}
@@ -166,6 +170,7 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 			continue
 		}
 
+		var updatedChartVersions repo.ChartVersions
 		for _, v := range vers {
 			// just using annotations here to attach a bit of information to the object
 			// it has nothing to do with k8s annotations and should not get into manifests
@@ -174,9 +179,22 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 			}
 
 			v.Annotations[AnnRepo] = rep.Orig.Name
+
+			// Validate the versions against semantic version constraints and filter
+			version, err := semver.NewVersion(v.Version)
+			if err != nil {
+				// Ignored if version string is not parsable
+				log.Debugf("failed to parse version string %q: %v", v.Version, err)
+				continue
+			}
+
+			if r.versionConstraint.Check(version) {
+				// Add only versions that satisfy the semantic version constraint
+				updatedChartVersions = append(updatedChartVersions, v)
+			}
 		}
 
-		res = append(res, vers...) // TODO filter dev versions here, relates to #139
+		res = append(res, updatedChartVersions...)
 	}
 	return res, nil
 }
@@ -220,6 +238,8 @@ type Repository struct {
 	Settings *cli.EnvSettings
 	Orig     *repo.Entry
 	mx       sync.Mutex
+
+	versionConstraint *semver.Constraints
 }
 
 func (r *Repository) indexFileName() string {
@@ -247,9 +267,25 @@ func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
 	}
 
 	res := []*repo.ChartVersion{}
-	for _, v := range ind.Entries {
-		if len(v) > 0 { // TODO filter dev versions here, relates to #139
-			res = append(res, v[0])
+	for _, cv := range ind.Entries {
+		for _, v := range cv {
+			version, err := semver.NewVersion(v.Version)
+			if err != nil {
+				// Ignored if version string is not parsable
+				log.Debugf("failed to parse version string %q: %v", v.Version, err)
+				continue
+			}
+
+			if r.versionConstraint.Check(version) {
+				// Add only versions that satisfy the semantic version constraint
+				res = append(res, v)
+
+				// Only the highest version satisfying the constraint is required. Hence, break.
+				// The constraint here is (only stable versions) vs (stable + dev/prerelease).
+				// If dev versions are disabled and chart only has dev versions,
+				// chart is excluded from the result.
+				break
+			}
 		}
 	}
 
@@ -309,4 +345,24 @@ func removeRepoCache(root, name string) error {
 		return errors.Wrapf(err, "can't remove index file %s", idx)
 	}
 	return os.Remove(idx)
+}
+
+// versionConstaint returns semantic version constraint instance that can be used to
+// validate the version of repositories. The flag isDevelEnabled is used to configure
+// enabling/disabling of development/prerelease versions of charts.
+func versionConstaint(isDevelEnabled bool) (*semver.Constraints, error) {
+	// When devel flag is disabled. i.e., Only stable releases are included.
+	version := ">0.0.0"
+
+	if isDevelEnabled {
+		// When devel flag is enabled. i.e., Prereleases (alpha, beta, release candidate, etc.) are included.
+		version = ">0.0.0-0"
+	}
+
+	constraint, err := semver.NewConstraint(version)
+	if err != nil {
+		return nil, errors.Wrapf(err, "invalid version constraint format %q", version)
+	}
+
+	return constraint, nil
 }

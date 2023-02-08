@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"io"
+
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/pkg/errors"
@@ -15,7 +17,6 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
-	"io"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -30,6 +31,7 @@ type DataLayer struct {
 	ConfGen         HelmConfigGetter
 	appPerContext   map[string]*Application
 	appPerContextMx *sync.Mutex
+	devel           bool
 }
 
 type StatusInfo struct {
@@ -40,7 +42,7 @@ type StatusInfo struct {
 	ClusterMode   bool
 }
 
-func NewDataLayer(ns []string, ver string, cg HelmConfigGetter) (*DataLayer, error) {
+func NewDataLayer(ns []string, ver string, cg HelmConfigGetter, devel bool) (*DataLayer, error) {
 	if cg == nil {
 		return nil, errors.New("HelmConfigGetter can't be nil")
 	}
@@ -56,6 +58,7 @@ func NewDataLayer(ns []string, ver string, cg HelmConfigGetter) (*DataLayer, err
 		ConfGen:         cg,
 		appPerContext:   map[string]*Application{},
 		appPerContextMx: new(sync.Mutex),
+		devel:           devel,
 	}, nil
 }
 
@@ -162,7 +165,7 @@ func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
 			return d.ConfGen(settings, ns)
 		}
 
-		a, err := NewApplication(settings, cfgGetter, d.Namespaces)
+		a, err := NewApplication(settings, cfgGetter, d.Namespaces, d.devel)
 		if err != nil {
 			return nil, errorx.Decorate(err, "Failed to create application for context '%s'", ctx)
 		}

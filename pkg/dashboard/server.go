@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
-	"net/http"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-version"
@@ -28,10 +29,11 @@ type Server struct {
 	Address    string
 	Debug      bool
 	NoTracking bool
+	Devel      bool
 }
 
 func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (string, utils.ControlChan, error) {
-	data, err := objects.NewDataLayer(s.Namespaces, s.Version, NewHelmConfig)
+	data, err := objects.NewDataLayer(s.Namespaces, s.Version, NewHelmConfig, s.Devel)
 	if err != nil {
 		return "", nil, errorx.Decorate(err, "Failed to create data layer")
 	}

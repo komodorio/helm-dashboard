@@ -1,6 +1,15 @@
 package dashboard
 
 import (
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
@@ -13,14 +22,6 @@ import (
 	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/storage"
 	"helm.sh/helm/v3/pkg/storage/driver"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"os"
-	"path/filepath"
-	"strings"
-	"testing"
 )
 
 var inMemStorage *storage.Storage
@@ -111,7 +112,7 @@ func TestConfigureRoutes(t *testing.T) {
 
 	// Required arguements for route configuration
 	abortWeb := func() {}
-	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
 	if err != nil {
 		t.Fatal(err)
@@ -131,7 +132,7 @@ func TestContextSetter(t *testing.T) {
 	con := GetTestGinContext(w)
 
 	// Required arguements
-	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
 	if err != nil {
 		t.Fatal(err)
@@ -161,7 +162,7 @@ func TestNewRouter(t *testing.T) {
 
 	// Required arguemnets
 	abortWeb := func() {}
-	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
 	if err != nil {
 		t.Fatal(err)
@@ -183,7 +184,7 @@ func TestConfigureScanners(t *testing.T) {
 	}
 
 	// Required arguemnets
-	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
 	if err != nil {
 		t.Fatal(err)
@@ -206,7 +207,7 @@ func TestConfigureKubectls(t *testing.T) {
 	}
 
 	// Required arguemnets
-	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig)
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
 	if err != nil {
 		t.Fatal(err)
@@ -226,7 +227,7 @@ func TestConfigureKubectls(t *testing.T) {
 
 func TestE2E(t *testing.T) {
 	// Initialize data layer
-	data, err := objects.NewDataLayer([]string{""}, "0.0.0-test", getFakeHelmConfig)
+	data, err := objects.NewDataLayer([]string{""}, "0.0.0-test", getFakeHelmConfig, false)
 	assert.NilError(t, err)
 
 	// Create a new router with the function

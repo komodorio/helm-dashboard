@@ -15,6 +15,7 @@ func TestNewDataLayer(t *testing.T) {
 		namespaces    []string
 		version       string
 		helmConfig    HelmConfigGetter
+		devel         bool
 		errorExpected bool
 	}{
 		{
@@ -22,6 +23,7 @@ func TestNewDataLayer(t *testing.T) {
 			namespaces:    []string{"namespace1", "namespace2"},
 			version:       "1.0.0",
 			helmConfig:    nil,
+			devel:         false,
 			errorExpected: true,
 		},
 		{
@@ -34,12 +36,13 @@ func TestNewDataLayer(t *testing.T) {
 			helmConfig: func(sett *cli.EnvSettings, ns string) (*action.Configuration, error) {
 				return &action.Configuration{}, nil
 			},
+			devel:         false,
 			errorExpected: false,
 		},
 	}
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			dl, err := NewDataLayer(tt.namespaces, tt.version, tt.helmConfig)
+			dl, err := NewDataLayer(tt.namespaces, tt.version, tt.helmConfig, tt.devel)
 			if tt.errorExpected {
 				assert.Error(t, err, "Expected error but got nil")
 			} else {
