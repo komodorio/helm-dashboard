@@ -2,22 +2,47 @@ package objects
 
 import (
 	"helm.sh/helm/v3/pkg/action"
+	"io/ioutil"
+	"os"
+	"path"
 	"testing"
 
 	"gotest.tools/v3/assert"
 	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/repo"
 )
 
 var filePath = "./testdata/repositories.yaml"
 
-func initRepository(t *testing.T, filePath string) *Repositories {
+func initRepository(t *testing.T) *Repositories {
 	t.Helper()
 
 	settings := cli.New()
 
+	fname, err := ioutil.TempFile("", "repo-*.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	input, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = ioutil.WriteFile(fname.Name(), input, 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		err := os.Remove(fname.Name())
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+
 	// Sets the repository file path
-	settings.RepositoryConfig = filePath
+	settings.RepositoryConfig = fname.Name()
+	settings.RepositoryCache = path.Dir(filePath)
 
 	testRepository := &Repositories{
 		Settings:   settings,
@@ -27,118 +52,55 @@ func initRepository(t *testing.T, filePath string) *Repositories {
 	return testRepository
 }
 
-func TestLoadRepo(t *testing.T) {
-
-	res, err := repo.LoadFile(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	testRepository := initRepository(t, filePath)
-
-	file, err := testRepository.Load()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, file.Generated, res.Generated)
-}
-
 func TestList(t *testing.T) {
-	res, err := repo.LoadFile(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	testRepository := initRepository(t, filePath)
+	testRepository := initRepository(t)
 
 	repos, err := testRepository.List()
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, len(repos), len(res.Repositories))
+	assert.Equal(t, len(repos), 4)
 }
 
 func TestAdd(t *testing.T) {
 	testRepoName := "TEST"
 	testRepoUrl := "https://helm.github.io/examples"
 
-	res, err := repo.LoadFile(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Delete the repository if already exist
-	res.Remove(testRepoName)
-
-	testRepository := initRepository(t, filePath)
-
-	err = testRepository.Add(testRepoName, testRepoUrl)
-
+	testRepository := initRepository(t)
+	err := testRepository.Add(testRepoName, testRepoUrl)
 	if err != nil {
 		t.Fatal(err, "Failed to add repo")
 	}
 
-	// Reload the file
-	res, err = repo.LoadFile(filePath)
+	r, err := testRepository.Get(testRepoName)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal(err, "Failed to add repo")
 	}
 
-	assert.Equal(t, res.Has(testRepoName), true)
-
-	// Removes test repository which is added for testing
-	t.Cleanup(func() {
-		removed := res.Remove(testRepoName)
-		if removed != true {
-			t.Log("Failed to clean the test repository file")
-		}
-		err = res.WriteFile(filePath, 0644)
-		if err != nil {
-			t.Log("Failed to write the file while cleaning test repo")
-		}
-	})
+	assert.Equal(t, r.Orig.URL, testRepoUrl)
 }
 
 func TestDelete(t *testing.T) {
-	testRepoName := "TEST DELETE"
-	testRepoUrl := "https://helm.github.io/examples"
+	testRepository := initRepository(t)
 
-	res, err := repo.LoadFile(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Add a test entry
-	res.Add(&repo.Entry{Name: testRepoName, URL: testRepoUrl})
-	err = res.WriteFile(filePath, 0644)
-	if err != nil {
-		t.Fatal("Failed to write the file while creating test repo")
-	}
-
-	testRepository := initRepository(t, filePath)
-
-	err = testRepository.Delete(testRepoName)
+	testRepoName := "charts" // don't ever delete 'testing'!
+	err := testRepository.Delete(testRepoName)
 	if err != nil {
 		t.Fatal(err, "Failed to delete the repo")
 	}
 
-	// Reload the file
-	res, err = repo.LoadFile(filePath)
-	if err != nil {
-		t.Fatal(err)
+	_, err = testRepository.Get(testRepoName)
+	if err == nil {
+		t.Fatal("Failed to delete repo")
 	}
-
-	assert.Equal(t, res.Has(testRepoName), false)
 }
 
 func TestGet(t *testing.T) {
 	// Initial repositiry name in test file
 	repoName := "charts"
 
-	testRepository := initRepository(t, filePath)
+	testRepository := initRepository(t)
 
 	repo, err := testRepository.Get(repoName)
 	if err != nil {
@@ -146,4 +108,22 @@ func TestGet(t *testing.T) {
 	}
 
 	assert.Equal(t, repo.Orig.Name, repoName)
+}
+
+func TestCharts(t *testing.T) {
+	testRepository := initRepository(t)
+
+	r, err := testRepository.Get("testing")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	charts, err := r.Charts()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(charts) != 2 {
+		t.Fatalf("Wrong charts len: %d", len(charts))
+	}
 }

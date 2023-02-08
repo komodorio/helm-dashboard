@@ -28,3 +28,6 @@ repositories:
   password: ""
   url: http://secondexample.com
   username: ""
+- cache: testing-index.yaml
+  name: testing
+  url: http://example.com/charts
