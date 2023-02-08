@@ -527,35 +527,39 @@ type RepoChartElement struct {
 	AppVersion  string `json:"app_version"`
 	Description string `json:"description"`
 
-	InstalledNamespace string `json:"installed_namespace"` // custom addition on top of Helm
-	InstalledName      string `json:"installed_name"`      // custom addition on top of Helm
+	InstalledNamespace string `json:"installed_namespace"`
+	InstalledName      string `json:"installed_name"`
 	Repository         string `json:"repository"`
 }
 
 func HReleaseToJSON(o *release.Release) *ReleaseElement {
 	return &ReleaseElement{
-		Name:        o.Name,
-		Namespace:   o.Namespace,
-		Revision:    strconv.Itoa(o.Version),
-		Updated:     o.Info.LastDeployed,
-		Status:      o.Info.Status,
-		Chart:       fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
-		AppVersion:  o.Chart.AppVersion(),
-		Icon:        o.Chart.Metadata.Icon,
-		Description: o.Chart.Metadata.Description,
+		Name:         o.Name,
+		Namespace:    o.Namespace,
+		Revision:     strconv.Itoa(o.Version),
+		Updated:      o.Info.LastDeployed,
+		Status:       o.Info.Status,
+		Chart:        fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
+		ChartName:    o.Chart.Name(),
+		ChartVersion: o.Chart.Metadata.Version,
+		AppVersion:   o.Chart.AppVersion(),
+		Icon:         o.Chart.Metadata.Icon,
+		Description:  o.Chart.Metadata.Description,
 	}
 }
 
 type ReleaseElement struct {
-	Name        string         `json:"name"`
-	Namespace   string         `json:"namespace"`
-	Revision    string         `json:"revision"`
-	Updated     helmtime.Time  `json:"updated"`
-	Status      release.Status `json:"status"`
-	Chart       string         `json:"chart"`
-	AppVersion  string         `json:"app_version"`
-	Icon        string         `json:"icon"`
-	Description string         `json:"description"`
+	Name         string         `json:"name"`
+	Namespace    string         `json:"namespace"`
+	Revision     string         `json:"revision"`
+	Updated      helmtime.Time  `json:"updated"`
+	Status       release.Status `json:"status"`
+	Chart        string         `json:"chart"`
+	ChartName    string         `json:"chartName"`
+	ChartVersion string         `json:"chartVersion"`
+	AppVersion   string         `json:"app_version"`
+	Icon         string         `json:"icon"`
+	Description  string         `json:"description"`
 }
 
 type RepositoryElement struct {
