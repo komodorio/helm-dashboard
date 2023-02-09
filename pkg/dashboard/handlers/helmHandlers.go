@@ -3,6 +3,10 @@ package handlers
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"sort"
+	"strconv"
+
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
@@ -15,9 +19,6 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
-	"net/http"
-	"sort"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
@@ -169,6 +170,8 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 }
 
 func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
+	h.EnableClientCache(c)
+
 	qp, err := utils.GetQueryProps(c)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
