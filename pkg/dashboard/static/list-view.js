@@ -79,6 +79,20 @@ function buildChartCard(elm) {
 
         loadChartHistory(chart.namespace, chart.name, elm.chart_name)
     })
+
+    // check if upgrade is possible
+    $.getJSON("/api/helm/repositories/latestver?name=" + elm.chartName).fail(function (xhr) {
+        reportError("Failed to find chart in repo", xhr)
+    }).done(function (data) {
+        if (!data || !data.length) {
+            return
+        }
+
+        if (isNewerVersion(elm.chartVersion, data[0].version)) {
+            card.find(".rel-name span").append("<span class='bi-arrow-up-circle-fill ms-2 text-success' title='Upgrade available: "+data[0].version+"'></span>")
+        }
+    })
+
     return card;
 }
 
