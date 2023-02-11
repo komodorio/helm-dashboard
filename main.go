@@ -29,6 +29,7 @@ type options struct {
 	BindHost   string `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
 	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`
 	Namespace  string `short:"n" long:"namespace" description:"Namespace for HELM operations"`
+	Devel      bool   `long:"devel" description:"Include development versions of charts"`
 }
 
 func main() {
@@ -50,6 +51,7 @@ func main() {
 		Address:    fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
 		Debug:      opts.Verbose,
 		NoTracking: opts.NoTracking,
+		Devel:      opts.Devel,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

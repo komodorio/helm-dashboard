@@ -1,19 +1,23 @@
 package objects
 
 import (
-	"helm.sh/helm/v3/pkg/action"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
 
 	"gotest.tools/v3/assert"
+	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 )
 
-var filePath = "./testdata/repositories.yaml"
+const (
+	validRepositoryConfigPath                    = "./testdata/repositories.yaml"
+	invalidCacheFileRepositoryConfigPath         = "./testdata/repositories-invalid-cache-file.yaml"
+	invalidMalformedManifestRepositoryConfigPath = "./testdata/repositories-malformed-manifest.yaml"
+)
 
-func initRepository(t *testing.T) *Repositories {
+func initRepository(t *testing.T, filePath string, devel bool) *Repositories {
 	t.Helper()
 
 	settings := cli.New()
@@ -40,20 +44,26 @@ func initRepository(t *testing.T) *Repositories {
 		}
 	})
 
+	vc, err := versionConstaint(devel)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// Sets the repository file path
 	settings.RepositoryConfig = fname.Name()
 	settings.RepositoryCache = path.Dir(filePath)
 
 	testRepository := &Repositories{
-		Settings:   settings,
-		HelmConfig: &action.Configuration{}, // maybe use copy of getFakeHelmConfig from api_test.go
+		Settings:          settings,
+		HelmConfig:        &action.Configuration{}, // maybe use copy of getFakeHelmConfig from api_test.go
+		versionConstraint: vc,
 	}
 
 	return testRepository
 }
 
 func TestList(t *testing.T) {
-	testRepository := initRepository(t)
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
 
 	repos, err := testRepository.List()
 	if err != nil {
@@ -67,7 +77,7 @@ func TestAdd(t *testing.T) {
 	testRepoName := "TEST"
 	testRepoUrl := "https://helm.github.io/examples"
 
-	testRepository := initRepository(t)
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
 	err := testRepository.Add(testRepoName, testRepoUrl)
 	if err != nil {
 		t.Fatal(err, "Failed to add repo")
@@ -82,7 +92,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	testRepository := initRepository(t)
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
 
 	testRepoName := "charts" // don't ever delete 'testing'!
 	err := testRepository.Delete(testRepoName)
@@ -100,7 +110,7 @@ func TestGet(t *testing.T) {
 	// Initial repositiry name in test file
 	repoName := "charts"
 
-	testRepository := initRepository(t)
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
 
 	repo, err := testRepository.Get(repoName)
 	if err != nil {
@@ -110,8 +120,8 @@ func TestGet(t *testing.T) {
 	assert.Equal(t, repo.Orig.Name, repoName)
 }
 
-func TestCharts(t *testing.T) {
-	testRepository := initRepository(t)
+func TestRepository_Charts_DevelDisabled(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
 
 	r, err := testRepository.Get("testing")
 	if err != nil {
@@ -123,7 +133,164 @@ func TestCharts(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(charts) != 2 {
-		t.Fatalf("Wrong charts len: %d", len(charts))
+	// Total charts in ./testdata/testing-index.yaml = 4
+	// Excluded charts = 2 (1 has invalid version, 1 has only dev version)
+	// Included charts = 2 (2 stable versions)
+	expectedCount := 2
+	if len(charts) != expectedCount {
+		t.Fatalf("Wrong charts count: %d, expected: %d", len(charts), expectedCount)
+	}
+}
+
+func TestRepository_Charts_DevelEnabled(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, true)
+
+	r, err := testRepository.Get("testing")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	charts, err := r.Charts()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Total charts in ./testdata/testing-index.yaml = 4
+	// Excluded charts = 1 (1 has invalid version)
+	// Included charts = 3 (2 stable versions, 1 has only dev version)
+	expectedCount := 3
+	if len(charts) != expectedCount {
+		t.Fatalf("Wrong charts count: %d, expected: %d", len(charts), expectedCount)
+	}
+}
+
+func TestRepository_Charts_InvalidCacheFile(t *testing.T) {
+	testRepository := initRepository(t, invalidCacheFileRepositoryConfigPath, false)
+
+	r, err := testRepository.Get("non-existing")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = r.Charts()
+	if err == nil {
+		t.Fatalf("Expected error for invalid cache file path, got nil")
+	}
+}
+
+func TestRepositories_Containing_DevelDisable(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+	chartVersions, err := testRepository.Containing("alpine")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Total versions of chart alpine in ./testdata/testing-index.yaml = 3
+	// Excluded charts = 1 (1 dev version)
+	// Included charts = 2 (2 stable versions)
+	expectedCount := 2
+	if len(chartVersions) != expectedCount {
+		t.Fatalf("Wrong charts versions count: %d, expected: %d", len(chartVersions), expectedCount)
+	}
+
+}
+
+func TestRepositories_Containing_DevelEnabled(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, true)
+
+	chartVersions, err := testRepository.Containing("alpine")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Total versions of chart alpine in ./testdata/testing-index.yaml = 3
+	// Excluded charts = 0
+	// Included charts = 3 (2 stable versions, 1 dev version)
+	expectedCount := 3
+	if len(chartVersions) != expectedCount {
+		t.Fatalf("Wrong charts versions count: %d, expected: %d", len(chartVersions), expectedCount)
+	}
+
+}
+
+func TestRepositories_Containing_DevelDisable_OnlyDevVersionsOfChartAvailable(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+	chartVersions, err := testRepository.Containing("traefik")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Total versions of chart traefik in ./testdata/testing-index.yaml = 1
+	// Excluded charts = 1 (1 dev version)
+	// Included charts = 0
+	expectedCount := 0
+	if len(chartVersions) != expectedCount {
+		t.Fatalf("Wrong charts versions count: %d, expected: %d", len(chartVersions), expectedCount)
+	}
+
+}
+
+func TestRepositories_Containing_DevelEnabled_OnlyDevVersionsOfChartAvailable(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, true)
+
+	chartVersions, err := testRepository.Containing("traefik")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Total versions of chart traefik in ./testdata/testing-index.yaml = 1
+	// Excluded charts = 0
+	// Included charts = 1 (1 dev version)
+	expectedCount := 1
+	if len(chartVersions) != expectedCount {
+		t.Fatalf("Wrong charts versions count: %d, expected: %d", len(chartVersions), expectedCount)
+	}
+
+}
+
+func TestRepositories_Containing_DevelDisable_InvalidChartVersion(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+	chartVersions, err := testRepository.Containing("rabbitmq")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Total versions of chart rabbitmq in ./testdata/testing-index.yaml = 1
+	// Excluded charts = 1 (1 invalid version)
+	// Included charts = 0
+	expectedCount := 0
+	if len(chartVersions) != expectedCount {
+		t.Fatalf("Wrong charts versions count: %d, expected: %d", len(chartVersions), expectedCount)
+	}
+
+}
+
+func TestRepositories_Containing_DevelEnabled_InvalidChartVersion(t *testing.T) {
+	testRepository := initRepository(t, validRepositoryConfigPath, true)
+
+	chartVersions, err := testRepository.Containing("rabbitmq")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Total versions of chart rabbitmq in ./testdata/testing-index.yaml = 1
+	// Excluded charts = 1 (1 invalid version)
+	// Included charts = 0
+	expectedCount := 0
+	if len(chartVersions) != expectedCount {
+		t.Fatalf("Wrong charts versions count: %d, expected: %d", len(chartVersions), expectedCount)
+	}
+
+}
+
+func TestRepositories_Containing_MalformedRepositoryConfigFile(t *testing.T) {
+	testRepository := initRepository(t, invalidMalformedManifestRepositoryConfigPath, false)
+
+	_, err := testRepository.Containing("alpine")
+	if err == nil {
+		t.Fatalf("Expected error for malformed RepositoryConfig file, got nil")
 	}
 }

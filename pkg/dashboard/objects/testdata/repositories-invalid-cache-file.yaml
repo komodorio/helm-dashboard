@@ -1,0 +1,6 @@
+apiVersion: ""
+generated: "0001-01-01T00:00:00Z"
+repositories:
+- cache: non-existing-index.yaml
+  name: non-existing
+  url: http://example.com/charts

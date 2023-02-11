@@ -64,3 +64,37 @@ entries:
           email: containers@bitnami.com
       icon: ""
       apiVersion: v2
+  traefik:
+    - apiVersion: v1
+      appVersion: 1.7.26
+      deprecated: true
+      description: A Traefik based Kubernetes ingress controller with Let's
+        Encrypt support
+      home: https://traefik.io/
+      icon: https://docs.traefik.io/assets/img/traefik.logo.png
+      keywords:
+      - traefik
+      - ingress
+      - acme
+      - letsencrypt
+      name: traefik
+      sources:
+      - https://github.com/containous/traefik
+      - https://github.com/helm/charts/tree/master/stable/traefik
+      version: 1.87.7-rc1
+  rabbitmq:
+    - apiVersion: v1
+      appVersion: 3.8.2
+      deprecated: true
+      description: DEPRECATED Open source message broker software that implements the Advanced
+        Message Queuing Protocol (AMQP)
+      home: https://www.rabbitmq.com
+      icon: https://bitnami.com/assets/stacks/rabbitmq/img/rabbitmq-stack-220x234.png
+      keywords:
+      - rabbitmq
+      - message queue
+      - AMQP
+      name: rabbitmq
+      sources:
+      - https://github.com/bitnami/bitnami-docker-rabbitmq
+      version: invalid-version
