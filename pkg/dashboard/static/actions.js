@@ -61,6 +61,11 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         chart = ""
     }
 
+    // local chart case
+    if (elm.urls && elm.urls.length && elm.urls[0].startsWith("file://")) {
+        chart = elm.urls[0];
+    }
+
     $('#upgradeModal').data("chart", chart).data("initial", !verCur)
     $('#upgradeModal form .chart-name').val(chart)
     $('#upgradeModal').data("newManifest", "")
@@ -394,7 +399,7 @@ $("#btnAddRepository").click(function () {
     window.location.reload()
 })
 
-$("#btnTest").click(function() {
+$("#btnTest").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('testModal'), {});
     $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Waiting for completion...')
     myModal.show()
@@ -406,7 +411,7 @@ $("#btnTest").click(function() {
         myModal.hide()
     }).done(function (data) {
         var output;
-        if(data.length == 0 || data == null || data == "") {
+        if (data.length == 0 || data == null || data == "") {
             output = "<div>Tests executed successfully<br><br><pre>Empty response from API<pre></div>"
         } else {
             output = data.replaceAll("\n", "<br>")

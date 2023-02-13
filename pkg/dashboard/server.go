@@ -24,12 +24,13 @@ import (
 )
 
 type Server struct {
-	Version    string
-	Namespaces []string
-	Address    string
-	Debug      bool
-	NoTracking bool
-	Devel      bool
+	Version     string
+	Namespaces  []string
+	Address     string
+	Debug       bool
+	NoTracking  bool
+	Devel       bool
+	LocalCharts []string
 }
 
 func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (string, utils.ControlChan, error) {
@@ -37,6 +38,8 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 	if err != nil {
 		return "", nil, errorx.Decorate(err, "Failed to create data layer")
 	}
+
+	data.LocalCharts = s.LocalCharts
 
 	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics

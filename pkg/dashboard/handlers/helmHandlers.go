@@ -3,11 +3,13 @@ package handlers
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/rogpeppe/go-internal/semver"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -15,12 +17,11 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
+	"k8s.io/utils/strings/slices"
 	"net/http"
 	"sort"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	"strings"
 )
 
 type HelmHandler struct {
@@ -288,12 +289,19 @@ func (h *HelmHandler) Install(c *gin.Context) {
 		return
 	}
 
+	repoChart, err := h.checkLocalRepo(c.PostForm("chart"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	justTemplate := c.PostForm("preview") == "true"
 	ns := c.Param("ns")
 	if ns == "[empty]" {
 		ns = ""
 	}
-	rel, err := app.Releases.Install(ns, c.PostForm("name"), c.PostForm("chart"), c.PostForm("version"), justTemplate, values)
+
+	rel, err := app.Releases.Install(ns, c.PostForm("name"), repoChart, c.PostForm("version"), justTemplate, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -304,6 +312,16 @@ func (h *HelmHandler) Install(c *gin.Context) {
 	} else {
 		c.IndentedJSON(http.StatusAccepted, rel)
 	}
+}
+
+func (h *HelmHandler) checkLocalRepo(repoChart string) (string, error) {
+	if strings.HasPrefix(repoChart, "file://") {
+		repoChart = repoChart[len("file://"):]
+		if !slices.Contains(h.Data.LocalCharts, repoChart) {
+			return "", fmt.Errorf("chart path is not present in local charts: %s", repoChart)
+		}
+	}
+	return repoChart, nil
 }
 
 func (h *HelmHandler) Upgrade(c *gin.Context) {
@@ -409,7 +427,13 @@ func (h *HelmHandler) RepoValues(c *gin.Context) {
 		return // sets error inside
 	}
 
-	out, err := app.Repositories.GetChartValues(c.Query("chart"), c.Query("version"))
+	repoChart, err := h.checkLocalRepo(c.Query("chart"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	out, err := app.Repositories.GetChartValues(repoChart, c.Query("version"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -433,8 +457,8 @@ func (h *HelmHandler) RepoList(c *gin.Context) {
 	out := []RepositoryElement{}
 	for _, r := range repos {
 		out = append(out, RepositoryElement{
-			Name: r.Orig.Name,
-			URL:  r.Orig.URL,
+			Name: r.Name(),
+			URL:  r.URL(),
 		})
 	}
 
