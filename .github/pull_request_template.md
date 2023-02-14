@@ -2,6 +2,7 @@
 
 <!-- Describe the proposed changes and any additional information -->
 
+<!-- Add all the screenshots which illustrate your changes -->
 
 ## Check List
 
@@ -18,11 +19,3 @@
 - [ ] I have documented the changes made (if applicable)
 - [ ] I have covered the changes with unit tests
 
-
-## Screenshots
-
-<!-- Add all the screenshots which support your changes -->
-
-## Note to reviewers
-
-<!-- Add notes to reviewers if applicable -->

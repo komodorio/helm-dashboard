@@ -59,7 +59,6 @@ func (r *Repositories) List() ([]Repository, error) {
 		lc := LocalChart{
 			LocalCharts: r.LocalCharts,
 		}
-		_ = lc.Update()
 		res = append(res, &lc)
 	}
 
@@ -409,6 +408,7 @@ func (l *LocalChart) URL() string {
 }
 
 func (l *LocalChart) Charts() (repo.ChartVersions, error) {
+	_ = l.Update() // always re-read, for chart devs to have quick debug loop
 	res := repo.ChartVersions{}
 	for _, c := range l.charts {
 		res = append(res, c...)
@@ -417,6 +417,7 @@ func (l *LocalChart) Charts() (repo.ChartVersions, error) {
 }
 
 func (l *LocalChart) ByName(name string) (repo.ChartVersions, error) {
+	_ = l.Update() // always re-read, for chart devs to have quick debug loop
 	for n, c := range l.charts {
 		if n == name {
 			return c, nil
