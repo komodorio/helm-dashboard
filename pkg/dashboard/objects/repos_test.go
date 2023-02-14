@@ -57,67 +57,61 @@ func initRepository(t *testing.T, filePath string, devel bool) *Repositories {
 		Settings:          settings,
 		HelmConfig:        &action.Configuration{}, // maybe use copy of getFakeHelmConfig from api_test.go
 		versionConstraint: vc,
+		LocalCharts:       []string{"../../../charts/helm-dashboard"},
 	}
 
 	return testRepository
 }
 
-func TestList(t *testing.T) {
+func TestFlow(t *testing.T) {
 	testRepository := initRepository(t, validRepositoryConfigPath, false)
 
+	// initial list
 	repos, err := testRepository.List()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NilError(t, err)
+	assert.Equal(t, len(repos), 5)
 
-	assert.Equal(t, len(repos), 4)
-}
-
-func TestAdd(t *testing.T) {
 	testRepoName := "TEST"
 	testRepoUrl := "https://helm.github.io/examples"
 
-	testRepository := initRepository(t, validRepositoryConfigPath, false)
-	err := testRepository.Add(testRepoName, testRepoUrl)
-	if err != nil {
-		t.Fatal(err, "Failed to add repo")
-	}
+	// add repo
+	err = testRepository.Add(testRepoName, testRepoUrl)
+	assert.NilError(t, err)
 
+	// get repo
 	r, err := testRepository.Get(testRepoName)
-	if err != nil {
-		t.Fatal(err, "Failed to add repo")
-	}
+	assert.NilError(t, err)
+	assert.Equal(t, r.URL(), testRepoUrl)
 
-	assert.Equal(t, r.Orig.URL, testRepoUrl)
-}
+	// update repo
+	err = r.Update()
+	assert.NilError(t, err)
 
-func TestDelete(t *testing.T) {
-	testRepository := initRepository(t, validRepositoryConfigPath, false)
+	// list charts
+	c, err := r.Charts()
+	assert.NilError(t, err)
 
-	testRepoName := "charts" // don't ever delete 'testing'!
-	err := testRepository.Delete(testRepoName)
-	if err != nil {
-		t.Fatal(err, "Failed to delete the repo")
-	}
+	// contains chart
+	c, err = testRepository.Containing(c[0].Name)
+	assert.NilError(t, err)
 
-	_, err = testRepository.Get(testRepoName)
-	if err == nil {
-		t.Fatal("Failed to delete repo")
-	}
-}
+	// chart by name from repo
+	c, err = r.ByName(c[0].Name)
+	assert.NilError(t, err)
 
-func TestGet(t *testing.T) {
-	// Initial repositiry name in test file
-	repoName := "charts"
+	// get chart values
+	v, err := testRepository.GetChartValues(r.Name()+"/"+c[0].Name, c[0].Version)
+	assert.NilError(t, err)
+	assert.Assert(t, v != "")
 
-	testRepository := initRepository(t, validRepositoryConfigPath, false)
+	// delete added
+	err = testRepository.Delete(testRepoName)
+	assert.NilError(t, err)
 
-	repo, err := testRepository.Get(repoName)
-	if err != nil {
-		t.Fatal(err, "Failed to get th repo")
-	}
-
-	assert.Equal(t, repo.Orig.Name, repoName)
+	// final list
+	repos, err = testRepository.List()
+	assert.NilError(t, err)
+	assert.Equal(t, len(repos), 5)
 }
 
 func TestRepository_Charts_DevelDisabled(t *testing.T) {

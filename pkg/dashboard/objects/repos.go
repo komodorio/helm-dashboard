@@ -11,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
@@ -204,24 +203,6 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 		res = append(res, updatedChartVersions...)
 	}
 	return res, nil
-}
-
-func (r *Repositories) GetChart(chart string, ver string) (*chart.Chart, error) {
-	// TODO: unused method?
-	client := action.NewShowWithConfig(action.ShowAll, r.HelmConfig)
-	client.Version = ver
-
-	cp, err := client.ChartPathOptions.LocateChart(chart, r.Settings)
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to locate chart '%s'", chart)
-	}
-
-	chrt, err := loader.Load(cp)
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to load chart from '%s'", cp)
-	}
-
-	return chrt, nil
 }
 
 func (r *Repositories) GetChartValues(chart string, ver string) (string, error) {
