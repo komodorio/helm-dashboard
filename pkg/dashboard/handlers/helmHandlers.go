@@ -163,6 +163,7 @@ func (h *HelmHandler) RepoVersions(c *gin.Context) {
 			AppVersion:  r.AppVersion,
 			Description: r.Description,
 			Repository:  r.Annotations[objects.AnnRepo],
+			URLs:        r.URLs,
 		})
 	}
 
@@ -195,6 +196,7 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 			AppVersion:  r.AppVersion,
 			Description: r.Description,
 			Repository:  r.Annotations[objects.AnnRepo],
+			URLs:        r.URLs,
 		})
 	}
 
@@ -343,8 +345,14 @@ func (h *HelmHandler) Upgrade(c *gin.Context) {
 		return
 	}
 
+	repoChart, err := h.checkLocalRepo(c.PostForm("chart"))
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	justTemplate := c.PostForm("preview") == "true"
-	rel, err := existing.Upgrade(c.PostForm("chart"), c.PostForm("version"), justTemplate, values)
+	rel, err := existing.Upgrade(repoChart, c.PostForm("version"), justTemplate, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -545,15 +553,16 @@ func (h *HelmHandler) handleGetSection(rel *objects.Release, section string, rDi
 	return res, nil
 }
 
-type RepoChartElement struct {
+type RepoChartElement struct { // TODO: do we need it at all? there is existing repo.ChartVersion in Helm
 	Name        string `json:"name"`
 	Version     string `json:"version"`
 	AppVersion  string `json:"app_version"`
 	Description string `json:"description"`
 
-	InstalledNamespace string `json:"installed_namespace"`
-	InstalledName      string `json:"installed_name"`
-	Repository         string `json:"repository"`
+	InstalledNamespace string   `json:"installed_namespace"`
+	InstalledName      string   `json:"installed_name"`
+	Repository         string   `json:"repository"`
+	URLs               []string `json:"urls"`
 }
 
 func HReleaseToJSON(o *release.Release) *ReleaseElement {
