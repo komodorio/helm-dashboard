@@ -96,8 +96,21 @@ If you want to increase the logging verbosity and see all the debug info, use th
 
 The official helm chart is [available here](https://github.com/komodorio/helm-charts/blob/master/charts/helm-dashboard)
 
+## Selected Features
 
-## Execute Helm tests
+### Support for Local Charts
+
+Local Helm chart is a directory with specially named files and a `Chart.yaml` file, which you can install via Helm, without the need to publish the chart into Helm repository. Chart developers might want to experiment with the chart locally, before uploading into public repository. Also, a proprietary application might only use non-published chart as an approach to deploy the software.
+
+For all the above use-cases, you may use Helm Dashboard UI, spcifying location of your local chart folders via special `--local-chart` command-line parameter. The parameter might be specified multiple times, for example:
+
+```shell
+helm-dashboard --local-chart=/opt/charts/my-private-app --local-chart=/home/dev/sources/app/chart
+```
+
+When _valid_ local chart sources specified, the repository list would contain a surrogate `[local]` entry, with those charts listed inside. All the chart operations are normal: installing, reconfiguring and upgrading. 
+
+### Execute Helm tests
 
 For all the release(s) (installed helm charts), you can execute helm tests for that release. For the tests to execute successfully, you need to have existing tests for that helm chart.
 
@@ -107,7 +120,7 @@ You can execute `helm test` for the specific release as below:
 The result of executed `helm test` for the release will be disapled as below:
 ![](screenshot_run_test_result.png)
 
-## Scanner Integrations
+### Scanner Integrations
 
 Upon startup, Helm Dashboard detects the presence of [Trivy](https://github.com/aquasecurity/trivy)
 and [Checkov](https://github.com/bridgecrewio/checkov) scanners. When available, these scanners are offered on k8s
