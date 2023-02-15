@@ -11,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
@@ -26,9 +25,10 @@ type Repositories struct {
 	HelmConfig        *action.Configuration
 	mx                sync.Mutex
 	versionConstraint *semver.Constraints
+	LocalCharts       []string
 }
 
-func (r *Repositories) Load() (*repo.File, error) {
+func (r *Repositories) load() (*repo.File, error) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
@@ -40,18 +40,26 @@ func (r *Repositories) Load() (*repo.File, error) {
 	return f, nil
 }
 
-func (r *Repositories) List() ([]*Repository, error) {
-	f, err := r.Load()
+func (r *Repositories) List() ([]Repository, error) {
+	f, err := r.load()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to load repo information")
 	}
 
-	res := []*Repository{}
+	res := []Repository{}
 	for _, item := range f.Repositories {
-		res = append(res, &Repository{
-			Settings: r.Settings,
-			Orig:     item,
+		res = append(res, &HelmRepo{
+			Settings:          r.Settings,
+			Orig:              item,
+			versionConstraint: r.versionConstraint,
 		})
+	}
+
+	if len(r.LocalCharts) > 0 {
+		lc := LocalChart{
+			LocalCharts: r.LocalCharts,
+		}
+		res = append(res, &lc)
 	}
 
 	return res, nil
@@ -71,7 +79,7 @@ func (r *Repositories) Add(name string, url string) error {
 		return err
 	}
 
-	f, err := r.Load()
+	f, err := r.load()
 	if err != nil {
 		return errorx.Decorate(err, "Failed to load repo config")
 	}
@@ -114,7 +122,7 @@ func (r *Repositories) Add(name string, url string) error {
 }
 
 func (r *Repositories) Delete(name string) error {
-	f, err := r.Load()
+	f, err := r.load()
 	if err != nil {
 		return errorx.Decorate(err, "failed to load repo information")
 	}
@@ -136,25 +144,22 @@ func (r *Repositories) Delete(name string) error {
 	return nil
 }
 
-func (r *Repositories) Get(name string) (*Repository, error) {
-	f, err := r.Load()
+func (r *Repositories) Get(name string) (Repository, error) {
+	l, err := r.List()
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to load repo information")
+		return nil, errorx.Decorate(err, "failed to get list of repos")
 	}
 
-	for _, entry := range f.Repositories {
-		if entry.Name == name {
-			return &Repository{
-				Settings:          r.Settings,
-				Orig:              entry,
-				versionConstraint: r.versionConstraint,
-			}, nil
+	for _, entry := range l {
+		if entry.Name() == name {
+			return entry, nil
 		}
 	}
 
-	return nil, errorx.DataUnavailable.New("Could not find reposiroty '%s'", name)
+	return nil, errorx.DataUnavailable.New("Could not find repository '%s'", name)
 }
 
+// Containing returns list of chart versions for the given chart name, across all repositories
 func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 	list, err := r.List()
 	if err != nil {
@@ -165,7 +170,7 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 	for _, rep := range list {
 		vers, err := rep.ByName(name)
 		if err != nil {
-			log.Warnf("Failed to get data from repo '%s', updating it might help", rep.Orig.Name)
+			log.Warnf("Failed to get data from repo '%s', updating it might help", rep.Name())
 			log.Debugf("The error was: %v", err)
 			continue
 		}
@@ -178,7 +183,7 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 				v.Annotations = map[string]string{}
 			}
 
-			v.Annotations[AnnRepo] = rep.Orig.Name
+			v.Annotations[AnnRepo] = rep.Name()
 
 			// Validate the versions against semantic version constraints and filter
 			version, err := semver.NewVersion(v.Version)
@@ -199,24 +204,6 @@ func (r *Repositories) Containing(name string) (repo.ChartVersions, error) {
 	return res, nil
 }
 
-func (r *Repositories) GetChart(chart string, ver string) (*chart.Chart, error) {
-	// TODO: unused method?
-	client := action.NewShowWithConfig(action.ShowAll, r.HelmConfig)
-	client.Version = ver
-
-	cp, err := client.ChartPathOptions.LocateChart(chart, r.Settings)
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to locate chart '%s'", chart)
-	}
-
-	chrt, err := loader.Load(cp)
-	if err != nil {
-		return nil, errorx.Decorate(err, "failed to load chart from '%s'", cp)
-	}
-
-	return chrt, nil
-}
-
 func (r *Repositories) GetChartValues(chart string, ver string) (string, error) {
 	// comes from cmd/helm/show.go
 	client := action.NewShowWithConfig(action.ShowValues, r.HelmConfig)
@@ -234,7 +221,15 @@ func (r *Repositories) GetChartValues(chart string, ver string) (string, error) 
 	return out, nil
 }
 
-type Repository struct {
+type Repository interface {
+	Name() string
+	URL() string
+	Update() error
+	Charts() (repo.ChartVersions, error)
+	ByName(name string) (repo.ChartVersions, error)
+}
+
+type HelmRepo struct {
 	Settings *cli.EnvSettings
 	Orig     *repo.Entry
 	mx       sync.Mutex
@@ -242,11 +237,19 @@ type Repository struct {
 	versionConstraint *semver.Constraints
 }
 
-func (r *Repository) indexFileName() string {
+func (r *HelmRepo) Name() string {
+	return r.Orig.Name
+}
+
+func (r *HelmRepo) URL() string {
+	return r.Orig.URL
+}
+
+func (r *HelmRepo) indexFileName() string {
 	return filepath.Join(r.Settings.RepositoryCache, helmpath.CacheIndexFile(r.Orig.Name))
 }
 
-func (r *Repository) getIndex() (*repo.IndexFile, error) {
+func (r *HelmRepo) getIndex() (*repo.IndexFile, error) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
@@ -260,13 +263,13 @@ func (r *Repository) getIndex() (*repo.IndexFile, error) {
 	return ind, nil
 }
 
-func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
+func (r *HelmRepo) Charts() (repo.ChartVersions, error) {
 	ind, err := r.getIndex()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get repo index")
 	}
 
-	res := []*repo.ChartVersion{}
+	res := repo.ChartVersions{}
 	for _, cv := range ind.Entries {
 		for _, v := range cv {
 			version, err := semver.NewVersion(v.Version)
@@ -292,7 +295,7 @@ func (r *Repository) Charts() ([]*repo.ChartVersion, error) {
 	return res, nil
 }
 
-func (r *Repository) ByName(name string) (repo.ChartVersions, error) {
+func (r *HelmRepo) ByName(name string) (repo.ChartVersions, error) {
 	ind, err := r.getIndex()
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get repo index")
@@ -305,7 +308,7 @@ func (r *Repository) ByName(name string) (repo.ChartVersions, error) {
 	return repo.ChartVersions{}, nil
 }
 
-func (r *Repository) Update() error {
+func (r *HelmRepo) Update() error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	log.Infof("Updating repository: %s", r.Orig.Name)
@@ -365,4 +368,60 @@ func versionConstaint(isDevelEnabled bool) (*semver.Constraints, error) {
 	}
 
 	return constraint, nil
+}
+
+type LocalChart struct {
+	LocalCharts []string
+
+	charts map[string]repo.ChartVersions
+	mx     sync.Mutex
+}
+
+// Update reloads the chart information from disk
+func (l *LocalChart) Update() error {
+	l.mx.Lock()
+	defer l.mx.Unlock()
+
+	l.charts = map[string]repo.ChartVersions{}
+	for _, lc := range l.LocalCharts {
+		c, err := loader.Load(lc)
+		if err != nil {
+			log.Warnf("Failed to load chart from '%s': %s", lc, err)
+			continue
+		}
+
+		// we don't filter out dev versions here, because local chart implies user wants to see the chart anyway
+		l.charts[c.Name()] = repo.ChartVersions{&repo.ChartVersion{
+			URLs:     []string{l.URL() + lc},
+			Metadata: c.Metadata,
+		}}
+	}
+	return nil
+}
+
+func (l *LocalChart) Name() string {
+	return "[local]"
+}
+
+func (l *LocalChart) URL() string {
+	return "file://"
+}
+
+func (l *LocalChart) Charts() (repo.ChartVersions, error) {
+	_ = l.Update() // always re-read, for chart devs to have quick debug loop
+	res := repo.ChartVersions{}
+	for _, c := range l.charts {
+		res = append(res, c...)
+	}
+	return res, nil
+}
+
+func (l *LocalChart) ByName(name string) (repo.ChartVersions, error) {
+	_ = l.Update() // always re-read, for chart devs to have quick debug loop
+	for n, c := range l.charts {
+		if n == name {
+			return c, nil
+		}
+	}
+	return repo.ChartVersions{}, nil
 }

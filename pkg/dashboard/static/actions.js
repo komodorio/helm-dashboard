@@ -56,13 +56,7 @@ function checkUpgradeable(name) {
 function popUpUpgrade(elm, ns, name, verCur, lastRev) {
     $("#upgradeModal .btn-confirm").prop("disabled", true)
 
-    let chart = elm.repository + "/" + elm.name;
-    if (!elm.name) {
-        chart = ""
-    }
-
-    $('#upgradeModal').data("chart", chart).data("initial", !verCur)
-    $('#upgradeModal form .chart-name').val(chart)
+    $('#upgradeModal').data("initial", !verCur)
     $('#upgradeModal').data("newManifest", "")
 
     $("#upgradeModalLabel .name").text(elm.name)
@@ -93,14 +87,17 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $.getJSON("/api/helm/repositories/versions?name=" + elm.name).fail(function (xhr) {
             reportError("Failed to find chart in repo", xhr)
         }).done(function (vers) {
+            vers.sort((b, a) => (a.version > b.version) - (a.version < b.version))
+
             // fill versions
             $('#upgradeModal select').empty()
             for (let i = 0; i < vers.length; i++) {
-                const opt = $("<option value='" + vers[i].version + "'></option>");
+                const opt = $("<option value='" + vers[i].version + "'></option>").data("ver", vers[i]);
+                const label = vers[i].repository + " @ " + vers[i].version;
                 if (vers[i].version === verCur) {
-                    opt.html(vers[i].version + " &middot;")
+                    opt.html(label + " ✓")
                 } else {
-                    opt.html(vers[i].version)
+                    opt.html(label)
                 }
                 $('#upgradeModal select').append(opt)
             }
@@ -162,9 +159,7 @@ function changeTimer() {
     if (reconfigTimeout) {
         window.clearTimeout(reconfigTimeout)
     }
-    reconfigTimeout = window.setTimeout(function () {
-        requestChangeDiff()
-    }, 500)
+    reconfigTimeout = window.setTimeout(requestChangeDiff, 500)
 }
 
 $("#upgradeModal textarea").keyup(changeTimer)
@@ -173,12 +168,26 @@ $("#upgradeModal .rel-ns").keyup(changeTimer)
 
 $('#upgradeModal select').change(function () {
     const self = $(this)
+    const ver = self.find("option:selected").data("ver");
+
+    let chart = ver.repository + "/" + ver.name;
+    if (!ver.name) {
+        chart = ""
+    }
+
+    // local chart case
+    if (ver.urls && ver.urls.length && ver.urls[0].startsWith("file://")) {
+        chart = ver.urls[0];
+    }
+
+    $('#upgradeModal').data("chart", chart)
+    $('#upgradeModal form .chart-name').val(chart)
 
     requestChangeDiff()
 
     // fill reference values
     $("#upgradeModal .ref-vals").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-    const chart = $("#upgradeModal").data("chart");
+
     // TODO: if chart is empty, query different URL that will restore values without repo
     if (chart) {
         $.get("/api/helm/repositories/values?chart=" + chart + "&version=" + self.val()).fail(function (xhr) {
@@ -231,7 +240,6 @@ $('#upgradeModal .btn-scan').click(function () {
 })
 
 function requestChangeDiff() {
-    const self = $('#upgradeModal select');
     const diffBody = $("#upgradeModalBody");
     diffBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating diff...')
     $("#upgradeModal .btn-confirm").prop("disabled", true)
@@ -394,7 +402,7 @@ $("#btnAddRepository").click(function () {
     window.location.reload()
 })
 
-$("#btnTest").click(function() {
+$("#btnTest").click(function () {
     const myModal = new bootstrap.Modal(document.getElementById('testModal'), {});
     $("#testModal .test-result").empty().prepend('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Waiting for completion...')
     myModal.show()
@@ -406,7 +414,7 @@ $("#btnTest").click(function() {
         myModal.hide()
     }).done(function (data) {
         var output;
-        if(data.length == 0 || data == null || data == "") {
+        if (data.length == 0 || data == null || data == "") {
             output = "<div>Tests executed successfully<br><br><pre>Empty response from API<pre></div>"
         } else {
             output = data.replaceAll("\n", "<br>")

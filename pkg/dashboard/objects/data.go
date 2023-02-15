@@ -32,6 +32,7 @@ type DataLayer struct {
 	appPerContext   map[string]*Application
 	appPerContextMx *sync.Mutex
 	devel           bool
+	LocalCharts     []string
 }
 
 type StatusInfo struct {
@@ -170,6 +171,8 @@ func (d *DataLayer) AppForCtx(ctx string) (*Application, error) {
 			return nil, errorx.Decorate(err, "Failed to create application for context '%s'", ctx)
 		}
 
+		a.Repositories.LocalCharts = d.LocalCharts
+
 		app = a
 		d.appPerContext[ctx] = app
 	}
@@ -218,7 +221,7 @@ func (d *DataLayer) loopUpdateRepos(ctx context.Context, interval time.Duration)
 			for _, repo := range repos {
 				err := repo.Update()
 				if err != nil {
-					log.Warnf("Failed to update repo %s: %v", repo.Orig.Name, err)
+					log.Warnf("Failed to update repo %s: %v", repo.Name(), err)
 				}
 			}
 		}

@@ -22,14 +22,15 @@ var (
 )
 
 type options struct {
-	Version    bool   `long:"version" description:"Show tool version"`
-	Verbose    bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
-	NoBrowser  bool   `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
-	NoTracking bool   `long:"no-analytics" description:"Disable user analytics (GA, DataDog etc.)"`
-	BindHost   string `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
-	Port       uint   `short:"p" long:"port" description:"Port to start server on" default:"8080"`
-	Namespace  string `short:"n" long:"namespace" description:"Namespace for HELM operations"`
-	Devel      bool   `long:"devel" description:"Include development versions of charts"`
+	Version    bool     `long:"version" description:"Show tool version"`
+	Verbose    bool     `short:"v" long:"verbose" description:"Show verbose debug information"`
+	NoBrowser  bool     `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
+	NoTracking bool     `long:"no-analytics" description:"Disable user analytics (Heap, DataDog etc.)"`
+	BindHost   string   `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
+	Port       uint     `short:"p" long:"port" description:"Port to start server on" default:"8080"`
+	Namespace  string   `short:"n" long:"namespace" description:"Namespace for HELM operations"`
+	Devel      bool     `long:"devel" description:"Include development versions of charts"`
+	LocalChart []string `long:"local-chart" description:"Specify location of local chart to include into UI"`
 }
 
 func main() {
@@ -46,12 +47,13 @@ func main() {
 	setupLogging(opts.Verbose)
 
 	server := dashboard.Server{
-		Version:    version,
-		Namespaces: strings.Split(opts.Namespace, ","),
-		Address:    fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
-		Debug:      opts.Verbose,
-		NoTracking: opts.NoTracking,
-		Devel:      opts.Devel,
+		Version:     version,
+		Namespaces:  strings.Split(opts.Namespace, ","),
+		Address:     fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
+		Debug:       opts.Verbose,
+		NoTracking:  opts.NoTracking,
+		Devel:       opts.Devel,
+		LocalCharts: opts.LocalChart,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

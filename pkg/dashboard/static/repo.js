@@ -10,7 +10,7 @@ function loadRepoView() {
         data.sort((a, b) => (a.name > b.name) - (a.name < b.name))
 
         data.forEach(function (elm) {
-            let opt = $('<li class="mb-2"><label><input type="radio" name="cluster" class="me-2"/><span></span></label></li>');
+            let opt = $('<li class="mb-2"><label><input type="radio" name="repo" class="me-2"/><span></span></label></li>');
             opt.attr('title', elm.url)
             opt.find("input").val(elm.name).text(elm.name).data("item", elm)
             opt.find("span").text(elm.name)
@@ -29,6 +29,8 @@ function loadRepoView() {
             $("#sectionRepo .repo-details").show()
             $("#sectionRepo .repo-details h2").text(elm.name)
             $("#sectionRepo .repo-details .url").text(elm.url)
+
+            $("#sectionRepo .btn-remove").prop("disabled", elm.url.startsWith('file://'))
 
             $("#sectionRepo .repo-details ul").html('<span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true"></span>')
             $.getJSON("/api/helm/repositories/" + elm.name).fail(function (xhr) {
