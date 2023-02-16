@@ -1,5 +1,3 @@
-#### Our first user-surevy is now [Live](https://helm-dashboard-survey.komodor.com/), vote and help us help you!
-
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="pkg/dashboard/static/logo-header-inverted.svg">
