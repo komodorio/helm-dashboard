@@ -170,14 +170,13 @@ $('#upgradeModal select').change(function () {
     const self = $(this)
     const ver = self.find("option:selected").data("ver");
 
-    let chart = ver.repository + "/" + ver.name;
-    if (!ver.name) {
-        chart = ""
-    }
-
-    // local chart case
-    if (ver.urls && ver.urls.length && ver.urls[0].startsWith("file://")) {
-        chart = ver.urls[0];
+    let chart = ""
+    if (ver) {
+        chart = ver.repository + "/" + ver.name;
+        // local chart case
+        if (ver.urls && ver.urls.length && ver.urls[0].startsWith("file://")) {
+            chart = ver.urls[0];
+        }
     }
 
     $('#upgradeModal').data("chart", chart)
