@@ -2,7 +2,7 @@
 
 # Copied w/ love from the chartmuseum/helm-push :)
 
-[ -z "$HELM_DEBUG" ] || set -x
+[ ! -z "$HELM_DEBUG" ] && set -x
 
 name="helm-dashboard"
 repo="https://github.com/komodorio/${name}"
