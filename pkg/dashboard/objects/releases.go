@@ -320,6 +320,7 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 	cmd.Version = version
 
 	cmd.DryRun = justTemplate
+	cmd.ResetValues = true
 
 	chrt, err := locateChart(cmd.ChartPathOptions, repoChart, r.Settings)
 	if err != nil {

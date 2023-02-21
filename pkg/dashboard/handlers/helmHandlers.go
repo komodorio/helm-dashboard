@@ -121,7 +121,7 @@ func (h *HelmHandler) History(c *gin.Context) {
 }
 
 func (h *HelmHandler) Resources(c *gin.Context) {
-	h.EnableClientCache(c)
+	// can't enable the client cache because resource list changes with time
 
 	rel := h.getRelease(c)
 	if rel == nil {

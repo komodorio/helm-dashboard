@@ -5,7 +5,7 @@
 ```bash
 helm repo add komodorio https://helm-charts.komodor.io
 helm repo update
-helm upgrade --install my-release komodorio/helm-dashboard
+helm upgrade --install helm-dashboard komodorio/helm-dashboard
 ```
 
 ## Introduction
@@ -17,14 +17,13 @@ While installed inside cluster, Helm Dashboard will run some additional backgrou
 ## Prerequisites
 
 - Kubernetes 1.16+
-- Helm 3+
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`:
+To install the chart with the release name `helm-dashboard`:
 
 ```bash
-helm install my-release .
+helm install helm-dashboard .
 ```
 
 The command deploys Helm Dashboard on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -33,10 +32,10 @@ The command deploys Helm Dashboard on the Kubernetes cluster in the default conf
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `my-release` deployment:
+To uninstall/delete the `helm-dashboard` deployment:
 
 ```bash
-helm uninstall my-release
+helm uninstall helm-dashboard
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -80,7 +79,7 @@ The following table lists the configurable parameters of the chart and their def
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 ```bash
-helm upgrade --install my-release komodorio/helm-dashboard --set dashboard.allowWriteActions=true --set service.port=9090
+helm upgrade --install helm-dashboard komodorio/helm-dashboard --set dashboard.allowWriteActions=true --set service.port=9090
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
