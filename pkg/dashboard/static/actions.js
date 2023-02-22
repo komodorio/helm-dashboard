@@ -102,11 +102,11 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
                 $('#upgradeModal select').append(opt)
             }
 
-            $('#upgradeModal select').val(elm.version).trigger("change").parent().show()
+            $('#upgradeModal select').val(elm.version).parent().show()
             upgrPopUpCommon(verCur, ns, lastRev, name)
         })
     } else { // chart without repo reconfigure
-        $('#upgradeModal select').empty().trigger("change").parent().hide()
+        $('#upgradeModal select').empty().parent().hide()
         upgrPopUpCommon(verCur, ns, lastRev, name)
     }
 }
@@ -121,9 +121,11 @@ function upgrPopUpCommon(verCur, ns, lastRev, name) {
             reportError("Failed to get charts values info", xhr)
         }).done(function (data) {
             $("#upgradeModal textarea").val(data).data("dirty", false)
+            $('#upgradeModal select').trigger("change")
         })
     } else {
         $("#upgradeModal textarea").val("").data("dirty", true)
+        $('#upgradeModal select').trigger("change")
     }
 }
 
