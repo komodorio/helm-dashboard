@@ -28,3 +28,4 @@ go.work
 
 .DS_Store
 .vscode/
+/pkg/dashboard/objects/testdata/hello-world-0.1.0.tgz
