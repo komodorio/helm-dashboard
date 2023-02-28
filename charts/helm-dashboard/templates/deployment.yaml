@@ -5,12 +5,11 @@ metadata:
   labels:
     {{- include "helm-dashboard.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
-      {{- include "helm-dashboard.selectorLabels" . | nindent 6 }}
+      {{- include "helm-dashboard.selectorLabels
+
   strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
   template:
     metadata:
