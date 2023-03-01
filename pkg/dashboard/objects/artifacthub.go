@@ -26,17 +26,13 @@ func QueryArtifactHub(chartName string) ([]*ArtifactHubResult, error) {
 		return nil, err
 	}
 
-	// maybe take last ~5 instead of 1
 	p.RawQuery = "offset=0&limit=5&facets=false&kind=0&deprecated=false&sort=relevance&ts_query_web=" + neturl.QueryEscape(chartName)
 
-	// Create request
 	req, err := http.NewRequest("GET", p.String(), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Set the user agent so that monocular can identify where the request
-	// is coming from
 	req.Header.Set("User-Agent", "Komodor Helm Dashboard/"+os.Getenv("HD_VERSION")) // TODO
 
 	log.Debugf("Making HTTP request: %v", req)
@@ -58,7 +54,6 @@ func QueryArtifactHub(chartName string) ([]*ArtifactHubResult, error) {
 	}
 
 	return result.Packages, nil
-
 }
 
 type ArtifactHubResults struct {
