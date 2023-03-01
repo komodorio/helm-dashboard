@@ -25,7 +25,11 @@ function checkUpgradeable(name) {
         if (!data || !data.length) {
             btnUpgradeCheck.prop("disabled", true)
             btnUpgradeCheck.text("")
-            $("#btnAddRepository").text("Add repository for it")
+            $("#btnAddRepository").text("Add repository for it").data("suggestRepo", "")
+        } else if (data[0].isSuggestedRepo) {
+            btnUpgradeCheck.prop("disabled", true)
+            btnUpgradeCheck.text("")
+            $("#btnAddRepository").text("Add repository for it: "+data[0].repository).data("suggestRepo", data[0].repository).data("suggestRepoUrl", data[0].urls[0])
         } else {
             $("#btnAddRepository").text("")
             btnUpgradeCheck.text("Check for new version")
@@ -399,7 +403,12 @@ $("#btnRollback").click(function () {
 })
 
 $("#btnAddRepository").click(function () {
+    const self=$(this)
     setHashParam("section", "repository")
+    if (self.data("suggestRepo")) {
+        setHashParam("suggestRepo", self.data("suggestRepo"))
+        setHashParam("suggestRepoUrl", self.data("suggestRepoUrl"))
+    }
     window.location.reload()
 })
 

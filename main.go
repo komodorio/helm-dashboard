@@ -34,6 +34,11 @@ type options struct {
 }
 
 func main() {
+	err := os.Setenv("HD_VERSION", version) // for anyone willing to access it
+	if err != nil {
+		fmt.Println("Failed to remember app version because of error: " + err.Error())
+	}
+
 	opts := parseFlags()
 	if opts.BindHost == "" {
 		host := os.Getenv("HD_BIND")
