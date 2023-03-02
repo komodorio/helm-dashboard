@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -207,7 +208,21 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 	if len(res) > 0 {
 		c.IndentedJSON(http.StatusOK, res[:1])
 	} else {
-		c.Status(http.StatusNoContent)
+		// caching it to avoid too many requests
+		found, err := h.Data.Cache.String("chart-artifacthub-query/"+qp.Name, nil, func() (string, error) {
+			return h.repoFromArtifactHub(qp.Name)
+		})
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		if found == "" {
+			c.Status(http.StatusNoContent)
+		} else {
+			c.Header("Content-Type", "application/json")
+			c.String(http.StatusOK, found)
+		}
 	}
 }
 
@@ -553,6 +568,49 @@ func (h *HelmHandler) handleGetSection(rel *objects.Release, section string, rDi
 	return res, nil
 }
 
+func (h *HelmHandler) repoFromArtifactHub(name string) (string, error) {
+	results, err := objects.QueryArtifactHub(name)
+	if err != nil {
+		log.Warnf("Failed to query ArtifactHub: %s", err)
+		return "", nil // swallowing the error to not annoy users
+	}
+
+	if len(results) == 0 {
+		return "", nil
+	}
+
+	sort.SliceStable(results, func(i, j int) bool {
+		// we prefer official repos
+		if results[i].Repository.Official && !results[j].Repository.Official {
+			return true
+		}
+
+		// or from verified publishers
+		if results[i].Repository.VerifiedPublisher && !results[j].Repository.VerifiedPublisher {
+			return true
+		}
+
+		// or just more popular
+		return results[i].Stars > results[j].Stars
+	})
+
+	r := results[0]
+	buf, err := json.Marshal([]*RepoChartElement{{
+		Name:            r.Name,
+		Version:         r.Version,
+		AppVersion:      r.AppVersion,
+		Description:     r.Description,
+		Repository:      r.Repository.Name,
+		URLs:            []string{r.Repository.Url},
+		IsSuggestedRepo: true,
+	}})
+	if err != nil {
+		return "", err
+	}
+
+	return string(buf), nil
+}
+
 type RepoChartElement struct { // TODO: do we need it at all? there is existing repo.ChartVersion in Helm
 	Name        string `json:"name"`
 	Version     string `json:"version"`
@@ -563,6 +621,7 @@ type RepoChartElement struct { // TODO: do we need it at all? there is existing 
 	InstalledName      string   `json:"installed_name"`
 	Repository         string   `json:"repository"`
 	URLs               []string `json:"urls"`
+	IsSuggestedRepo    bool     `json:"isSuggestedRepo"`
 }
 
 func HReleaseToJSON(o *release.Release) *ReleaseElement {

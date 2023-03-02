@@ -89,7 +89,13 @@ function buildChartCard(elm) {
         }
 
         if (isNewerVersion(elm.chartVersion, data[0].version)) {
-            card.find(".rel-name span").append("<span class='bi-arrow-up-circle-fill ms-2 text-success' title='Upgrade available: "+data[0].version+"'></span>")
+            const icon = $("<span class='ms-2 text-success' title='Upgrade available: " + data[0].version + " from " + data[0].repository + "'></span>")
+            if (data[0].isSuggestedRepo) {
+                icon.addClass("bi-arrow-up-circle")
+            } else {
+                icon.addClass("bi-arrow-up-circle-fill")
+            }
+            card.find(".rel-name span").append(icon)
         }
     })
 

@@ -2,6 +2,13 @@ function loadRepoView() {
     $("#sectionRepo .repo-details").hide()
     $("#sectionRepo").show()
 
+    $("#repoAddModal input[name=name]").val(getHashParam("suggestRepo"))
+    $("#repoAddModal input[name=url]").val(getHashParam("suggestRepoUrl"))
+
+    if (getHashParam("suggestRepo")) {
+        $("#sectionRepo .repo-list .btn").click()
+    }
+
     $.getJSON("/api/helm/repositories").fail(function (xhr) {
         reportError("Failed to get list of repositories", xhr)
         sendStats('Get repo', {'status': 'fail'});
@@ -85,6 +92,8 @@ $("#inputSearch").keyup(function () {
 })
 
 $("#sectionRepo .repo-list .btn").click(function () {
+    setHashParam("suggestRepo", null)
+    setHashParam("suggestRepoUrl", null)
     const myModal = new bootstrap.Modal(document.getElementById('repoAddModal'), {});
     myModal.show()
 })
