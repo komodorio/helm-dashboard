@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"os"
 	"sync"
 	"time"
 
@@ -194,13 +195,12 @@ func (d *DataLayer) nsForCtx(ctx string) string {
 }
 
 func (d *DataLayer) PeriodicTasks(ctx context.Context) {
-	if !d.StatusInfo.ClusterMode { // TODO: maybe have a separate flag for that?
-		log.Debugf("Not in cluster mode, not starting background tasks")
-		return
-	}
+	// TODO: separate scanning setup for in-cluster?
 
-	// auto-update repos
-	go d.loopUpdateRepos(ctx, 10*time.Minute) // TODO: parameterize interval?
+	if os.Getenv("HD_NO_AUTOUPDATE") == "" {
+		// auto-update repos
+		go d.loopUpdateRepos(ctx, 10*time.Minute) // TODO: parameterize interval?
+	}
 
 	// auto-scan
 }
