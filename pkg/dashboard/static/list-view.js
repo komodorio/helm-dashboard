@@ -88,14 +88,18 @@ function buildChartCard(elm) {
             return
         }
 
-        if (isNewerVersion(elm.chartVersion, data[0].version)) {
-            const icon = $("<span class='ms-2 text-success' data-bs-toggle='tooltip' data-bs-placement='bottom' data-bs-title='Upgrade available: " + data[0].version + " from " + data[0].repository + "'></span>")
+        if (isNewerVersion(elm.chartVersion, data[0].version) || data[0].isSuggestedRepo) {
+            const icon = $("<br/><span class='ms-2 fw-bold' data-bs-toggle='tooltip' data-bs-placement='bottom'></span>")
             if (data[0].isSuggestedRepo) {
-                icon.addClass("bi-arrow-up-circle")
+                icon.addClass("bi-plus-circle-fill text-primary")
+                icon.text(" ADD REPO")
+                icon.attr("data-bs-title", "Add '" + data[0].repository+"' to list of known repositories")
             } else {
-                icon.addClass("bi-arrow-up-circle-fill")
+                icon.addClass("bi-arrow-up-circle-fill text-primary")
+                icon.text(" UPGRADE")
+                icon.attr("data-bs-title", "Upgrade available: " + data[0].version + " from " + data[0].repository)
             }
-            card.find(".rel-name span").append(icon)
+            card.find(".rel-chart div").append(icon)
 
             const tooltipTriggerList = card.find('[data-bs-toggle="tooltip"]')
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))

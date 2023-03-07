@@ -117,8 +117,8 @@ $("#topNav ul a").click(function () {
     initView()
 })
 
-const myAlert = document.getElementById('errorAlert')
-myAlert.addEventListener('close.bs.alert', event => {
+const errAlert = document.getElementById('errorAlert')
+errAlert.addEventListener('close.bs.alert', event => {
     event.preventDefault()
     $("#errorAlert").hide()
 })
