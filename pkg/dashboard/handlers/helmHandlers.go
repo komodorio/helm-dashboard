@@ -250,7 +250,6 @@ func (h *HelmHandler) RepoCharts(c *gin.Context) {
 		return
 	}
 
-	// TODO: enrich with installed
 	enrichRepoChartsWithInstalled(charts, installed)
 
 	sort.Slice(charts, func(i, j int) bool {
@@ -580,18 +579,30 @@ func (h *HelmHandler) repoFromArtifactHub(name string) (string, error) {
 	}
 
 	sort.SliceStable(results, func(i, j int) bool {
+		ri, rj := results[i], results[j]
+
 		// we prefer official repos
-		if results[i].Repository.Official && !results[j].Repository.Official {
+		if ri.Repository.Official && !rj.Repository.Official {
 			return true
 		}
 
 		// or from verified publishers
-		if results[i].Repository.VerifiedPublisher && !results[j].Repository.VerifiedPublisher {
+		if ri.Repository.VerifiedPublisher && !rj.Repository.VerifiedPublisher {
 			return true
 		}
 
 		// or just more popular
-		return results[i].Stars > results[j].Stars
+		if ri.Stars > rj.Stars {
+			return true
+		}
+
+		// or with more recent app version
+
+		if semver.Compare("v"+ri.AppVersion, "v"+rj.AppVersion) > 0 {
+			return true
+		}
+
+		return false
 	})
 
 	r := results[0]

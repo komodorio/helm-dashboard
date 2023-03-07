@@ -357,3 +357,5 @@ function setFilteredNamespaces(filteredNamespaces) {
         setHashParam("filteredNamespace", filteredNamespaces.join('+'))
     }
 }
+
+const KomodorCTALink="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&utm_source=helm-dash&utm_medium=cta&utm_content=helm-dash"

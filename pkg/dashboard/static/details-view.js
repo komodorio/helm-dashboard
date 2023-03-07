@@ -196,7 +196,7 @@ function showResources(namespace, chart, revision) {
                 const statusBlock = resBlock.find(".res-status");
                 statusBlock.empty().append(badge).attr("title", data.status.phase)
                 const statusMessage = getStatusMessage(data.status)
-                resBlock.find(".res-statusmsg").html("<span class='text-muted small'>" + (statusMessage ? statusMessage : '') + "</span>")
+                resBlock.find(".res-statusmsg").html("<span class='text-muted small me-2'>" + (statusMessage ? statusMessage : '') + "</span>")
 
                 if (badge.text() !== "NotFound" && revision == $("#specRev").data("last-rev")) {
                     resBlock.find(".res-actions")
@@ -214,6 +214,10 @@ function showResources(namespace, chart, revision) {
                             scanResource(ns, res.kind, res.metadata.name, badge.clone())
                         })
                     }
+                }
+
+                if (badge.hasClass("bg-danger")) {
+                    resBlock.find(".res-statusmsg").append("<a href='" + KomodorCTALink + "' class='btn btn-primary btn-sm fw-normal fs-80' target='_blank'>Troubleshoot in Komodor <i class='bi-box-arrow-up-right'></i></a>")
                 }
             })
         }

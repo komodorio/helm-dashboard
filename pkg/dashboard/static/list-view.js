@@ -89,13 +89,17 @@ function buildChartCard(elm) {
         }
 
         if (isNewerVersion(elm.chartVersion, data[0].version)) {
-            const icon = $("<span class='ms-2 text-success' title='Upgrade available: " + data[0].version + " from " + data[0].repository + "'></span>")
+            const icon = $("<span class='ms-2 text-success' data-bs-toggle='tooltip' data-bs-placement='bottom' data-bs-title='Upgrade available: " + data[0].version + " from " + data[0].repository + "'></span>")
             if (data[0].isSuggestedRepo) {
                 icon.addClass("bi-arrow-up-circle")
             } else {
                 icon.addClass("bi-arrow-up-circle-fill")
             }
             card.find(".rel-name span").append(icon)
+
+            const tooltipTriggerList = card.find('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+            sendStats('upgradeIconShown', {'isProbable': data[0].isSuggestedRepo})
         }
     })
 

@@ -69,9 +69,15 @@
                     </a></li>
             </ul>
             <div>
-                <a class="btn" href="https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash"><img
-                        src="static/komodor-logo.svg" alt="komodor.io"
-                        style="height: 1.2rem; vertical-align: text-bottom; filter: grayscale(00%);"></a>
+                <div class="border-muted text-muted border rounded p-1 pe-2 me-3 d-flex">
+                    <img alt="Komodor" src="./static/komodor-icon.png" class="me-2" style="width: 42px; height: 42px"/>
+                    <span class="text-nowrap">
+                        <a href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&utm_source=helm-dash&utm_medium=cta&utm_content=helm-dash"
+                           class="link text-primary fw-bold text-decoration-none">Upgrade your HELM experience - Free
+                            <i class="bi-box-arrow-up-right ms-1"></i></a><br/>
+                        Auth & RBAC, k8s events, troubleshooting and more
+                    </span>
+                </div>
             </div>
             <div class="separator-vertical"><span></span></div>
             <i class="btn bi-power text-muted p-2 m-1 mx-2" title="Shut down the Helm Dashboard application"></i>
@@ -89,7 +95,9 @@
                 <button class="btn btn-sm border-secondary text-muted">
                     <i class="bi-plus-lg"></i> Add Repository
                 </button>
-                <div class="mt-2 p-2 small">Charts developers: you can also add local directories as chart source. Use <span class="font-monospace text-success">--local-chart</span> CLI switch to specify it.</div>
+                <div class="mt-2 p-2 small">Charts developers: you can also add local directories as chart source. Use
+                    <span class="font-monospace text-success">--local-chart</span> CLI switch to specify it.
+                </div>
             </div>
         </div>
         <div class="col-9 repo-details bg-white b-shadow pt-4 px-5 overflow-auto rounded">
@@ -305,6 +313,8 @@
     <hr>
     <p style="white-space: pre-wrap"></p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <hr/>
+    <span class="small text-muted fs-80">Hint: Komodor has the same HELM capabilities, with enterprise features and support. <a href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&utm_source=helm-dash&utm_medium=cta&utm_content=helm-dash" target="_blank">Sign up for free.</a></span>
 </div>
 
 <div class="offcanvas offcanvas-end rounded-start" tabindex="-1" id="describeModal"
@@ -314,8 +324,12 @@
             <h5 id="describeModalLabel"></h5>
             <p class="m-0 mt-4">ResourceType</p>
         </div>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-
+        <div>
+            <a href='https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&utm_source=helm-dash&utm_medium=cta&utm_content=helm-dash'
+               class='btn btn-primary btn-sm me-2' target='_blank'>See more details in Komodor <i
+                    class='bi-box-arrow-up-right'></i></a>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
     </div>
     <div class="offcanvas-body p-2 ps-4" id="describeModalBody">
     </div>
