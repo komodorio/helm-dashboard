@@ -32,12 +32,12 @@ export default function Badge(
       {type: string,
          children: React.ReactNode}) {
     let colorVariants = new Map<string, string>();
-    colorVariants.set("error", "bg-red-100 text-white-800");
-    colorVariants.set("success", "bg-green-100 text-blackde-100 text-black-800");
-    colorVariants.set("info", "bg-blue-100 text-black-800");
+    colorVariants.set("error", "bg-red-500 text-white");
+    colorVariants.set("success", "bg-green-300 text-black-100 text-black-800");
+    colorVariants.set("info", "bg-blue-200 text-black-800");
     colorVariants.set("default", "text-black-800");
 
-    const badgeBase = "inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium"
+    const badgeBase = "inline-flex items-center px-2.5 py-0.5 rounded text-xs font-light"
     // the type of the badge is indicated by "type" prop.
     // the default type is "default".
     //the resulting span element is stored in badge_elem.
