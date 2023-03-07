@@ -493,47 +493,5 @@
 <script src="static/actions.js"></script>
 <script src="static/scripts.js"></script>
 
-<!-- BANNER START
-<a id="banner"
-   href="https://helm-dashboard-survey.komodor.com/"
-   class="display-none position-absolute top-0 start-50 translate-middle-x bg-primary text-light rounded px-2 mt-1 text-decoration-none py-1">Help
-    shaping the future by participating in user survey <b class="bi-x-lg"></b></a>
-<script>
-    function setCookie(name, value, days) {
-        let expires = "";
-        if (days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    }
-
-    function getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            const c = ca[i].trim();
-            if (c.indexOf(nameEQ) === 0) {
-                return c.substring(nameEQ.length, c.length)
-            }
-        }
-        return null;
-    }
-
-    const cookie = getCookie("hideBanner");
-    if (cookie == null) {
-        console.log("show")
-        $("#banner").show()
-    }
-
-    $("#banner b").click(function (evt) {
-        evt.preventDefault()
-        setCookie("hideBanner", "1", 365);
-        $("#banner").hide()
-    })
-</script>
- /BANNER END -->
-
 </body>
 </html>
