@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"github.com/google/martian/log"
 	"github.com/joomcode/errorx"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net/http"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
@@ -56,19 +58,40 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 }
 
 func EnhanceStatus(res *v12.Carp) {
-	// custom logic to provide most meaningful status for the resource
-	if res.Status.Phase == "Active" || res.Status.Phase == "Error" {
-		_ = res.Name + ""
-	} else if res.Status.Phase == "" && len(res.Status.Conditions) > 0 {
-		res.Status.Phase = v12.CarpPhase(res.Status.Conditions[len(res.Status.Conditions)-1].Type)
-		res.Status.Message = res.Status.Conditions[len(res.Status.Conditions)-1].Message
-		res.Status.Reason = res.Status.Conditions[len(res.Status.Conditions)-1].Reason
-		if res.Status.Conditions[len(res.Status.Conditions)-1].Status == "False" {
-			res.Status.Phase = "Not" + res.Status.Phase
-		}
-	} else if res.Status.Phase == "" {
-		res.Status.Phase = "Exists"
+	s := res.Status
+	if s.Conditions == nil {
+		s.Conditions = []v12.CarpCondition{}
 	}
+
+	c := v12.CarpCondition{
+		Type:    "hdHealth",
+		Status:  "Healthy",
+		Reason:  s.Reason,
+		Message: s.Message,
+	}
+	const unhealthy = "Unhealthy"
+
+	// custom logic to provide most meaningful status for the resource
+	if s.Phase == "Error" {
+		c.Status = unhealthy
+	} else if s.Phase == "" && len(s.Conditions) > 0 {
+		sort.SliceStable(s.Conditions, func(i, j int) bool {
+			return s.Conditions[i].LastTransitionTime.Before(&s.Conditions[j].LastTransitionTime)
+		})
+
+		last := s.Conditions[len(s.Conditions)-1]
+		c.Reason = string(last.Type)
+		c.Message = last.Message
+		if last.Status == "False" {
+			c.Status = unhealthy
+		}
+	} else if s.Phase == "" {
+		c.Reason = "Exists"
+	} else {
+		log.Debugf("Something else")
+	}
+
+	s.Conditions = append(s.Conditions, c)
 }
 
 func (h *KubeHandler) Describe(c *gin.Context) {

@@ -93,7 +93,7 @@ function buildChartCard(elm) {
             if (data[0].isSuggestedRepo) {
                 icon.addClass("bi-plus-circle-fill text-primary")
                 icon.text(" ADD REPO")
-                icon.attr("data-bs-title", "Add '" + data[0].repository+"' to list of known repositories")
+                icon.attr("data-bs-title", "Add '" + data[0].repository + "' to list of known repositories")
             } else {
                 icon.addClass("bi-arrow-up-circle-fill text-primary")
                 icon.text(" UPGRADE")
@@ -105,6 +105,13 @@ function buildChartCard(elm) {
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
             sendStats('upgradeIconShown', {'isProbable': data[0].isSuggestedRepo})
         }
+    })
+
+    // check resource health status
+    $.getJSON("/api/helm/releases/" + elm.namespace + "/" + elm.name + "/resources/aggregate").fail(function (xhr) {
+        reportError("Failed to find chart in repo", xhr)
+    }).done(function (data) {
+        console.log(data)
     })
 
     return card;
