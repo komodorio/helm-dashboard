@@ -89,7 +89,7 @@ function buildChartCard(elm) {
         }
 
         if (isNewerVersion(elm.chartVersion, data[0].version) || data[0].isSuggestedRepo) {
-            const icon = $("<br/><span class='ms-2 fw-bold' data-bs-toggle='tooltip' data-bs-placement='bottom'></span>")
+            const icon = $("<br/><span class='fw-bold' data-bs-toggle='tooltip' data-bs-placement='bottom'></span>")
             if (data[0].isSuggestedRepo) {
                 icon.addClass("bi-plus-circle-fill text-primary")
                 icon.text(" ADD REPO")
