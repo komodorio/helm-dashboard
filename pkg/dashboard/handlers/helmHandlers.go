@@ -4,6 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"sort"
+	"strconv"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
@@ -19,10 +24,6 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
 	"k8s.io/utils/strings/slices"
-	"net/http"
-	"sort"
-	"strconv"
-	"strings"
 )
 
 type HelmHandler struct {
@@ -494,7 +495,7 @@ func (h *HelmHandler) RepoAdd(c *gin.Context) {
 	}
 
 	// TODO: more repo options to accept
-	err := app.Repositories.Add(c.PostForm("name"), c.PostForm("url"))
+	err := app.Repositories.Add(c.PostForm("name"), c.PostForm("url"), c.PostForm("username"), c.PostForm("password"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

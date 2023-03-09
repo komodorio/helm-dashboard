@@ -362,8 +362,26 @@
             </div>
             <div class="modal-body">
                 <form enctype="application/x-www-form-urlencoded">
-                    <label class="form-label">Name: <input class="form-control" name="name"></label>
-                    <label class="form-label">URL: <input class="form-control" name="url"></label>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label required">Name</label>
+                            <input class="form-control" type="text" name="name" placeholder="Komodorio">
+                        </div>
+                        <div class="col">
+                            <label class="form-label required">URL</label>
+                            <input class="form-control" type="text"  name="url" placeholder="https://helm-charts.komodor.io">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Username</label>
+                            <input class="form-control" type="text" name="username">
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Password</label>
+                            <input class="form-control" type="password" name="password">
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
