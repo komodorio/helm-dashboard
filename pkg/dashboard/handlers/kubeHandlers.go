@@ -1,16 +1,14 @@
 package handlers
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/utils/strings/slices"
 	"net/http"
-	"sort"
-
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
 
 const Healthy = "Healthy"
@@ -81,15 +79,18 @@ func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
 	} else if slices.Contains([]string{"Available", "Active", "Established", "Bound", "Ready"}, string(s.Phase)) {
 		// all good
 	} else if s.Phase == "" && len(s.Conditions) > 0 {
-		sort.SliceStable(s.Conditions, func(i, j int) bool {
-			return s.Conditions[i].LastTransitionTime.Before(&s.Conditions[j].LastTransitionTime)
-		})
-
-		last := s.Conditions[len(s.Conditions)-1]
-		c.Reason = string(last.Type)
-		c.Message = last.Message
-		if last.Status == "False" {
-			c.Status = Unhealthy
+		for _, cond := range s.Conditions {
+			if cond.Type == "Progressing" { // https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+				if cond.Status == "False" {
+					c.Status = Unhealthy
+					c.Reason = cond.Reason
+					c.Message = cond.Message
+				} else if cond.Reason != "NewReplicaSetAvailable" {
+					c.Status = Progressing
+					c.Reason = cond.Reason
+					c.Message = cond.Message
+				}
+			}
 		}
 	} else if s.Phase == "" {
 		c.Reason = "Exists"

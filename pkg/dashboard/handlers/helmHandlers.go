@@ -135,7 +135,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 		return
 	}
 
-	if c.Query("health") != "" {
+	if c.Query("health") != "" { // we need  to query k8s for health status
 		app := h.GetApp(c)
 		if app == nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
