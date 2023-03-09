@@ -11,6 +11,7 @@ import (
 	"net/http"
 )
 
+const Unknown = "Unknown"
 const Healthy = "Healthy"
 const Unhealthy = "Unhealthy"
 const Progressing = "Progressing"
@@ -68,7 +69,7 @@ func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
 
 	c := v12.CarpCondition{
 		Type:    "hdHealth",
-		Status:  Healthy,
+		Status:  Unknown,
 		Reason:  s.Reason,
 		Message: s.Message,
 	}
@@ -77,7 +78,7 @@ func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
 	if s.Phase == "Error" {
 		c.Status = Unhealthy
 	} else if slices.Contains([]string{"Available", "Active", "Established", "Bound", "Ready"}, string(s.Phase)) {
-		// all good
+		c.Status = Healthy
 	} else if s.Phase == "" && len(s.Conditions) > 0 {
 		for _, cond := range s.Conditions {
 			if cond.Type == "Progressing" { // https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
@@ -90,12 +91,21 @@ func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
 					c.Reason = cond.Reason
 					c.Message = cond.Message
 				}
+			} else if cond.Type == "Available" && c.Status == Unknown {
+				if cond.Status == "False" {
+					c.Status = Unhealthy
+				} else {
+					c.Status = Healthy
+				}
+				c.Reason = cond.Reason
+				c.Message = cond.Message
 			}
 		}
 	} else if s.Phase == "" {
+		c.Status = Healthy
 		c.Reason = "Exists"
 	} else {
-		log.Debugf("Something else")
+		log.Warnf("Unhandled status: %v", s)
 	}
 
 	s.Conditions = append(s.Conditions, c)
