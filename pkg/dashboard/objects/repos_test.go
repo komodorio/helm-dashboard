@@ -75,7 +75,7 @@ func TestFlow(t *testing.T) {
 	testRepoUrl := "https://helm.github.io/examples"
 
 	// add repo
-	err = testRepository.Add(testRepoName, testRepoUrl)
+	err = testRepository.Add(testRepoName, testRepoUrl, "", "")
 	assert.NilError(t, err)
 
 	// get repo
