@@ -101,17 +101,49 @@ function buildChartCard(elm) {
             }
             card.find(".rel-chart div").append(icon)
 
-            const tooltipTriggerList = card.find('[data-bs-toggle="tooltip"]')
+            const tooltipTriggerList = card.find('.rel-chart [data-bs-toggle="tooltip"]')
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
             sendStats('upgradeIconShown', {'isProbable': data[0].isSuggestedRepo})
         }
     })
 
     // check resource health status
-    $.getJSON("/api/helm/releases/" + elm.namespace + "/" + elm.name + "/resources/aggregate").fail(function (xhr) {
+    $.getJSON("/api/helm/releases/" + elm.namespace + "/" + elm.name + "/resources?health=true").fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
-        console.log(data)
+        let cntGood = 0, cntBad = 0, cntProgress = 0;
+        for (let i = 0; i < data.length; i++) {
+            const res = data[i]
+            for (let k = 0; k < res.status.conditions.length; k++) {
+                if (res.status.conditions[k].type !== "hdHealth") { // it's our custom condition type
+                    continue
+                }
+
+                const cond = res.status.conditions[k]
+                if (cond.status === "Healthy") {
+                    cntGood += 1
+                } else if (cond.status === "Progressing") {
+                    cntProgress += 1
+                } else {
+                    cntBad += 1
+                }
+            }
+        }
+
+        if (cntGood) {
+            card.find(".rel-status div").append("<i class='bi-heart text-success fs-6 me-1' data-bs-toggle='tooltip' data-bs-title='" + cntGood + " resources healthy'></i>")
+        }
+
+        if (cntProgress) {
+            card.find(".rel-status div").append("<i class='bi-heart-pulse-fill text-warning fs-6 me-1' data-bs-toggle='tooltip' data-bs-title='" + cntBad + " resources progressing'></i>")
+        }
+
+        if (cntBad) {
+            card.find(".rel-status div").append("<i class='bi-heartbreak-fill text-danger fs-6 me-1' data-bs-toggle='tooltip' data-bs-title='" + cntBad + " resources unhealthy'></i>")
+        }
+
+        const tooltipTriggerList = card.find('.rel-status [data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     })
 
     return card;

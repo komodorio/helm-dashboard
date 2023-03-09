@@ -302,6 +302,11 @@
           "name": "name",
           "in": "path",
           "description": "Name of Helm release"
+        },
+        {
+          "name": "health",
+          "in": "query",
+          "description": "Flag to query k8s health status of resources"
         }
       ],
       "get": {
@@ -312,34 +317,6 @@
         "responses": {
           "200": {
             "description": "Structured list of resources",
-            "content": {
-              "application/json": {}
-            }
-          }
-        }
-      }
-    },
-    "/api/helm/releases/{ns}/{name}/resources/aggregate": {
-      "parameters": [
-        {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
-        },
-        {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
-      ],
-      "get": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Aggregate status of health for resources of a release",
-        "responses": {
-          "200": {
-            "description": "Status object",
             "content": {
               "application/json": {}
             }

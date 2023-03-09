@@ -149,7 +149,7 @@ function showResources(namespace, chart, revision) {
     const resBody = $("#nav-resources .body");
     const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
     resBody.empty().append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-    let url = "/api/helm/releases/" + namespace + "/" + chart + "/resources"
+    let url = "/api/helm/releases/" + namespace + "/" + chart + "/resources?health=true"
     $.getJSON(url).fail(function (xhr) {
         reportError("Failed to get list of resources", xhr)
     }).done(function (data) {
@@ -179,23 +179,30 @@ function showResources(namespace, chart, revision) {
             resBlock.find(".res-name").text(res.metadata.name)
 
             resBody.append(resBlock)
-            let ns = res.metadata.namespace ? res.metadata.namespace : namespace
-            $.getJSON("/api/k8s/" + res.kind.toLowerCase() + "/get?name=" + res.metadata.name + "&namespace=" + ns).fail(function () {
-                //reportError("Failed to get list of resources")
-            }).done(function (data) {
-                const badge = $("<span class='badge me-2 fw-normal'></span>").text(data.status.phase);
-                if (["Available", "Active", "Established", "Bound", "Ready"].includes(data.status.phase)) {
+
+            for (let k = 0; k < res.status.conditions.length; k++) {
+                if (res.status.conditions[k].type !== "hdHealth") { // it's our custom condition type
+                    continue
+                }
+
+                const cond=res.status.conditions[k]
+
+                const badge = $("<span class='badge me-2 fw-normal'></span>").text(cond.reason);
+                if (cond.status==="Healthy") {
                     badge.addClass("bg-success text-dark")
-                } else if (["Exists"].includes(data.status.phase)) {
-                    badge.addClass("bg-success text-dark bg-opacity-50")
-                } else if (["Progressing"].includes(data.status.phase)) {
+                } else if (cond.status==="Progressing") {
                     badge.addClass("bg-warning")
                 } else {
                     badge.addClass("bg-danger")
                 }
+
+                if (["Exists"].includes(cond.reason)) {
+                    badge.addClass("bg-opacity-50")
+                }
+
                 const statusBlock = resBlock.find(".res-status");
-                statusBlock.empty().append(badge).attr("title", data.status.phase)
-                const statusMessage = getStatusMessage(data.status)
+                statusBlock.empty().append(badge).attr("title", cond.reason)
+                const statusMessage = cond.message
                 resBlock.find(".res-statusmsg").html("<span class='text-muted small me-2'>" + (statusMessage ? statusMessage : '') + "</span>")
 
                 if (badge.text() !== "NotFound" && revision == $("#specRev").data("last-rev")) {
@@ -219,7 +226,7 @@ function showResources(namespace, chart, revision) {
                 if (badge.hasClass("bg-danger")) {
                     resBlock.find(".res-statusmsg").append("<a href='" + KomodorCTALink + "' class='btn btn-primary btn-sm fw-normal fs-80' target='_blank'>Troubleshoot in Komodor <i class='bi-box-arrow-up-right'></i></a>")
                 }
-            })
+            }
         }
     })
 }

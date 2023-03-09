@@ -18,13 +18,11 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
-	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/utils/strings/slices"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 type HelmHandler struct {
@@ -137,47 +135,24 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, res)
-}
-
-var mxResAggregate sync.Mutex
-
-func (h *HelmHandler) ResourcesAggregate(c *gin.Context) {
-	// can't enable the client cache because resource status changes with time
-
-	mxResAggregate.Lock() // otherwise we can overwhelm k8s
-	defer mxResAggregate.Unlock()
-
-	rel := h.getRelease(c)
-	if rel == nil {
-		return // error state is set inside
-	}
-
-	res, err := objects.ParseManifests(rel.Orig.Manifest)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	app := h.GetApp(c)
-	if app == nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	infos := []*v1.Carp{}
-	for _, obj := range res {
-		ns := obj.Namespace
-		if ns == "" {
-			ns = c.Param("ns")
-		}
-		info, err := app.K8s.GetResourceInfo(obj.Kind, ns, obj.Name)
-		if err != nil {
+	if c.Query("health") != "" {
+		app := h.GetApp(c)
+		if app == nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		EnhanceStatus(info)
-		infos = append(infos, info)
+		for _, obj := range res {
+			ns := obj.Namespace
+			if ns == "" {
+				ns = c.Param("ns")
+			}
+			info, err := app.K8s.GetResourceInfo(obj.Kind, ns, obj.Name)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			obj.Status = *EnhanceStatus(info)
+		}
 	}
 
 	c.IndentedJSON(http.StatusOK, res)

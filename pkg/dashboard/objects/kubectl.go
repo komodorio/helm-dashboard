@@ -146,6 +146,7 @@ func (k *K8s) GetResource(kind string, namespace string, name string) (*runtime.
 }
 
 func (k *K8s) GetResourceInfo(kind string, namespace string, name string) (*testapiv1.Carp, error) {
+	// TODO: mutex to avoid a lot of requests?
 	obj, err := k.GetResource(kind, namespace, name)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get k8s object")
