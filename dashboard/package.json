@@ -16,11 +16,23 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.7.0",
+    "prettier": "2.8.4",
+    "typescript": "^4.9.5"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "npx eslint src/",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "npx prettier src/ --check",
+    "prettier:fix": "npm run prettier -- --write"
   },
   "eslintConfig": {
     "extends": [
