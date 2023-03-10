@@ -231,16 +231,6 @@ function showResources(namespace, chart, revision) {
     })
 }
 
-function getStatusMessage(status) {
-    if (!status) {
-        return
-    }
-    if (status.conditions) {
-        return status.conditions[0].message || status.conditions[0].reason
-    }
-    return status.message || status.reason
-}
-
 function showDescribe(ns, kind, name, badge) {
     $("#describeModal .offcanvas-header p").text(kind)
     $("#describeModalLabel").text(name).append(badge.addClass("ms-3 small fw-normal"))
