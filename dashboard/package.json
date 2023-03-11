@@ -17,6 +17,14 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^6.3.1",
+    "@storybook/addon-essentials": "^6.3.1",
+    "@storybook/addon-links": "^6.3.1",
+    "@storybook/builder-vite": "^0.4.2",
+    "@storybook/node-logger": "^6.3.1",
+    "@storybook/preset-create-react-app": "^3.1.6",
+    "@storybook/react": "^6.3.8",
+    "@storybook/testing-library": "^0.0.1",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
@@ -25,18 +33,11 @@
     "autoprefixer": "^10.4.14",
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-storybook": "^0.6.11",
     "postcss": "^8.4.21",
     "prettier": "2.8.4",
     "tailwindcss": "^3.2.7",
     "typescript": "^4.9.5",
-    "vite": "^4.1.0",
-    "@storybook/builder-vite": "^0.4.2",
-    "@storybook/addon-actions": "^6.3.1",
-    "@storybook/addon-essentials": "^6.3.1",
-    "@storybook/addon-links": "^6.3.1",
-    "@storybook/node-logger": "^6.3.1",
-    "@storybook/preset-create-react-app": "^3.1.6",
-    "@storybook/react": "^6.3.8",
-    "@storybook/testing-library": "^0.0.1"
+    "vite": "^4.1.0"
   }
 }
