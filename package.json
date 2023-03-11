@@ -1,0 +1,20 @@
+{
+  "name": "helm-dashboard",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">\r   <picture>\r     <source media=\"(prefers-color-scheme: dark)\" srcset=\"pkg/dashboard/static/logo-header-inverted.svg\">\r     <source media=\"(prefers-color-scheme: light)\" srcset=\"pkg/dashboard/static/logo-header.svg#gh-light-mode-only\">\r     <img alt=\"Helm Dashboard\" src=\"pkg/dashboard/static/logo-header.svg#gh-light-mode-only\">\r   </picture>\r </p>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tony-Stark/helm-dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tony-Stark/helm-dashboard/issues"
+  },
+  "homepage": "https://github.com/Tony-Stark/helm-dashboard#readme"
+}

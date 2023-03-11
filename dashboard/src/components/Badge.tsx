@@ -17,16 +17,16 @@
  * <Badge type="warning">Warning</Badge>
  *
  * @param {string} type - The type of the badge.
- * @param {string} className - The class name of the badge.
  * @param {string} children - The content of the badge.
  * @returns {JSX.Element} - The badge component.
  *
  * @see https://tailwindcss.com/docs/border-radius
-
  */
+
 import React from 'react'
 // import index.css from the main folder
 import '../index.css'
+
 export default function Badge (
   { type, children }:
   { type: 'error' | 'success' | 'info' | 'default'
