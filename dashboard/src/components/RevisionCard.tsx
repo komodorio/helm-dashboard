@@ -69,19 +69,29 @@ previousVersion: string, currentVersion: string,
 statusCode: 'Deployed' | 'Superseded' | 'Failed' }):
  JSX.Element {
     return (
-      <div className="card h-40 w-80">
+      <div className="card">
+
         {/* the status is displayed in the top left corner, using the Status component */}
-        {/* and also using tailwind css classes */}
         <div className="flex flex-row justify-start items-start">
           <Status statusCode={statusCode} />
         </div>
+
         {/* the revision number is displayed in the top right corner */}
-        {/* and also using tailwind css classes */}
         <div className="flex flex-row justify-end items-start">
-          <span className="text-sm font-bold">{revision}</span>
+          <span className="text-sm font-bold">#{revision}</span>
         </div>
-        {/* the revision age is displayed in the bottom right corner */}
-        {/* using  tailwind css classes */}
+
+        {/* the version-change sub part is displayed in the bottom left corner */}
+        <div className="flex flex-row justify-start items-end">
+          <span className="text-sm font-light">{previousVersion}</span>
+          {/* the correct symbol is displayed based on the previous and current */}
+          {/* automatically, and the symbol is displayed directly */}
+          {/* it's an up-arrow if the current version is higher than the previous, */}
+          {/* and a down-arrow if the current version is lower than the previous */}
+          {currentVersion > previousVersion ? <span className="text-sm font-light"> &#8593; </span> : <span className="text-sm font-light"> &#8595; </span>}
+          <span className="text-sm font-light">{currentVersion}</span>
+        </div>
+
         {/* if the revision was made longer than 60 seconds ago, the time is displayed in minutes */}
         {/* if the revision was made longer than 60 minutes ago, the time is displayed in hours */}
         <div className="flex flex-row justify-end items-end">
@@ -94,17 +104,7 @@ statusCode: 'Deployed' | 'Superseded' | 'Failed' }):
             }
           </span>
         </div>
-        {/* the version-change sub part is displayed in the bottom left corner */}
-        {/* and also using tailwind css classes */} 
-        <div className="flex flex-row justify-start items-end">
-          <span className="text-sm font-light">{previousVersion}</span>
-          {/* the correct symbol is displayed based on the previous and current */}
-          {/* automatically, and the symbol is displayed directly */}
-          {/* it's an up-arrow if the current version is higher than the previous, */}
-          {/* and a down-arrow if the current version is lower than the previous */}
-          {currentVersion > previousVersion ? <span className="text-sm font-light"> &#8593; </span> : <span className="text-sm font-light"> &#8595; </span>}
-          <span className="text-sm font-light">{currentVersion}</span>
-        </div>
+
       </div> 
     );
 }

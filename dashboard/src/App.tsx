@@ -16,7 +16,8 @@ function App() {
       <Button onClick={()=>{return}}> hello</Button>
       <hr />
       <RevisionCard revisionDate={new Date('August 19, 1975 23:15:30')} 
-        revision={"8"} previousVersion={"1.0.0"} currentVersion={"1.0.1"} statusCode={"Superseded"}/>
+        revision={"8"} previousVersion={"1.0.0"} currentVersion={"1.0.1"}
+        statusCode={"Superseded"} />
     </div>
   )
 }
