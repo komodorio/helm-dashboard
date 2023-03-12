@@ -179,18 +179,18 @@ function showResources(namespace, chart, revision) {
             resBlock.find(".res-name").text(res.metadata.name)
 
             resBody.append(resBlock)
-
+            let ns = res.metadata.namespace ? res.metadata.namespace : namespace
             for (let k = 0; k < res.status.conditions.length; k++) {
                 if (res.status.conditions[k].type !== "hdHealth") { // it's our custom condition type
                     continue
                 }
 
-                const cond=res.status.conditions[k]
+                const cond = res.status.conditions[k]
 
                 const badge = $("<span class='badge me-2 fw-normal'></span>").text(cond.reason);
-                if (cond.status==="Healthy") {
+                if (cond.status === "Healthy") {
                     badge.addClass("bg-success text-dark")
-                } else if (cond.status==="Progressing") {
+                } else if (cond.status === "Progressing") {
                     badge.addClass("bg-warning")
                 } else {
                     badge.addClass("bg-danger")

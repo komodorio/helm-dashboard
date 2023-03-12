@@ -101,11 +101,15 @@ func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
 				c.Message = cond.Message
 			}
 		}
+	} else if s.Phase == "Pending" {
+		c.Status = Progressing
+		c.Reason = string(s.Phase)
 	} else if s.Phase == "" {
 		c.Status = Healthy
 		c.Reason = "Exists"
 	} else {
 		log.Warnf("Unhandled status: %v", s)
+		c.Reason = string(s.Phase)
 	}
 
 	s.Conditions = append(s.Conditions, c)
