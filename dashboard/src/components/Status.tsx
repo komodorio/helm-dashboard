@@ -14,7 +14,7 @@
  *
  */
 import React from 'react'
-
+import '../index.css'
 export default function Status({statusCode}: {statusCode: 'Deployed' | 'Superseded' | 'Failed'}): JSX.Element {
   const statusVariants = {
     Deployed: 'text-green-500',
@@ -22,12 +22,12 @@ export default function Status({statusCode}: {statusCode: 'Deployed' | 'Supersed
     Failed: 'text-red-500'
   };
   /* the text should be bold. we can use tailwind utility class for that */
-  const baseTextElem = 'h-2 w-2 font-bold';
+  const baseTextElem = 'inline-flex h-2 w-2 font-bold';
   /* this const is the tailwind classes that should be used for displaying the small status orb correctly,
       regardless of status */
-  const baseOrbElem = 'h-2 w-2'
+  const baseOrbElem = 'inline-flex h-2 w-2'
   return (
-    <span className="flex h-4 w-4">
+    <div className='inline-flex items-center px-2.5 py-0.5 rounded text-xs font-light'>
       {/* an orb with the correct color is displayed according to the status code using svg */}
       {/* this orb should be position right beside the left of the status text */}
         <span>
@@ -42,6 +42,6 @@ export default function Status({statusCode}: {statusCode: 'Deployed' | 'Supersed
         <span className={`${baseTextElem} ${statusVariants[statusCode]}`}>
           {statusCode}
         </span>
-    </span>
+    </div>
 )
 }
