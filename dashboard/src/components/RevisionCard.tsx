@@ -62,34 +62,8 @@
 import React from "react";
 import "../index.css";
 import Status from "./Status";
-/** 
- * This function creates the AGE part that will be displayed
- * on the bottom right corner.
- * it uses condiiontal rendering logic to display time in different formats,
- * according to the revision age. If the revision age is in an order of seconds
- * it'll be displayed as seconds, if minutes than minutes etc.
- *
- * @param {Date} revisionDate: the date of the creation of the revision
- * @return JSX.element
- */ 
-function getRevisionAgeJSX(revisionDate: Date):JSX.Element {
-  return (
-    <span className="text-sm font-light">
-      AGE:{" "}
-      {Math.floor((Date.now() - revisionDate.getTime()) / 1000) < 60
-        ? Math.floor((Date.now() - revisionDate.getTime()) / 1000) + "s"
-        : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) < 60
-        ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) + "m"
-        : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) <
-          24
-        ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) +
-          "h"
-        : Math.floor(
-            (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60 / 24
-          ) + "d"}
-    </span>
-  );
-}
+
+
 export default function RevisionCard({
   revision,
   revisionDate,
@@ -109,6 +83,24 @@ export default function RevisionCard({
   isRefreshable: boolean;
   onClick: () => void;
 }): JSX.Element {
+  function getRevisionAgeJSX(revisionDate: Date):JSX.Element {
+    return (
+      <span className="text-sm font-light">
+        AGE:{" "}
+        {Math.floor((Date.now() - revisionDate.getTime()) / 1000) < 60
+          ? Math.floor((Date.now() - revisionDate.getTime()) / 1000) + "s"
+          : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) < 60
+          ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) + "m"
+          : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) <
+            24
+          ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) +
+            "h"
+          : Math.floor(
+              (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60 / 24
+            ) + "d"}
+      </span>
+    );
+  }
   const activeVariants = {
     true: "border-1 border-blue-500",
     false: "border-1 border-gray-300"
