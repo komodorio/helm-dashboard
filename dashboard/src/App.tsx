@@ -3,6 +3,7 @@ import Badge from "./components/Badge";
 import Status from "./components/Status";
 import Button from "./components/Button";
 import RevisionCard from "./components/RevisionCard";
+import TabsBar from "./components/TabsBar";
 function App() {
   return (
     <div>
@@ -21,6 +22,12 @@ function App() {
         {" "}
         hello
       </Button>
+      <hr />
+      <TabsBar 
+          tabs={[{name: "hello", component: <div>hello</div>}, {name: "hello2", component: <div>hello2</div>}]} 
+          activeTab="hello" setActiveTab={(tab)=>{return;}} 
+          setTabContent={(tab)=>{return;}}
+        />
       <hr />
       <div className="relative h-64 w-32">
         <RevisionCard

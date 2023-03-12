@@ -62,6 +62,24 @@
 import React from "react";
 import "../index.css";
 import Status from "./Status";
+function getRevisionAgeJSX(revisionDate: Date):JSX.Element {
+  return (
+    <span className="text-sm font-light">
+      AGE:{" "}
+      {Math.floor((Date.now() - revisionDate.getTime()) / 1000) < 60
+        ? Math.floor((Date.now() - revisionDate.getTime()) / 1000) + "s"
+        : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) < 60
+        ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) + "m"
+        : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) <
+          24
+        ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) +
+          "h"
+        : Math.floor(
+            (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60 / 24
+          ) + "d"}
+    </span>
+  );
+}
 export default function RevisionCard({
   revision,
   revisionDate,
@@ -118,23 +136,7 @@ export default function RevisionCard({
       {/* if the revision was made longer than 60 minutes ago, the time is displayed in hours */}
       {/* if the revision was made longer than 24 hours ago, the time is displayed in days */}
       <div className="absolute bottom-0 right-0 mb-4 mr-4">
-        <span className="text-sm font-light">
-          AGE:{" "}
-          {Math.floor((Date.now() - revisionDate.getTime()) / 1000) < 60
-            ? Math.floor((Date.now() - revisionDate.getTime()) / 1000) + "s"
-            : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) < 60
-            ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) +
-              "m"
-            : Math.floor(
-                (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60
-              ) < 24
-            ? Math.floor(
-                (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60
-              ) + "h"
-            : Math.floor(
-                (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60 / 24
-              ) + "d"}
-        </span>
+        {getRevisionAgeJSX(revisionDate)}
       </div>
     </div>
   );
