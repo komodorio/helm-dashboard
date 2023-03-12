@@ -21,6 +21,5 @@ const Template: ComponentStory<typeof Badge> = (args) => <Badge {...args} />;
 export const FirstStory = Template.bind({});
 
 FirstStory.args = {
-    children: "Badge Text",
-    
+    children: <><span>Property:</span>&nbsp; <span className="font-semibold">Property Value</span></>,
 };
