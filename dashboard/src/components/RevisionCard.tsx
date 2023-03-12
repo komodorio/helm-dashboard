@@ -62,6 +62,16 @@
 import React from "react";
 import "../index.css";
 import Status from "./Status";
+/** 
+ * This function creates the AGE part that will be displayed
+ * on the bottom right corner.
+ * it uses condiiontal rendering logic to display time in different formats,
+ * according to the revision age. If the revision age is in an order of seconds
+ * it'll be displayed as seconds, if minutes than minutes etc.
+ *
+ * @param {Date} revisionDate: the date of the creation of the revision
+ * @return JSX.element
+ */ 
 function getRevisionAgeJSX(revisionDate: Date):JSX.Element {
   return (
     <span className="text-sm font-light">
@@ -132,9 +142,7 @@ export default function RevisionCard({
         <span className="text-sm font-light">{currentVersion}</span>
       </div>
 
-      {/* if the revision was made longer than 60 seconds ago, the time is displayed in minutes */}
-      {/* if the revision was made longer than 60 minutes ago, the time is displayed in hours */}
-      {/* if the revision was made longer than 24 hours ago, the time is displayed in days */}
+
       <div className="absolute bottom-0 right-0 mb-4 mr-4">
         {getRevisionAgeJSX(revisionDate)}
       </div>
