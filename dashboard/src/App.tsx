@@ -1,71 +1,46 @@
-import "./App.css";
-import Badge from "./components/Badge";
-import Status from "./components/Status";
-import Button from "./components/Button";
-import RevisionCard from "./components/RevisionCard";
-import TabsBar from "./components/TabsBar";
-function App() {
+//import "./App.css";
+import "./index.css";
+
+function App(): JSX.Element {
+  /* using tailwind css utilty classes
+    we create a big card in the center of the screen
+    with a title and instructions on how to run storybook configured
+    for this project. (helm-dashboard projecT).
+    The title is "Welcome to our project!"
+    The instructions include <code> and <pre> tags to display
+    the commands to run storybook and for some troubleshooting.
+    The card is bordered with slightly rounded corners.
+    The card is clickable and will redirect to localhost:6006 
+    where storybook is running.
+    If there are still any issues, the user shouldn't hesitate to ask for help.
+    no login information required. */
   return (
-    <div>
-      <hr />
-      <Badge type="error"> Not Available</Badge>
-      <hr />
-      <Badge type="success"> Available </Badge>
-      <hr />
-      <Status isRefreshable={false} statusCode="Deployed" />
-      <hr />
-      <Button
-        onClick={() => {
-          return;
-        }}
-      >
-        {" "}
-        hello
-      </Button>
-      <hr />
-      <TabsBar 
-          tabs={[{name: "hello", component: <div>hello</div>}, {name: "hello2", component: <div>hello2</div>}]} 
-          activeTab="hello" setActiveTab={(tab)=>{return;}} 
-          setTabContent={(tab)=>{return;}}
-        />
-      <hr />
-      <div className="relative h-64 w-32">
-        <RevisionCard
-          revisionDate={new Date("August 19, 1975 23:15:30")}
-          revision={"8"}
-          previousVersion={"1.0.0"}
-          currentVersion={"1.0.1"}
-          statusCode={"Superseded"}
-          isActive="true"
-          isRefreshable={true}
-          onClick={() => {
-            return;
-          }}
-        />
-        <RevisionCard
-          revisionDate={new Date("August 19, 2022 23:15:30")}
-          revision={"7"}
-          previousVersion={"1.0.0"}
-          currentVersion={"1.0.1"}
-          statusCode={"Failed"}
-          isActive="false"
-          isRefreshable={false}
-          onClick={() => {
-            return;
-          }}
-        />
-        <RevisionCard
-          revisionDate={new Date("March 3, 2023 23:15:30")}
-          revision={"6"}
-          previousVersion={"2.1.0"}
-          currentVersion={"1.0.1"}
-          statusCode={"Deployed"}
-          isActive="false"
-          isRefreshable={false}
-          onClick={() => {
-            return;
-          }}
-        />
+    <div className="flex items-center justify-center h-screen">
+      <div className="max-w-3xl max-h-3xl w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="px-4 py-2">
+          <h1 className="text-2xl font-bold text-gray-800">Welcome to our project!</h1>
+          <p className="mt-2">
+            To run storybook, run the following commands:
+          </p>
+          <pre className="mt-2 border-2 bg-gray-400 rounded-sm">
+            <code className="text-gray-200">
+             &nbsp; npm install &nbsp;<i className="text-gray-300">// to verify that all dependencies are installed</i>
+            <br />
+            &nbsp; npm run storybook 
+            </code>
+          </pre>
+          <p className="mt-2 text-gray-600">
+            If you have trouble, don't hesitate to ask for help.
+          </p>
+        </div>
+        <div className="flex items-center justify-end px-4 py-2 bg-gray-100">
+          <a
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            href="http://localhost:6006"
+          >
+            Run Storybook
+          </a>
+        </div>
       </div>
     </div>
   );
