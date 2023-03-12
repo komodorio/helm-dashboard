@@ -17,8 +17,10 @@ import React from "react";
 import "../index.css";
 export default function Status({
   statusCode,
+  isRefreshable=false,
 }: {
   statusCode: "Deployed" | "Superseded" | "Failed";
+  isRefreshable: boolean;
 }): JSX.Element {
   const statusVariants = {
     Deployed: "text-green-500",
@@ -27,13 +29,14 @@ export default function Status({
   };
   /* the text should be bold. we can use tailwind utility class for that */
   const baseTextElem = "inline-flex font-bold";
-  /* this const is the tailwind classes that should be used for displaying the small status orb correctly,
-      regardless of status */
+  // this const is used to display the refresh icon
+  const refreshIcon = <>&nbsp;<button className="hover:text-blue-400">&#8635;</button></>;
   return (
     <div className="inline-flex items-center rounded font-light text-base">
       {/* a unicode circle is displayed with the correct color is displayed according to the status code using svg */}
       <span className={`${baseTextElem} ${statusVariants[statusCode]}`}>
         {"\u25c9"} {statusCode}
+        {isRefreshable ? refreshIcon : ""}
       </span>
     </div>
   );

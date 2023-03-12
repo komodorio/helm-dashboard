@@ -69,7 +69,8 @@ export default function RevisionCard({
   currentVersion,
   statusCode,
   isActive = "false",
-  onClick,
+  isRefreshable = false,
+  onClick
 }: {
   revision: string;
   revisionDate: Date;
@@ -77,6 +78,7 @@ export default function RevisionCard({
   currentVersion: string;
   statusCode: "Deployed" | "Superseded" | "Failed";
   isActive: "true" | "false";
+  isRefreshable: boolean;
   onClick: () => void;
 }): JSX.Element {
   const activeVariants = {
@@ -90,7 +92,7 @@ export default function RevisionCard({
     >
       {/* the status is displayed in the top left corner, using the Status component */}
       <div className="absolute top-0 left-0 mt-4 ml-4">
-        <Status statusCode={statusCode} />
+        <Status isRefreshable={isRefreshable} statusCode={statusCode} />
       </div>
 
       {/* the revision number is displayed in the top right corner */}
@@ -114,8 +116,10 @@ export default function RevisionCard({
 
       {/* if the revision was made longer than 60 seconds ago, the time is displayed in minutes */}
       {/* if the revision was made longer than 60 minutes ago, the time is displayed in hours */}
+      {/* if the revision was made longer than 24 hours ago, the time is displayed in days */}
       <div className="absolute bottom-0 right-0 mb-4 mr-4">
         <span className="text-sm font-light">
+          AGE:{" "}
           {Math.floor((Date.now() - revisionDate.getTime()) / 1000) < 60
             ? Math.floor((Date.now() - revisionDate.getTime()) / 1000) + "s"
             : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) < 60
@@ -123,7 +127,13 @@ export default function RevisionCard({
               "m"
             : Math.floor(
                 (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60
-              ) + "h"}
+              ) < 24
+            ? Math.floor(
+                (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60
+              ) + "h"
+            : Math.floor(
+                (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60 / 24
+              ) + "d"}
         </span>
       </div>
     </div>

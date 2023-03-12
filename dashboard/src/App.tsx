@@ -11,7 +11,7 @@ function App() {
       <hr />
       <Badge type="success"> Available </Badge>
       <hr />
-      <Status statusCode="Deployed" />
+      <Status isRefreshable={false} statusCode="Deployed" />
       <hr />
       <Button
         onClick={() => {
@@ -30,24 +30,27 @@ function App() {
           currentVersion={"1.0.1"}
           statusCode={"Superseded"}
           isActive = "true"
+          isRefreshable={true}
           onClick={() => {return;}}
         />
         <RevisionCard
-          revisionDate={new Date("August 19, 1975 23:15:30")}
+          revisionDate={new Date("August 19, 2022 23:15:30")}
           revision={"7"}
           previousVersion={"1.0.0"}
           currentVersion={"1.0.1"}
           statusCode={"Failed"}
           isActive="false"
+          isRefreshable={false}
           onClick={() => {return;}}
         />
         <RevisionCard
-          revisionDate={new Date("August 19, 1975 23:15:30")}
+          revisionDate={new Date("March 3, 2023 23:15:30")}
           revision={"6"}
           previousVersion={"2.1.0"}
           currentVersion={"1.0.1"}
           statusCode={"Deployed"}
           isActive="false"
+          isRefreshable={false}
           onClick={() => {return;}}
         />
       </div>
