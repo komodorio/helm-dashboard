@@ -1,25 +1,58 @@
-import './App.css'
-import Badge from './components/Badge'
-import Status from './components/Status'
-import Button from './components/Button'
-import RevisionCard from './components/RevisionCard'
+import "./App.css";
+import Badge from "./components/Badge";
+import Status from "./components/Status";
+import Button from "./components/Button";
+import RevisionCard from "./components/RevisionCard";
 function App() {
   return (
     <div>
       <hr />
-      <Badge type="error"> Hello </Badge>
+      <Badge type="error"> Not Available</Badge>
       <hr />
-      <Badge type="success"> Hello </Badge>
+      <Badge type="success"> Available </Badge>
       <hr />
       <Status statusCode="Deployed" />
       <hr />
-      <Button onClick={()=>{return}}> hello</Button>
+      <Button
+        onClick={() => {
+          return;
+        }}
+      >
+        {" "}
+        hello
+      </Button>
       <hr />
-      <RevisionCard revisionDate={new Date('August 19, 1975 23:15:30')} 
-        revision={"8"} previousVersion={"1.0.0"} currentVersion={"1.0.1"}
-        statusCode={"Superseded"} />
+      <div className="relative h-64 w-32">
+        <RevisionCard
+          revisionDate={new Date("August 19, 1975 23:15:30")}
+          revision={"8"}
+          previousVersion={"1.0.0"}
+          currentVersion={"1.0.1"}
+          statusCode={"Superseded"}
+          isActive = "true"
+          onClick={() => {return;}}
+        />
+        <RevisionCard
+          revisionDate={new Date("August 19, 1975 23:15:30")}
+          revision={"7"}
+          previousVersion={"1.0.0"}
+          currentVersion={"1.0.1"}
+          statusCode={"Failed"}
+          isActive="false"
+          onClick={() => {return;}}
+        />
+        <RevisionCard
+          revisionDate={new Date("August 19, 1975 23:15:30")}
+          revision={"6"}
+          previousVersion={"2.1.0"}
+          currentVersion={"1.0.1"}
+          statusCode={"Deployed"}
+          isActive="false"
+          onClick={() => {return;}}
+        />
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -9,21 +9,30 @@
  *
  * @param children: children
  * @param onClick: () => void
- * 
+ *
  *
  */
 
-import React from 'react'
-import '../index.css'
+import React from "react";
+import "../index.css";
 // this is a type declaration for the action prop.
 // it is a function that takes a string as an argument and returns void.
 
-export default function Button({children, onClick}: {children: React.ReactNode, onClick: ()=>void}): JSX.Element{
-return(
-  <>
-    <button onClick={onClick} className="border border-gray-500 bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded">
+export default function Button({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+}): JSX.Element {
+  return (
+    <>
+      <button
+        onClick={onClick}
+        className="border border-gray-500 bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded"
+      >
         {children}
-    </button>
-  </>
-);
+      </button>
+    </>
+  );
 }
