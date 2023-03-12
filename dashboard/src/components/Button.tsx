@@ -29,7 +29,7 @@ export default function Button({
     <>
       <button
         onClick={onClick}
-        className="border border-gray-500 bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded"
+        className="border border-gray-500 bg-gray-100 hover:bg-gray-200 text-black py-2 px-4 rounded"
       >
         {children}
       </button>

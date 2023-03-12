@@ -21,5 +21,8 @@ const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
 export const FirstStory = Template.bind({});
 
 FirstStory.args = {
-  children: "Button Text",
+  children: <>
+              <span>&uarr;</span>
+              <span> Update</span>
+            </>,
 };
