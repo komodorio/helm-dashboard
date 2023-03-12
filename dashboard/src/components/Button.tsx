@@ -20,7 +20,7 @@ import "../index.css";
 
 export default function Button({
   children,
-  onClick,
+  onClick
 }: {
   children: React.ReactNode;
   onClick: () => void;

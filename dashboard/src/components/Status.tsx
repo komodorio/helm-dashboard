@@ -17,7 +17,7 @@ import React from "react";
 import "../index.css";
 export default function Status({
   statusCode,
-  isRefreshable=false,
+  isRefreshable = false
 }: {
   statusCode: "Deployed" | "Superseded" | "Failed";
   isRefreshable: boolean;
@@ -25,12 +25,16 @@ export default function Status({
   const statusVariants = {
     Deployed: "text-green-500",
     Superseded: "text-gray-500",
-    Failed: "text-red-500",
+    Failed: "text-red-500"
   };
   /* the text should be bold. we can use tailwind utility class for that */
   const baseTextElem = "inline-flex font-bold";
   // this const is used to display the refresh icon
-  const refreshIcon = <>&nbsp;<button className="hover:text-blue-400">&#8635;</button></>;
+  const refreshIcon = (
+    <>
+      &nbsp;<button className="hover:text-blue-400">&#8635;</button>
+    </>
+  );
   return (
     <div className="inline-flex items-center rounded font-light text-base">
       {/* a unicode circle is displayed with the correct color is displayed according to the status code using svg */}

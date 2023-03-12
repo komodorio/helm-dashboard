@@ -29,9 +29,11 @@ function App() {
           previousVersion={"1.0.0"}
           currentVersion={"1.0.1"}
           statusCode={"Superseded"}
-          isActive = "true"
+          isActive="true"
           isRefreshable={true}
-          onClick={() => {return;}}
+          onClick={() => {
+            return;
+          }}
         />
         <RevisionCard
           revisionDate={new Date("August 19, 2022 23:15:30")}
@@ -41,7 +43,9 @@ function App() {
           statusCode={"Failed"}
           isActive="false"
           isRefreshable={false}
-          onClick={() => {return;}}
+          onClick={() => {
+            return;
+          }}
         />
         <RevisionCard
           revisionDate={new Date("March 3, 2023 23:15:30")}
@@ -51,7 +55,9 @@ function App() {
           statusCode={"Deployed"}
           isActive="false"
           isRefreshable={false}
-          onClick={() => {return;}}
+          onClick={() => {
+            return;
+          }}
         />
       </div>
     </div>
