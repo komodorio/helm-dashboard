@@ -73,6 +73,7 @@
 import React from "react";
 import { StatusCode } from "../global";
 import Status from "./Status";
+import {getAge} from '../timeUtils';
 
 export interface RevisionCardProps {
   revision: string;
@@ -86,29 +87,9 @@ export interface RevisionCardProps {
   onRefreshClick: () => void;
 }
 
-export default function RevisionCard({
-  props
-}: {
-  props: RevisionCardProps;
-}): JSX.Element {
-  function getRevisionAgeJSX(revisionDate: Date):JSX.Element {
-    return (
-      <span className="text-sm font-light">
-        AGE:{" "}
-        {Math.floor((Date.now() - revisionDate.getTime()) / 1000) < 60
-          ? Math.floor((Date.now() - revisionDate.getTime()) / 1000) + "s"
-          : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) < 60
-          ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60) + "m"
-          : Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) <
-            24
-          ? Math.floor((Date.now() - revisionDate.getTime()) / 1000 / 60 / 60) +
-            "h"
-          : Math.floor(
-              (Date.now() - revisionDate.getTime()) / 1000 / 60 / 60 / 24
-            ) + "d"}
-      </span>
-    );
-  }
+export default function RevisionCard(
+  props: RevisionCardProps
+): JSX.Element {
   const isActiveStr = props.isActive ? "true" : "false";
   const activeVariants = {
     true: "border-1 border-blue-500",
@@ -145,7 +126,9 @@ export default function RevisionCard({
 
 
       <div className="absolute bottom-0 right-0 mb-4 mr-4">
-        {getRevisionAgeJSX(props.revisionDate)}
+        <span>
+          {getAge(props.revisionDate)}
+        </span>
       </div>
     </div>
   );

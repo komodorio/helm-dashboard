@@ -14,7 +14,6 @@
  */
 import React from "react";
 import {StatusCode} from '../global';
-
 export default function Status({
   statusCode,
   isRefreshable = false
