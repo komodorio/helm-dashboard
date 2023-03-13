@@ -29,7 +29,7 @@ const confirmModalActions: ModalAction[] = [
   {
     text: "Cancel",
     callback: () => {
-      console.log("confirmModal: clicked Cancek");
+      console.log("confirmModal: clicked Cancel");
     },
   },
   {
