@@ -111,7 +111,6 @@ function buildChartCard(elm) {
     $.getJSON("/api/helm/releases/" + elm.namespace + "/" + elm.name + "/resources?health=true").fail(function (xhr) {
         reportError("Failed to find chart in repo", xhr)
     }).done(function (data) {
-        let cntGood = 0, cntBad = 0, cntProgress = 0;
         for (let i = 0; i < data.length; i++) {
             const res = data[i]
             for (let k = 0; k < res.status.conditions.length; k++) {
@@ -120,26 +119,17 @@ function buildChartCard(elm) {
                 }
 
                 const cond = res.status.conditions[k]
+                const square=$("<span class='me-1 mb-1 square rounded rounded-1' data-bs-toggle='tooltip'>&nbsp;</span>")
                 if (cond.status === "Healthy") {
-                    cntGood += 1
+                    square.addClass("bg-success")
                 } else if (cond.status === "Progressing") {
-                    cntProgress += 1
+                    square.addClass("bg-warning")
                 } else {
-                    cntBad += 1
+                    square.addClass("bg-danger")
                 }
+                square.attr("data-bs-title", cond.status+" "+res.kind+" '"+res.metadata.name+"'")
+                card.find(".rel-status div").append(square)
             }
-        }
-
-        if (cntGood) {
-            card.find(".rel-status div").append("<i class='bi-heart text-success fs-6 me-1' data-bs-toggle='tooltip' data-bs-title='" + cntGood + " resources healthy'></i>")
-        }
-
-        if (cntProgress) {
-            card.find(".rel-status div").append("<i class='bi-heart-pulse-fill text-warning fs-6 me-1' data-bs-toggle='tooltip' data-bs-title='" + cntBad + " resources progressing'></i>")
-        }
-
-        if (cntBad) {
-            card.find(".rel-status div").append("<i class='bi-heartbreak-fill text-danger fs-6 me-1' data-bs-toggle='tooltip' data-bs-title='" + cntBad + " resources unhealthy'></i>")
         }
 
         const tooltipTriggerList = card.find('.rel-status [data-bs-toggle="tooltip"]')
