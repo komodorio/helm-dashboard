@@ -47,12 +47,7 @@ version, and a symbol in between to indicate if this is
   }
 } as ComponentMeta<typeof RevisionCard>;
 */
-const meta: Meta = {
-  title: 'Revision Card',
-  component: RevisionCard,
-}
-export default meta;
-const Template:Story<RevisionCardProps> = (args) => <RevisionCard props={args} />;
+const Template: ComponentStory<typeof RevisionCard> = (args: RevisionCardProps) => <RevisionCard {...args} />;
 export const Default = Template.bind({});
 Default.args = {
   revision: '1',
@@ -65,17 +60,8 @@ Default.args = {
   isActive: true,
   isRefreshable : false,
 }
-export const RevisionCardStory = () => {
-  const props: RevisionCardProps = {
-    revision: '1',
-    revisionDate: new Date('2021-01-01 00:00:00'),
-    previousVersion: '1.12.31',
-    currentVersion: '1.12.32',
-    onClick: () => {},
-    onRefreshClick: () => {},
-    statusCode: 'Deployed',
-    isActive: true,
-    isRefreshable : false,
-  }
-  return <RevisionCard props={props} />
+export default {
+title:'Revision Card',
+component: RevisionCard,
+args: Default.args,
 }

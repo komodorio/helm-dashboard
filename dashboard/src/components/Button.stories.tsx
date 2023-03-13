@@ -20,7 +20,7 @@ export default {
 // create a template for it.
 // We want to declare default values for the props, so we create a
 // default args object.
-const Template: Story<ButtonProps> = (args) => <Button props={args} />;
+const Template: ComponentStory<typeof Button> = (args: ButtonProps) => <Button {...args} />;
 export const Default = Template.bind({});
 Default.args = {
   children: <><span>&uarr;</span><span>Update</span></>,
