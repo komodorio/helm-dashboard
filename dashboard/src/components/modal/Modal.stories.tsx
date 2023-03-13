@@ -27,9 +27,15 @@ export const ConfirmModal = Template.bind({});
 
 const confirmModalActions: ModalAction[] = [
   {
+    text: "Cancel",
+    callback: () => {
+      console.log("confirmModal: clicked Cancek");
+    },
+  },
+  {
     text: "Confirm",
     callback: () => {
-      console.log("confirmModal clicked Confirm");
+      console.log("confirmModal: clicked Confirm");
     },
   },
 ];
