@@ -20,7 +20,7 @@ export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement>{
   children: React.ReactNode;
   onClick: () => void;
 }
-export default function Button({props}: {props: ButtonProps}): JSX.Element {
+export default function Button(props: ButtonProps): JSX.Element {
   return (
     <>
       <button

@@ -1,4 +1,4 @@
-/*/**
+/**
  * @file Status.tsx
  * The Status component:
  * This component is used to display the status of a deployment.
@@ -11,11 +11,10 @@
  *
  * @param statusCode: enum StatusCode
  *
- *
  */
 import React from "react";
-// import global constants from global.tsx
 import {StatusCode} from '../global';
+
 export default function Status({
   statusCode,
   isRefreshable = false

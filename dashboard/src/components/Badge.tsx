@@ -8,11 +8,6 @@
  * behind the scenes, it uses tailwindcss classes to imlement the badge,
  * with the correct styles.
  *
- * an example for a warning badge implementation using tailwind:
- *
- * <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
- * bg-yellow-100 text-yellow-800">
- *
  * @example
  * <Badge type="warning">Warning</Badge>
  *
@@ -24,9 +19,9 @@
  */
 
 import React from 'react'
-// import index.css from the main folder
+import { BadgeCode } from '../global';
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  type: 'error' | 'success' | 'info' | 'default'
+  type: BadgeCode,
   children: React.ReactNode
 }
 export default function Badge (

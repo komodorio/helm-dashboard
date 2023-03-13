@@ -1,3 +1,18 @@
+/**
+ * 
+ * @file TextInput.tsx
+ * @description This is a single-lined text field.
+ *              You can choose a placeholder, label,
+ *              and whether the field is mandatory.
+ * @interface TextInputProps:
+ * - label: the label to be displayed
+ * - placeholder: placeholder text
+ * - isMandatory: adds a red star if is.
+ *
+ * @return JSX.Element 
+ *
+ */
+
 import React from "react";
 
 export interface TextInputProps {
@@ -6,17 +21,14 @@ export interface TextInputProps {
   isMandatory?: boolean;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
-const defaultProps = {
-  label:'Label',
-  placeholder:'Write something here...',
-  isMandatory:false,
-  onChange:()=>{}
-}
-export default function TextInput({props}: {props: TextInputProps}): JSX.Element {
+
+export default function TextInput(props: TextInputProps): JSX.Element {
   return (
     <div className="mb-6">
       <label className="block ml-1 mb-1 text-sm font-medium text-gray-900dark:text-white">
         {props.label}
+        {/* if prop.isMandatory is true, add a whitespace and a red star to signify it*/}
+        {props.isMandatory ? <span className='text-red-500'> *</span> : ""}
       </label>
       <input
         type="text"
