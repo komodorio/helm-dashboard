@@ -302,6 +302,11 @@
           "name": "name",
           "in": "path",
           "description": "Name of Helm release"
+        },
+        {
+          "name": "health",
+          "in": "query",
+          "description": "Flag to query k8s health status of resources"
         }
       ],
       "get": {
