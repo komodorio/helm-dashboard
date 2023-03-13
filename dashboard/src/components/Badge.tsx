@@ -25,7 +25,6 @@
 
 import React from 'react'
 // import index.css from the main folder
-import '../index.css'
 
 export default function Badge (
   { type, children }:

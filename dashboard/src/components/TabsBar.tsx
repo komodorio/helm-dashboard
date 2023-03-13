@@ -16,7 +16,6 @@
  */
 
 import React from "react";
-import "../index.css";
 
 interface TabsBarProps {
   tabs: Array<{ name: string; component: JSX.Element }>;

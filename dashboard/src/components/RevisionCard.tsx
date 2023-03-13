@@ -72,7 +72,6 @@
 
 import React from "react";
 import { StatusCode } from "../global";
-import "../index.css";
 import Status from "./Status";
 
 interface RevisionCardProps {

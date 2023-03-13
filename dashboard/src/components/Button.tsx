@@ -14,7 +14,6 @@
  */
 
 import React from "react";
-import "../index.css";
 // this is a type declaration for the action prop.
 // it is a function that takes a string as an argument and returns void.
 
