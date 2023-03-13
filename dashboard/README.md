@@ -66,4 +66,14 @@ Inorder to open a pull request with your changes. \
  for example) and get your pull request reviewed.
 
 # Component library
-TODO
+We created components library to have a consistent design system throughout the project. Please rely on these componenets.
+Additional information and examples on how to use them are available when you run Storybook, which shows them in an interactive way and in different scenarios.
+
+Once you run it, you'll be able to see pre-made scenarios, documentation, and play with the component properties.
+
+To run Storybook, make sure that all the dependencies are installed and run:
+```shell
+npm run storybook
+```
+
+Refer to the [official documentation](https://storybook.js.org/docs/react/get-started/install) for more information.
