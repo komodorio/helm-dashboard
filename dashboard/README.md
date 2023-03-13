@@ -1,12 +1,15 @@
 # Helm dashboard V2
+Welcome to our new project, upgrading helm dashbord, we call it, Helm Dashboard version... 2! 🤩
+
 Helm dashboard V2 is an open source effort to modernize the helm-dashboard.
-Our goals are to create a version of help more:
+Our goals are to create a version which is more:
 1. Maintable 
 2. Extendable
 3. Contributor friendly 
 
 
 ## What is helm?
+First thing first, if you are new here please check out these resources to see what helm is all about
 [Video](https://www.youtube.com/watch?v=fy8SHvNZGeE)
 [Article](https://kruschecompany.com/helm-kubernetes/)
 
@@ -17,8 +20,12 @@ The legacy dashboard found [here](https://github.com/komodorio/helm-dashboard/tr
 Our goal with dashboard V2 is to improve the ability to maintain and extend our dashboard app. To achive this we are using a more modern frontend stack.
 - Vite, as our build tool.
 - React will be used to make this project more inviting for developers to contribute too.
+- TypeScript and ESLint will keep the project safe, please keep them clean.
 - Tailwind will be used for styling.
+- React-Query will be used to fetch data from the backend.
 - Storybook is utilized to develop a component library.
+
+Please follow through the file structure to understand how things are structured and should be used.
 
 # Contribution guide
 
@@ -31,6 +38,8 @@ The legacy dashboard is great for refrence and checking that you have implemente
 4. `bin/dashboard`
 
 The UI should now be running on http://localhost:8080/
+If you're having issues with that please follow the main README in the main folder.
+If you still having troubles please contact us on our [Slack community channel](https://join.slack.com/t/komodorkommunity/shared_invite/zt-1lz4cme86-2zIKTRtTFnzL_UNxaUS9yw)
 
 ## Setting up your development environment
 
@@ -40,10 +49,9 @@ The UI should now be running on http://localhost:8080/
     - `git fetch`
     - `git checkout helm-dashboard-v2`
 
-
 ## Running dashboard V2
 
-1. first make sure you cloned the project correctly. This is explained in this [stage](https://github.com/komodorio/helm-dashboard/blob/helm-dashboard-v2/dashboard/README.md#setting-up-your-development-environment).
+1. Make sure you cloned the project correctly. This is explained in this [stage](https://github.com/komodorio/helm-dashboard/blob/helm-dashboard-v2/dashboard/README.md#setting-up-your-development-environment).
 2. go to `helm-dashboard-v2/dashboard` in your local project.
 3. inorder to install dependncies and start the development server
     - `npm i`
@@ -55,7 +63,7 @@ The UI should now be running on http://localhost:8080/
 If you are completely new to the project its recommended to look for tasks labled: `good first issue`.
 These tasks should be simple enough for a begginer or for someone looking to learn the code base.
 
-You are also free to reachout to us on [discord](https://discord.gg/udRezxKt), we can help you find a task that suits your perfectly.
+You are also free to reachout to us on [Slack](https://join.slack.com/t/komodorkommunity/shared_invite/zt-1lz4cme86-2zIKTRtTFnzL_UNxaUS9yw), we can help you find a task that suits your perfectly.
 
 ## Opening a pull request
 Inorder to open a pull request with your changes. \
