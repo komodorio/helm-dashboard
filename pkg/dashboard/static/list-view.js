@@ -93,7 +93,7 @@ function buildChartCard(elm) {
             if (data[0].isSuggestedRepo) {
                 icon.addClass("bi-plus-circle-fill text-primary")
                 icon.text(" ADD REPO")
-                icon.attr("data-bs-title", "Add '" + data[0].repository+"' to list of known repositories")
+                icon.attr("data-bs-title", "Add '" + data[0].repository + "' to list of known repositories")
             } else {
                 icon.addClass("bi-arrow-up-circle-fill text-primary")
                 icon.text(" UPGRADE")
@@ -101,10 +101,39 @@ function buildChartCard(elm) {
             }
             card.find(".rel-chart div").append(icon)
 
-            const tooltipTriggerList = card.find('[data-bs-toggle="tooltip"]')
+            const tooltipTriggerList = card.find('.rel-chart [data-bs-toggle="tooltip"]')
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
             sendStats('upgradeIconShown', {'isProbable': data[0].isSuggestedRepo})
         }
+    })
+
+    // check resource health status
+    $.getJSON("/api/helm/releases/" + elm.namespace + "/" + elm.name + "/resources?health=true").fail(function (xhr) {
+        reportError("Failed to find chart in repo", xhr)
+    }).done(function (data) {
+        for (let i = 0; i < data.length; i++) {
+            const res = data[i]
+            for (let k = 0; k < res.status.conditions.length; k++) {
+                if (res.status.conditions[k].type !== "hdHealth") { // it's our custom condition type
+                    continue
+                }
+
+                const cond = res.status.conditions[k]
+                const square=$("<span class='me-1 mb-1 square rounded rounded-1' data-bs-toggle='tooltip'>&nbsp;</span>")
+                if (cond.status === "Healthy") {
+                    square.addClass("bg-success")
+                } else if (cond.status === "Progressing") {
+                    square.addClass("bg-warning")
+                } else {
+                    square.addClass("bg-danger")
+                }
+                square.attr("data-bs-title", cond.status+" "+res.kind+" '"+res.metadata.name+"'")
+                card.find(".rel-status div").append(square)
+            }
+        }
+
+        const tooltipTriggerList = card.find('.rel-status [data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     })
 
     return card;
