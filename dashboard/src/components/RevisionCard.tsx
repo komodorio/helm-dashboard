@@ -47,6 +47,17 @@
  * and a down-arrow if the current version is lower than the previous.
  *
  * Props:
+ * @param props with the interface:
+  * {
+  *   revision: string;
+  *   revisionDate: Date;
+  *   previousVersion: string;
+  *   currentVersion: string;
+  *   statusCode: StatusCode;
+  *   isActive: boolean;
+  *   isRefreshable: boolean;
+  *   onClick: () => void;
+  * }
  * @param {string} revision - the revision number
  * @param {Date} revisionDate - the revision date
  * @param {string} previousVersion - the previous version
@@ -60,28 +71,25 @@
  */
 
 import React from "react";
+import { StatusCode } from "../global";
 import "../index.css";
 import Status from "./Status";
 
-
-export default function RevisionCard({
-  revision,
-  revisionDate,
-  previousVersion,
-  currentVersion,
-  statusCode,
-  isActive = "false",
-  isRefreshable = false,
-  onClick
-}: {
+interface RevisionCardProps {
   revision: string;
   revisionDate: Date;
   previousVersion: string;
   currentVersion: string;
-  statusCode: "Deployed" | "Superseded" | "Failed";
-  isActive: "true" | "false";
+  statusCode: StatusCode;
+  isActive: boolean;
   isRefreshable: boolean;
   onClick: () => void;
+}
+
+export default function RevisionCard({
+  props
+}: {
+  props: RevisionCardProps;
 }): JSX.Element {
   function getRevisionAgeJSX(revisionDate: Date):JSX.Element {
     return (
@@ -101,42 +109,43 @@ export default function RevisionCard({
       </span>
     );
   }
+  const isActiveStr = props.isActive ? "true" : "false";
   const activeVariants = {
     true: "border-1 border-blue-500",
     false: "border-1 border-gray-300"
   };
   return (
     <div
-      className={`card ${activeVariants[isActive]} relative h-24 w-64 hover:card-hover m-1`}
-      onClick={onClick}
+      className={`card ${activeVariants[isActiveStr]} relative h-24 w-64 hover:card-hover m-1`}
+      onClick={props.onClick}
     >
       {/* the status is displayed in the top left corner, using the Status component */}
       <div className="absolute top-0 left-0 mt-4 ml-4">
-        <Status isRefreshable={isRefreshable} statusCode={statusCode} />
+        <Status isRefreshable={props.isRefreshable} statusCode={props.statusCode} />
       </div>
 
       {/* the revision number is displayed in the top right corner */}
       <div className="absolute top-0 right-0 mt-4 mr-4">
-        <span className="text-sm font-bold">#{revision}</span>
+        <span className="text-sm font-bold">#{props.revision}</span>
       </div>
       {/* the version-change sub part is displayed in the bottom left corner */}
       <div className="absolute bottom-0 left-0 mb-4 ml-4">
-        <span className="text-sm font-light">{previousVersion}</span>
+        <span className="text-sm font-light">{props.previousVersion}</span>
         {/* the correct symbol is displayed based on the previous and current */}
         {/* automatically, and the symbol is displayed directly */}
         {/* it's an up-arrow if the current version is higher than the previous, */}
         {/* and a down-arrow if the current version is lower than the previous */}
-        {currentVersion > previousVersion ? (
+        {props.currentVersion > props.previousVersion ? (
           <span className="text-sm font-light"> &#8593; </span>
         ) : (
           <span className="text-sm font-light"> &#8595; </span>
         )}
-        <span className="text-sm font-light">{currentVersion}</span>
+        <span className="text-sm font-light">{props.currentVersion}</span>
       </div>
 
 
       <div className="absolute bottom-0 right-0 mb-4 mr-4">
-        {getRevisionAgeJSX(revisionDate)}
+        {getRevisionAgeJSX(props.revisionDate)}
       </div>
     </div>
   );
