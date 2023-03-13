@@ -10,6 +10,16 @@ Our goals are to create a version of help more:
 [Video](https://www.youtube.com/watch?v=fy8SHvNZGeE)
 [Article](https://kruschecompany.com/helm-kubernetes/)
 
+# Legacy dashboard vs dashboard V2
+
+The legacy dashboard found [here](https://github.com/komodorio/helm-dashboard/tree/main/pkg/dashboard/static) is a static webapp and was written vanilla css, jquery, javascript and html. If you inspect the code abit you may notice that its relitvly hard to extend and maintain such a project.
+
+Our goal with dashboard V2 is to improve the ability to maintain and extend our dashboard app. To achive this we are using a more modern frontend stack.
+- Vite, as our build tool.
+- React will be used to make this project more inviting for developers to contribute too.
+- Tailwind will be used for styling.
+- Storybook is utilized to develop a component library.
+
 # Contribution guide
 
 ## Running legacy dashboard
