@@ -1,9 +1,14 @@
 import { useState, useEffect, PropsWithChildren } from "react";
 
+export enum ModalButtonStyle {
+  default,
+  primary,
+}
+
 export type ModalAction = {
   callback: () => void;
   text: string;
-  btnStyle?: string;
+  btnStyle?: ModalButtonStyle;
 };
 
 type ModalProps = {
@@ -13,11 +18,19 @@ type ModalProps = {
   actions?: ModalAction[];
 } & PropsWithChildren;
 
-const buttonDefaultStyle =
-"text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800";
-
 const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(isOpen);
+
+  const colorVariants = new Map<ModalButtonStyle, string>([
+    [
+      ModalButtonStyle.default,
+      "text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600",
+    ],
+    [
+      ModalButtonStyle.primary,
+      "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
+    ],
+  ]);
 
   useEffect(() => {
     setIsVisible(isOpen);
@@ -54,11 +67,15 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
           {children}
         </p>
       </div>
-      <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600" >
+      <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
         {actions?.map((action) => (
           <button
             type="button"
-            className={action.btnStyle ?? buttonDefaultStyle}
+            className={
+              action.btnStyle
+                ? colorVariants.get(action.btnStyle)
+                : colorVariants.get(ModalButtonStyle.default)
+            }
             onClick={action.callback}
           >
             {action.text}

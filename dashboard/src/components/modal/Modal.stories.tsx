@@ -1,7 +1,7 @@
 // Modal.stories.ts|tsx
 
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import Modal, { ModalAction } from "./Modal";
+import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -37,6 +37,7 @@ const confirmModalActions: ModalAction[] = [
     callback: () => {
       console.log("confirmModal: clicked Confirm");
     },
+    btnStyle: ModalButtonStyle.primary,
   },
 ];
 
