@@ -127,7 +127,8 @@ export default function RevisionCard(
 
       <div className="absolute bottom-0 right-0 mb-4 mr-4">
         <span>
-          {getAge(props.revisionDate)}
+
+          {props.revisionDate && getAge(props.revisionDate)}
         </span>
       </div>
     </div>
