@@ -4,6 +4,8 @@ import React from 'react';
 
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import Badge from './Badge';
+import { BadgeProps } from './Badge';
+import { Story } from '@storybook/react/types-6-0';
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -14,12 +16,14 @@ export default {
   title: 'Badge',
   component: Badge,
 } as ComponentMeta<typeof Badge>;
-
-//👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Badge> = (args) => <Badge {...args} />;
-
-export const FirstStory = Template.bind({});
-
-FirstStory.args = {
-    children: <><span>Property:</span>&nbsp; <span className="font-semibold">Property Value</span></>,
+// recall that Badge has 'props' which is of type BadgeProps
+// we want to past theme to the story with the name 'Default', so we
+// create a template for it.
+// we want to declare default values for the props, so we create a
+// default args object.
+const Template: Story<BadgeProps> = (args) => <Badge props={args} />;
+export const Default = Template.bind({});
+Default.args = {
+  type: 'info',
+  children: <><span className='font-semibold'>version: </span>&nbsp;<span> 2.0.3</span></>,
 };

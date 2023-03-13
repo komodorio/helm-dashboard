@@ -7,6 +7,8 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import TextInput from "./TextInput";
+import { TextInputProps } from "./TextInput";
+import {Story} from "@storybook/react/types-6-0";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -22,11 +24,25 @@ export default {
 const Template: ComponentStory<typeof TextInput> = (args) => (
   <TextInput {...args} />
 );
+// we create another template that will enable us to pass the props
+// using 'props' as the argument. recall that TextInput has 'props',
+// which is of type TextInputProps. we want to pass them to the story
+// with the name 'Primary', so we create a template for it.
+const Template2: Story<TextInputProps> = (args) => <TextInput props={args} />;
+export const Primary = Template2.bind({});
+Primary.args = {
+  label: "Label",
+  placeholder: "Write something here...",
+  isMandatory: false,
+  onChange: () => {},
+};
 
 export const FirstStory = Template.bind({});
 FirstStory.args = {
-  label: "Label",
-  placeholder: "Placeholder",
-  isMandatory: false,
-  onChange: () => {},
+  props: {
+    label: "Label",
+    placeholder: "Write something here...",
+    isMandatory: false,
+    onChange: () => {},
+  },
 };

@@ -25,11 +25,13 @@
 
 import React from 'react'
 // import index.css from the main folder
-
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  type: 'error' | 'success' | 'info' | 'default'
+  children: React.ReactNode
+}
 export default function Badge (
-  { type, children }:
-  { type: 'error' | 'success' | 'info' | 'default'
-    children: React.ReactNode }): JSX.Element {
+  { props }:
+  { props: BadgeProps}): JSX.Element {
   const colorVariants = {
     error: 'bg-red-500 text-white',
     success: 'bg-green-300 text-black-100 text-black-800',
@@ -41,7 +43,7 @@ export default function Badge (
   // the type of the badge is indicated by "type" prop.
   // the default type is "default".
   // the resulting span element is stored in badge_elem.
-  const badgeElem = <span className={`${badgeBase} ${colorVariants[type]}`}>{children}</span>
+  const badgeElem = <span className={`${badgeBase} ${colorVariants[props.type]}`}>{props.children}</span>
   return (
     badgeElem
   )

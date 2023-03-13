@@ -74,7 +74,7 @@ import React from "react";
 import { StatusCode } from "../global";
 import Status from "./Status";
 
-interface RevisionCardProps {
+export interface RevisionCardProps {
   revision: string;
   revisionDate: Date;
   previousVersion: string;
@@ -83,6 +83,7 @@ interface RevisionCardProps {
   isActive: boolean;
   isRefreshable: boolean;
   onClick: () => void;
+  onRefreshClick: () => void;
 }
 
 export default function RevisionCard({

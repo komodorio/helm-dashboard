@@ -2,9 +2,9 @@
 
 import React from 'react';
 
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { ComponentStory, ComponentMeta, Story } from '@storybook/react';
 import Button from './Button';
-
+import {ButtonProps} from './Button';
 //👇 This default export determines where your story goes in the story list
 export default {
   /* 👇 The title prop is optional.
@@ -15,14 +15,14 @@ export default {
   component: Button,
 } as ComponentMeta<typeof Button>;
 
-//👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
-
-export const FirstStory = Template.bind({});
-
-FirstStory.args = {
-  children: <>
-              <span>&uarr;</span>
-              <span> Update</span>
-            </>,
+// Recall that Button has 'props' which is of type ButtonProps
+// We want to past theme to the story with the name 'Default', so we
+// create a template for it.
+// We want to declare default values for the props, so we create a
+// default args object.
+const Template: Story<ButtonProps> = (args) => <Button props={args} />;
+export const Default = Template.bind({});
+Default.args = {
+  children: <><span>&uarr;</span><span>Update</span></>,
+  onClick: () => {},
 };

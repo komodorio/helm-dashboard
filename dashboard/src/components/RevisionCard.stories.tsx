@@ -4,14 +4,15 @@ import React from 'react';
 
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import RevisionCard from './RevisionCard';
-
-
+import { RevisionCardProps } from './RevisionCard';
+import '../index.css'
+import {Meta, Story} from '@storybook/react/';
 //👇 This default export determines where your story goes in the story list
-export default {
+/*export default {
   /* 👇 The title prop is optional.
   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
   * to learn how to generate automatic titles
-  */
+  *
   title: 'Revision Card',
   component: RevisionCard,
   parameters: {
@@ -45,14 +46,36 @@ version, and a symbol in between to indicate if this is
     },
   }
 } as ComponentMeta<typeof RevisionCard>;
-
-//👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof RevisionCard> = (args) => <RevisionCard {...args} />;
-
-export const FirstStory = Template.bind({});
-
-FirstStory.args = {
-    revisionDate: new Date("2021-01-01 00:00:00"),
-    currentVersion: "0.11.73",
-    previousVersion: "0.10.74",
-};
+*/
+const meta: Meta = {
+  title: 'Revision Card',
+  component: RevisionCard,
+}
+export default meta;
+const Template:Story<RevisionCardProps> = (args) => <RevisionCard props={args} />;
+export const Default = Template.bind({});
+Default.args = {
+  revision: '1',
+  revisionDate: new Date('2021-01-01 00:00:00'),
+  previousVersion: '1.12.31',
+  currentVersion: '1.12.32',
+  onClick: () => {},
+  onRefreshClick: () => {},
+  statusCode: 'Deployed',
+  isActive: true,
+  isRefreshable : false,
+}
+export const RevisionCardStory = () => {
+  const props: RevisionCardProps = {
+    revision: '1',
+    revisionDate: new Date('2021-01-01 00:00:00'),
+    previousVersion: '1.12.31',
+    currentVersion: '1.12.32',
+    onClick: () => {},
+    onRefreshClick: () => {},
+    statusCode: 'Deployed',
+    isActive: true,
+    isRefreshable : false,
+  }
+  return <RevisionCard props={props} />
+}
