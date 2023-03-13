@@ -51,7 +51,7 @@ The UI should now be running on http://localhost:8080/
 4. with the default integration the dashboard should run on http://localhost:3000/ 
 
 
-## Choseing a task
+## Choosing a task
 If you are completely new to the project its recommended to look for tasks labled: `good first issue`.
 These tasks should be simple enough for a begginer or for someone looking to learn the code base.
 
