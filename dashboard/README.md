@@ -30,11 +30,23 @@ The UI should now be running on http://localhost:8080/
     - `git fetch`
     - `git checkout helm-dashboard-v2`
 
+
+## Running dashboard V2
+
+1. first make sure you cloned the project correctly. This is explained on [this stage]([helm-dashboard-v2/dashboard](https://github.com/komodorio/helm-dashboard/tree/helm-dashboard-v2/dashboard#setting-up-your-development-environment)).
+2. go to `helm-dashboard-v2/dashboard` in your local project.
+3. inorder to install dependncies and start the development server
+    - `npm i`
+    - `npm start`
+4. with the default integration the dashboard should run on http://localhost:3000/ 
+
+
 ## Choseing a task
 If you are completely new to the project its recommended to look for tasks labled: `good first issue`.
 These tasks should be simple enough for a begginer or for someone looking to learn the code base.
 
-You are also free to reachout to us on [discord](), we can help you find a task that suits your perfectly.
+You are also free to reachout to us on [discord](https://discord.gg/udRezxKt), we can help you find a task that suits your perfectly.
+
 ## Opening a pull request
 Inorder to open a pull request with your changes. \
     1. make sure you are synced with `helm-dashboard-v2` and that all conflicts are resolved. \
