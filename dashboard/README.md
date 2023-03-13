@@ -64,3 +64,6 @@ Inorder to open a pull request with your changes. \
     3. then navigate to https://github.com/komodorio/helm-dashboard and open a pull request. Make sure you are merging from your branch to `helm-dashboard-v2`. \
     4. you should now tag a main developer (@chad11111
  for example) and get your pull request reviewed.
+
+# Component library
+TODO
