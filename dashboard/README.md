@@ -33,7 +33,7 @@ The UI should now be running on http://localhost:8080/
 
 ## Running dashboard V2
 
-1. first make sure you cloned the project correctly. This is explained on [this stage]([helm-dashboard-v2/dashboard](https://github.com/komodorio/helm-dashboard/tree/helm-dashboard-v2/dashboard#setting-up-your-development-environment)).
+1. first make sure you cloned the project correctly. This is explained in this [stage](https://github.com/komodorio/helm-dashboard/blob/helm-dashboard-v2/dashboard/README.md#setting-up-your-development-environment).
 2. go to `helm-dashboard-v2/dashboard` in your local project.
 3. inorder to install dependncies and start the development server
     - `npm i`
