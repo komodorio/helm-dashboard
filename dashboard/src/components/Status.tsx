@@ -14,11 +14,13 @@
  *
  */
 import React from "react";
+// import global constants from global.tsx
+import {StatusCode} from '../global';
 export default function Status({
   statusCode,
   isRefreshable = false
 }: {
-  statusCode: "Deployed" | "Superseded" | "Failed";
+  statusCode: StatusCode; 
   isRefreshable: boolean;
 }): JSX.Element {
   const statusVariants = {
