@@ -24,9 +24,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   type: BadgeCode,
   children: React.ReactNode
 }
-export default function Badge (
-  { props }:
-  { props: BadgeProps}): JSX.Element {
+export default function Badge (props: BadgeProps): JSX.Element {
   const colorVariants = {
     error: 'bg-red-500 text-white',
     success: 'bg-green-300 text-black-100 text-black-800',
