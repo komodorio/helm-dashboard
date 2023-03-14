@@ -117,7 +117,7 @@ For all the release(s) (installed helm charts), you can execute helm tests for t
 You can execute `helm test` for the specific release as below:
 ![](images/screenshot_run_test.png)
 
-The result of executed `helm test` for the release will be disapled as below:
+The result of executed `helm test` for the release will be displayed as below:
 ![](images/screenshot_run_test_result.png)
 
 ### Scanner Integrations
