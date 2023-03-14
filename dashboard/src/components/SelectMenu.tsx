@@ -39,10 +39,10 @@ export interface SelectMenuItemProps {
 // define the SelectMenuProps interface:
 
 export interface SelectMenuProps {
-    header: string;
-    children: React.ReactNode;
-    selected: number;
-    onSelect: (id: number) => void;
+    header: string,
+    children: React.ReactNode,
+    selected: number,
+    onSelect: (id: number) => void,
 }
 
 // define the SelectMenu component:
@@ -61,17 +61,17 @@ export function SelectMenuItem({label, id}: SelectMenuItemProps): JSX.Element {
                 id={id.toString()} // id must be a string
                 value={id}
                 checked={false}
-                onChange={() => {}}
+                onChange={() => {return;}}
             />
             <label htmlFor={id.toString()}>{label}</label>
         </div>
     );
 }
 
-export default function SelectMenu(props: SelectMenuProps): JSX.Element {
+export default function SelectMenu(props: SelectMenuProps): JSX.Element{
     const {header, children, selected, onSelect} = props;
     return (
-        <div className="flex flex-col">
+        <div className="card flex flex-col">
             <h2 className="text-xl font-bold">{header}</h2>
             <div className="flex flex-col">
                 {children}
