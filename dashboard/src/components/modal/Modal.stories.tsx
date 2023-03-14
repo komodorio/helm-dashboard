@@ -46,7 +46,7 @@ export const CustomModal: ComponentStory<typeof Modal> = (args) => (
   <Modal {...args}>
     <div>
       <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-        Custom Modal Contant
+        Custom Modal Content
       </p>
       <button
         className="bg-cyan-500 p-2"
@@ -65,6 +65,20 @@ CustomModal.args = {
       Custom <span className="text-red-500"> Title</span>
     </div>
   ),
+  isOpen: true,
+  actions: confirmModalActions,
+};
+
+export const AutoScrollWhenContentIsMoreThan500Height: ComponentStory<typeof Modal> = (args) => (
+  <Modal {...args}>
+    <div style={{ height: "1000px", backgroundColor: "skyblue" }}>
+      This div height is 1000 px so we can see a vertical scroll to the right of it.
+    </div>
+  </Modal>
+);
+
+AutoScrollWhenContentIsMoreThan500Height.args = {
+  title: 'Auto Scroll when content is more than height 500px ',
   isOpen: true,
   actions: confirmModalActions,
 };

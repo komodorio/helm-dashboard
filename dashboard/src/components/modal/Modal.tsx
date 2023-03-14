@@ -64,7 +64,12 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
           </button>
         </div>
       )}
-      <div className="p-6 space-y-6">{children}</div>
+      <div
+        className="p-6 space-y-6 overflow-y-auto"
+        style={{ maxHeight: "500px" }}
+      >
+        {children}
+      </div>
       <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
         {actions?.map((action) => (
           <button
