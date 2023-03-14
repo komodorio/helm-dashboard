@@ -42,10 +42,11 @@ BasicModal.args = {
   actions: confirmModalActions,
 };
 
-
 const customModalActions: ModalAction[] = [
   {
     text: "custom button 1",
+    className:
+      "text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800",
     callback: () => {
       console.log("confirmModal: clicked custom button 1");
     },
@@ -86,16 +87,19 @@ CustomModal.args = {
   actions: customModalActions,
 };
 
-export const AutoScrollWhenContentIsMoreThan500Height: ComponentStory<typeof Modal> = (args) => (
+export const AutoScrollWhenContentIsMoreThan500Height: ComponentStory<
+  typeof Modal
+> = (args) => (
   <Modal {...args}>
-    <div style={{ height: "1000px",width:'50%',  backgroundColor: "skyblue" }}>
-      This div height is 1000 px so we can see a vertical scroll to the right of it.
+    <div style={{ height: "1000px", width: "50%", backgroundColor: "skyblue" }}>
+      This div height is 1000 px so we can see a vertical scroll to the right of
+      it.
     </div>
   </Modal>
 );
 
 AutoScrollWhenContentIsMoreThan500Height.args = {
-  title: 'Auto Scroll when content is more than 500px height',
+  title: "Auto Scroll when content is more than 500px height",
   isOpen: true,
   actions: confirmModalActions,
 };

@@ -9,6 +9,7 @@ export type ModalAction = {
   callback: () => void;
   text: string;
   btnStyle?: ModalButtonStyle;
+  className?: string;
 };
 
 type ModalProps = {
@@ -35,6 +36,14 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
   useEffect(() => {
     setIsVisible(isOpen);
   }, [isOpen]);
+
+  const getClassName = (action: ModalAction) => {
+    if (action.className) return action.className;
+
+    return action.btnStyle
+      ? colorVariants.get(action.btnStyle)
+      : colorVariants.get(ModalButtonStyle.default);
+  };
 
   return isVisible ? (
     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -74,11 +83,7 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
         {actions?.map((action) => (
           <button
             type="button"
-            className={
-              action.btnStyle
-                ? colorVariants.get(action.btnStyle)
-                : colorVariants.get(ModalButtonStyle.default)
-            }
+            className={getClassName(action)}
             onClick={action.callback}
           >
             {action.text}
