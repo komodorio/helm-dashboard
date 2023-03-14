@@ -8,11 +8,6 @@
  * behind the scenes, it uses tailwindcss classes to imlement the badge,
  * with the correct styles.
  *
- * an example for a warning badge implementation using tailwind:
- *
- * <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
- * bg-yellow-100 text-yellow-800">
- *
  * @example
  * <Badge type="warning">Warning</Badge>
  *
@@ -20,17 +15,17 @@
  * @param {string} children - The content of the badge.
  * @returns {JSX.Element} - The badge component.
  *
- * @see https://tailwindcss.com/docs/border-radius
+ * 
  */
 
 import React from 'react'
-// import index.css from the main folder
-import '../index.css'
+import { BadgeCode } from '../global';
 
-export default function Badge (
-  { type, children }:
-  { type: 'error' | 'success' | 'info' | 'default'
-    children: React.ReactNode }): JSX.Element {
+export interface BadgeProps {
+  type: BadgeCode,
+  children: React.ReactNode
+}
+export default function Badge (props: BadgeProps): JSX.Element {
   const colorVariants = {
     error: 'bg-red-500 text-white',
     success: 'bg-green-300 text-black-100 text-black-800',
@@ -38,11 +33,11 @@ export default function Badge (
     default: 'text-black-800'
   }
 
-  const badgeBase = 'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-light'
+  const badgeBase = 'inline-flex items-center px-2.5 py-0.5 rounded text-sm'
   // the type of the badge is indicated by "type" prop.
   // the default type is "default".
   // the resulting span element is stored in badge_elem.
-  const badgeElem = <span className={`${badgeBase} ${colorVariants[type]}`}>{children}</span>
+  const badgeElem = <span className={`${badgeBase} ${colorVariants[props.type]}`}>{props.children}</span>
   return (
     badgeElem
   )
