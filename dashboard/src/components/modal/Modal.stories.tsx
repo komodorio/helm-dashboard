@@ -42,6 +42,23 @@ BasicModal.args = {
   actions: confirmModalActions,
 };
 
+
+const customModalActions: ModalAction[] = [
+  {
+    text: "custom button 1",
+    callback: () => {
+      console.log("confirmModal: clicked custom button 1");
+    },
+  },
+  {
+    text: "custom button 2",
+    callback: () => {
+      console.log("confirmModal: clicked custom button 2");
+    },
+    btnStyle: ModalButtonStyle.primary,
+  },
+];
+
 export const CustomModal: ComponentStory<typeof Modal> = (args) => (
   <Modal {...args}>
     <div>
@@ -66,7 +83,7 @@ CustomModal.args = {
     </div>
   ),
   isOpen: true,
-  actions: confirmModalActions,
+  actions: customModalActions,
 };
 
 export const AutoScrollWhenContentIsMoreThan500Height: ComponentStory<typeof Modal> = (args) => (
