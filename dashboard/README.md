@@ -55,8 +55,8 @@ If you still having troubles please contact us on our [Slack community channel](
 2. go to `helm-dashboard-v2/dashboard` in your local project.
 3. inorder to install dependncies and start the development server
     - `npm i`
-    - `npm start`
-4. with the default integration the dashboard should run on http://localhost:3000/ 
+    - `npm run dev`
+4. with the default integration the dashboard should run on  http://localhost:5173/ 
 
 
 ## Choosing a task
