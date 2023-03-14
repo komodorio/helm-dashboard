@@ -95,7 +95,7 @@ export const AutoScrollWhenContentIsMoreThan500Height: ComponentStory<typeof Mod
 );
 
 AutoScrollWhenContentIsMoreThan500Height.args = {
-  title: 'Auto Scroll when content is more than height 500px ',
+  title: 'Auto Scroll when content is more than 500px height',
   isOpen: true,
   actions: confirmModalActions,
 };
