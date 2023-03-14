@@ -71,7 +71,7 @@ CustomModal.args = {
 
 export const AutoScrollWhenContentIsMoreThan500Height: ComponentStory<typeof Modal> = (args) => (
   <Modal {...args}>
-    <div style={{ height: "1000px", backgroundColor: "skyblue" }}>
+    <div style={{ height: "1000px",width:'50%',  backgroundColor: "skyblue" }}>
       This div height is 1000 px so we can see a vertical scroll to the right of it.
     </div>
   </Modal>
