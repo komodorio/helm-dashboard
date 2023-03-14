@@ -1,4 +1,4 @@
-import { useState, useEffect, PropsWithChildren } from "react";
+import { useState, useEffect, PropsWithChildren, ReactNode } from "react";
 
 export enum ModalButtonStyle {
   default,
@@ -12,7 +12,7 @@ export type ModalAction = {
 };
 
 type ModalProps = {
-  title: string;
+  title: string | ReactNode;
   isOpen: boolean;
   onClose: () => void;
   actions?: ModalAction[];
@@ -62,11 +62,7 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
           </svg>
         </button>
       </div>
-      <div className="p-6 space-y-6">
-        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-          {children}
-        </p>
-      </div>
+      <div className="p-6 space-y-6">{children}</div>
       <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
         {actions?.map((action) => (
           <button

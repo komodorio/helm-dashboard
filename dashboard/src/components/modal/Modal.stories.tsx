@@ -15,12 +15,7 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof Modal> = (args) => (
-  <Modal {...args}>
-    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-    Lorem Ipsum has been the industry's standard dummy text ever since the
-    1500s, when an unknown printer took a galley of type and scrambled it to
-    make a type specimen book.
-  </Modal>
+  <Modal {...args}>Simple text content</Modal>
 );
 
 export const ConfirmModal = Template.bind({});
@@ -42,7 +37,34 @@ const confirmModalActions: ModalAction[] = [
 ];
 
 ConfirmModal.args = {
-  title: "Standard title",
+  title: "Simple string title",
+  isOpen: true,
+  actions: confirmModalActions,
+};
+
+export const CustomModal: ComponentStory<typeof Modal> = (args) => (
+  <Modal {...args}>
+    <div>
+      <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+        Custom Modal Contant
+      </p>
+      <button
+        className="bg-cyan-500 p-2"
+        type="button"
+        onClick={() => alert("just a button")}
+      >
+        Just a button
+      </button>
+    </div>
+  </Modal>
+);
+
+CustomModal.args = {
+  title: (
+    <div>
+      Custom <span className="text-red-500"> Title</span>
+    </div>
+  ),
   isOpen: true,
   actions: confirmModalActions,
 };
