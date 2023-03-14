@@ -15,10 +15,10 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof Modal> = (args) => (
-  <Modal {...args}>Simple text content</Modal>
+  <Modal {...args}>Basic text content</Modal>
 );
 
-export const ConfirmModal = Template.bind({});
+export const BasicModal = Template.bind({});
 
 const confirmModalActions: ModalAction[] = [
   {
@@ -36,8 +36,8 @@ const confirmModalActions: ModalAction[] = [
   },
 ];
 
-ConfirmModal.args = {
-  title: "Simple string title",
+BasicModal.args = {
+  title: "Basic text title",
   isOpen: true,
   actions: confirmModalActions,
 };
