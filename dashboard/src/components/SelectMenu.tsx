@@ -31,16 +31,16 @@ import React from 'react';
 // This is an object with a label and id.
 // The label is a string, and the id is a number.
 // The id is used to identify the selected menu item.
-type SelectMenuItem = {
+export interface SelectMenuItemProps {
     label: string;
     id: number;
 };
 
 // define the SelectMenuProps interface:
 
-interface SelectMenuProps {
+export interface SelectMenuProps {
     header: string;
-    children: SelectMenuItem[];
+    children: React.ReactNode;
     selected: number;
     onSelect: (id: number) => void;
 }
@@ -52,26 +52,29 @@ interface SelectMenuProps {
 // the onSelect function is called when a menu item is selected
 // the onSelect function is passed the id of the selected menu item
 
+export function SelectMenuItem({label, id}: SelectMenuItemProps): JSX.Element {
+    return (
+        <div className="flex flex-row">
+            <input
+                type="radio"
+                name="menu"
+                id={id.toString()} // id must be a string
+                value={id}
+                checked={false}
+                onChange={() => {}}
+            />
+            <label htmlFor={id.toString()}>{label}</label>
+        </div>
+    );
+}
 
-export default function SelectMenu({props}: {props: SelectMenuProps}): JSX.Element {
+export default function SelectMenu(props: SelectMenuProps): JSX.Element {
     const {header, children, selected, onSelect} = props;
     return (
         <div className="flex flex-col">
             <h2 className="text-xl font-bold">{header}</h2>
             <div className="flex flex-col">
-                {children.map((item) => (
-                    <div key={item.id} className="flex flex-row">
-                        <input
-                            type="radio"
-                            name={header}
-                            id={item.id.toString()} // id must be a string
-                            value={item.id}
-                            checked={item.id === selected}
-                            onChange={() => onSelect(item.id)}
-                        />
-                        <label htmlFor={item.id.toString()}>{item.label}</label>
-                    </div>
-            ))}
+                {children}
             </div>
         </div>
     );

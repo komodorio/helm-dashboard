@@ -20,7 +20,8 @@
 
 import React from 'react'
 import { BadgeCode } from '../global';
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+
+export interface BadgeProps {
   type: BadgeCode,
   children: React.ReactNode
 }
