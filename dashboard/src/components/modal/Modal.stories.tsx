@@ -32,7 +32,7 @@ const confirmModalActions: ModalAction[] = [
     callback: () => {
       console.log("confirmModal: clicked Confirm");
     },
-    btnStyle: ModalButtonStyle.primary,
+    variant: ModalButtonStyle.info,
   },
 ];
 
@@ -56,7 +56,7 @@ const customModalActions: ModalAction[] = [
     callback: () => {
       console.log("confirmModal: clicked custom button 2");
     },
-    btnStyle: ModalButtonStyle.primary,
+    variant: ModalButtonStyle.error,
   },
 ];
 
