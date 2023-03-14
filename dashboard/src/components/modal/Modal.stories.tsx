@@ -18,16 +18,18 @@ const Template: ComponentStory<typeof Modal> = (args) => (
   <Modal {...args}>Basic text content</Modal>
 );
 
-export const BasicModal = Template.bind({});
+export const Default = Template.bind({});
 
 const confirmModalActions: ModalAction[] = [
   {
+    id: "1",
     text: "Cancel",
     callback: () => {
       console.log("confirmModal: clicked Cancel");
     },
   },
   {
+    id: "2",
     text: "Confirm",
     callback: () => {
       console.log("confirmModal: clicked Confirm");
@@ -36,7 +38,7 @@ const confirmModalActions: ModalAction[] = [
   },
 ];
 
-BasicModal.args = {
+Default.args = {
   title: "Basic text title",
   isOpen: true,
   actions: confirmModalActions,
@@ -44,6 +46,7 @@ BasicModal.args = {
 
 const customModalActions: ModalAction[] = [
   {
+    id: "1",
     text: "custom button 1",
     className:
       "text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800",
@@ -52,6 +55,7 @@ const customModalActions: ModalAction[] = [
     },
   },
   {
+    id: "2",
     text: "custom button 2",
     callback: () => {
       console.log("confirmModal: clicked custom button 2");
