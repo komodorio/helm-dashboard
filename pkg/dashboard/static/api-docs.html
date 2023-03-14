@@ -35,12 +35,12 @@
                 const data = JSON.parse(request.responseText);
                 display(data);
             } else {
-                alert("Failed to get " + swaggerUrl)
+                alert("Failed to get "+ swaggerUrl)
             }
         };
 
         request.onerror = function () {
-            alert("Failed to get " + swaggerUrl)
+            alert("Failed to get "+ swaggerUrl)
         };
 
         request.send();
@@ -67,5 +67,4 @@
         reqOas();
     });
 </script>
-<script src="analytics.js"></script>
 </html>

@@ -6,8 +6,6 @@ xhr.onload = function () {
         if (status.Analytics) {
             enableDD(version)
             enableHeap(version, status.ClusterMode)
-        } else {
-            console.log("Analytics is disabled in this session")
         }
     }
 }

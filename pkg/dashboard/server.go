@@ -46,7 +46,7 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 
 	err = s.detectClusterMode(data)
 	if err != nil {
-		return "", nil, errorx.Decorate(err, "Failed to detect cluster mode")
+		return "", nil, err
 	}
 
 	go checkUpgrade(data.StatusInfo)
@@ -80,7 +80,7 @@ func (s *Server) detectClusterMode(data *objects.DataLayer) error {
 		}
 		ns, err := app.K8s.GetNameSpaces()
 		if err != nil { // no point in continuing without kubectl context and k8s connection
-			return errorx.InitializationFailed.Wrap(err, "No k8s cluster connection")
+			return err
 		}
 		log.Debugf("Got %d namespaces listed", len(ns.Items))
 		data.StatusInfo.ClusterMode = true
