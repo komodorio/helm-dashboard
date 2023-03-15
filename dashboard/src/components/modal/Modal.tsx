@@ -8,20 +8,20 @@ export enum ModalButtonStyle {
   success,
 }
 
-export type ModalAction = {
-  id: string;
-  callback: () => void;
-  text: string;
-  variant?: ModalButtonStyle;
-  className?: string;
-};
+export interface ModalAction {
+  id: string,
+  callback: () => void,
+  text: string,
+  variant?: ModalButtonStyle,
+  className?: string
+}
 
-export type ModalProps = {
-  title?: string | ReactNode;
-  isOpen: boolean;
-  onClose: () => void;
-  actions?: ModalAction[];
-} & PropsWithChildren;
+export interface ModalProps extends PropsWithChildren {
+  title?: string | ReactNode,
+  isOpen: boolean,
+  onClose: () => void,
+  actions?: ModalAction[],
+}
 
 const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(isOpen);
