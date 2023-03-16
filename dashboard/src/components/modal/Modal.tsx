@@ -72,7 +72,7 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
       {isVisible && (
         <>
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 m-7">
             {title && (
               <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                 {getTitle(title)}
@@ -98,7 +98,7 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
               </div>
             )}
             <div
-              className="p-6 space-y-6 overflow-y-auto"
+              className="p-4 space-y-6 overflow-y-auto"
               style={{ maxHeight: "500px" }}
             >
               {children}
