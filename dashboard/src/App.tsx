@@ -4,6 +4,7 @@ import "./index.css";
 import Installed from "./pages/Installed";
 import NotFound from "./pages/NotFound";
 import Repository from "./pages/Repository";
+import Repo_Manage_Section from "./Repo_Manage_Section";
 
 export default function App() {
   return (
