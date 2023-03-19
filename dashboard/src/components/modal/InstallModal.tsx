@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
+import Modal from "./Modal";
+import { ModalAction, ModalButtonStyle } from "./Modal";
 
 interface InstallModalProps {
   isOpen: boolean;
@@ -14,8 +15,8 @@ interface VersionToInstall {
 
 const versionsToInstall: VersionToInstall[] = [
   { id: "1", name: "bitnami @ 14.0.14" },
-  { id: "1", name: "bitnami @ 15.0.15" },
-  { id: "1", name: "bitnami @ 16.0.16" },
+  { id: "2", name: "bitnami @ 15.0.15" },
+  { id: "3", name: "bitnami @ 16.0.16" },
 ];
 
 const cluster = "kind-kind";
@@ -58,7 +59,9 @@ export default function InstallModal({
           <div className="inline-block relative mb-6">
             <select className="block appearance-none w-full font-semibold bg-white border border-gray-400 hover:border-gray-500 ml-2 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline text-green-700">
               {versionsToInstall.map((version) => (
-                <option key={version.id}>{version.name}</option>
+                <option key={version.id} value={version.id}>
+                  {version.name}
+                </option>
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
