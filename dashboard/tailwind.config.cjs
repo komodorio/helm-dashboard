@@ -5,8 +5,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "error-bg": "#F9D7DA",
-        "error-color": "#842029",
+        error: {
+          "border-color": "#DC3545",
+          "background": "#F9D7DA",
+          color: "#842029",
+        },
         "link-color": "#0D6EFD",
       },
     },

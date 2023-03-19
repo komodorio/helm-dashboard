@@ -2,10 +2,10 @@ import Modal from "./Modal";
 
 interface ErrorModalProps {
   isOpen: boolean;
-  onConfirm: () => void;
+  onClose: () => void;
 }
 
-export default function ErrorModal({ isOpen, onConfirm }: ErrorModalProps) {
+export default function ErrorModal({ isOpen, onClose }: ErrorModalProps) {
   const ErrorTitle = (
     <div className="font-bold text-2xl text-error-color">
       <div className="flex gap-3">
@@ -26,13 +26,13 @@ export default function ErrorModal({ isOpen, onConfirm }: ErrorModalProps) {
   );
   return (
     <Modal
-      containerClassNames={" bg-error-bg border-2 border-error-color"}
+      containerClassNames={" border-2 border-error-border-color bg-error-background"}
       title={ErrorTitle}
       isOpen={isOpen}
-      onClose={onConfirm}
+      onClose={onClose}
       bottomContent={
         <div className="flex p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-          <span className="small text-muted fs-80">
+          <span className="text-sm text-muted fs-80 text-gray-500">
             Hint: Komodor has the same HELM capabilities, with enterprise
             features and support.{" "}
             <a
