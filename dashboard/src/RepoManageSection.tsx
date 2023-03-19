@@ -1,6 +1,6 @@
 
-import "./Repo_Manage_Section.css"
-function Repo_Manage_Section():JSX.Element {
+import "./RepoManageSection.css"
+function RepoManageSection():JSX.Element {
   return (
     <div className='Card'>
         <h2>Repositories</h2>
@@ -23,4 +23,4 @@ function Repo_Manage_Section():JSX.Element {
   )
 }
 
-export default Repo_Manage_Section
+export default RepoManageSection
