@@ -151,25 +151,15 @@ Kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand ab
 
 ## Local Dev Testing
 
-Prerequisites, binaries installed and operational:
-
-- [Go](https://go.dev/doc/install)
+Prerequisites: `helm` and `kubectl` binaries installed and operational.
 
 There is a need to build binary for plugin to function, run:
-
-### Linux
 
 ```shell
 go build -o bin/dashboard .
 ```
 
-### Windows
-
-```bat
-go build -o bin\dashboard.exe .
-```
-
-You can just run the `dashboard` or `dashboard.exe` binary directly, it will just work.
+You can just run the `bin/dashboard` binary directly, it will just work.
 
 To install, checkout the source code and run from source dir:
 

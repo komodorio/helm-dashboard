@@ -126,14 +126,7 @@ func (k *K8s) DescribeResource(kind string, ns string, name string) (string, err
 
 func (k *K8s) GetResource(kind string, namespace string, name string) (*runtime.Object, error) {
 	builder := k.Factory.NewBuilder()
-	builder = builder.Unstructured().SingleResourceType()
-	if namespace != "" {
-		builder = builder.NamespaceParam(namespace)
-	} else {
-		builder = builder.DefaultNamespace()
-	}
-
-	resp := builder.Flatten().ResourceNames(kind, name).Do()
+	resp := builder.Unstructured().NamespaceParam(namespace).Flatten().ResourceNames(kind, name).Do()
 	if resp.Err() != nil {
 		return nil, errorx.Decorate(resp.Err(), "failed to get k8s resource")
 	}
@@ -146,7 +139,6 @@ func (k *K8s) GetResource(kind string, namespace string, name string) (*runtime.
 }
 
 func (k *K8s) GetResourceInfo(kind string, namespace string, name string) (*testapiv1.Carp, error) {
-	// TODO: mutex to avoid a lot of requests?
 	obj, err := k.GetResource(kind, namespace, name)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to get k8s object")

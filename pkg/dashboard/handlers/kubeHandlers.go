@@ -1,20 +1,14 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/api/errors"
-	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
-	"k8s.io/utils/strings/slices"
 	"net/http"
-)
 
-const Unknown = "Unknown"
-const Healthy = "Healthy"
-const Unhealthy = "Unhealthy"
-const Progressing = "Progressing"
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+)
 
 type KubeHandler struct {
 	*Contexted
@@ -61,59 +55,20 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
-func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
-	s := res.Status
-	if s.Conditions == nil {
-		s.Conditions = []v12.CarpCondition{}
-	}
-
-	c := v12.CarpCondition{
-		Type:    "hdHealth",
-		Status:  Unknown,
-		Reason:  s.Reason,
-		Message: s.Message,
-	}
-
+func EnhanceStatus(res *v12.Carp) {
 	// custom logic to provide most meaningful status for the resource
-	if s.Phase == "Error" {
-		c.Status = Unhealthy
-	} else if slices.Contains([]string{"Available", "Active", "Established", "Bound", "Ready"}, string(s.Phase)) {
-		c.Status = Healthy
-	} else if s.Phase == "" && len(s.Conditions) > 0 {
-		for _, cond := range s.Conditions {
-			if cond.Type == "Progressing" { // https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-				if cond.Status == "False" {
-					c.Status = Unhealthy
-					c.Reason = cond.Reason
-					c.Message = cond.Message
-				} else if cond.Reason != "NewReplicaSetAvailable" {
-					c.Status = Progressing
-					c.Reason = cond.Reason
-					c.Message = cond.Message
-				}
-			} else if cond.Type == "Available" && c.Status == Unknown {
-				if cond.Status == "False" {
-					c.Status = Unhealthy
-				} else {
-					c.Status = Healthy
-				}
-				c.Reason = cond.Reason
-				c.Message = cond.Message
-			}
+	if res.Status.Phase == "Active" || res.Status.Phase == "Error" {
+		_ = res.Name + ""
+	} else if res.Status.Phase == "" && len(res.Status.Conditions) > 0 {
+		res.Status.Phase = v12.CarpPhase(res.Status.Conditions[len(res.Status.Conditions)-1].Type)
+		res.Status.Message = res.Status.Conditions[len(res.Status.Conditions)-1].Message
+		res.Status.Reason = res.Status.Conditions[len(res.Status.Conditions)-1].Reason
+		if res.Status.Conditions[len(res.Status.Conditions)-1].Status == "False" {
+			res.Status.Phase = "Not" + res.Status.Phase
 		}
-	} else if s.Phase == "Pending" {
-		c.Status = Progressing
-		c.Reason = string(s.Phase)
-	} else if s.Phase == "" {
-		c.Status = Healthy
-		c.Reason = "Exists"
-	} else {
-		log.Warnf("Unhandled status: %v", s)
-		c.Reason = string(s.Phase)
+	} else if res.Status.Phase == "" {
+		res.Status.Phase = "Exists"
 	}
-
-	s.Conditions = append(s.Conditions, c)
-	return &s
 }
 
 func (h *KubeHandler) Describe(c *gin.Context) {

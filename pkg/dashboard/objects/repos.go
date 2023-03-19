@@ -65,13 +65,9 @@ func (r *Repositories) List() ([]Repository, error) {
 	return res, nil
 }
 
-func (r *Repositories) Add(name string, url string, username string, password string) error {
+func (r *Repositories) Add(name string, url string) error {
 	if name == "" || url == "" {
 		return errors.New("Name and URL are required parameters to add the repository")
-	}
-
-	if (username != "" && password == "") || (username == "" && password != "") {
-		return errors.New("Username and Password, both are required parameters to add the repository with authentication")
 	}
 
 	// copied from cmd/helm/repo_add.go
@@ -92,10 +88,10 @@ func (r *Repositories) Add(name string, url string, username string, password st
 	defer r.mx.Unlock()
 
 	c := repo.Entry{
-		Name:     name,
-		URL:      url,
-		Username: username,
-		Password: password,
+		Name: name,
+		URL:  url,
+		//Username:              o.username,
+		//Password:              o.password,
 		//PassCredentialsAll:    o.passCredentialsAll,
 		//CertFile:              o.certFile,
 		//KeyFile:               o.keyFile,
