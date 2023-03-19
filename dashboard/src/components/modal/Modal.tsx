@@ -117,20 +117,22 @@ const Modal = ({
               >
                 {children}
               </div>
-              {bottomContent ?? (
-                <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                  {actions?.map((action) => (
-                    <button
-                      key={action.id}
-                      type="button"
-                      className={getClassName(action)}
-                      onClick={action.callback}
-                    >
-                      {action.text}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {bottomContent ??
+              <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600"> 
+                {actions?.map((action) => (
+                  <button
+                    key={action.id}
+                    type="button"
+                    className={getClassName(action)}
+                    onClick={action.callback}
+                  >
+                    {action.text}
+                  </button>
+                ))}
+                
+                
+               </div> 
+                }
             </div>
           </div>
         </div>
