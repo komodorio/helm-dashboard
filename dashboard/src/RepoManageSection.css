@@ -1,12 +1,13 @@
 .Card{
-    margin-top: 10px;
-    margin-left:10px;
+    flex: 0.25;
+    left: 0px;
     width: 25vw;
     height: fit-content;
     padding: 10px;
     border: 1px solid whitesmoke;
     border-radius: 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-right: 5px;
 }
 .Card>h2{
     font-weight:bolder;
