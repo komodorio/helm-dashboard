@@ -4,6 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"sort"
+	"strconv"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
@@ -19,10 +24,6 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
 	"k8s.io/utils/strings/slices"
-	"net/http"
-	"sort"
-	"strconv"
-	"strings"
 )
 
 type HelmHandler struct {
@@ -133,6 +134,26 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
+	}
+
+	if c.Query("health") != "" { // we need  to query k8s for health status
+		app := h.GetApp(c)
+		if app == nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		for _, obj := range res {
+			ns := obj.Namespace
+			if ns == "" {
+				ns = c.Param("ns")
+			}
+			info, err := app.K8s.GetResourceInfo(obj.Kind, ns, obj.Name)
+			if err != nil {
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			obj.Status = *EnhanceStatus(info)
+		}
 	}
 
 	c.IndentedJSON(http.StatusOK, res)
@@ -494,7 +515,7 @@ func (h *HelmHandler) RepoAdd(c *gin.Context) {
 	}
 
 	// TODO: more repo options to accept
-	err := app.Repositories.Add(c.PostForm("name"), c.PostForm("url"))
+	err := app.Repositories.Add(c.PostForm("name"), c.PostForm("url"), c.PostForm("username"), c.PostForm("password"))
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -586,23 +607,24 @@ func (h *HelmHandler) repoFromArtifactHub(name string) (string, error) {
 			return true
 		}
 
+		// more popular
+		if ri.Stars != rj.Stars {
+			return ri.Stars > rj.Stars
+		}
+
 		// or from verified publishers
 		if ri.Repository.VerifiedPublisher && !rj.Repository.VerifiedPublisher {
 			return true
 		}
 
-		// or just more popular
-		if ri.Stars > rj.Stars {
-			return true
-		}
-
 		// or with more recent app version
-
-		if semver.Compare("v"+ri.AppVersion, "v"+rj.AppVersion) > 0 {
-			return true
+		c := semver.Compare("v"+ri.AppVersion, "v"+rj.AppVersion)
+		if c != 0 {
+			return c > 0
 		}
 
-		return false
+		// shorter repo name is usually closer to officials
+		return len(ri.Repository.Name) < len(rj.Repository.Name)
 	})
 
 	r := results[0]
