@@ -129,8 +129,6 @@ const Modal = ({
                     {action.text}
                   </button>
                 ))}
-                
-                
                </div> 
                 }
             </div>
@@ -138,7 +136,7 @@ const Modal = ({
         </div>
       )}
     </>,
-    document.getElementById("portal")
+    document.getElementById("portal")!
   );
 };
 

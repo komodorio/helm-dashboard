@@ -8,6 +8,7 @@
     border: theme('borderWidth.DEFAULT') solid theme('colors.gray.200');
     padding: theme('spacing.6');
     box-shadow: theme('boxShadow.xl');
+    padding-top: theme('spacing.12');
   }
 .card-hover{
    background-color: theme('colors.gray.100');
