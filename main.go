@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/joomcode/errorx"
 	"os"
 	"os/signal"
 	"strings"
@@ -73,7 +74,13 @@ func main() {
 
 	address, webServerDone, err := server.StartServer(ctx, cancel)
 	if err != nil {
-		log.Fatalf("Failed to start Helm Dashboard: %+v", err)
+		if errorx.IsOfType(err, errorx.InitializationFailed) {
+			log.Debugf("Full error: %+v", err)
+			log.Errorf("No Kubernetes cluster connection possible. Make sure you have valid kubeconfig file or run dashboard from inside cluster. See https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/")
+			os.Exit(1)
+		} else {
+			log.Fatalf("Failed to start Helm Dashboard: %+v", err)
+		}
 	}
 
 	if !opts.NoTracking {

@@ -301,3 +301,22 @@ nav .nav-tabs .nav-link.active {
 .test-result {
     font-size: 1rem;
 }
+
+.square {
+    width: 0.55rem;
+    height: 0.55rem;
+    display: inline-block;
+    border-radius: 0.1rem!important;
+}
+
+.square.bg-danger {
+    background-color: #ff0072!important;
+}
+
+.square.bg-warning {
+    background-color: #ffa800!important;
+}
+
+.square.bg-success   {
+    background-color: #00c2ab!important;
+}
