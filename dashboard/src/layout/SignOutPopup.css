@@ -1,0 +1,39 @@
+.signout-background{
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0 !important;
+}
+.signout{
+    position: absolute;
+    top: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    width: 40vw;
+    height:25vh;
+    background-color: white;
+    border: 1px solid ;
+    outline:none;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 10px;
+}
+.signout>h1{
+    padding-left: 1rem;
+    font-weight: bolder;
+    font-size: x-large;
+    color: #4d4d4d;
+}
+.signout>p{
+    padding-left: 1rem;
+    font-size: large;
+}
