@@ -20,10 +20,20 @@ export interface ModalProps extends PropsWithChildren {
   title?: string | ReactNode;
   isOpen: boolean;
   onClose: () => void;
+  containerClassNames?: string;
   actions?: ModalAction[];
+  bottomContent?: ReactNode;
 }
 
-const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
+const Modal = ({
+  title,
+  isOpen,
+  onClose,
+  children,
+  actions,
+  containerClassNames,
+  bottomContent,
+}: ModalProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(isOpen);
 
   const colorVariants = new Map<ModalButtonStyle, string>([
@@ -70,8 +80,13 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
   return ReactDom.createPortal(
     <>
       {isVisible && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity">
-            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 m-7">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
+          <div className="flex justify-center">
+            <div
+              className={`relative bg-white rounded-lg shadow dark:bg-gray-700 m-7 w-4/5 ${
+                containerClassNames ?? ""
+              }`}
+            >
               {title && (
                 <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                   {getTitle(title)}
@@ -102,7 +117,8 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
               >
                 {children}
               </div>
-              <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+              {bottomContent ??
+              <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600"> 
                 {actions?.map((action) => (
                   <button
                     key={action.id}
@@ -113,9 +129,11 @@ const Modal = ({ title, isOpen, onClose, children, actions }: ModalProps) => {
                     {action.text}
                   </button>
                 ))}
-              </div>
+               </div> 
+                }
             </div>
           </div>
+        </div>
       )}
     </>,
     document.getElementById("portal")!
