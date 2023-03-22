@@ -1,39 +1,31 @@
-import "../App.css"
+import "../App.css";
+import LogoHeader from "../assets/logo-header.svg";
 
-function Header():JSX.Element {
+export default function Header() {
   return (
-    <header className="app-header">
-    <div className="header-left">
-      <div className="logo">
-        <img src="" alt='Helm-DashBoard'/>
-      </div>
-      <div className="vertical-seperator">
-        |
-      </div>
-      <div className="header-items">
-        <h3>Installed</h3>
-        <h3>Repository</h3>
-        <h3>Help</h3>
-        <h3>Upgrade</h3>
+    <div className=" h-16 flex items-center gap-10">
+      <span className=" h-full flex">
+        <img src={LogoHeader} alt="Helm-DashBoard" width={140} height={40} />
+      </span>
+      <span className="w-0.5 h-3/4 bg-gray-200"/>
+      <div className="inline-block">
+        <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <li>
+            <a href="#" aria-current="page">
+              Installed
+            </a>
+          </li>
+          <li>
+            <a href="#">Repository</a>
+          </li>
+          <li>
+            <a href="#">Help</a>
+          </li>
+          <li>
+            <a href="#">Upgrade to v1.2.0</a>
+          </li>
+        </ul>
       </div>
     </div>
-    <div className="header-right">
-        <div className="redirect">
-          <img className='komodor-img'src="" alt='Komodor'/>  
-          <span>
-            <a href="" />
-            <p>Some Content</p>
-          </span>
-        </div>
-        <div className="vertical-seperator">
-          |
-        </div>
-        <div className="signout-btn">
-          <button>Signout</button>
-        </div>
-    </div>
-  </header>
-  )
+  );
 }
-
-export default Header
