@@ -8,11 +8,13 @@ const lastRelease = "v1.2.0";
 
 export default function Header() {
 import "../App.css"
-import SignOutpopup from "./SignOutPopup";
-import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined';
 import { useState } from "react";
+import Modal from "../components/modal/Modal";
+import { CiPower } from 'react-icons/ci';
 function Header():JSX.Element {
-
+  const onClose= () => {
+    console.log("close button clcked")
+  }
   const [signOut,setSignOut]=useState(false);
 
   const handleClick=()=>{
@@ -21,6 +23,13 @@ function Header():JSX.Element {
 
   return (
     <header className="app-header">
+    {
+          signOut && <Modal title={"Session Ended"}
+          isOpen={true}
+          onClose={onClose}>
+            <p>The Helm Dashboard application has been shutdown. You can now close the browser tab.</p>
+          </Modal>
+    }
     <div className="header-left">
       <div className="logo">
         <img src="" alt='Helm-DashBoard'/>
@@ -45,8 +54,10 @@ function Header():JSX.Element {
         <div className="vertical-seperator">
           |
         </div>
-        <div className="signout-btn">
-          <button>Signout</button>
+        
+        <div className="signout-btn" onClick={handleClick}>
+          <CiPower size="1.5rem"/>
+          <span>C</span>
         </div>
     </div>
   );
