@@ -320,3 +320,7 @@ nav .nav-tabs .nav-link.active {
 .square.bg-success   {
     background-color: #00c2ab!important;
 }
+
+.hljs {
+    overflow-x: inherit;
+}
