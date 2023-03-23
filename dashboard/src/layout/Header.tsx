@@ -10,16 +10,9 @@ export default function Header() {
   return (
     <div className="h-16 flex items-center gap-10 justify-between">
       <div className="h-16 flex items-center gap-10 ">
-        <span className=" h-full flex">
-          <Link to="/">
-            <img
-              src={LogoHeader}
-              alt="Helm-DashBoard"
-              width={140}
-              height={40}
-            />
-          </Link>
-        </span>
+        <NavLink to="/">
+          <img src={LogoHeader} alt="Helm-DashBoard" width={140} height={40} />
+        </NavLink>
         <span className="w-[1px] h-3/4 bg-gray-200" />
         <div className="inline-block">
           <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
@@ -67,7 +60,10 @@ export default function Header() {
         <div className="flex gap-2 border bottom-gray-200 rounded">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
-            <a href="https://komodor.com/helm-dash/" className="text-[#0d6efd] font-bold">
+            <a
+              href="https://komodor.com/helm-dash/"
+              className="text-[#0d6efd] font-bold"
+            >
               Upgrade your HELM experience - Free
             </a>
             <label>Auth & RBAC, k8s events, troubleshooting and more</label>
