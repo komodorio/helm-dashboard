@@ -8,10 +8,10 @@ const lastRelease = "v1.2.0";
 
 export default function Header() {
   return (
-    <div className="h-16 flex items-center gap-10 justify-between bg-white">
-      <div className="h-16 flex items-center gap-10 ">
+    <div className="h-16 flex items-center justify-between bg-white">
+      <div className="h-16 flex items-center gap-6 ">
         <NavLink to="/">
-          <img src={LogoHeader} alt="Helm-DashBoard" width={140} height={40} />
+          <img src={LogoHeader} alt="Helm-DashBoard" className="ml-3 w-[140px] "/>
         </NavLink>
         <span className="w-[1px] h-3/4 bg-gray-200" />
         <div className="inline-block">
