@@ -12,6 +12,7 @@ module.exports = {
         },
         "link-color": "#0D6EFD",
         "body-background": "#F4F7FA",
+        "upgrade-color": "#FC1683",
       },
     },
   },
