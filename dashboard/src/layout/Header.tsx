@@ -1,14 +1,14 @@
-import { Link, NavLink } from "react-router-dom";
-import "../App.css";
+import { NavLink } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
+import ShutDownButton from "./ShutDownButton";
 
 const lastRelease = "v1.2.0";
 
 export default function Header() {
   return (
-    <div className="h-16 flex items-center gap-10 justify-between">
+    <div className="h-16 flex items-center gap-10 justify-between bg-white">
       <div className="h-16 flex items-center gap-10 ">
         <NavLink to="/">
           <img src={LogoHeader} alt="Helm-DashBoard" width={140} height={40} />
@@ -56,8 +56,9 @@ export default function Header() {
           </ul>
         </div>
       </div>
-      <div className="h-16 flex items-center gap-10 ">
-        <div className="flex gap-2 border bottom-gray-200 rounded">
+      <div className="h-16 flex items-center gap-5 ">
+        
+        <div className="flex p-1 gap-2 border bottom-gray-200 rounded">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
             <a
@@ -66,12 +67,12 @@ export default function Header() {
             >
               Upgrade your HELM experience - Free
             </a>
-            <label>Auth & RBAC, k8s events, troubleshooting and more</label>
+            <label className="text-[#707583]">Auth & RBAC, k8s events, troubleshooting and more</label>
           </div>
         </div>
 
         <span className="w-[1px] h-3/4 bg-gray-200" />
-        <div>shut down</div>
+        <ShutDownButton/>
       </div>
     </div>
   );
