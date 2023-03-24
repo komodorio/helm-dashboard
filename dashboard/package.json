@@ -5,14 +5,16 @@
   "main": "index.js",
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-      },
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.9.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.21.0",
     "@storybook/addon-actions": "^6.5.16",
     "@storybook/addon-essentials": "^6.5.16",
     "@storybook/addon-interactions": "^6.5.16",
     "@storybook/addon-links": "^6.5.16",
+    "@storybook/addon-postcss": "^2.0.0",
     "@storybook/builder-vite": "^0.4.2",
     "@storybook/react": "^6.5.16",
     "@storybook/testing-library": "^0.0.13",
@@ -36,7 +38,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "lint": "npx eslint src/",
     "lint:fix": "npm run lint -- --fix",
