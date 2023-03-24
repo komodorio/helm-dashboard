@@ -97,52 +97,17 @@
 *{
     margin: 0;
 }
-.app-header{
-    display: flex;
-    justify-content: space-between;
-    margin: 5px;
-    padding: 10px;
-}
-.header-left{
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    flex: 0.6;
-}
-.header-items{
-    display: flex;
-    flex: 0.8;
-    justify-content: space-evenly;
-}
-.header-right{
-    display: flex;
-    align-items: center;
-    flex: 0.2;
-    justify-content: space-around;
-}
-.redirect{
-    display: flex;
-    flex: 0.8;
-}
-.redirect>img{
-    margin-right: 5px;
-}
-.card{
-    display: flex;
-    height: 100vh;
-    padding-left:1rem !important;
-}
 
 .Card{
-    flex: 0.25;
-    left: 0px;
+    position: absolute;
+    left: 1rem;
+    margin-top: 1rem;
     width: 25vw;
     height: fit-content;
     padding: 10px;
     border: 1px solid whitesmoke;
     border-radius: 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    margin-right: 5px;
 }
 .Card>h2{
     font-weight:bolder;
