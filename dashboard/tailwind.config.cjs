@@ -7,10 +7,12 @@ module.exports = {
       colors: {
         error: {
           "border-color": "#DC3545",
-          "background": "#F9D7DA",
+          background: "#F9D7DA",
           color: "#842029",
         },
         "link-color": "#0D6EFD",
+        "body-background": "#F4F7FA",
+        "upgrade-color": "#FC1683",
       },
     },
   },
