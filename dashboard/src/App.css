@@ -37,6 +37,73 @@
     padding-left:1rem !important;
 }
 
+.Card{
+    flex: 0.25;
+    left: 0px;
+    width: 25vw;
+    height: fit-content;
+    padding: 10px;
+    border: 1px solid whitesmoke;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-right: 5px;
+}
+.Card>h2{
+    font-weight:bolder;
+    margin-bottom: 10px;
+    font-size: large;
+    color:#4d4d4d;
+}
+.Card>form{
+    display: flex;
+    flex: 0.2;
+    flex-direction: column;
+    justify-content: space-evenly;
+    margin-left: 10px;
+    margin-bottom: 30px;
+    
+}
+.repo_options{
+    padding-bottom: 5px;
+}
+.radio-btn{
+    accent-color: #4d4dff;
+    -webkit-transform: scale(1.2);
+}
+.option{
+    margin-left: 8px;
+    color:#4d4d4d;
+    font-weight: 500;
+}
+
+.Card>button{
+    margin-bottom: 10px;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    color: grey;
+}
+.btn-element{
+    display: flex;
+    align-items: center;
+    
+}
+.btn-logo{
+    margin:0px 2px 0px 10px;
+    font-size:18px;
+}
+.btn-title{
+    margin: 5px 10px 5px 0px;
+    font-weight:bold;
+}
+.Card>p{
+    text-align: justify;
+    margin:5px 25px 0px 5px;
+    padding: 5px;
+}
+.chart{
+    color:#00ff00;
+}
+
 .card-right{
     flex: 0.75;
     margin-top: 5px;
