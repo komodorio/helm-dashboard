@@ -48,7 +48,7 @@ function DropDown({ items }: DropDownProps) {
       </div>
       {popupState.isOpen && (
         <div
-          className={`bg-white mt-3 absolute rounded border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
+          className={`flex flex-col py-1 gap-1 bg-white mt-3 absolute rounded border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
         >
           {items.map((item) => (
             <>
@@ -58,9 +58,9 @@ function DropDown({ items }: DropDownProps) {
                 <div
                   onClick={() => {
                     item.onClick?.();
-                    //setPopupState((prev) => ({ ...prev, isOpen: false }));
+                    setPopupState((prev) => ({ ...prev, isOpen: false }));
                   }}
-                  className="cursor-pointer font-normal flex items-center gap-2 py-3 pl-3 pr-7 hover:bg-[#E9ECEF]"
+                  className="cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-[#E9ECEF]"
                 >
                   {item.icon && <span> {item.icon ?? null}</span>}
                   <span>{item.text}</span>
