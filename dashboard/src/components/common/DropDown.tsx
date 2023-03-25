@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import ArrowDownIcon from "../../assets/arrow-down-icon.svg";
 
 export type DropDownItem = {
@@ -27,6 +27,29 @@ function DropDown({ items }: DropDownProps) {
     Y: 0,
   });
 
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (popupState.isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [popupState.isOpen]);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      setPopupState((prev) => ({
+        ...prev,
+        isOpen: false,
+      }));
+    }
+  };
+
   return (
     <>
       <div className="relative flex flex-col items-center">
@@ -48,6 +71,7 @@ function DropDown({ items }: DropDownProps) {
       </div>
       {popupState.isOpen && (
         <div
+          ref={modalRef}
           className={`flex flex-col py-1 gap-1 bg-white mt-3 absolute rounded border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
         >
           {items.map((item) => (
@@ -60,7 +84,11 @@ function DropDown({ items }: DropDownProps) {
                     item.onClick?.();
                     setPopupState((prev) => ({ ...prev, isOpen: false }));
                   }}
-                  className="cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-[#E9ECEF]"
+                  className={`cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-[#E9ECEF] ${
+                    item.isDisabled
+                      ? "cursor-default hover:bg-transparent text-gray-400"
+                      : ""
+                  }`}
                 >
                   {item.icon && <span> {item.icon ?? null}</span>}
                   <span>{item.text}</span>

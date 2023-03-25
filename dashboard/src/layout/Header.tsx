@@ -92,7 +92,7 @@ export default function Header() {
                     onClick: openAPI,
                   },
                   { id: "6", isSeparator: true },
-                  { id: "7", text: "version 0.0.0" },
+                  { id: "7", text: "version 0.0.0", isDisabled: true },
                 ]}
               ></DropDown>
             </li>
