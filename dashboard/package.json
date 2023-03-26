@@ -38,7 +38,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "storybook": "NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006",
+    "storybook": "set NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "lint": "npx eslint src/",
     "lint:fix": "npm run lint -- --fix",
