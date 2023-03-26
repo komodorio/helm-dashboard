@@ -1,6 +1,6 @@
 import '../App.css'
 
-function Sidebar():JSX.Element {
+function RepositoryManage():JSX.Element {
   return (
     <div className="Card">
         <h2>Repositories</h2>
@@ -24,4 +24,4 @@ function Sidebar():JSX.Element {
   )
 }
 
-export default Sidebar
+export default RepositoryManage
