@@ -2,7 +2,9 @@ name: Build
 
 on:
   push:
-    branches: main
+    branches:
+     - main
+     - helm-dashboard-v2
   pull_request:
     branches: "*"
 

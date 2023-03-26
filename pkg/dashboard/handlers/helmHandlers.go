@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
 	"sort"
 	"strconv"
@@ -150,10 +149,10 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 			}
 			info, err := app.K8s.GetResourceInfo(obj.Kind, ns, obj.Name)
 			if err != nil {
-				log.Warnf("Failed to get resource info for %s %s/%s: %+v", obj.Name, ns, obj.Name, err)
-				info = &v1.Carp{}
+				_ = c.AbortWithError(http.StatusInternalServerError, err)
+				return
 			}
-			obj.Status = *EnhanceStatus(info, err)
+			obj.Status = *EnhanceStatus(info)
 		}
 	}
 
