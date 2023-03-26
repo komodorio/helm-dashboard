@@ -29,3 +29,9 @@
     box-shadow: theme('boxShadow.xl'); 
 } 
 }
+#portal{
+    top: 0;
+    width: 40%;
+    left: 30%;
+    position: absolute;
+}
