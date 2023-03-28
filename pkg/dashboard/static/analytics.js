@@ -69,3 +69,47 @@ function sendStats(name, prop){
         window.heap.track(name, prop);
     }
 }
+
+function sendToSegmentThroughAPI(eventName, properties, accessToken, inInitial) {
+    const userEmail = window.komodor.userEmail;
+    if (!userEmail) {
+        sessionStorage.removeItem("userLoggedIn");
+        return;
+    }
+    sendData(properties, "track", userEmail, accessToken, inInitial, eventName);
+}
+
+function sendData(data, eventType, userId, accessToken, inInitial, eventName) {
+    const body = createBody(eventType, userId, data, eventName);
+    const auth_skipper = inInitial ? ANALYTICS_ADMIN_USER_EMAIL : "";
+    return fetch(`${appConfig_1.default.analyticsApiUrl}/analytics/segment/${eventType}`, {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        //credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "api-key": auth_skipper,
+            Authorization: accessToken,
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+    });
+}
+
+function createBody(segmentCallType, userId, params, eventName) {
+    const data = { userId: userId };
+    if (segmentCallType === "identify") {
+        data["traits"] = params;
+    }
+    else if (segmentCallType === "track") {
+        if (!eventName) {
+            throw new Error("no eventName parameter on segment track call");
+        }
+        params["datadogReplay"] = (0, exceptionManagement_1.getDatadogReplayUrl)();
+        data["properties"] = params;
+        data["eventName"] = eventName;
+    }
+    return data;
+}
