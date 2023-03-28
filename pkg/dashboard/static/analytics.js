@@ -1,4 +1,6 @@
 const xhr = new XMLHttpRequest();
+
+
 xhr.onload = function () {
     if (xhr.readyState === XMLHttpRequest.DONE) {
         const status = JSON.parse(xhr.responseText);
@@ -6,6 +8,7 @@ xhr.onload = function () {
         if (status.Analytics) {
             enableDD(version)
             enableHeap(version, status.ClusterMode)
+            enableSegmentBackend(version, status.ClusterMode)
         } else {
             console.log("Analytics is disabled in this session")
         }
@@ -64,25 +67,28 @@ function enableHeap(version, inCluster) {
     });
 }
 
-function sendStats(name, prop){
+function sendStats(name, prop){ // if heap is failed to connect wont it return true either?
     if (window.heap) {
         window.heap.track(name, prop);
     }
 }
 
-function sendToSegmentThroughAPI(eventName, properties, accessToken, inInitial) {
-    const userEmail = window.komodor.userEmail;
-    if (!userEmail) {
-        sessionStorage.removeItem("userLoggedIn");
-        return;
+function sendToSegmentThroughAPI(eventName, properties) {
+    if (window.heap){
+    const userId = generateUserId();
+    try {
+        sendData(properties, "track", userId, eventName);
     }
-    sendData(properties, "track", userEmail, accessToken, inInitial, eventName);
+    catch (e) {
+        console.log("failed sending data to segment", e);
+        }
+    }
 }
 
-function sendData(data, eventType, userId, accessToken, inInitial, eventName) {
+function sendData(data, eventType, userId, eventName) {
     const body = createBody(eventType, userId, data, eventName);
-    const auth_skipper = inInitial ? ANALYTICS_ADMIN_USER_EMAIL : "";
-    return fetch(`${appConfig_1.default.analyticsApiUrl}/analytics/segment/${eventType}`, {
+    const auth_skipper = ANALYTICS_ADMIN_USER_EMAIL; // add as a env to deploy
+    return fetch(`https://api.komodor.com/analytics/segment/${eventType}`, {
         method: "POST",
         mode: "cors",
         cache: "no-cache",
@@ -90,7 +96,6 @@ function sendData(data, eventType, userId, accessToken, inInitial, eventName) {
         headers: {
             "Content-Type": "application/json",
             "api-key": auth_skipper,
-            Authorization: accessToken,
         },
         redirect: "follow",
         referrerPolicy: "no-referrer",
@@ -107,9 +112,22 @@ function createBody(segmentCallType, userId, params, eventName) {
         if (!eventName) {
             throw new Error("no eventName parameter on segment track call");
         }
-        params["datadogReplay"] = (0, exceptionManagement_1.getDatadogReplayUrl)();
         data["properties"] = params;
         data["eventName"] = eventName;
     }
     return data;
 }
+
+async function enableSegmentBackend(version, ClusterMode, userId) {
+    await sendData({version: version, clusterMode: ClusterMode}, "identify", userId);
+}
+
+const generateUserId = (() => {
+    let userId = null;
+    return () => {
+        if (!userId) {
+            userId = crypto.randomUUID();
+        }
+        return userId;
+    };
+})();
