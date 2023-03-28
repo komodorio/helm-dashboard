@@ -5,7 +5,7 @@ function Revision() {
   return (
     <div className="flex">
       <div className="flex flex-col gap-2 w-1/6 h-screen bg-[#E8EDF2]">
-        <label>Revisions</label>
+        <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">Revisions</label>
         <RevisionsList />
       </div>
 
