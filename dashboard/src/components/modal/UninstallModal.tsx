@@ -53,7 +53,7 @@ export default function UninstallModal({
       <div>Following resources will be deleted from the cluster:</div>
       <div>
         {resources.map((resource) => (
-          <div className="flex gap-7 w-100 mb-3">
+          <div key={resource.id} className="flex gap-7 w-100 mb-3">
             <span className="text-right w-1/5 font-medium italic">
               {resource.type}
             </span>
