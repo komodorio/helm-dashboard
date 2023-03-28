@@ -1,5 +1,7 @@
+import axios from "axios";
 import { useState } from "react";
-import { BsPencil, BsTrash3 } from "react-icons/bs";
+import { BsPencil, BsTrash3, BsHourglassSplit } from "react-icons/bs";
+import { Chart } from "../data/types";
 import UninstallModal from "./modal/UninstallModal";
 
 type RevisionTagProps = {
@@ -16,10 +18,55 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
   );
 }
 
-function RevisionDetails() {
+function RevisionDetails(chart: Chart) {
   const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
+  const [isChecking, setChecking] = useState(false);
 
-  const checkUpgradeable = () => {
+  const checkUpgradeable = async () => {
+    try {
+      const response = await axios.get(
+        "/api/helm/repositories/latestver?name=" + chart.name
+      );
+      const data = response.data;
+
+      let elm = { name: "", version: "0" };
+      // const btnUpgradeCheck = $("#btnUpgradeCheck");
+      if (!data || !data.length) {
+        //     btnUpgradeCheck.prop("disabled", true)
+        //     btnUpgradeCheck.text("")
+        //     $("#btnAddRepository").text("Add repository for it").data("suggestRepo", "")
+      } else if (data[0].isSuggestedRepo) {
+        //     btnUpgradeCheck.prop("disabled", true)
+        //     btnUpgradeCheck.text("")
+        //     $("#btnAddRepository").text("Add repository for it: "+data[0].repository).data("suggestRepo", data[0].repository).data("suggestRepoUrl", data[0].urls[0])
+      } else {
+        //     $("#btnAddRepository").text("")
+        //     btnUpgradeCheck.text("Check for new version")
+        elm = data[0];
+      }
+
+      // $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
+      // const verCur = $("#specRev").data("last-chart-ver");
+      // btnUpgradeCheck.data("repo", elm.repository)
+      // btnUpgradeCheck.data("chart", elm.name)
+
+      // const canUpgrade = isNewerVersion(verCur, elm.version);
+      // btnUpgradeCheck.prop("disabled", false)
+      // if (canUpgrade) {
+      //     $("#btnUpgrade span").text("Upgrade to " + elm.version)
+      //     $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-arrow-up")
+      // } else {
+      //     $("#btnUpgrade span").text("Reconfigure")
+      //     $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-pencil")
+      // }
+
+      // $("#btnUpgrade").off("click").click(function () {
+      //     popUpUpgrade(elm, getHashParam("namespace"), getHashParam("chart"), verCur, $("#specRev").data("last-rev"))
+      // })
+    } catch (error) {
+      //errorAlert-"Failed to find chart in repo"
+    }
+
     console.error("checkUpgradeable not implemented"); //todo: implement
   };
 
@@ -37,7 +84,7 @@ function RevisionDetails() {
   };
 
   return (
-    <div className="flex flex-col px-16 pt-5">
+    <div className="flex flex-col px-16 pt-5 gap-3">
       <span className="text-[#1FA470] font-semibold">● DEPLOYED</span>
       <div className="flex justify-between">
         <span className="text-[#3d4048] text-4xl">airFlow</span>
@@ -45,8 +92,17 @@ function RevisionDetails() {
           <div className="flex flex-col">
             <button onClick={checkUpgradeable}>
               <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                <BsPencil />
-                Reconfigure
+                {isChecking ? (
+                  <>
+                    <BsHourglassSplit />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <BsPencil />
+                    Reconfigure
+                  </>
+                )}
               </span>
             </button>
             <a
