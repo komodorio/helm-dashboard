@@ -1,15 +1,14 @@
 import HeaderLogo from "../../assets/packges-header.svg";
+import { InstalledPackage } from "../../pages/Installed";
 
-export default function InstalledPackageCard() {
-    const currentPackage = {
-        version: "0.1.0",
-        name: "airflow",
-        revision: "1",
-        versions: ["0.1.0", "0.1.1", "0.1.2", "0.1.3"],
-        default: "",
-        lastUpdated: "9d",
-        description: "Apache Airflow is a tool th express and execute workflows as directed acyclic graphs (DAGs) it",
-    }
+type Props = {
+    installedPackage: InstalledPackage;
+}
+
+export default function InstalledPackageCard(props: Props){
+    
+    const {installedPackage} = props;
+
     return (
         <div
         className="flex items-center justify-between bg-white rounded-md p-2 my-5 drop-shadow border-l-8 border-l-emerald-400"
@@ -20,22 +19,22 @@ export default function InstalledPackageCard() {
             <table className="w-11/12  border-spacing-1">
                 <thead>
                     <tr>
-                        <td><h2 className="font-bold text-2xl p-l-2 max-w-1/5">{currentPackage.name}</h2></td>
+                        <td><h2 className="font-bold text-2xl p-l-2">{installedPackage.name}</h2></td>
                         <td className="text-green-800 font-bold w-1/6 ">&#8226; Installed</td>
-                        <td className="w-1/6 m-2 "><small className=" font-bold ">{currentPackage.name} - {currentPackage.version}</small></td>
-                        <td className=" "><small className=" font-bold ">#{currentPackage.revision}</small></td>
+                        <td className="w-1/6 m-2 "><small className=" font-bold ">{installedPackage.name} - {installedPackage.version}</small></td>
+                        <td className=" "><small className=" font-bold ">#{installedPackage.revision}</small></td>
                         <td className=" "><small className=" font-bold ">default</small></td>
-                        <td className=" "><small className=" font-bold ">{currentPackage.lastUpdated}</small></td>
+                        <td className=" "><small className=" font-bold ">{installedPackage.lastUpdated}</small></td>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td className="pr-12"><span className="p w-11/12">{currentPackage.description}</span></td>
+                        <td className="pr-10 max-w-20"><span className="max-w-11/12">{installedPackage.description}</span></td>
                         <td></td>
-                        <td className="font-light mx-3">chart version</td>
-                        <td className="font-light mx-5 ">revision </td>
-                        <td className="font-light "> namespace </td>
-                        <td className="font-light "> updated</td>
+                        <td className="font-light mx-3 py-0">chart version</td>
+                        <td className="font-light mx-5 py-0">revision </td>
+                        <td className="font-light  py-0"> namespace </td>
+                        <td className="font-light  py-0"> updated</td>
                     </tr>
                 </tbody>
             </table>
@@ -45,8 +44,8 @@ export default function InstalledPackageCard() {
 
 
 {/* <div className="w-1/5">
-<h2 className="font-bold text-xl w-1/5 ">{currentPackage.name}</h2>
-<small>{currentPackage.description}</small>
+<h2 className="font-bold text-xl w-1/5 ">{installedPackage.name}</h2>
+<small>{installedPackage.description}</small>
 </div>
 
 <div>
@@ -56,10 +55,10 @@ export default function InstalledPackageCard() {
 </div>
 
 <div>
-{currentPackage.name} - {currentPackage.version}
+{installedPackage.name} - {installedPackage.version}
 </div>
 <div>
-#{currentPackage.revision}
+#{installedPackage.revision}
 </div>
 
 <div>
@@ -67,5 +66,5 @@ default
 </div>
 
 <div>
-{currentPackage.lastUpdated}
+{installedPackage.lastUpdated}
 </div> */}
