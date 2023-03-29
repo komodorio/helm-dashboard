@@ -1,7 +1,4 @@
-import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
-import RevisionCard from './RevisionCard';
-import { RevisionCardProps } from './RevisionCard';
+import { ComponentStory } from '@storybook/react';
 import '../index.css'
 import RevisionList, { RevisionListProps } from './RevisionList';
 

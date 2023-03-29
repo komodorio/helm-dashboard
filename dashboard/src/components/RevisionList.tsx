@@ -1,11 +1,4 @@
-
-
-import React from "react";
-import { StatusCode } from "../global";
-import Status from "./Status";
-import { getAge } from '../timeUtils';
 import RevisionCard, { RevisionCardProps } from "./RevisionCard";
-
 
 export interface RevisionListProps {
   cardsProps: RevisionCardProps[]
@@ -19,9 +12,3 @@ export default function RevisionList(
   );
   return <div>{listItems}</div>;
 }
-
-
-
-
-
-
