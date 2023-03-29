@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components{
+.card {
+    background-color: theme('colors.white');
+    border-radius: theme('borderRadius.lg');
+    border: theme('borderWidth.DEFAULT') solid theme('colors.gray.200');
+    padding: theme('spacing.6');
+    box-shadow: theme('boxShadow.xl');
+    padding-top: theme('spacing.12');
+  }
+.card-hover{
+   background-color: theme('colors.gray.100');
+    border-radius: theme('borderRadius.lg');
+    padding: theme('spacing.6');
+    box-shadow: theme('boxShadow.xl');
+}
+.card-active{
+   background-color: theme('colors.gray.200');
+    border-radius: theme('borderRadius.lg');
+    padding: theme('spacing.6');
+    box-shadow: theme('boxShadow.xl');
+}
+.card-disabled{
+   background-color: theme('colors.gray.300');
+    border-radius: theme('borderRadius.lg');
+    padding: theme('spacing.6');
+    box-shadow: theme('boxShadow.xl'); 
+} 
+}
+#portal{
+    top: 0;
+    width: 40%;
+    left: 30%;
+    position: absolute;
+}
