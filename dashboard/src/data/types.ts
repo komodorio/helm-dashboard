@@ -1,7 +1,3 @@
-export type Revision = {
-  name: string;
-};
-
 export type Chart = {
   name: string;
   home: string;
@@ -44,4 +40,9 @@ export type Release = {
   app_version: string;
   icon: string;
   description: string;
+};
+
+export type Repository = {
+  name: string;
+  url: string;
 };

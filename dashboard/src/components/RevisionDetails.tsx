@@ -18,7 +18,11 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
   );
 }
 
-function RevisionDetails(chart: Chart) {
+type RevisionDetailsProps = {
+  chart: Chart;
+};
+
+function RevisionDetails({ chart }: RevisionDetailsProps) {
   const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
   const [isChecking, setChecking] = useState(false);
 

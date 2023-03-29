@@ -11,7 +11,7 @@ function ShutDownButton() {
 
   const handleClick = async () => {
     await axios
-      .delete("/")
+      .delete("/",)
       .then(() => {
         setSignOut(true);
         window.close();

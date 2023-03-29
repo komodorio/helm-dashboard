@@ -4,6 +4,23 @@ import { Chart } from "../data/types";
 
 const chart: Chart = {
   name: "1",
+  home: "",
+  sources: [],
+  version: "",
+  description: "",
+  keywords: [],
+  maintainers: [],
+  icon: "",
+  apiVersion: "",
+  appVersion: "",
+  annotations: {
+    category: "",
+    licenses: "",
+  },
+  dependencies: [],
+  urls: [],
+  created: "",
+  digest: "",
 };
 
 function Revision() {
