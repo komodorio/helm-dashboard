@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
-import { InstalledPackage } from "../../pages/Installed";
 import InstalledPackageCard from "./InstalledPackageCard";
+import InstalledPackage from "../../models/PackageModel";
 
 type Props = {
     installedPackages: InstalledPackage[];

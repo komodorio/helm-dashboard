@@ -1,26 +1,8 @@
 import { useState } from 'react';
 import InstalledPackagesHeader from '../components/InstalledPackagesArea.tsx/InstalledPackagesHeader';
 import InstalledPackagesList from '../components/InstalledPackagesArea.tsx/InstalledPackagesList';
-export class InstalledPackage{
-  version: string
-  name: string;
-  revision: number;
-  lastUpdated: string;
-  description: string;
-  constructor(
-    version: string,
-    name: string,
-    revision: number,
-    lastUpdated: string,
-    description: string
-  ){ 
-    this.version = version;
-    this.name = name;
-    this.revision = revision;
-    this.lastUpdated = lastUpdated;
-    this.description = description;
-   };
-}
+import InstalledPackage from '../models/PackageModel';
+
 const currentPackage = {
   version: "0.1.0",
   name: "airflow",
@@ -31,7 +13,7 @@ const currentPackage = {
 
 function Installed() {
 
-  const [installedPackages, setInstalledPackages] = useState([currentPackage, currentPackage]);
+  const [installedPackages, setInstalledPackages] = useState<InstalledPackage[]>([currentPackage, currentPackage]);
 
   return (
     <div

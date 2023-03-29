@@ -1,5 +1,5 @@
 import HeaderLogo from "../../assets/packges-header.svg";
-import { InstalledPackage } from "../../pages/Installed";
+import InstalledPackage from "../../models/PackageModel";
 
 type Props = {
     installedPackages: InstalledPackage[];

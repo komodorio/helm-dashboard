@@ -1,5 +1,5 @@
 import HeaderLogo from "../../assets/packges-header.svg";
-import { InstalledPackage } from "../../pages/Installed";
+import InstalledPackage from "../../models/PackageModel";
 
 type Props = {
     installedPackage: InstalledPackage;
@@ -41,30 +41,3 @@ export default function InstalledPackageCard(props: Props){
         </div>
     )
 }
-
-
-{/* <div className="w-1/5">
-<h2 className="font-bold text-xl w-1/5 ">{installedPackage.name}</h2>
-<small>{installedPackage.description}</small>
-</div>
-
-<div>
-<span className="text-green-800 font-bold w-1/6 p-5">
-    &#8226; Installed
-</span>
-</div>
-
-<div>
-{installedPackage.name} - {installedPackage.version}
-</div>
-<div>
-#{installedPackage.revision}
-</div>
-
-<div>
-default
-</div>
-
-<div>
-{installedPackage.lastUpdated}
-</div> */}
