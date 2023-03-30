@@ -56,12 +56,12 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 		return
 	}
 
-	EnhanceStatus(res)
+	EnhanceStatus(res, nil)
 
 	c.IndentedJSON(http.StatusOK, res)
 }
 
-func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
+func EnhanceStatus(res *v12.Carp, err error) *v12.CarpStatus {
 	s := res.Status
 	if s.Conditions == nil {
 		s.Conditions = []v12.CarpCondition{}
@@ -75,7 +75,10 @@ func EnhanceStatus(res *v12.Carp) *v12.CarpStatus {
 	}
 
 	// custom logic to provide most meaningful status for the resource
-	if s.Phase == "Error" {
+	if err != nil {
+		c.Reason = "ErrorGettingStatus"
+		c.Message = err.Error()
+	} else if s.Phase == "Error" {
 		c.Status = Unhealthy
 	} else if slices.Contains([]string{"Available", "Active", "Established", "Bound", "Ready"}, string(s.Phase)) {
 		c.Status = Healthy
