@@ -2,6 +2,7 @@ const xhr = new XMLHttpRequest();
 
 
 xhr.onload = function () {
+
     if (xhr.readyState === XMLHttpRequest.DONE) {
         const status = JSON.parse(xhr.responseText);
         const version = status.CurVer
@@ -63,31 +64,35 @@ function enableHeap(version, inCluster) {
     heap.load("4249623943");
     window.heap.addEventProperties({
         'version': version,
-        'installationMode': inCluster?"cluster":"local"
+        'installationMode': inCluster ? "cluster" : "local"
     });
 }
 
-function sendStats(name, prop){ // if heap is failed to connect wont it return true either?
+function sendStats(name, prop) {
     if (window.heap) {
         window.heap.track(name, prop);
     }
 }
 
+function enableSegmentBackend(version, ClusterMode) {
+    sendToSegmentThroughAPI("helm dashboard loaded", {version, 'installationMode': ClusterMode ? "cluster" : "local"})
+}
+
 function sendToSegmentThroughAPI(eventName, properties) {
-    if (window.heap){
-    const userId = generateUserId();
-    try {
-        sendData(properties, "track", userId, eventName);
-    }
-    catch (e) {
-        console.log("failed sending data to segment", e);
+    if (window.heap) {
+        const userId = getUserId();
+        try {
+            sendData(properties, "track", userId, eventName);
+        } catch (e) {
+            console.log("failed sending data to segment", e);
         }
     }
 }
 
 function sendData(data, eventType, userId, eventName) {
     const body = createBody(eventType, userId, data, eventName);
-    const auth_skipper = ANALYTICS_ADMIN_USER_EMAIL; // add as a env to deploy
+    ANALYTICS_ADMIN_USER_EMAIL = "komodor.analytics@admin.com"
+    const auth_skipper = ANALYTICS_ADMIN_USER_EMAIL;
     return fetch(`https://api.komodor.com/analytics/segment/${eventType}`, {
         method: "POST",
         mode: "cors",
@@ -104,11 +109,10 @@ function sendData(data, eventType, userId, eventName) {
 }
 
 function createBody(segmentCallType, userId, params, eventName) {
-    const data = { userId: userId };
+    const data = {userId: userId};
     if (segmentCallType === "identify") {
         data["traits"] = params;
-    }
-    else if (segmentCallType === "track") {
+    } else if (segmentCallType === "track") {
         if (!eventName) {
             throw new Error("no eventName parameter on segment track call");
         }
@@ -118,11 +122,7 @@ function createBody(segmentCallType, userId, params, eventName) {
     return data;
 }
 
-async function enableSegmentBackend(version, ClusterMode, userId) {
-    await sendData({version: version, clusterMode: ClusterMode}, "identify", userId);
-}
-
-const generateUserId = (() => {
+const getUserId = (() => {
     let userId = null;
     return () => {
         if (!userId) {
