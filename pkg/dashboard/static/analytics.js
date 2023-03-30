@@ -1,11 +1,15 @@
 const xhr = new XMLHttpRequest();
+
+
 xhr.onload = function () {
+
     if (xhr.readyState === XMLHttpRequest.DONE) {
         const status = JSON.parse(xhr.responseText);
         const version = status.CurVer
         if (status.Analytics) {
             enableDD(version)
             enableHeap(version, status.ClusterMode)
+            enableSegmentBackend(version, status.ClusterMode)
         } else {
             console.log("Analytics is disabled in this session")
         }
@@ -60,12 +64,70 @@ function enableHeap(version, inCluster) {
     heap.load("4249623943");
     window.heap.addEventProperties({
         'version': version,
-        'installationMode': inCluster?"cluster":"local"
+        'installationMode': inCluster ? "cluster" : "local"
     });
 }
 
-function sendStats(name, prop){
+function sendStats(name, prop) {
     if (window.heap) {
         window.heap.track(name, prop);
     }
 }
+
+function enableSegmentBackend(version, ClusterMode) {
+    sendToSegmentThroughAPI("helm dashboard loaded", {version, 'installationMode': ClusterMode ? "cluster" : "local"})
+}
+
+function sendToSegmentThroughAPI(eventName, properties) {
+    if (window.heap) {
+        const userId = getUserId();
+        try {
+            sendData(properties, "track", userId, eventName);
+        } catch (e) {
+            console.log("failed sending data to segment", e);
+        }
+    }
+}
+
+function sendData(data, eventType, userId, eventName) {
+    const body = createBody(eventType, userId, data, eventName);
+    ANALYTICS_ADMIN_USER_EMAIL = "komodor.analytics@admin.com"
+    const auth_skipper = ANALYTICS_ADMIN_USER_EMAIL;
+    return fetch(`https://api.komodor.com/analytics/segment/${eventType}`, {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        //credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "api-key": auth_skipper,
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+    });
+}
+
+function createBody(segmentCallType, userId, params, eventName) {
+    const data = {userId: userId};
+    if (segmentCallType === "identify") {
+        data["traits"] = params;
+    } else if (segmentCallType === "track") {
+        if (!eventName) {
+            throw new Error("no eventName parameter on segment track call");
+        }
+        data["properties"] = params;
+        data["eventName"] = eventName;
+    }
+    return data;
+}
+
+const getUserId = (() => {
+    let userId = null;
+    return () => {
+        if (!userId) {
+            userId = crypto.randomUUID();
+        }
+        return userId;
+    };
+})();
