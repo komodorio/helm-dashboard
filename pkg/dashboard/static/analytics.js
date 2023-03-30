@@ -1,10 +1,10 @@
 const xhr = new XMLHttpRequest();
 const TRACK_EVENT_TYPE = "track"
+const IDENTIFY_EVENT_TYPE = "identify"
 const BASE_ANALYTIC_MSG = {
     method: "POST",
     mode: "cors",
     cache: "no-cache",
-    //credentials: "include",
     headers: {
         "Content-Type": "application/json",
         "api-key": "komodor.analytics@admin.com",
@@ -86,14 +86,14 @@ function sendStats(name, prop) {
 }
 
 function enableSegmentBackend(version, ClusterMode) {
-    sendToSegmentThroughAPI("helm dashboard loaded", {version, 'installationMode': ClusterMode ? "cluster" : "local"})
+    sendToSegmentThroughAPI("helm dashboard loaded", {version, 'installationMode': ClusterMode ? "cluster" : "local"}, TRACK_EVENT_TYPE)
 }
 
-function sendToSegmentThroughAPI(eventName, properties) {
+function sendToSegmentThroughAPI(eventName, properties, segmentCallType) {
     if (window.heap) {
         const userId = getUserId();
         try {
-            sendData(properties, "track", userId, eventName);
+            sendData(properties, segmentCallType, userId, eventName);
         } catch (e) {
             console.log("failed sending data to segment", e);
         }
@@ -110,7 +110,7 @@ function sendData(data, eventType, userId, eventName) {
 
 function createBody(segmentCallType, userId, params, eventName) {
     const data = {userId: userId};
-    if (segmentCallType === "identify") {
+    if (segmentCallType === IDENTIFY_EVENT_TYPE) {
         data["traits"] = params;
     } else if (segmentCallType === TRACK_EVENT_TYPE) {
         if (!eventName) {
