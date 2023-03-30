@@ -90,14 +90,12 @@ function enableSegmentBackend(version, ClusterMode) {
 }
 
 function sendToSegmentThroughAPI(eventName, properties, segmentCallType) {
-    if (window.heap) {
         const userId = getUserId();
         try {
             sendData(properties, segmentCallType, userId, eventName);
         } catch (e) {
             console.log("failed sending data to segment", e);
         }
-    }
 }
 
 function sendData(data, eventType, userId, eventName) {
