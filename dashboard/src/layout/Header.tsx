@@ -3,7 +3,13 @@ import LogoHeader from "../assets/logo-header.svg";
 import DropDown, { DropDownItem } from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
 import ShutDownButton from "./ShutDownButton";
-import { BsSlack, BsGithub, BsArrowRepeat, BsBraces } from "react-icons/bs";
+import {
+  BsSlack,
+  BsGithub,
+  BsArrowRepeat,
+  BsBraces,
+  BsBoxArrowUpRight,
+} from "react-icons/bs";
 import axios from "axios";
 
 const lastRelease = "v1.2.0";
@@ -115,7 +121,10 @@ export default function Header() {
               href="https://komodor.com/helm-dash/"
               className="text-[#0d6efd] font-bold"
             >
-              Upgrade your HELM experience - Free
+              <div className="flex items-center gap-2">
+                Upgrade your HELM experience - Free
+                <BsBoxArrowUpRight className="w-[14px] h-[14px]" />
+              </div>
             </a>
             <label className="text-[#707583]">
               Auth & RBAC, k8s events, troubleshooting and more
