@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
 import { BsPencil, BsTrash3, BsHourglassSplit } from "react-icons/bs";
-import { Chart } from "../data/types";
-import UninstallModal from "./modal/UninstallModal";
+import { Chart } from "../../data/types";
+import UninstallModal from "../modal/UninstallModal";
+import RevisionTabs from "./RevisionTabs";
 
 type RevisionTagProps = {
   caption: string;
@@ -137,6 +138,7 @@ function RevisionDetails({ chart }: RevisionDetailsProps) {
         <RevisionTag caption="cluster" text="docker" />
       </div>
       <label>Install complete</label>
+      <RevisionTabs/>
       <UninstallModal
         uninstallTarget="airflow"
         namespace="default"
