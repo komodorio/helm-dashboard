@@ -9,11 +9,7 @@ const tabs = [
 ];
 
 function RevisionTabs() {
-  return (
-    <div>
-      <Tabs tabs={tabs} />
-    </div>
-  );
+  return <Tabs tabs={tabs} />;
 }
 
 export default RevisionTabs;

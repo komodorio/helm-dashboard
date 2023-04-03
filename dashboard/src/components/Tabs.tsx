@@ -26,11 +26,8 @@ TabsProps) {
         {tabs.map((tab, index) => (
           <button
             key={tab.label}
-            className={`px-4 py-2 text-sm font-normal text-[#3B3D45] focus:outline-none"  
-              ${
-                activeTab === index &&
-                "border-b-[3px] border-[#3B3D45]"
-              }
+            className={`cursor-pointer px-4 py-2 text-sm font-normal text-[#3B3D45] focus:outline-none"  
+              ${activeTab === index && "border-b-[3px] border-[#3B3D45]"}
             `}
             onClick={() => setActiveTab(index)}
           >
@@ -38,7 +35,7 @@ TabsProps) {
           </button>
         ))}
       </div>
-      <div className="mt-4">{tabs[activeTab].content}</div>
+      <div>{tabs[activeTab].content}</div>
     </div>
   );
 }

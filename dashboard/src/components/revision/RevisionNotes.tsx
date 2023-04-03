@@ -18,7 +18,7 @@ function RevisionNotes() {
             type="radio"
             value="view"
             name="notes-view"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
           />
           <label
             htmlFor="view"
@@ -35,7 +35,7 @@ function RevisionNotes() {
             type="radio"
             value="diff-with-previous"
             name="notes-view"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
           />
           <label
             htmlFor="diff-with-previous"
@@ -52,14 +52,19 @@ function RevisionNotes() {
             type="radio"
             value="diff-with-specific-revision"
             name="notes-view"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
           />
           <label
             htmlFor="diff-with-specific-revision"
             className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
             <div>
-              Diff with specific revision:<input type="text" value="1"></input>
+              Diff with specific revision:
+              <input
+                className="border ml-2 border-gray-500 w-10 p-1 rounded-sm"
+                type="text"
+                value="1"
+              ></input>
             </div>
           </label>
         </div>
