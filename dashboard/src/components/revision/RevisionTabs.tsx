@@ -1,11 +1,11 @@
 import Tabs from "../Tabs";
-import RevisionNotes from "./RevisionNotes";
+import RevisionDiff from "./RevisionDiff";
 
 const tabs = [
   { label: "Resources", content: <>"Resources"</> },
-  { label: "Manifests", content: <>"Manifest"</> },
-  { label: "Values", content: <>"first Values"</> },
-  { label: "Notes", content: <RevisionNotes /> },
+  { label: "Manifests", content: <RevisionDiff /> },
+  { label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
+  { label: "Notes", content: <RevisionDiff /> },
 ];
 
 function RevisionTabs() {
