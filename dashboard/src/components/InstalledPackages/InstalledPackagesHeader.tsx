@@ -28,14 +28,14 @@ export default function InstalledPackagesHeader({
           />
         </div>
       </div>
-      <div className="grid grid-cols-12 text-xs font-medium justify-between bg-[#ECEFF2] p-2">
-        <span className="col-2" />
-        <span className="col-2">NAME</span>
-        <span className="col-3">RELEASE STATUS</span>
-        <span className="col-2">CHART</span>
-        <span className="col-1">REVISION</span>
-        <span className="col-1">NAMESPACE</span>
-        <span className="col-1">UPDATED</span>
+      <div className="grid grid-cols-12 text-xs font-medium bg-[#ECEFF2] p-2">
+        <span className="col-span-1" />
+        <span className="col-span-3">NAME</span>
+        <span className="col-span-3">RELEASE STATUS</span>
+        <span className="col-span-2">CHART</span>
+        <span className="col-span-1">REVISION</span>
+        <span className="col-span-1">NAMESPACE</span>
+        <span className="col-span-1">UPDATED</span>
       </div>
     </div>
   );
