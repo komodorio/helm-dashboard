@@ -15,7 +15,7 @@ export default function InstalledPackageCard({
         className="w-[40px] mx-4 col-span-1"
       />
 
-      <div className="col-span-10">
+      <div className="col-span-10 text-sm">
         <div className="grid grid-cols-10">
             <div className="col-span-3 font-medium text-lg">
               {installedPackage.name}
