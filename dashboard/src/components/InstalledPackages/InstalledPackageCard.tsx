@@ -23,7 +23,7 @@ export default function InstalledPackageCard({
           <div className="col-span-3">
             <span className="text-[#1FA470] font-semibold">● DEPLOYED</span>
           </div>
-          <div className="col-span-2">{installedPackage.version}</div>
+          <div className="col-span-2"> {installedPackage.name}-{installedPackage.version}</div>
           <div className="col-span-1">#{installedPackage.revision}</div>
           <div className="col-span-1">default</div>
           <div className="col-span-1">{installedPackage.lastUpdated}</div>
