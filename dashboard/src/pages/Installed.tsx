@@ -1,6 +1,6 @@
 import { useState } from "react";
-import InstalledPackagesHeader from "../components/InstalledPackagesArea.tsx/InstalledPackagesHeader";
-import InstalledPackagesList from "../components/InstalledPackagesArea.tsx/InstalledPackagesList";
+import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader";
+import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { InstalledPackage } from "../data/types";
 
