@@ -46,3 +46,13 @@ export type Repository = {
   name: string;
   url: string;
 };
+
+export type InstalledPackage = {
+  image: string;
+  version: string;
+  name: string;
+  revision: number;
+  lastUpdated: string;
+  description: string;
+}
+
