@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown, { DropDownItem } from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
-import ShutDownButton from "./ShutDownButton";
+import ShutDownButton from "../components/ShutDownButton";
 import {
   BsSlack,
   BsGithub,
@@ -11,10 +11,77 @@ import {
   BsBoxArrowUpRight,
 } from "react-icons/bs";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
-const lastRelease = "v1.2.0";
+type Status = {
+  CurVer: string;
+  LatestVer: string;
+  Analytics: boolean;
+  CacheHitRatio: number;
+  ClusterMode: boolean;
+};
 
 export default function Header() {
+  const [currentVersion, setCurrentVersion] = useState("");
+  const [latestVersion, setLatestVersion] = useState("");
+
+  useEffect(() => {
+    getToolVersion();
+  }, []);
+
+  const getToolVersion = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/status");
+
+      console.log(response);
+
+      const status = await response.json();
+      fillToolVersion(status);
+    } catch (error) {
+      console.error(error);
+      //reportError("Failed to get tool version", error)
+    }
+
+    // let limNS = null
+    // $.getJSON("/status").fail(function (xhr) { // maybe /options call in the future
+    //     reportError("Failed to get tool version", xhr)
+    // }).done(function (data) {
+    //     $("body").data("status", data)
+    //     fillToolVersion(data)
+    //     limNS = data.LimitedToNamespace
+    //     if (limNS) {
+    //         $("#limitNamespace").show().find("span").text(limNS)
+    //     }
+    //     fillClusters(limNS)
+
+    //     if (data.ClusterMode) {
+    //         $(".bi-power").hide()
+    //         $("#clusterFilterBlock").hide()
+    //     }
+    // })
+  };
+
+  function fillToolVersion(data: Status) {
+    setCurrentVersion(data.CurVer);
+    if (isNewerVersion(data.CurVer, data.LatestVer)) {
+      setLatestVersion(data.LatestVer);
+      //$(".upgrade-possible").show();
+    }
+  }
+
+  function isNewerVersion(oldVersion: string, newVersion: string) {
+    oldVersion = oldVersion?.replace("v", "");
+    newVersion = newVersion?.replace("v", "");
+
+    const oldParts = oldVersion.split(".").map((part) => parseInt(part));
+    const newParts = newVersion.split(".").map((part) => parseInt(part));
+
+    return (
+      newParts.some((part, index) => part > oldParts[index]) ||
+      oldParts.length < newParts.length
+    );
+  }
+
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
   };
@@ -98,7 +165,11 @@ export default function Header() {
                     onClick: openAPI,
                   },
                   { id: "6", isSeparator: true },
-                  { id: "7", text: "version 0.0.0", isDisabled: true },
+                  {
+                    id: "7",
+                    text: `version ${currentVersion}`,
+                    isDisabled: true,
+                  },
                 ]}
               ></DropDown>
             </li>
@@ -107,7 +178,7 @@ export default function Header() {
                 href="https://github.com/komodorio/helm-dashboard/releases"
                 className="text-upgrade-color"
               >
-                Upgrade to {lastRelease}
+                Upgrade to {latestVersion}
               </a>
             </li>
           </ul>

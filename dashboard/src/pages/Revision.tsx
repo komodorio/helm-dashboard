@@ -1,5 +1,5 @@
-import RevisionDetails from "../components/RevisionDetails";
-import RevisionsList from "../components/RevisionsList";
+import RevisionDetails from "../components/revision/RevisionDetails";
+import RevisionsList from "../components/revision/RevisionsList";
 import { Chart } from "../data/types";
 
 const chart: Chart = {

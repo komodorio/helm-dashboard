@@ -1,6 +1,6 @@
 import { BsPower } from "react-icons/bs";
 import { useState } from "react";
-import Modal from "../components/modal/Modal";
+import Modal from "./modal/Modal";
 import axios from "axios";
 
 function ShutDownButton() {
@@ -11,7 +11,7 @@ function ShutDownButton() {
 
   const handleClick = async () => {
     await axios
-      .delete("/",)
+      .delete("/")
       .then(() => {
         setSignOut(true);
         window.close();
