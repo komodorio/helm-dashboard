@@ -1,21 +1,121 @@
 import { NavLink } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
-import DropDown from "../components/common/DropDown";
+import DropDown, { DropDownItem } from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
-import ShutDownButton from "./ShutDownButton";
+import ShutDownButton from "../components/ShutDownButton";
+import {
+  BsSlack,
+  BsGithub,
+  BsArrowRepeat,
+  BsBraces,
+  BsBoxArrowUpRight,
+} from "react-icons/bs";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-const lastRelease = "v1.2.0";
+type Status = {
+  CurVer: string;
+  LatestVer: string;
+  Analytics: boolean;
+  CacheHitRatio: number;
+  ClusterMode: boolean;
+};
 
 export default function Header() {
+  const [currentVersion, setCurrentVersion] = useState("");
+  const [latestVersion, setLatestVersion] = useState("");
+
+  useEffect(() => {
+    getToolVersion();
+  }, []);
+
+  const getToolVersion = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/status");
+
+      console.log(response);
+
+      const status = await response.json();
+      fillToolVersion(status);
+    } catch (error) {
+      console.error(error);
+      //reportError("Failed to get tool version", error)
+    }
+
+    // let limNS = null
+    // $.getJSON("/status").fail(function (xhr) { // maybe /options call in the future
+    //     reportError("Failed to get tool version", xhr)
+    // }).done(function (data) {
+    //     $("body").data("status", data)
+    //     fillToolVersion(data)
+    //     limNS = data.LimitedToNamespace
+    //     if (limNS) {
+    //         $("#limitNamespace").show().find("span").text(limNS)
+    //     }
+    //     fillClusters(limNS)
+
+    //     if (data.ClusterMode) {
+    //         $(".bi-power").hide()
+    //         $("#clusterFilterBlock").hide()
+    //     }
+    // })
+  };
+
+  function fillToolVersion(data: Status) {
+    setCurrentVersion(data.CurVer);
+    if (isNewerVersion(data.CurVer, data.LatestVer)) {
+      setLatestVersion(data.LatestVer);
+      //$(".upgrade-possible").show();
+    }
+  }
+
+  function isNewerVersion(oldVersion: string, newVersion: string) {
+    oldVersion = oldVersion?.replace("v", "");
+    newVersion = newVersion?.replace("v", "");
+
+    const oldParts = oldVersion.split(".").map((part) => parseInt(part));
+    const newParts = newVersion.split(".").map((part) => parseInt(part));
+
+    return (
+      newParts.some((part, index) => part > oldParts[index]) ||
+      oldParts.length < newParts.length
+    );
+  }
+
+  const openSupportChat = () => {
+    window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
+  };
+
+  const openProjectPage = () => {
+    window.open("https://github.com/komodorio/helm-dashboard", "_blank");
+  };
+
+  const resetCache = async () => {
+    try {
+      await axios.delete("/api/cache");
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const openAPI = () => {
+    window.open("http://localhost:8080/static/api-docs.html", "_blank");
+  };
+
   return (
     <div className="h-16 flex items-center justify-between bg-white">
       <div className="h-16 flex items-center gap-6 ">
         <NavLink to="/">
-          <img src={LogoHeader} alt="Helm-DashBoard" className="ml-3 w-[140px] "/>
+          <img
+            src={LogoHeader}
+            alt="Helm-DashBoard"
+            className="ml-3 w-[140px] "
+          />
         </NavLink>
         <span className="w-[1px] h-3/4 bg-gray-200" />
         <div className="inline-block">
-          <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-normal md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li>
               <NavLink
                 to="/"
@@ -39,9 +139,37 @@ export default function Header() {
             <li>
               <DropDown
                 items={[
-                  { id: "1", text: "Support chat", icon: "1" },
-                  { id: "2", text: "Project Page", icon: "2" },
-                  { id: "2", text: "Reset Cache", icon: "2" },
+                  {
+                    id: "1",
+                    text: "Support chat",
+                    icon: <BsSlack />,
+                    onClick: openSupportChat,
+                  } as DropDownItem,
+                  {
+                    id: "2",
+                    text: "Project Page",
+                    icon: <BsGithub />,
+                    onClick: openProjectPage,
+                  },
+                  { id: "3", isSeparator: true },
+                  {
+                    id: "4",
+                    text: "Reset Cache",
+                    icon: <BsArrowRepeat />,
+                    onClick: resetCache,
+                  },
+                  {
+                    id: "5",
+                    text: "REST API",
+                    icon: <BsBraces />,
+                    onClick: openAPI,
+                  },
+                  { id: "6", isSeparator: true },
+                  {
+                    id: "7",
+                    text: `version ${currentVersion}`,
+                    isDisabled: true,
+                  },
                 ]}
               ></DropDown>
             </li>
@@ -50,14 +178,13 @@ export default function Header() {
                 href="https://github.com/komodorio/helm-dashboard/releases"
                 className="text-upgrade-color"
               >
-                Upgrade to {lastRelease}
+                Upgrade to {latestVersion}
               </a>
             </li>
           </ul>
         </div>
       </div>
       <div className="h-16 flex items-center gap-5 ">
-        
         <div className="flex p-1 gap-2 border bottom-gray-200 rounded">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
@@ -65,14 +192,19 @@ export default function Header() {
               href="https://komodor.com/helm-dash/"
               className="text-[#0d6efd] font-bold"
             >
-              Upgrade your HELM experience - Free
+              <div className="flex items-center gap-2">
+                Upgrade your HELM experience - Free
+                <BsBoxArrowUpRight className="w-[14px] h-[14px]" />
+              </div>
             </a>
-            <label className="text-[#707583]">Auth & RBAC, k8s events, troubleshooting and more</label>
+            <label className="text-[#707583]">
+              Auth & RBAC, k8s events, troubleshooting and more
+            </label>
           </div>
         </div>
 
         <span className="w-[1px] h-3/4 bg-gray-200" />
-        <ShutDownButton/>
+        <ShutDownButton />
       </div>
     </div>
   );

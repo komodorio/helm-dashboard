@@ -1,11 +1,26 @@
 const xhr = new XMLHttpRequest();
+const TRACK_EVENT_TYPE = "track"
+const IDENTIFY_EVENT_TYPE = "identify"
+const BASE_ANALYTIC_MSG = {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+        "Content-Type": "application/json",
+        "api-key": "komodor.analytics@admin.com",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer"
+}
 xhr.onload = function () {
+
     if (xhr.readyState === XMLHttpRequest.DONE) {
         const status = JSON.parse(xhr.responseText);
         const version = status.CurVer
         if (status.Analytics) {
             enableDD(version)
             enableHeap(version, status.ClusterMode)
+            enableSegmentBackend(version, status.ClusterMode)
         } else {
             console.log("Analytics is disabled in this session")
         }
@@ -60,12 +75,57 @@ function enableHeap(version, inCluster) {
     heap.load("4249623943");
     window.heap.addEventProperties({
         'version': version,
-        'installationMode': inCluster?"cluster":"local"
+        'installationMode': inCluster ? "cluster" : "local"
     });
 }
 
-function sendStats(name, prop){
+function sendStats(name, prop) {
     if (window.heap) {
         window.heap.track(name, prop);
     }
 }
+
+function enableSegmentBackend(version, ClusterMode) {
+    sendToSegmentThroughAPI("helm dashboard loaded", {version, 'installationMode': ClusterMode ? "cluster" : "local"}, TRACK_EVENT_TYPE)
+}
+
+function sendToSegmentThroughAPI(eventName, properties, segmentCallType) {
+        const userId = getUserId();
+        try {
+            sendData(properties, segmentCallType, userId, eventName);
+        } catch (e) {
+            console.log("failed sending data to segment", e);
+        }
+}
+
+function sendData(data, eventType, userId, eventName) {
+    const body = createBody(eventType, userId, data, eventName);
+    return fetch(`https://api.komodor.com/analytics/segment/${eventType}`, {
+        ...BASE_ANALYTIC_MSG,
+        body: JSON.stringify(body),
+    });
+}
+
+function createBody(segmentCallType, userId, params, eventName) {
+    const data = {userId: userId};
+    if (segmentCallType === IDENTIFY_EVENT_TYPE) {
+        data["traits"] = params;
+    } else if (segmentCallType === TRACK_EVENT_TYPE) {
+        if (!eventName) {
+            throw new Error("no eventName parameter on segment track call");
+        }
+        data["properties"] = params;
+        data["eventName"] = eventName;
+    }
+    return data;
+}
+
+const getUserId = (() => {
+    let userId = null;
+    return () => {
+        if (!userId) {
+            userId = crypto.randomUUID();
+        }
+        return userId;
+    };
+})();

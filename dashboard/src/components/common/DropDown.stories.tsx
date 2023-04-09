@@ -1,7 +1,8 @@
-// TabsBar.stories.ts|tsx
+// DropDown.stories.ts|tsx
 
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import DropDown from "./DropDown";
+import { BsSlack, BsGithub } from "react-icons/bs";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -20,32 +21,14 @@ const Template: ComponentStory<typeof DropDown> = (args) => (
 
 export const Default = Template.bind({});
 
+const onClick = () => {
+  alert("menu item 1 clicked");
+};
+
 Default.args = {
   items: [
-    {
-      id: "1",
-      text: "item1",
-      icon: "ArrowDownIcon",
-    },
-    {
-      id: "2",
-      text: "item2",
-      icon: "ArrowDownIcon",
-    },
-    {
-      id: "3",
-      text: "item3",
-      icon: "ArrowDownIcon",
-    },
-    {
-      id: "4",
-      text: "item4",
-      icon: "ArrowDownIcon",
-    },
-    {
-      id: "5",
-      text: "item5",
-      icon: "ArrowDownIcon",
-    },
+    { id: "1", text: "Menu Item 1", onClick: onClick, icon: <BsSlack /> },
+    { id: "2 ", isSeparator: true },
+    { id: "3", text: "Menu Item 3", isDisabled: true, icon: <BsGithub /> },
   ],
 };
