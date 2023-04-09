@@ -15,19 +15,20 @@ export default function InstalledPackageCard({
         className="w-[40px] mx-4 col-span-1"
       />
 
-      <div className="col-span-10 text-sm">
-        <div className="grid grid-cols-10">
-            <div className="col-span-3 font-medium text-lg">
-              {installedPackage.name}
-            </div>
-            <div className="col-span-2">
-              <span className="text-[#1FA470] font-semibold">● DEPLOYED</span>
-            </div>
-            <div className="col-span-1">#{installedPackage.revision}</div>
-            <div className="col-span-1">default</div>
-            <div className="col-span-1">{installedPackage.lastUpdated}</div>
+      <div className="col-span-11 text-sm">
+        <div className="grid grid-cols-11">
+          <div className="col-span-3 font-medium text-lg">
+            {installedPackage.name}
+          </div>
+          <div className="col-span-3">
+            <span className="text-[#1FA470] font-semibold">● DEPLOYED</span>
+          </div>
+          <div className="col-span-2">{installedPackage.version}</div>
+          <div className="col-span-1">#{installedPackage.revision}</div>
+          <div className="col-span-1">default</div>
+          <div className="col-span-1">{installedPackage.lastUpdated}</div>
         </div>
-        <div className="grid grid-cols-10 text-xs">
+        <div className="grid grid-cols-11 text-xs">
           <div className="col-span-3">{installedPackage.description}</div>
           <div className="col-span-3"></div>
           <div className="col-span-2 text-[#707583]">CHART VERSION</div>
