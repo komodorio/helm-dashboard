@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import Modal from "./Modal";
-import { ModalAction, ModalButtonStyle } from "./Modal";
+import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
 import { Chart } from "../../data/types";
 
 interface InstallModalProps {
   isOpen: boolean;
-  chart?:Partial<Chart>;
+  chart?: Partial<Chart>;
   onConfirm: () => void;
 }
 
