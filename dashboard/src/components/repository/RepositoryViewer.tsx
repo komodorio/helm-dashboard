@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BsTrash3, BsArrowRepeat } from "react-icons/bs";
 import { Chart } from "../../data/types";
+import ChartViewer from "./ChartViewer";
 
 const charts: Partial<Chart>[] = [
   {
@@ -49,6 +50,7 @@ function RepositoryViewer() {
       <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
       <div className="flex justify-between">
         <span className="text-[#3d4048] text-4xl">airFlow</span>
+
         <div className="flex flex-row gap-3">
           <button onClick={update}>
             <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
@@ -64,23 +66,20 @@ function RepositoryViewer() {
           </button>
         </div>
       </div>
+      <span className="text-[#3d4048] text-sm bg-[#D6EFFE] px-3 py-1 rounded-md self-start">
+        URL:{" "}
+        <span className="font-bold">https://charts.bitnami.com/bitnami</span>
+      </span>
 
-      <div className="bg-[#ECEFF2] grid grid-cols-4 text-xs font-bold p-2 px-4 rounded-md">
+      <div className="bg-[#ECEFF2] grid grid-cols-5 text-xs font-bold p-2 px-4 rounded-md">
         <span className="col-span-1">CHART NAME</span>
         <span className="col-span-2">DESCRIPTION</span>
         <span className="col-span-1">VERSION</span>
+        <span className="col-span-1"></span>
       </div>
 
       {charts.map((chart) => (
-        <div key={chart.id} className="grid grid-cols-4 hover:bg-[#f4f7fa] p-4">
-          <span className="col-span-1 font-semibold flex flex-row items-center gap-1">
-            <img src="https://bitnami.com/assets/stacks/airflow/img/airflow-stack-220x234.png"
-            className="h-4"/>
-            {chart.name}
-            </span>
-          <span className="col-span-2 text-sm">{chart.description}</span>
-          <span className="col-span-1">{chart.version}</span>
-        </div>
+        <ChartViewer key={chart.id} chart={chart} />
       ))}
     </div>
   );
