@@ -8,7 +8,7 @@ const repositories = [
 
 function RepositoriesList() {
   return (
-    <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5">
+    <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5 gap-3">
       <label className="font-bold">Repositories</label>
       {repositories.map((repository) => (
         <span className="flex items-center" key={repository.id}>
@@ -22,7 +22,7 @@ function RepositoriesList() {
         </span>
       ))}
       <button type="button">+ Add Repository</button>
-      <p>
+      <p className="text-xs">
         Charts developers: you can also add local directories as chart source.
         Use <span className="text-green-600">--local-chart</span> CLI switch to
         specify it.
