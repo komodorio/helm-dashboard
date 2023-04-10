@@ -49,6 +49,7 @@ export type Repository = {
 };
 
 export type InstalledPackage = {
+  id:string;
   image: string;
   version: string;
   name: string;
