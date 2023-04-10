@@ -1,4 +1,5 @@
 export type Chart = {
+  id: string;
   name: string;
   home: string;
   sources: string[];
@@ -48,11 +49,11 @@ export type Repository = {
 };
 
 export type InstalledPackage = {
+  id:string;
   image: string;
   version: string;
   name: string;
   revision: number;
   lastUpdated: string;
   description: string;
-}
-
+};
