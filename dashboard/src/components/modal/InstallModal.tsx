@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { ModalAction, ModalButtonStyle } from "./Modal";
+import { Chart } from "../../data/types";
 
 interface InstallModalProps {
   isOpen: boolean;
-  installTarget: string;
+  chart?:Partial<Chart>;
   onConfirm: () => void;
 }
 
@@ -22,13 +23,13 @@ const versionsToInstall: VersionToInstall[] = [
 const cluster = "kind-kind";
 
 export default function InstallModal({
+  chart,
   isOpen,
   onConfirm,
-  installTarget,
 }: InstallModalProps) {
   const uninstallTitle = (
     <div className="font-medium text-2xl">
-      Install <span className="text-green-700 font-bold">{installTarget}</span>
+      Install <span className="text-green-700 font-bold">{chart?.name}</span>
     </div>
   );
 
