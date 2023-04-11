@@ -1,10 +1,10 @@
 package objects
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,11 +14,11 @@ import (
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -102,8 +102,7 @@ func (d *DataLayer) GetStatus() *StatusInfo {
 type SectionFn = func(*release.Release, bool) (string, error)
 
 func ParseManifests(out string) ([]*v1.Carp, error) {
-	dec := yaml.NewDecoder(bytes.NewReader([]byte(out)))
-
+	dec := yaml.NewYAMLOrJSONDecoder(strings.NewReader(out), 4096)
 	res := make([]*v1.Carp, 0)
 	var tmp interface{}
 	for {
