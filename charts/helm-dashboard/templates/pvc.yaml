@@ -14,7 +14,9 @@ spec:
   {{- if .Values.dashboard.persistence.hostPath }}
   storageClassName: ""
   {{- else }}
+  {{- if kindIs "string" .Values.dashboard.persistence.storageClass }}
   storageClassName: "{{ .Values.dashboard.persistence.storageClass }}"
+  {{- end }}
   {{- end }}
   accessModes:
   {{- if not (empty .Values.dashboard.persistence.accessModes) }}
