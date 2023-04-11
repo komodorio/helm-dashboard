@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { BsPencil, BsTrash3, BsHourglassSplit } from "react-icons/bs";
-import { Chart } from "../../data/types";
+import { ReleaseRevision } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
 import RevisionTabs from "./RevisionTabs";
 
@@ -20,17 +20,17 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
 }
 
 type RevisionDetailsProps = {
-  chart: Chart;
+  release: ReleaseRevision;
 };
 
-function RevisionDetails({ chart }: RevisionDetailsProps) {
+function RevisionDetails({ release }: RevisionDetailsProps) {
   const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
   const [isChecking, setChecking] = useState(false);
 
   const checkUpgradeable = async () => {
     try {
       const response = await axios.get(
-        "/api/helm/repositories/latestver?name=" + chart.name
+        "/api/helm/repositories/latestver?name=" + release.chart_name
       );
       const data = response.data;
 
@@ -127,18 +127,30 @@ function RevisionDetails({ chart }: RevisionDetailsProps) {
           </div>
         </div>
       </div>
-      <div>
-        <label>Revision #1</label>
-        <label>3/26/2023, 2:19:39 PM</label>
+      <div className="flex flex-row gap-6">
+        <span>
+          Revision <span className="font-semibold">#{release.revision}</span>
+        </span>
+        <span>
+          {new Intl.DateTimeFormat("en-US", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+            hour12: true,
+          }).format(new Date(release.updated))}
+        </span>
       </div>
       <div className="flex flex-wrap gap-4">
-        <RevisionTag caption="chart version" text="airflow-14.0.16" />
-        <RevisionTag caption="app version" text="2.5.2" />
-        <RevisionTag caption="namespace" text="default" />
+        <RevisionTag caption="chart version" text={release.chart} />
+        <RevisionTag caption="app version" text={release.app_version} />
+        <RevisionTag caption="namespace" text="release.namespace" />
         <RevisionTag caption="cluster" text="docker" />
       </div>
-      <label>Install complete</label>
-      <RevisionTabs/>
+      <span>{release.description}</span>
+      <RevisionTabs />
       <UninstallModal
         uninstallTarget="airflow"
         namespace="default"

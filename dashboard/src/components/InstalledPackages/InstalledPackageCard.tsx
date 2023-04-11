@@ -34,7 +34,8 @@ export default function InstalledPackageCard({
         navigate(
           `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
             release.revision
-          }/${"resources"}`
+          }/${"resources"}`,
+          { state: release }
         )
       } //todo: add parameters : context=docker-desktop&namespace=default&chart=argo-cd&revision=2&tab=resources
     >
@@ -60,7 +61,7 @@ export default function InstalledPackageCard({
             {release.namespace}
           </div>
           <div className="col-span-1 font-semibold text-xs">
-            {getAge(new Date(release.updated))}
+            {getAge(release.updated)}
           </div>
         </div>
         <div className="grid grid-cols-11 text-xs">

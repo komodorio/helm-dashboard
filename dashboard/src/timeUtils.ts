@@ -1,5 +1,5 @@
-export function getAge(date: Date) {
-  if (typeof date == "number") {
+export function getAge(date: Date | number | string) {
+  if (typeof date === "number" || typeof date === "string") {
     date = new Date(date);
   }
   const age = Date.now() - date.getTime();
