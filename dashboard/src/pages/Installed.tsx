@@ -42,7 +42,7 @@ function Installed() {
 
   return (
     <div className="flex flex-row">
-      <ClustersList />
+      <ClustersList installedPackages={installedPackages}/>
       <div className="p-5 w-4/5">
         <InstalledPackagesHeader installedPackages={installedPackages} />
 

@@ -1,5 +1,4 @@
 export function getAge(date: Date) {
-  console.log(date);
   if (typeof date == "number") {
     date = new Date(date);
   }
