@@ -15,7 +15,7 @@ export default function App() {
           <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen">
             <Routes>
               <Route path="/" element={<Installed />} />
-              <Route path="/revision" element={<Revision />} />
+              <Route path="/revision/:context/:namespace/:chart/:revision/:tab" element={<Revision />} />
               <Route path="/repository" element={<Repository />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

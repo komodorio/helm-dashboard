@@ -1,13 +1,7 @@
-/**
- *
- *
- */
-import React from 'react'
 export function getAge(date: Date) {
-  console.log(date);
-  if (typeof(date) == 'number'){
-  date = new Date(date);
-}
+  if (typeof date == "number") {
+    date = new Date(date);
+  }
   const age = Date.now() - date.getTime();
   const seconds = Math.floor(age / 1000);
   const minutes = Math.floor(seconds / 60);

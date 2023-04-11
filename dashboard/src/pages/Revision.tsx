@@ -1,8 +1,10 @@
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
 import { Chart } from "../data/types";
+import { useParams } from "react-router";
 
 const chart: Chart = {
+  id: "1",
   name: "1",
   home: "",
   sources: [],
@@ -24,6 +26,11 @@ const chart: Chart = {
 };
 
 function Revision() {
+  const params = useParams();
+  const { context, namespace } = params;
+
+  console.log(params);
+
   return (
     <div className="flex">
       <div className="flex flex-col gap-2 w-1/6 h-screen bg-[#E8EDF2]">
