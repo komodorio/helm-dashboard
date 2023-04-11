@@ -30,6 +30,7 @@ export type Chart = {
 };
 
 export type Release = {
+  id:string;
   name: string;
   namespace: string;
   revision: string;
@@ -46,14 +47,4 @@ export type Release = {
 export type Repository = {
   name: string;
   url: string;
-};
-
-export type InstalledPackage = {
-  id:string;
-  image: string;
-  version: string;
-  name: string;
-  revision: number;
-  lastUpdated: string;
-  description: string;
 };

@@ -1,8 +1,8 @@
 import HeaderLogo from "../../assets/packges-header.svg";
-import { InstalledPackage } from "../../data/types";
+import { Release } from "../../data/types";
 
 type InstalledPackagesHeaderProps = {
-  installedPackages: InstalledPackage[];
+  installedPackages: Release[];
 };
 
 export default function InstalledPackagesHeader({

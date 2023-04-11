@@ -1,14 +1,18 @@
 import { useState } from "react";
-import { InstalledPackage } from "../../data/types";
+import { Release } from "../../data/types";
 import { BsArrowUpCircleFill } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import { getAge } from "../../timeUtils";
 
 type InstalledPackageCardProps = {
-  installedPackage: InstalledPackage;
+  release: Release;
 };
 
 export default function InstalledPackageCard({
-  installedPackage,
+  release,
 }: InstalledPackageCardProps) {
+  const navigate = useNavigate();
+
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(true);
 
@@ -26,33 +30,41 @@ export default function InstalledPackageCard({
       }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
+      onClick={() =>
+        navigate(
+          `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
+            release.revision
+          }/${"resources"}`
+        )
+      } //todo: add parameters : context=docker-desktop&namespace=default&chart=argo-cd&revision=2&tab=resources
     >
       <img
-        src={installedPackage.image}
+        src={release.icon}
         alt="Helm-DashBoard"
         className="w-[40px] mx-4 col-span-1"
       />
 
       <div className="col-span-11 text-sm">
         <div className="grid grid-cols-11">
-          <div className="col-span-3 font-medium text-lg">
-            {installedPackage.name}
-          </div>
+          <div className="col-span-3 font-medium text-lg">{release.name}</div>
           <div className="col-span-3">
             <span className="text-[#1FA470] font-bold text-xs">
-              ● DEPLOYED
+              ● {release.status.toUpperCase()}
             </span>
           </div>
-          <div className="col-span-2">
-            {" "}
-            {installedPackage.name}-{installedPackage.version}
+          <div className="col-span-2">{release.chart}</div>
+          <div className="col-span-1 font-semibold text-xs">
+            #{release.revision}
           </div>
-          <div className="col-span-1 font-semibold text-xs">#{installedPackage.revision}</div>
-          <div className="col-span-1 font-semibold text-xs">default</div>
-          <div className="col-span-1 font-semibold text-xs">{installedPackage.lastUpdated}</div>
+          <div className="col-span-1 font-semibold text-xs">
+            {release.namespace}
+          </div>
+          <div className="col-span-1 font-semibold text-xs">
+            {getAge(new Date(release.updated))}
+          </div>
         </div>
         <div className="grid grid-cols-11 text-xs">
-          <div className="col-span-3">{installedPackage.description}</div>
+          <div className="col-span-3">{release.description}</div>
           <div className="col-span-3"></div>
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>
