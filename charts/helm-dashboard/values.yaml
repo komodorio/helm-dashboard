@@ -43,7 +43,7 @@ dashboard:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ""
+    storageClass: null
 
     ## Helm Dashboard Persistent Volume access modes
     ## Must match those of existing PV or dynamic provisioner

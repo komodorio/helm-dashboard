@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
 	"sort"
@@ -133,8 +134,19 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 
 	res, err := objects.ParseManifests(rel.Orig.Manifest)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		res = append(res, &v1.Carp{
+			TypeMeta: metav1.TypeMeta{Kind: "ManifestParseError"},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: err.Error(),
+			},
+			Spec: v1.CarpSpec{},
+			Status: v1.CarpStatus{
+				Phase:   "BrokenManifest",
+				Message: err.Error(),
+			},
+		})
+		//_ = c.AbortWithError(http.StatusInternalServerError, err)
+		//return
 	}
 
 	if c.Query("health") != "" { // we need  to query k8s for health status

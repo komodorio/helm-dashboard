@@ -129,6 +129,7 @@ function reportError(err, xhr) {
         $("#errorAlert p").text(xhr.responseText)
     }
     $("#errorAlert").show()
+    sendStats("errorReported", {"errMessage": err})
 }
 
 
