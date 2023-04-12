@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ReleaseRevision } from "../../data/types";
 import { getAge } from "../../timeUtils";
+import StatusLabel from "../common/StatusLabel";
 
 type RevisionsListProps = {
   releaseRevisions: ReleaseRevision[];
@@ -18,13 +19,13 @@ export default function RevisionsList({
           onClick={() => setSelectedRevision(revision.revision)}
           key={revision.revision}
           className={`flex flex-col border rounded-md mx-5 p-2 gap-4 cursor-pointer ${
-            revision.revision === selectedRevision ? "border-[#007bff] bg-white" : "border-[#DCDDDF] bg-[#F4F7FA]"
+            revision.revision === selectedRevision
+              ? "border-[#007bff] bg-white"
+              : "border-[#DCDDDF] bg-[#F4F7FA]"
           }`}
         >
           <div className="flex row justify-between">
-            <span className="text-[#1FA470] font-semibold">
-              ● {revision.status.toUpperCase()}
-            </span>
+            <StatusLabel status={revision.status} />
             <span className="font-semibold">#{revision.revision}</span>
           </div>
           <div className="self-end text-[#707583] text-xs">

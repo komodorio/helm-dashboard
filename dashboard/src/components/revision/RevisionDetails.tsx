@@ -4,6 +4,7 @@ import { BsPencil, BsTrash3, BsHourglassSplit } from "react-icons/bs";
 import { ReleaseRevision } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
 import RevisionTabs from "./RevisionTabs";
+import StatusLabel from "../common/StatusLabel";
 
 type RevisionTagProps = {
   caption: string;
@@ -90,7 +91,7 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
-      <span className="text-[#1FA470] font-semibold">● DEPLOYED</span>
+      <StatusLabel status="deployed"/>
       <div className="flex justify-between">
         <span className="text-[#3d4048] text-4xl">airFlow</span>
         <div className="flex flex-row gap-3">
