@@ -3,6 +3,7 @@ import { Release } from "../../data/types";
 import { BsArrowUpCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
+import StatusLabel from "../common/StatusLabel";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -34,7 +35,8 @@ export default function InstalledPackageCard({
         navigate(
           `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
             release.revision
-          }/${"resources"}`
+          }/${"resources"}`,
+          { state: release }
         )
       } //todo: add parameters : context=docker-desktop&namespace=default&chart=argo-cd&revision=2&tab=resources
     >
@@ -48,9 +50,7 @@ export default function InstalledPackageCard({
         <div className="grid grid-cols-11">
           <div className="col-span-3 font-medium text-lg">{release.name}</div>
           <div className="col-span-3">
-            <span className="text-[#1FA470] font-bold text-xs">
-              ● {release.status.toUpperCase()}
-            </span>
+            <StatusLabel status={release.status} />
           </div>
           <div className="col-span-2">{release.chart}</div>
           <div className="col-span-1 font-semibold text-xs">
@@ -60,7 +60,7 @@ export default function InstalledPackageCard({
             {release.namespace}
           </div>
           <div className="col-span-1 font-semibold text-xs">
-            {getAge(new Date(release.updated))}
+            {getAge(release.updated)}
           </div>
         </div>
         <div className="grid grid-cols-11 text-xs">

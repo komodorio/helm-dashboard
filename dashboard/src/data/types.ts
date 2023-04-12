@@ -30,7 +30,7 @@ export type Chart = {
 };
 
 export type Release = {
-  id:string;
+  id: string;
   name: string;
   namespace: string;
   revision: string;
@@ -47,4 +47,16 @@ export type Release = {
 export type Repository = {
   name: string;
   url: string;
+};
+
+export type ReleaseRevision = {
+  revision: number;
+  updated: string;
+  status: string;
+  chart: string;
+  app_version: string;
+  description: string;
+  chart_name: string;
+  chart_ver: string;
+  has_tests: boolean;
 };

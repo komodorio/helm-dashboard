@@ -1,35 +1,36 @@
+import { useLocation } from "react-router-dom";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
-import { Chart } from "../data/types";
 import { useParams } from "react-router";
 
-const chart: Chart = {
-  id: "1",
-  name: "1",
-  home: "",
-  sources: [],
-  version: "",
-  description: "",
-  keywords: [],
-  maintainers: [],
-  icon: "",
-  apiVersion: "",
-  appVersion: "",
-  annotations: {
-    category: "",
-    licenses: "",
+const releaseRevisions = [
+  {
+    revision: 1,
+    updated: "2023-04-03T15:49:47.3335433+03:00",
+    status: "superseded",
+    chart: "argo-cd-4.5.3",
+    app_version: "2.6.7",
+    description: "Install complete",
+    chart_name: "argo-cd",
+    chart_ver: "4.5.3",
+    has_tests: false,
   },
-  dependencies: [],
-  urls: [],
-  created: "",
-  digest: "",
-};
+  {
+    revision: 2,
+    updated: "2023-04-05T08:00:07.7821687+03:00",
+    status: "deployed",
+    chart: "argo-cd-4.5.3",
+    app_version: "2.6.7",
+    description: "Upgrade complete",
+    chart_name: "argo-cd",
+    chart_ver: "4.5.3",
+    has_tests: false,
+  },
+];
 
 function Revision() {
-  const params = useParams();
-  const { context, namespace } = params;
-
-  console.log(params);
+  const { state: release } = useLocation();
+  console.log(release);
 
   return (
     <div className="flex">
@@ -37,11 +38,11 @@ function Revision() {
         <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">
           Revisions
         </label>
-        <RevisionsList />
+        <RevisionsList releaseRevisions={releaseRevisions}/>
       </div>
 
       <div className="w-full h-screen bg-[#F4F7FA]">
-        <RevisionDetails chart={chart} />
+        <RevisionDetails release={releaseRevisions[0]} />
       </div>
     </div>
   );
