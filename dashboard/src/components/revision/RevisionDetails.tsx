@@ -1,6 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
-import { BsPencil, BsTrash3, BsHourglassSplit } from "react-icons/bs";
+import {
+  BsPencil,
+  BsTrash3,
+  BsHourglassSplit,
+  BsArrowRepeat,
+} from "react-icons/bs";
 import { ReleaseRevision } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
 import RevisionTabs from "./RevisionTabs";
@@ -80,6 +85,8 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
     setIsOpenUninstallModal(true);
   };
 
+  const rollback = ()=>{}
+
   const checkForNewVersion = () => {
     console.error("checkForNewVersion not implemented"); //todo: implement
   };
@@ -91,7 +98,7 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
-      <StatusLabel status="deployed"/>
+      <StatusLabel status="deployed" />
       <div className="flex justify-between">
         <span className="text-[#3d4048] text-4xl">airFlow</span>
         <div className="flex flex-row gap-3">
@@ -117,6 +124,14 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
             >
               check for new version
             </a>
+          </div>
+          <div className="h-1/2">
+            <button onClick={rollback}>
+              <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+                <BsArrowRepeat />
+                Rollback to #1
+              </span>
+            </button>
           </div>
           <div className="h-1/2">
             <button onClick={unInstall}>
