@@ -85,7 +85,9 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
     setIsOpenUninstallModal(true);
   };
 
-  const rollback = ()=>{}
+  const rollback = ()=>{
+    console.error("not implemented")
+  }
 
   const checkForNewVersion = () => {
     console.error("checkForNewVersion not implemented"); //todo: implement
