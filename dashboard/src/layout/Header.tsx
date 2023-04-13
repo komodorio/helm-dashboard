@@ -134,7 +134,7 @@ export default function Header() {
                     text: "Support chat",
                     icon: <BsSlack />,
                     onClick: openSupportChat,
-                  } as DropDownItem,
+                  },
                   {
                     id: "2",
                     text: "Project Page",
@@ -161,7 +161,7 @@ export default function Header() {
                     isDisabled: true,
                   },
                 ]}
-              ></DropDown>
+              />
             </li>
             <li>
               <a
