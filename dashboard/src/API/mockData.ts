@@ -1,5 +1,11 @@
 const mockData = {
-  toolVersion: "0.0.0",
+  status: {
+    CurVer: "0.0.0",
+    LatestVer: "v1.3.1",
+    Analytics: false,
+    CacheHitRatio: 0,
+    ClusterMode: false,
+  },
   clusters: [
     {
       IsCurrent: true,
@@ -182,7 +188,7 @@ const mockData = {
       icon: "https://raw.githubusercontent.com/mailhog/MailHog-UI/master/assets/images/hog.png",
       description: "An e-mail testing tool for developers",
     },
-  ]
+  ],
 };
 
 export default mockData;

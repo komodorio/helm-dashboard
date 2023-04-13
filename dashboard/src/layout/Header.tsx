@@ -13,14 +13,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import apiService from "../API/apiService";
-
-type Status = {
-  CurVer: string;
-  LatestVer: string;
-  Analytics: boolean;
-  CacheHitRatio: number;
-  ClusterMode: boolean;
-};
+import { Status } from "../data/types";
 
 export default function Header() {
   const [currentVersion, setCurrentVersion] = useState("");
@@ -32,12 +25,8 @@ export default function Header() {
 
   const getToolVersion = async () => {
     try {
-      const response = await apiService.getToolVersion();
-
-      console.log(response);
-
-      const status = await response.json();
-      fillToolVersion(status);
+      const status = await apiService.getToolVersion();
+      fillToolVersion(status.CurVer);
     } catch (error) {
       console.error(error);
       //reportError("Failed to get tool version", error)

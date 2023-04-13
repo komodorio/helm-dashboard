@@ -7,7 +7,7 @@ class ApiService {
   ) {}
 
   getToolVersion = async () => {
-    if (this.isMockMode) return mockData.toolVersion;
+    if (this.isMockMode) return mockData.status;
     const response = await fetch(`${this.baseUrl}/status`);
     const data = await response.json();
     return data;

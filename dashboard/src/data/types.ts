@@ -68,3 +68,11 @@ export type Cluster = {
   AuthInfo: string;
   Namespace: string;
 };
+
+export type Status = {
+  CurVer: string;
+  LatestVer: string;
+  Analytics: boolean;
+  CacheHitRatio: number;
+  ClusterMode: boolean;
+};
