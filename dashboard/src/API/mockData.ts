@@ -189,6 +189,20 @@ const mockData = {
       description: "An e-mail testing tool for developers",
     },
   ],
+  repositoriesLatestVersion: [
+    {
+      name: "argo-cd",
+      version: "4.5.6",
+      app_version: "2.6.7",
+      description:
+        "Argo CD is a continuous delivery tool for Kubernetes based on GitOps.",
+      installed_namespace: "",
+      installed_name: "",
+      repository: "bitnami",
+      urls: ["https://charts.bitnami.com/bitnami/argo-cd-4.5.6.tgz"],
+      isSuggestedRepo: false,
+    },
+  ],
 };
 
 export default mockData;

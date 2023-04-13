@@ -13,6 +13,15 @@ class ApiService {
     return data;
   };
 
+  getRepositoryLatestVersion = async (repositoryName: string) => {
+    if (this.isMockMode) return mockData.repositoriesLatestVersion[0];
+    const response = await fetch(
+      `${this.baseUrl}/api/helm/repositories/latestver?name=${repositoryName}`
+    );
+    const data = await response.json();
+    return data;
+  };
+
   getInstalledReleases = async () => {
     if (this.isMockMode) return mockData.installedReleases;
     const response = await fetch(`${this.baseUrl}/api/helm/releases`);

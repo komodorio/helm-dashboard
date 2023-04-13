@@ -9,6 +9,9 @@ type InstalledPackageCardProps = {
   release: Release;
 };
 
+const upgradeVersion = "4.5.6";
+const upgradeRepository = "bitnami";
+
 export default function InstalledPackageCard({
   release,
 }: InstalledPackageCardProps) {
@@ -23,6 +26,9 @@ export default function InstalledPackageCard({
   const handleMouseOut = () => {
     setIsMouseOver(false);
   };
+
+  
+
 
   return (
     <div
@@ -69,7 +75,10 @@ export default function InstalledPackageCard({
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>
             {showUpgrade && (
-              <span className="text-[#0d6efd] flex flex-row items-center gap-1 font-bold">
+              <span
+                className="text-[#0d6efd] flex flex-row items-center gap-1 font-bold"
+                title={`upgrade available: ${upgradeVersion} from ${upgradeRepository}`}
+              >
                 <BsArrowUpCircleFill />
                 UPGRADE
               </span>
