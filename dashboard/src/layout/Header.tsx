@@ -26,7 +26,7 @@ export default function Header() {
   const getToolVersion = async () => {
     try {
       const status = await apiService.getToolVersion();
-      fillToolVersion(status.CurVer);
+      fillToolVersion(status);
     } catch (error) {
       console.error(error);
       //reportError("Failed to get tool version", error)
