@@ -1,16 +1,15 @@
 import { useState } from "react";
-import { Release } from "../../data/types";
+import { LatestVersionResult, Release } from "../../data/types";
 import { BsArrowUpCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
+import { useQuery } from "@tanstack/react-query";
+import apiService from "../../API/apiService";
 
 type InstalledPackageCardProps = {
   release: Release;
 };
-
-const upgradeVersion = "4.5.6";
-const upgradeRepository = "bitnami";
 
 export default function InstalledPackageCard({
   release,
@@ -20,15 +19,17 @@ export default function InstalledPackageCard({
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(true);
 
+  const { data: latestVersionResult } = useQuery<LatestVersionResult>({
+    queryKey: ["chartName", release.chartName],
+    queryFn: () => apiService.getRepositoryLatestVersion(release.chartName),
+  });
+
   const handleMouseOver = () => {
     setIsMouseOver(true);
   };
   const handleMouseOut = () => {
     setIsMouseOver(false);
   };
-
-  
-
 
   return (
     <div
@@ -77,7 +78,7 @@ export default function InstalledPackageCard({
             {showUpgrade && (
               <span
                 className="text-[#0d6efd] flex flex-row items-center gap-1 font-bold"
-                title={`upgrade available: ${upgradeVersion} from ${upgradeRepository}`}
+                title={`upgrade available: ${latestVersionResult?.version} from ${latestVersionResult?.repository}`}
               >
                 <BsArrowUpCircleFill />
                 UPGRADE

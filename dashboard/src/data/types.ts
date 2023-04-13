@@ -76,3 +76,15 @@ export type Status = {
   CacheHitRatio: number;
   ClusterMode: boolean;
 };
+
+export type LatestVersionResult = {
+  name: string;
+  version: string;
+  app_version: string;
+  description: string;
+  installed_namespace: string;
+  installed_name: string;
+  repository: string;
+  urls: string[];
+  isSuggestedRepo: boolean;
+};
