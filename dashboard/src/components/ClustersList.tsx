@@ -4,10 +4,10 @@ import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
 
 type ClustersListProps = {
-  installedPackages: Release[];
+  installedReleases: Release[] | undefined;
 };
 
-function ClustersList({ installedPackages }: ClustersListProps) {
+function ClustersList({ installedReleases }: ClustersListProps) {
   const [namespaces, setNamespaces] =
     useState<{ name: string; amount: number }[]>();
 
@@ -19,7 +19,7 @@ function ClustersList({ installedPackages }: ClustersListProps) {
   useEffect(() => {
     const mapNamespaces = new Map<string, number>();
 
-    installedPackages.forEach((release) => {
+    installedReleases?.forEach((release) => {
       if (mapNamespaces.has(release.namespace)) {
         const amount = mapNamespaces.get(release.namespace) ?? 0 + 1;
         mapNamespaces.set(release.namespace, amount);
@@ -35,7 +35,7 @@ function ClustersList({ installedPackages }: ClustersListProps) {
     }));
 
     setNamespaces(tempNamespaces);
-  }, [installedPackages]);
+  }, [installedReleases]);
 
   return (
     <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5">

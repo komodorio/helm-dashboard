@@ -2,7 +2,7 @@ import HeaderLogo from "../../assets/packges-header.svg";
 import { Release } from "../../data/types";
 
 type InstalledPackagesHeaderProps = {
-  installedPackages: Release[];
+  installedPackages: Release[] | undefined;
 };
 
 export default function InstalledPackagesHeader({
@@ -17,7 +17,7 @@ export default function InstalledPackagesHeader({
             alt="Helm-DashBoard"
             className="display-inline h-12 ml-3 w-[140px] "
           />
-          <h2 className="display-inline font-bold text-xl ">{`Installed Charts (${installedPackages.length})`}</h2>
+          <h2 className="display-inline font-bold text-xl ">{`Installed Charts (${installedPackages?.length})`}</h2>
         </div>
 
         <div className="w-1/4">

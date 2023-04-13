@@ -1,18 +1,16 @@
-import { Dispatch, SetStateAction } from "react";
 import InstalledPackageCard from "./InstalledPackageCard";
-import { InstalledPackage } from "../../data/types";
+import { Release } from "../../data/types";
 
 type InstalledPackagesListProps = {
-  installedPackages: InstalledPackage[];
-  setInstalledPackages: Dispatch<SetStateAction<InstalledPackage[]>>;
+  installedReleases: Release[] | undefined;
 };
 
 export default function InstalledPackagesList({
-  installedPackages,
+  installedReleases,
 }: InstalledPackagesListProps) {
   return (
     <div>
-      {installedPackages.map((installedPackage: InstalledPackage) => (
+      {installedReleases?.map((installedPackage: Release) => (
         <InstalledPackageCard
           key={installedPackage.id}
           release={installedPackage}

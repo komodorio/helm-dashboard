@@ -13,6 +13,13 @@ class ApiService {
     return data;
   };
 
+  getInstalledReleases = async () => {
+    if (this.isMockMode) return mockData.installedReleases;
+    const response = await fetch(`${this.baseUrl}/api/helm/releases`);
+    const data = await response.json();
+    return data;
+  };
+
   getClusters = async () => {
     if (this.isMockMode) return mockData.clusters;
     const response = await fetch(`${this.baseUrl}/api/k8s/contexts`);
