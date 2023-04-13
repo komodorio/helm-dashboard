@@ -60,3 +60,11 @@ export type ReleaseRevision = {
   chart_ver: string;
   has_tests: boolean;
 };
+
+export type Cluster = {
+  IsCurrent: boolean;
+  Name: string;
+  Cluster: string;
+  AuthInfo: string;
+  Namespace: string;
+};

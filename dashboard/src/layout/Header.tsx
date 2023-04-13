@@ -12,6 +12,7 @@ import {
 } from "react-icons/bs";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import apiService from "../API/apiService";
 
 type Status = {
   CurVer: string;
@@ -31,7 +32,7 @@ export default function Header() {
 
   const getToolVersion = async () => {
     try {
-      const response = await fetch("http://localhost:8080/status");
+      const response = await apiService.getToolVersion();
 
       console.log(response);
 
