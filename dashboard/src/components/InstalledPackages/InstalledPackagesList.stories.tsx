@@ -21,7 +21,7 @@ const Template: ComponentStory<typeof InstalledPackagesList> = (args) => (
 export const Default = Template.bind({});
 
 Default.args = {
-  installedPackages: [
+  installedReleases: [
     {
       id: "package1",
       image: "img",

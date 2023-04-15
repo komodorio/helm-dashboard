@@ -12,14 +12,8 @@ import {
 } from "react-icons/bs";
 import axios from "axios";
 import { useEffect, useState } from "react";
-
-type Status = {
-  CurVer: string;
-  LatestVer: string;
-  Analytics: boolean;
-  CacheHitRatio: number;
-  ClusterMode: boolean;
-};
+import apiService from "../API/apiService";
+import { Status } from "../data/types";
 
 export default function Header() {
   const [currentVersion, setCurrentVersion] = useState("");
@@ -31,11 +25,7 @@ export default function Header() {
 
   const getToolVersion = async () => {
     try {
-      const response = await fetch("http://localhost:8080/status");
-
-      console.log(response);
-
-      const status = await response.json();
+      const status = await apiService.getToolVersion();
       fillToolVersion(status);
     } catch (error) {
       console.error(error);
@@ -144,7 +134,7 @@ export default function Header() {
                     text: "Support chat",
                     icon: <BsSlack />,
                     onClick: openSupportChat,
-                  } as DropDownItem,
+                  },
                   {
                     id: "2",
                     text: "Project Page",
@@ -171,7 +161,7 @@ export default function Header() {
                     isDisabled: true,
                   },
                 ]}
-              ></DropDown>
+              />
             </li>
             <li>
               <a
