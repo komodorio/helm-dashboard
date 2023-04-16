@@ -44,11 +44,3 @@ The Helm Dashboard provides a REST API that you can use to manage and interact w
 4. Authentication: The REST API may require authentication to access certain endpoints, depending on the configuration of the Helm Dashboard. The API supports several authentication methods, including basic authentication and bearer tokens.
 
 5. Response format: The REST API typically returns responses in JSON format, which can be easily parsed by client applications.
-
-
-
-
-
-
-
-
