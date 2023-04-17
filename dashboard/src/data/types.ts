@@ -60,3 +60,31 @@ export type ReleaseRevision = {
   chart_ver: string;
   has_tests: boolean;
 };
+
+export type Cluster = {
+  IsCurrent: boolean;
+  Name: string;
+  Cluster: string;
+  AuthInfo: string;
+  Namespace: string;
+};
+
+export type Status = {
+  CurVer: string;
+  LatestVer: string;
+  Analytics: boolean;
+  CacheHitRatio: number;
+  ClusterMode: boolean;
+};
+
+export type LatestVersionResult = {
+  name: string;
+  version: string;
+  app_version: string;
+  description: string;
+  installed_namespace: string;
+  installed_name: string;
+  repository: string;
+  urls: string[];
+  isSuggestedRepo: boolean;
+};
