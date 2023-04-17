@@ -1,4 +1,10 @@
-import { Chart, ChartVersion, Repository } from "../data/types";
+import {
+  Chart,
+  ChartVersion,
+  Release,
+  ReleaseRevision,
+  Repository,
+} from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
@@ -66,6 +72,21 @@ class ApiService {
       `${this.baseUrl}/api/helm/repositories/versions?name=${chart.name}`
     );
     const data = await response.json();
+    return data;
+  };
+
+  getReleasesHistory = async ({
+    queryKey,
+  }: QueryFunctionContext<Release[], Release>) => {
+    const [_, release] = queryKey;
+
+    if (release == undefined) return null;
+
+    const response = await fetch(
+      `${this.baseUrl}/api/helm/releases/${release.namespace}/${release.chartName}/history`
+    );
+    const data = await response.json();
+
     return data;
   };
 }

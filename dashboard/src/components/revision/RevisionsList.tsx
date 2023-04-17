@@ -4,7 +4,7 @@ import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 
 type RevisionsListProps = {
-  releaseRevisions: ReleaseRevision[];
+  releaseRevisions: ReleaseRevision[] | undefined;
 };
 
 export default function RevisionsList({
@@ -14,7 +14,7 @@ export default function RevisionsList({
 
   return (
     <>
-      {releaseRevisions.map((revision) => (
+      {releaseRevisions?.map((revision) => (
         <div
           onClick={() => setSelectedRevision(revision.revision)}
           key={revision.revision}

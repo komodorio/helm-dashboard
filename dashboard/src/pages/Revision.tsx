@@ -1,9 +1,11 @@
 import { useLocation } from "react-router-dom";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
-import { useParams } from "react-router";
+import { Release, ReleaseRevision } from "../data/types";
+import { useQuery } from "@tanstack/react-query";
+import apiService from "../API/apiService";
 
-const releaseRevisions = [
+const releaseRevisions: ReleaseRevision[] = [
   {
     revision: 1,
     updated: "2023-04-03T15:49:47.3335433+03:00",
@@ -30,7 +32,13 @@ const releaseRevisions = [
 
 function Revision() {
   const { state: release } = useLocation();
-  console.log(release);
+
+  const { data: releaseRevisions } = useQuery<ReleaseRevision[]>({
+    queryKey: ["releasesHisotry", release],
+    queryFn: apiService.getReleasesHistory,
+  });
+
+  if (!releaseRevisions) return <></>;
 
   return (
     <div className="flex">
@@ -38,7 +46,7 @@ function Revision() {
         <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">
           Revisions
         </label>
-        <RevisionsList releaseRevisions={releaseRevisions}/>
+        <RevisionsList releaseRevisions={releaseRevisions} />
       </div>
 
       <div className="w-full h-screen bg-[#F4F7FA]">

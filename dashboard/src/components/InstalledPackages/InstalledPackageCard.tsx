@@ -31,6 +31,18 @@ export default function InstalledPackageCard({
     setIsMouseOver(false);
   };
 
+  const handleOnClick = () => {
+
+    console.log(release)
+
+    navigate(
+      `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
+        release.revision
+      }/${"resources"}`,
+      { state: release }
+    );
+  };
+
   return (
     <div
       className={`grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-5 drop-shadow border-l-4 border-l-[#1BE99A] cursor-pointer ${
@@ -38,14 +50,7 @@ export default function InstalledPackageCard({
       }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
-      onClick={() =>
-        navigate(
-          `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
-            release.revision
-          }/${"resources"}`,
-          { state: release }
-        )
-      } //todo: add parameters : context=docker-desktop&namespace=default&chart=argo-cd&revision=2&tab=resources
+      onClick={handleOnClick}
     >
       <img
         src={release.icon}
