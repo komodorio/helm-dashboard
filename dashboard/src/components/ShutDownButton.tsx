@@ -3,17 +3,21 @@ import { useState } from "react";
 import Modal from "./modal/Modal";
 import axios from "axios";
 
-function ShutDownButton() {
+
+ function ShutDownButton () {
   const onClose = () => {
-    console.log("close button clicked");
+    console.clear();
+    console.log("close button clicked"); 
+    setSignOut(false);
   };
   const [signOut, setSignOut] = useState(false);
-
   const handleClick = async () => {
-    await axios
+    console.clear();
+    console.log("open message click ");
+    setSignOut(true);
+    await axios 
       .delete("/")
       .then(() => {
-        setSignOut(true);
         window.close();
       })
       .catch((error) => {
