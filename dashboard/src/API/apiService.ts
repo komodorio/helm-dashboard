@@ -62,8 +62,6 @@ class ApiService {
   }: QueryFunctionContext<ChartVersion[], Chart>) => {
     const [_, chart] = queryKey;
 
-    console.log(chart);
-
     const response = await fetch(
       `${this.baseUrl}/api/helm/repositories/versions?name=${chart.name}`
     );
