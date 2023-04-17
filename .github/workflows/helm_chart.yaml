@@ -1,0 +1,24 @@
+name: Create Helm chart
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: "*"
+
+jobs:
+  chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Helm Template Check For Sanity
+        uses: igabaydulin/helm-check-action@0.1.4
+        env:
+          CHART_LOCATION: ./charts/helm-dashboard
+          CHART_VALUES: ./charts/helm-dashboard/values.yaml
+      - name: Test Helm plugin install script is runnable
+        run: |
+          scripts/install_plugin.sh

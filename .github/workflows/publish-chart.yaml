@@ -1,4 +1,4 @@
-name: publish helm chart
+name: Publish Helm chart
 
 # for manual running in case we need to update the chart without releasing the dashboard app
 on:

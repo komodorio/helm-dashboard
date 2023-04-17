@@ -1,0 +1,22 @@
+name: Create Docker image
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: "*"
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          outputs: local
+          build-args: VER=0.0.0-dev

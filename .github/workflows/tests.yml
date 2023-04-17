@@ -1,0 +1,35 @@
+name: Run Tests
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Unit tests
+        run: |
+          go test -v -race ./... -covermode=atomic # Run all the tests with the race detector enabled
+      - name: Static analysis
+        run: |
+          go vet ./... # go vet is the official Go static analyzer
+      - name: Cyclomatic complexity
+        run: |
+          go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+          /home/runner/go/bin/gocyclo -over 19 main.go pkg # forbid code with huge/complex functions
+      - name: Dry Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --snapshot --rm-dist
+      - name: Test Binary is Runnable
+        run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
