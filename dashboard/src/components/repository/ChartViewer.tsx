@@ -26,7 +26,7 @@ function ChartViewer({ chart }: ChartViewerProps) {
       >
         <span className="col-span-1 font-semibold flex flex-row items-center gap-1">
           <img
-            src="https://bitnami.com/assets/stacks/airflow/img/airflow-stack-220x234.png"
+            src= {chart.icon}
             className="h-4"
           />
           {chart.name}

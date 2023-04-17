@@ -1,9 +1,11 @@
+import { Chart, Repository } from "../data/types";
 import mockData from "./mockData";
+import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
   constructor(
     protected readonly baseUrl: string,
-    protected readonly isMockMode: boolean = true
+    protected readonly isMockMode: boolean = false
   ) {}
 
   getToolVersion = async () => {
@@ -39,6 +41,24 @@ class ApiService {
   getNamespaces = async () => {
     if (this.isMockMode) return mockData.namespaces;
     const response = await fetch(`${this.baseUrl}/api/k8s/namespaces/list`);
+    const data = await response.json();
+    return data;
+  };
+
+  getRepositories = async () => {
+    const response = await fetch(`${this.baseUrl}/api/helm/repositories`);
+    const data = await response.json();
+    return data;
+  };
+
+  getRepositoryCharts = async ({
+    queryKey,
+  }: QueryFunctionContext<Chart[], Repository>) => {
+    const [_, repository] = queryKey;
+
+    const response = await fetch(
+      `${this.baseUrl}/api/helm/repositories/${repository.name}`
+    );
     const data = await response.json();
     return data;
   };

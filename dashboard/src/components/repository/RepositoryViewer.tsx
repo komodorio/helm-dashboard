@@ -1,30 +1,24 @@
 import axios from "axios";
 import { BsTrash3, BsArrowRepeat } from "react-icons/bs";
-import { Chart } from "../../data/types";
+import { Chart, Repository } from "../../data/types";
 import ChartViewer from "./ChartViewer";
+import { useQuery } from "@tanstack/react-query";
+import apiService from "../../API/apiService";
 
-const charts: Partial<Chart>[] = [
-  {
-    id: "1",
-    name: "airflow",
-    description:
-      "Apache Airflow is a tool to express and execute workflows as directed acyclic graphs (DAGs). It includes utilities to schedule tasks, monitor task progress and handle task dependencies.",
-    version: "14.0.17",
-  },
-  {
-    id: "2",
-    name: "apache",
-    description:
-      "Apache HTTP Server is an open-source HTTP server. The goal of this project is to provide a secure, efficient and extensible server that provides HTTP services in sync with the current HTTP standards.",
-    version: "9.2.23",
-  },
-];
+type RepositoryViewerProps = {
+  repository: Repository | undefined;
+};
 
-function RepositoryViewer() {
+function RepositoryViewer({ repository }: RepositoryViewerProps) {
+  
+  const { data: charts } = useQuery<Chart[]>({
+    queryKey: ["charts", repository],
+    queryFn: apiService.getRepositoryCharts,
+  });
+
   const update = async () => {
     try {
-      const repository = ""; // todo: take from real data
-      const url = `/api/helm/repositories/${repository}`;
+      const url = `/api/helm/repositories/${repository?.name}`;
       await axios.post(url);
       window.location.reload();
     } catch (error) {
@@ -77,9 +71,8 @@ function RepositoryViewer() {
         <span className="col-span-1">VERSION</span>
         <span className="col-span-1"></span>
       </div>
-
-      {charts.map((chart) => (
-        <ChartViewer key={chart.id} chart={chart} />
+      {charts?.map((chart: Chart) => (
+        <ChartViewer key={chart.name} chart={chart} />
       ))}
     </div>
   );
