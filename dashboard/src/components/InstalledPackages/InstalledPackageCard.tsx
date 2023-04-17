@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LatestVersionResult, Release } from "../../data/types";
+import { ChartVersion, Release } from "../../data/types";
 import { BsArrowUpCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
@@ -19,7 +19,7 @@ export default function InstalledPackageCard({
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(true);
 
-  const { data: latestVersionResult } = useQuery<LatestVersionResult>({
+  const { data: latestVersionResult } = useQuery<ChartVersion>({
     queryKey: ["chartName", release.chartName],
     queryFn: () => apiService.getRepositoryLatestVersion(release.chartName),
   });

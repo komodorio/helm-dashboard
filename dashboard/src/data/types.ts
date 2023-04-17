@@ -77,7 +77,7 @@ export type Status = {
   ClusterMode: boolean;
 };
 
-export type LatestVersionResult = {
+export type ChartVersion = {
   name: string;
   version: string;
   app_version: string;

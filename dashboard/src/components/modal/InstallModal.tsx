@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
 import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
-import { Chart } from "../../data/types";
+import { Chart, ChartVersion } from "../../data/types";
+import { useQuery } from "@tanstack/react-query";
+import apiService from "../../API/apiService";
 
 interface InstallModalProps {
   isOpen: boolean;
   chart?: Partial<Chart>;
   onConfirm: () => void;
 }
-
-interface VersionToInstall {
-  id: string;
-  name: string;
-}
-
-const versionsToInstall: VersionToInstall[] = [
-  { id: "1", name: "bitnami @ 14.0.14" },
-  { id: "2", name: "bitnami @ 15.0.15" },
-  { id: "3", name: "bitnami @ 16.0.16" },
-];
 
 const cluster = "kind-kind";
 
@@ -31,6 +22,11 @@ export default function InstallModal({
       Install <span className="text-green-700 font-bold">{chart?.name}</span>
     </div>
   );
+
+  const { data: chartVersions } = useQuery<ChartVersion[]>({
+    queryKey: ["chartVersions", chart],
+    queryFn: apiService.getChartVersions,
+  });
 
   const [confirmModalActions, setConfirmModalActions] =
     useState<ModalAction[]>();
@@ -58,9 +54,9 @@ export default function InstallModal({
           <label className="text-xl font-medium">Version to install:</label>
           <div className="inline-block relative mb-6">
             <select className="block appearance-none w-full font-semibold bg-white border border-gray-400 hover:border-gray-500 ml-2 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline text-green-700">
-              {versionsToInstall.map((version) => (
-                <option key={version.id} value={version.id}>
-                  {version.name}
+              {chartVersions?.map((charVersion: ChartVersion) => (
+                <option key={charVersion.version} value={charVersion.version}>
+                  {charVersion.version}
                 </option>
               ))}
             </select>

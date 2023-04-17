@@ -1,4 +1,4 @@
-import { Chart, Repository } from "../data/types";
+import { Chart, ChartVersion, Repository } from "../data/types";
 import mockData from "./mockData";
 import { QueryFunctionContext } from "@tanstack/react-query";
 
@@ -58,6 +58,20 @@ class ApiService {
 
     const response = await fetch(
       `${this.baseUrl}/api/helm/repositories/${repository.name}`
+    );
+    const data = await response.json();
+    return data;
+  };
+
+  getChartVersions = async ({
+    queryKey,
+  }: QueryFunctionContext<ChartVersion[], Chart>) => {
+    const [_, chart] = queryKey;
+
+    console.log(chart);
+
+    const response = await fetch(
+      `${this.baseUrl}/api/helm/repositories/versions?name=${chart.name}`
     );
     const data = await response.json();
     return data;
