@@ -89,6 +89,20 @@ class ApiService {
 
     return data;
   };
+
+  getValues = async ({ queryKey }) => {
+    const [_, params] = queryKey;
+    const { namespace, chart, version } = params;
+
+    if (!namespace || !chart || !chart.name || version === undefined)
+      return Promise.reject(new Error("missing parameters"));
+
+    const url = `${this.baseUrl}/api/helm/repositories/values?chart=${namespace}/${chart.name}&version=${version}`;
+    const response = await fetch(url);
+    const data = await response.text();
+
+    return data;
+  };
 }
 
 const apiService = new ApiService("http://localhost:8080");

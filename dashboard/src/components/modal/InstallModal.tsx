@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
 import { Chart, ChartVersion } from "../../data/types";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ interface InstallModalProps {
 }
 
 const cluster = "kind-kind";
+const namespace = "bitnami"; // todo: use context API to get this param
 
 export default function InstallModal({
   chart,
@@ -31,6 +32,8 @@ export default function InstallModal({
   const [confirmModalActions, setConfirmModalActions] =
     useState<ModalAction[]>();
 
+  const [versionToInstall, setVersionToInstall] = useState<string>();
+
   useEffect(() => {
     setConfirmModalActions([
       {
@@ -41,6 +44,24 @@ export default function InstallModal({
       },
     ]);
   }, [onConfirm]);
+
+  const { data: chartValues, refetch } = useQuery(
+    ["values", { namespace, chart, version: versionToInstall }],
+    apiService.getValues,
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+    }
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [versionToInstall]);
+
+  const handleVersionToInstallChanged = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+    setVersionToInstall(e.target.value);
+  };
 
   return (
     <Modal
@@ -53,7 +74,10 @@ export default function InstallModal({
         <div>
           <label className="text-xl font-medium">Version to install:</label>
           <div className="inline-block relative mb-6">
-            <select className="block appearance-none w-full font-semibold bg-white border border-gray-400 hover:border-gray-500 ml-2 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline text-green-700">
+            <select
+              onChange={handleVersionToInstallChanged}
+              className="block appearance-none w-full font-semibold bg-white border border-gray-400 hover:border-gray-500 ml-2 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline text-green-700"
+            >
               {chartVersions?.map((charVersion: ChartVersion) => (
                 <option key={charVersion.version} value={charVersion.version}>
                   {charVersion.version}
@@ -129,7 +153,9 @@ export default function InstallModal({
               >
                 Chart Values Reference:
               </label>
-              <div className="border border-gray-200 bg-slate-200 h-8"></div>
+              <div className="border border-gray-200 bg-slate-200">
+                {chartValues}
+              </div>
             </div>
           </div>
         </div>
