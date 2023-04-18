@@ -6,6 +6,7 @@ import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
+import HealthStatus from "./HealthStatus";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -32,8 +33,7 @@ export default function InstalledPackageCard({
   };
 
   const handleOnClick = () => {
-
-    console.log(release)
+    console.log(release);
 
     navigate(
       `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
@@ -77,7 +77,9 @@ export default function InstalledPackageCard({
         </div>
         <div className="grid grid-cols-11 text-xs">
           <div className="col-span-3">{release.description}</div>
-          <div className="col-span-3"></div>
+          <div className="col-span-3">
+            <HealthStatus />
+          </div>
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>
             {showUpgrade && (
