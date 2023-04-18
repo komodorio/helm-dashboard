@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState, useEffect, PropsWithChildren, ReactNode } from "react";
 import ReactDom from "react-dom";
 
@@ -80,7 +81,7 @@ const Modal = ({
   return ReactDom.createPortal(
     <>
       {isVisible && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
+        <div className="backdrop-contrast-50 fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
           <div className="flex justify-center">
             <div
               className={`relative bg-white rounded-lg shadow dark:bg-gray-700 m-7 w-2/5${
@@ -99,7 +100,7 @@ const Modal = ({
                     <svg
                       className="w-5 h-5"
                       fill="currentColor"
-                      viewBox="0 0 20 20"
+                      viewBox="0 0 40"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
@@ -113,7 +114,7 @@ const Modal = ({
               )}
               <div
                 className="p-4 space-y-6 overflow-y-auto"
-                style={{ maxHeight: "500px" }}
+                style={{ maxHeight: "800px" }}
               >
                 {children}
               </div>
