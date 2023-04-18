@@ -88,19 +88,17 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
   };
 
   const rollback = () => {
-    console.error("not implemented");
+    throw new Error("not implemented");
   };
 
   const checkForNewVersion = () => {
-    console.error("checkForNewVersion not implemented"); //todo: implement
+    throw new Error("checkForNewVersion not implemented"); //todo: implement
   };
 
   const unInstallConfirmed = () => {
     setIsOpenUninstallModal(false);
-    console.error("unInstallConfirmed not implemented"); //todo: implement
+    throw new Error("unInstallConfirmed not implemented"); //todo: implement
   };
-
-  console.log("111" + JSON.stringify(release));
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
