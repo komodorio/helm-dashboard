@@ -83,14 +83,15 @@ const Modal = ({
     <>
     
       {isVisible && (
-        <div className="backdrop-contrast-50 fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
-          <div className="flex justify-center">
+        
+        <div className="backdrop-contrast-50 fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" >
+          <div className="flex justify-center" onClick= {onClose}>
             <div
               className={`relative bg-white rounded-lg shadow dark:bg-gray-700 m-7 w-2/5${
                 containerClassNames ?? ""
-              }`}
-              onClick= {onClose}
+              } `}
             >
+              
               {title && (
                 <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                   {getTitle(title)}
