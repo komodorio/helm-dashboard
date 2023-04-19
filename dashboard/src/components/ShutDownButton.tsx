@@ -28,7 +28,8 @@ import axios from "axios";
   return (
     <div className="ShutDownButton">
       {signOut && (
-        <Modal title={"Session Ended"} isOpen={true} onClose={onClose}>
+        <Modal 
+         title={"Session Ended"} isOpen={true} onClose={onClose}> 
           <p>
             The Helm Dashboard application has been shutdown. You can now close
             the browser tab.

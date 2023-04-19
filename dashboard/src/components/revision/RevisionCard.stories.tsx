@@ -54,8 +54,9 @@ Default.args = {
   revisionDate: new Date('2021-01-01 00:00:00'),
   previousVersion: '1.12.31',
   currentVersion: '1.12.32',
-  onClick: () => {},
-  onRefreshClick: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // onClick: () => {},
+  // onRefreshClick:() => {},
   statusCode: 'Deployed',
   isActive: true,
   isRefreshable : false,
