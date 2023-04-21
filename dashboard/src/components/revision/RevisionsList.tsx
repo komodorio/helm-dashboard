@@ -4,7 +4,7 @@ import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 
 type RevisionsListProps = {
-  releaseRevisions: ReleaseRevision[] | undefined;
+  releaseRevisions: ReleaseRevision[];
 };
 
 export default function RevisionsList({

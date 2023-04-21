@@ -33,8 +33,6 @@ export default function InstalledPackageCard({
   };
 
   const handleOnClick = () => {
-    console.log(release);
-
     navigate(
       `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
         release.revision
