@@ -6,14 +6,10 @@ import axios from "axios";
 
  function ShutDownButton () {
   const onClose = () => {
-    console.clear();
-    console.log("close button clicked"); 
     setSignOut(false);
   };
   const [signOut, setSignOut] = useState(false);
   const handleClick = async () => {
-    console.clear();
-    console.log("open message click ");
     setSignOut(true);
     await axios 
       .delete("/")
