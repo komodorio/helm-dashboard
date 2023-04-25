@@ -18,6 +18,9 @@ jobs:
       # Node part
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.5.2
+        with:
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
       - name: NPM install
         run: npm i
         working-directory: ./dashboard
