@@ -14,6 +14,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      # Node part
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.5.2
+      - name: NPM install
+        run: npm i
+      - name: NPM build
+        run: npm run build
+
+      # Golang part
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
