@@ -1,12 +1,23 @@
+# Stage - frontend
+FROM node:latest as frontend
+
+WORKDIR /build
+
+COPY dashboard ./
+
+RUN npm i
+RUN npm run build
+
 # Stage - builder
 FROM golang as builder
-
 
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV CGO_ENABLED=0
 
 WORKDIR /build
+
+COPY --from=frontend /build/dist /build/pkg/dashboard/static/
 
 COPY go.mod ./
 COPY go.sum ./
