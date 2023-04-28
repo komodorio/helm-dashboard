@@ -91,7 +91,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $.getJSON("/api/helm/repositories/versions?name=" + elm.name).fail(function (xhr) {
             reportError("Failed to find chart in repo", xhr)
         }).done(function (vers) {
-            vers = vers.map( a => a.split('.').map( n => +n+100000 ).join('.') ).sort().map( a => a.split('.').map( n => +n-100000 ).join('.') );
+            vers.sort((b, a) => (a.version > b.version) - (a.version < b.version))
 
             // fill versions
             $('#upgradeModal select').empty()
