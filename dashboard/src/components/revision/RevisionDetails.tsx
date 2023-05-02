@@ -6,10 +6,11 @@ import {
   BsHourglassSplit,
   BsArrowRepeat,
 } from "react-icons/bs";
-import { ReleaseRevision } from "../../data/types";
+import { Release } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
 import RevisionTabs from "./RevisionTabs";
 import StatusLabel from "../common/StatusLabel";
+import { useParams } from "react-router-dom";
 
 type RevisionTagProps = {
   caption: string;
@@ -26,17 +27,18 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
 }
 
 type RevisionDetailsProps = {
-  release: ReleaseRevision;
+  release: Release;
 };
 
 function RevisionDetails({ release }: RevisionDetailsProps) {
   const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
   const [isChecking, setChecking] = useState(false);
+  const { context, namespace } = useParams();
 
   const checkUpgradeable = async () => {
     try {
       const response = await axios.get(
-        "/api/helm/repositories/latestver?name=" + release.chart_name
+        "/api/helm/repositories/latestver?name=" + release.chartName
       );
       const data = response.data;
 
@@ -85,17 +87,17 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
     setIsOpenUninstallModal(true);
   };
 
-  const rollback = ()=>{
-    console.error("not implemented")
-  }
+  const rollback = () => {
+    throw new Error("not implemented");
+  };
 
   const checkForNewVersion = () => {
-    console.error("checkForNewVersion not implemented"); //todo: implement
+    throw new Error("checkForNewVersion not implemented"); //todo: implement
   };
 
   const unInstallConfirmed = () => {
     setIsOpenUninstallModal(false);
-    console.error("unInstallConfirmed not implemented"); //todo: implement
+    throw new Error("unInstallConfirmed not implemented"); //todo: implement
   };
 
   return (
@@ -164,8 +166,8 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
       <div className="flex flex-wrap gap-4">
         <RevisionTag caption="chart version" text={release.chart} />
         <RevisionTag caption="app version" text={release.app_version} />
-        <RevisionTag caption="namespace" text="release.namespace" />
-        <RevisionTag caption="cluster" text="docker" />
+        <RevisionTag caption="namespace" text={namespace ?? ""} />
+        <RevisionTag caption="cluster" text={context ?? ""} />
       </div>
       <span>{release.description}</span>
       <RevisionTabs />

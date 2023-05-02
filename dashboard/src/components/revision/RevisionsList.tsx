@@ -14,7 +14,7 @@ export default function RevisionsList({
 
   return (
     <>
-      {releaseRevisions.map((revision) => (
+      {releaseRevisions?.map((revision) => (
         <div
           onClick={() => setSelectedRevision(revision.revision)}
           key={revision.revision}

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { LatestVersionResult, Release } from "../../data/types";
+import { ChartVersion, Release } from "../../data/types";
 import { BsArrowUpCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
+import HealthStatus from "./HealthStatus";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -19,7 +20,7 @@ export default function InstalledPackageCard({
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(true);
 
-  const { data: latestVersionResult } = useQuery<LatestVersionResult>({
+  const { data: latestVersionResult } = useQuery<ChartVersion>({
     queryKey: ["chartName", release.chartName],
     queryFn: () => apiService.getRepositoryLatestVersion(release.chartName),
   });
@@ -31,6 +32,15 @@ export default function InstalledPackageCard({
     setIsMouseOver(false);
   };
 
+  const handleOnClick = () => {
+    navigate(
+      `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
+        release.revision
+      }/${"resources"}`,
+      { state: release }
+    );
+  };
+
   return (
     <div
       className={`grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-5 drop-shadow border-l-4 border-l-[#1BE99A] cursor-pointer ${
@@ -38,14 +48,7 @@ export default function InstalledPackageCard({
       }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
-      onClick={() =>
-        navigate(
-          `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
-            release.revision
-          }/${"resources"}`,
-          { state: release }
-        )
-      } //todo: add parameters : context=docker-desktop&namespace=default&chart=argo-cd&revision=2&tab=resources
+      onClick={handleOnClick}
     >
       <img
         src={release.icon}
@@ -72,7 +75,9 @@ export default function InstalledPackageCard({
         </div>
         <div className="grid grid-cols-11 text-xs">
           <div className="col-span-3">{release.description}</div>
-          <div className="col-span-3"></div>
+          <div className="col-span-3">
+            <HealthStatus />
+          </div>
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>
             {showUpgrade && (
