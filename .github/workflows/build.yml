@@ -18,7 +18,7 @@ jobs:
           go-version: 1.18
       - name: Unit tests
         run: |
-          go test -v -race ./... -covermode=atomic # Run all the tests with the race detector enabled
+          go test -v -race ./... -covermode=atomic -coverprofile=coverage.out # Run all the tests with the race detector enabled
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
       - name: Static analysis
