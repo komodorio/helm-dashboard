@@ -29,7 +29,7 @@ function checkUpgradeable(name) {
         } else if (data[0].isSuggestedRepo) {
             btnUpgradeCheck.prop("disabled", true)
             btnUpgradeCheck.text("")
-            $("#btnAddRepository").text("Add repository for it: "+data[0].repository).data("suggestRepo", data[0].repository).data("suggestRepoUrl", data[0].urls[0])
+            $("#btnAddRepository").text("Add repository for it: " + data[0].repository).data("suggestRepo", data[0].repository).data("suggestRepoUrl", data[0].urls[0])
         } else {
             $("#btnAddRepository").text("")
             btnUpgradeCheck.text("Check for new version")
@@ -91,7 +91,7 @@ function popUpUpgrade(elm, ns, name, verCur, lastRev) {
         $.getJSON("/api/helm/repositories/versions?name=" + elm.name).fail(function (xhr) {
             reportError("Failed to find chart in repo", xhr)
         }).done(function (vers) {
-            vers = vers.map( a => a.split('.').map( n => +n+100000 ).join('.') ).sort().map( a => a.split('.').map( n => +n-100000 ).join('.') );
+            vers.sort((a, b) => (isNewerVersion(a.version, b.version)?1:-1))
 
             // fill versions
             $('#upgradeModal select').empty()
@@ -403,7 +403,7 @@ $("#btnRollback").click(function () {
 })
 
 $("#btnAddRepository").click(function () {
-    const self=$(this)
+    const self = $(this)
     setHashParam("section", "repository")
     if (self.data("suggestRepo")) {
         setHashParam("suggestRepo", self.data("suggestRepo"))
