@@ -8,10 +8,18 @@ If you want to switch to a different cluster, simply click on the corresponding 
 ![Multicluster_screenshot](images/screenshot_multicluster.png)
 
 # Repository
+Essentially, a repository is a location where charts are gathered and can be shared. If you want to learn more about repositories, [click here](https://helm.sh/docs/topics/chart_repository/). You can find the repository in the home section, as depicted in the figure.
+![Repository3](images/screenshot_repository3.png)
+
 You can add the repository by clicking on 'Add Repository', as shown in the figure.
 ![Repository](images/screenshot_repository.png)
 
-After completing that step, enter the following data, as shown in the figure, to add your repository to the Helm dashboard.
+After completing that step, enter the following data: the repository name and its URL. You can also add the username and password, although this is optional.
 ![Repository2](images/screenshot_repository2.png)
+
+If you want to update your repository, delete it, and then filter your chart, you can do so as shown in the figure.
+![Repository4](images/screenshot_repository4.png)
+
+
 
 
