@@ -17,9 +17,11 @@ You can add the repository by clicking on 'Add Repository', as shown in the figu
 After completing that step, enter the following data: the repository name and its URL. You can also add the username and password, although this is optional.
 ![Repository2](images/screenshot_repository2.png)
 
-If you want to update your repository, delete it, and then filter your chart, you can do so as shown in the figure.
+Updating means refreshing your repository. You can update your repository as shown in the figure.
 ![Repository4](images/screenshot_repository4.png)
 
+If you want to remove your repository from the Helm dashboard, click on the 'Remove' button as shown in the figure.
+![Repository5](images/screenshot_repository5.png)
 
-
-
+If you want to install a particular chart from the list of available charts, use the filter as shown in the figure.
+![Repository6](images/screenshot_repository6.png)
