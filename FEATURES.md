@@ -25,3 +25,6 @@ If you want to remove your repository from the Helm dashboard, click on the 'Rem
 
 Use the filter option to find the desired chart quicker from the list of charts.
 ![Repository6](images/screenshot_repository6.png)
+
+If you want to install a particular chart, simply hover the pointer over the chart name and an 'Install' button will appear, as shown in the figure.
+![Repository7](images/screenshot_repository7.png)
