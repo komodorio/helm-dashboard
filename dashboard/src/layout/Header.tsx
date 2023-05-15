@@ -11,53 +11,12 @@ import {
   BsBoxArrowUpRight,
 } from "react-icons/bs";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import apiService from "../API/apiService";
-import { Status } from "../data/types";
+import { useGetApplicationStatus } from "../API/other";
 
 export default function Header() {
-  const [currentVersion, setCurrentVersion] = useState("");
-  const [latestVersion, setLatestVersion] = useState("");
+  const { data: statusData } = useGetApplicationStatus()
 
-  useEffect(() => {
-    getToolVersion();
-  }, []);
-
-  const getToolVersion = async () => {
-    try {
-      const status = await apiService.getToolVersion();
-      fillToolVersion(status);
-    } catch (error) {
-      console.error(error);
-      //reportError("Failed to get tool version", error)
-    }
-
-    // let limNS = null
-    // $.getJSON("/status").fail(function (xhr) { // maybe /options call in the future
-    //     reportError("Failed to get tool version", xhr)
-    // }).done(function (data) {
-    //     $("body").data("status", data)
-    //     fillToolVersion(data)
-    //     limNS = data.LimitedToNamespace
-    //     if (limNS) {
-    //         $("#limitNamespace").show().find("span").text(limNS)
-    //     }
-    //     fillClusters(limNS)
-
-    //     if (data.ClusterMode) {
-    //         $(".bi-power").hide()
-    //         $("#clusterFilterBlock").hide()
-    //     }
-    // })
-  };
-
-  function fillToolVersion(data: Status) {
-    setCurrentVersion(data.CurVer);
-    if (isNewerVersion(data.CurVer, data.LatestVer)) {
-      setLatestVersion(data.LatestVer);
-      //$(".upgrade-possible").show();
-    }
-  }
+  console.log(statusData);
 
   function isNewerVersion(oldVersion: string, newVersion: string) {
     oldVersion = oldVersion?.replace("v", "");
@@ -157,7 +116,7 @@ export default function Header() {
                   { id: "6", isSeparator: true },
                   {
                     id: "7",
-                    text: `version ${currentVersion}`,
+                    text: `version ${statusData?.CurVer}`,
                     isDisabled: true,
                   },
                 ]}
@@ -168,7 +127,7 @@ export default function Header() {
                 href="https://github.com/komodorio/helm-dashboard/releases"
                 className="text-upgrade-color"
               >
-                Upgrade to {latestVersion}
+                Upgrade to {statusData?.LatestVer}
               </a>
             </li>
           </ul>
