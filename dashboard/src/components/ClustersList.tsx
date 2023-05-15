@@ -4,7 +4,7 @@ import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
 
 type ClustersListProps = {
-  installedReleases: Release[] | undefined;
+  installedReleases?: Release[];
 };
 
 function ClustersList({ installedReleases }: ClustersListProps) {
