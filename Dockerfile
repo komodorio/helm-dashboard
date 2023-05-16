@@ -7,6 +7,7 @@ COPY dashboard ./
 
 RUN npm i
 RUN npm run build
+RUN ls -la ..
 
 # Stage - builder
 FROM golang as builder
@@ -17,7 +18,7 @@ ENV CGO_ENABLED=0
 
 WORKDIR /build
 
-COPY --from=frontend /build/dist /build/pkg/dashboard/static/
+COPY --from=frontend /pkg/dashboard/static /build/pkg/dashboard/static/
 
 COPY go.mod ./
 COPY go.sum ./
