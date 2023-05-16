@@ -5,9 +5,7 @@ WORKDIR /build
 
 COPY dashboard ./
 
-RUN npm i
-RUN npm run build
-RUN ls -la ..
+RUN npm i && npm run build
 
 # Stage - builder
 FROM golang as builder
