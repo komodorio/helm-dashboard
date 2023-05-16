@@ -177,8 +177,9 @@ func configureStatic(api *gin.Engine) {
 		})
 
 		// serve a directory called static
-		api.GET("/static/*filepath", func(c *gin.Context) {
-			c.File(path.Join(localDevPath, c.Param("filepath")))
+		api.GET("/assets/*filepath", func(c *gin.Context) {
+			joined := path.Join(localDevPath, "assets", c.Param("filepath"))
+			c.File(joined)
 		})
 	} else {
 		// the root page
@@ -187,8 +188,8 @@ func configureStatic(api *gin.Engine) {
 		})
 
 		// serve a directory called static
-		api.GET("/static/*filepath", func(c *gin.Context) {
-			c.FileFromFS(c.Request.URL.Path, fs)
+		api.GET("/assets/*filepath", func(c *gin.Context) {
+			c.FileFromFS(path.Join("static", c.Request.URL.Path), fs)
 		})
 	}
 }

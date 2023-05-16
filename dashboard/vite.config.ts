@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    assetsDir: ".",
-    outDir: '../pkg/dashboard/static'
+    assetsDir: "./assets",
+    outDir: '../pkg/dashboard/static',
+    emptyOutDir: true,
   }
 })
