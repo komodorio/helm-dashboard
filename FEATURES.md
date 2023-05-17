@@ -28,3 +28,16 @@ Use the filter option to find the desired chart quicker from the list of charts.
 
 If you want to install a particular chart, simply hover the pointer over the chart name and an 'Install' button will appear, as shown in the figure.
 ![Repository7](images/screenshot_repository7.png)
+
+# Installed Releases list
+This tells us which chart version we are using.
+![Releases1](images/screenshot_release.png)
+
+A revision is linked to a release to track the number of updates/changes that release encounters.
+![Releases2](images/screenshot_release2.png)
+ 
+Namespaces are a way to organize clusters into virtual sub-clusters — they can be helpful when different teams or projects share a Kubernetes cluster. Any number of namespaces are supported within a cluster, each logically separated from others but with the ability to communicate with each other.
+![Releases3](images/screenshot_release3.png)
+
+This indicates the time when your chart was last updated.
+![Releases4](images/screenshot_release4.png)
