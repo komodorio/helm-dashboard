@@ -30,7 +30,7 @@ If you want to install a particular chart, simply hover the pointer over the cha
 ![Repository7](images/screenshot_repository7.png)
 
 # Installed Releases list
-This tells us which chart version we are using.
+This informs us about the release version we are currently using. You can utilize the filter option to refine your search for a specific release by employing namespaces and freetext.
 ![Releases1](images/screenshot_release.png)
 
 A revision is linked to a release to track the number of updates/changes that release encounters.
@@ -39,8 +39,5 @@ A revision is linked to a release to track the number of updates/changes that re
 Namespaces are a way to organize clusters into virtual sub-clusters — they can be helpful when different teams or projects share a Kubernetes cluster. Any number of namespaces are supported within a cluster, each logically separated from others but with the ability to communicate with each other.
 ![Releases3](images/screenshot_release3.png)
 
-This indicates the time when your chart was last updated.
+This indicates the time when your release was last updated.
 ![Releases4](images/screenshot_release4.png)
-
-You can utilize the filter option to narrow down a specific chart by using namespaces and freetext.
-![Releases5](images/screenshot_release5.png)
