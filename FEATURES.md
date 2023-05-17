@@ -41,3 +41,6 @@ Namespaces are a way to organize clusters into virtual sub-clusters — they can
 
 This indicates the time when your chart was last updated.
 ![Releases4](images/screenshot_release4.png)
+
+You can utilize the filter option to narrow down a specific chart by using namespaces and freetext.
+![Releases5](images/screenshot_release5.png)
