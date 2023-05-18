@@ -30,14 +30,20 @@ If you want to install a particular chart, simply hover the pointer over the cha
 ![Repository7](images/screenshot_repository7.png)
 
 # Installed Releases list
-This informs us about the release version we are currently using. You can utilize the filter option to refine your search for a specific release by employing namespaces and freetext.
-![Releases1](images/screenshot_release.png)
+A release is an instance of your selected chart running on your Kubernetes Cluster. That means every time that you install a Helm chart there, it creates a new release or instance that coexists with other releases without conflict. You can filter releases based on namespaces or search for release names 
+![Releases](images/screenshot_release.png)
+
+The squares represent k8s resources installed by the release. Hover over each square to view a tooltip with details. Yellow indicates "pending," green signifies a healthy state, and red indicates an unhealthy state.
+![Releases1](images/screenshot_release1.png)
+
+This indicates the list of releases and the corresponding chart versions.
+![Releases2](images/screenshot_release2.png)
 
 A revision is linked to a release to track the number of updates/changes that release encounters.
-![Releases2](images/screenshot_release2.png)
+![Releases3](images/screenshot_release3.png)
  
 Namespaces are a way to organize clusters into virtual sub-clusters — they can be helpful when different teams or projects share a Kubernetes cluster. Any number of namespaces are supported within a cluster, each logically separated from others but with the ability to communicate with each other.
-![Releases3](images/screenshot_release3.png)
-
-This indicates the time when your release was last updated.
 ![Releases4](images/screenshot_release4.png)
+
+Updated" refers to the amount of time that has passed since the last revision of the release. Whenever you install or upgrade the release, a new revision is created. You can think of it as the "age" of the latest revision.
+![Releases5](images/screenshot_release5.png)
