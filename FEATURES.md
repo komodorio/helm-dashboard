@@ -36,7 +36,7 @@ A release is an instance of your selected chart running on your Kubernetes Clust
 The squares represent k8s resources installed by the release. Hover over each square to view a tooltip with details. Yellow indicates "pending," green signifies a healthy state, and red indicates an unhealthy state.
 ![Releases1](images/screenshot_release1.png)
 
-This indicates the list of releases and the corresponding chart versions.
+It indicates the version of chart that corresponds to this release.
 ![Releases2](images/screenshot_release2.png)
 
 A revision is linked to a release to track the number of updates/changes that release encounters.
