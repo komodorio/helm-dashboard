@@ -9,7 +9,7 @@
 <p align="center">A simplified way of working with Helm.</p>
 
 
-![GitHub contributors](https://img.shields.io/github/contributors/komodorio/helm-dashboard) [![GitHub issues](https://img.shields.io/github/issues-raw/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard/issues) ![GitHub stars](https://img.shields.io/github/stars/komodorio/helm-dashboard?style=social) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/komodorio/helm-dashboard) ![GitHub pull requests](https://img.shields.io/github/issues-pr/komodorio/helm-dashboard) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard/releases) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/komodorio/helm-dashboard) [![GitHub license](https://img.shields.io/github/license/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard)
+![GitHub contributors](https://img.shields.io/github/contributors/komodorio/helm-dashboard) [![GitHub issues](https://img.shields.io/github/issues-raw/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard/issues) ![GitHub stars](https://img.shields.io/github/stars/komodorio/helm-dashboard?style=social) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/komodorio/helm-dashboard) ![GitHub pull requests](https://img.shields.io/github/issues-pr/komodorio/helm-dashboard) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard/releases) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/komodorio/helm-dashboard) [![GitHub license](https://img.shields.io/github/license/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard) [![codecov](https://codecov.io/gh/komodorio/helm-dashboard/branch/main/graph/badge.svg?token=PXPSNVHI2T)](https://codecov.io/gh/komodorio/helm-dashboard)
 
 <kbd>[<img src="images/screenshot.png" style="width: 100%; border: 1px solid silver;" border="1" alt="Screenshot">](images/screenshot.png)</kbd>
 
@@ -20,7 +20,7 @@ _Helm Dashboard_ is an **open-source project** which offers a UI-driven way to v
 corresponding k8s resources. Also, you can perform simple actions like roll back to a revision or upgrade to newer
 version.
 This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision of
-helping Kubernetes users to navigate and troubleshoot their clusters, the project is **NOT** an offical project by the [helm team](https://helm.sh/).
+helping Kubernetes users to navigate and troubleshoot their clusters, the project is **NOT** an official project by the [helm team](https://helm.sh/).
 
 Key capabilities of the tool:
 
@@ -100,7 +100,7 @@ The official helm chart is [available here](https://github.com/komodorio/helm-ch
 
 Local Helm chart is a directory with specially named files and a `Chart.yaml` file, which you can install via Helm, without the need to publish the chart into Helm repository. Chart developers might want to experiment with the chart locally, before uploading into public repository. Also, a proprietary application might only use non-published chart as an approach to deploy the software.
 
-For all the above use-cases, you may use Helm Dashboard UI, spcifying location of your local chart folders via special `--local-chart` command-line parameter. The parameter might be specified multiple times, for example:
+For all the above use-cases, you may use Helm Dashboard UI, specifying the location of your local chart folders via special `--local-chart` command-line parameter. The parameter might be specified multiple times, for example:
 
 ```shell
 helm-dashboard --local-chart=/opt/charts/my-private-app --local-chart=/home/dev/sources/app/chart

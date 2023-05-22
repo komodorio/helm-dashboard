@@ -90,7 +90,7 @@ class ApiService {
     return data;
   };
 
-  getValues = async ({ queryKey }) => {
+  getValues = async ({ queryKey }: any) => {
     const [_, params] = queryKey;
     const { namespace, chart, version } = params;
 
