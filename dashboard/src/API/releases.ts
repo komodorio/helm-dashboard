@@ -1,11 +1,8 @@
 import { useQuery, UseQueryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 
-/**
-// Get list of installed releases
-function useGetInstalledReleases(options?: UseQueryOptions<InstalledReleases>) {
-  return useQuery<InstalledReleases>('installedReleases', () => callApi<InstalledReleases>('/api/helm/releases'), options);
+export function useGetInstalledReleases(options?: UseQueryOptions<InstalledReleases[]>) {
+  return useQuery<InstalledReleases[]>(['installedReleases'], () => callApi<InstalledReleases[]>('/api/helm/releases'), options);
 }
- */
 
 // Install new release
 function useInstallRelease(options?: UseMutationOptions<void, unknown, InstallReleaseRequest>) {
@@ -112,7 +109,20 @@ interface InstallReleaseRequest {
   }
   
   // Response objects
-  interface InstalledReleases {}
+  export interface InstalledReleases {
+    id: string;
+    name: string;
+    namespace: string;
+    revision: string;
+    updated: string;
+    status: string;
+    chart: string;
+    chartName: string;
+    chartVersion: string;
+    app_version: string;
+    icon: string;
+    description: string;
+  }
   
   interface ReleaseRevisions {}
   
