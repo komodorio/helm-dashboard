@@ -33,7 +33,7 @@ jobs:
         with:
           version: latest
           args: release --snapshot --rm-dist
-      - name: Test Binary is Runnable
+      - name: Test if the Binary is Runnable
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.3.1
@@ -70,6 +70,6 @@ jobs:
         env:
           CHART_LOCATION: ./charts/helm-dashboard
           CHART_VALUES: ./charts/helm-dashboard/values.yaml
-      - name: Test Helm plugin install script is runnable
+      - name: Test if the Helm plugin install script is runnable
         run: |
           scripts/install_plugin.sh
