@@ -21,7 +21,7 @@ func initRepository(t *testing.T, filePath string, devel bool) *Repositories {
 
 	settings := cli.New()
 
-	fname, err := os.MkdirTemp("", "repo-*.yaml")
+	fname, err := os.CreateTemp("", "repo-*.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,13 +31,13 @@ func initRepository(t *testing.T, filePath string, devel bool) *Repositories {
 		t.Fatal(err)
 	}
 
-	err = os.WriteFile(fname, input, 0644)
+	err = os.WriteFile(fname.Name(), input, 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Cleanup(func() {
-		err := os.Remove(fname)
+		err := os.Remove(fname.Name())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -49,7 +49,7 @@ func initRepository(t *testing.T, filePath string, devel bool) *Repositories {
 	}
 
 	// Sets the repository file path
-	settings.RepositoryConfig = fname
+	settings.RepositoryConfig = fname.Name()
 	settings.RepositoryCache = path.Dir(filePath)
 
 	testRepository := &Repositories{
