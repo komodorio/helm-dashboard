@@ -1,7 +1,6 @@
 package objects
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -22,23 +21,23 @@ func initRepository(t *testing.T, filePath string, devel bool) *Repositories {
 
 	settings := cli.New()
 
-	fname, err := ioutil.TempFile("", "repo-*.yaml")
+	fname, err := os.MkdirTemp("", "repo-*.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	input, err := ioutil.ReadFile(filePath)
+	input, err := os.ReadFile(filePath)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = ioutil.WriteFile(fname.Name(), input, 0644)
+	err = os.WriteFile(fname, input, 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Cleanup(func() {
-		err := os.Remove(fname.Name())
+		err := os.Remove(fname)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -50,7 +49,7 @@ func initRepository(t *testing.T, filePath string, devel bool) *Repositories {
 	}
 
 	// Sets the repository file path
-	settings.RepositoryConfig = fname.Name()
+	settings.RepositoryConfig = fname
 	settings.RepositoryCache = path.Dir(filePath)
 
 	testRepository := &Repositories{

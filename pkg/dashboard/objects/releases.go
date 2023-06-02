@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"sync"
@@ -140,7 +140,7 @@ func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.E
 			err = errorx.Decorate(err, "An error occurred while checking for chart dependencies. You may need to run `helm dependency build` to fetch missing dependencies")
 			if true { // client.DependencyUpdate
 				man := &downloader.Manager{
-					Out:              ioutil.Discard,
+					Out:              io.Discard,
 					ChartPath:        cp,
 					Keyring:          pathOpts.Keyring,
 					SkipUpdate:       false,
@@ -347,7 +347,7 @@ func (r *Release) restoreChart() (string, error) {
 	// we're unlikely to have the original chart, let's try the cheesy thing...
 
 	log.Infof("Attempting to restore the chart for %s", r.Orig.Name)
-	dir, err := ioutil.TempDir("", "khd-*")
+	dir, err := os.MkdirTemp("", "khd-*")
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to get temporary directory")
 	}
@@ -357,7 +357,7 @@ func (r *Release) restoreChart() (string, error) {
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to restore Chart.yaml")
 	}
-	err = ioutil.WriteFile(path.Join(dir, "Chart.yaml"), cdata, 0644)
+	err = os.WriteFile(path.Join(dir, "Chart.yaml"), cdata, 0644)
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to write file Chart.yaml")
 	}
@@ -367,7 +367,7 @@ func (r *Release) restoreChart() (string, error) {
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to restore values.yaml")
 	}
-	err = ioutil.WriteFile(path.Join(dir, "values.yaml"), vdata, 0644)
+	err = os.WriteFile(path.Join(dir, "values.yaml"), vdata, 0644)
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to write file values.yaml")
 	}
@@ -381,7 +381,7 @@ func (r *Release) restoreChart() (string, error) {
 			return "", errorx.Decorate(err, "failed to create directory for file: %s", fname)
 		}
 
-		err = ioutil.WriteFile(fname, f.Data, 0644)
+		err = os.WriteFile(fname, f.Data, 0644)
 		if err != nil {
 			return "", errorx.Decorate(err, "failed to write file to restore chart: %s", fname)
 		}

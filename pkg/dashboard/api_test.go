@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -34,7 +33,7 @@ func TestMain(m *testing.M) { // fixture to set logging level via env variable
 	}
 
 	inMemStorage = storage.Init(driver.NewMemory())
-	d, err := ioutil.TempDir("", "helm")
+	d, err := os.MkdirTemp("", "helm")
 	if err != nil {
 		panic(err)
 	}
