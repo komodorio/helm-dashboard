@@ -47,3 +47,11 @@ Namespaces are a way to organize clusters into virtual sub-clusters — they can
 
 Updated" refers to the amount of time that has passed since the last revision of the release. Whenever you install or upgrade the release, a new revision is created. You can think of it as the "age" of the latest revision.
 ![Releases5](images/screenshot_release5.png)
+
+# Release details
+This indicates the status of the deployed release, and 'Age' represents the amount of time that has passed since the creation of the revision until now.
+![Detail](images/screenshot_release_detail.png)
+
+You can use the Upgrade/Downgrade button to switch to different release versions, as shown in the figure.
+![Detail1](images/screenshot_release_detail1.png)
+
