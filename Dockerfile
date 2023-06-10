@@ -27,14 +27,14 @@ FROM alpine
 EXPOSE 8080
 
 # Python
-RUN apk add --update --no-cache python3 curl && python3 -m ensurepip && pip3 install --upgrade pip setuptools && pip3 install py3-cffi
+RUN apk add --update --no-cache python3 curl && python3 -m ensurepip && pip3 install --upgrade pip setuptools
 
 # Trivy
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.18.3
 RUN trivy --version
 
 # Checkov scanner
-RUN pip3 install checkov packaging==21.3 && checkov --version
+RUN (pip3 install checkov packaging==21.3 && checkov --version) || echo Failed to install optional Checkov
 
 COPY --from=builder /build/src/bin/dashboard /bin/helm-dashboard
 
