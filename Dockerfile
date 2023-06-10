@@ -34,7 +34,7 @@ RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/
 RUN trivy --version
 
 # Checkov scanner
-RUN pip3 install checkov packaging==21.3 && checkov --version
+RUN (pip3 install checkov packaging==21.3 && checkov --version) || echo Failed to install optional Checkov
 
 COPY --from=builder /build/src/bin/dashboard /bin/helm-dashboard
 
