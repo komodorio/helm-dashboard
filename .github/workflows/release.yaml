@@ -118,4 +118,4 @@ jobs:
           user_email: "komi@komodor.io"
           user_name: "komodor-bot"
           destination_branch: "master"
-          commit_msg: "feat(helm-dashboard): ${{ github.event.head_commit.message }}" #important!! don't change this commit message unless you change the condition in pipeline.yml on helm-charts repo
+          commit_msg: "feat(OSS helm-dashboard): ${{ github.event.head_commit.message }}" #important!! don't change this commit message unless you change the condition in pipeline.yml on helm-charts repo
