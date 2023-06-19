@@ -8,7 +8,7 @@ import { useGetInstalledReleases } from "../API/releases";
 
 function Installed() {
   const { data: installedReleases } = useGetInstalledReleases()
-
+  
   debugger;
   return (
     <div className="flex flex-row">
