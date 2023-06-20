@@ -58,6 +58,13 @@ If you still having troubles please contact us on our [Slack community channel](
     - `npm run dev`
 4. with the default integration the dashboard should run on  http://localhost:5173/ 
 
+## Setting up a local cluster with ease
+
+1. Install [Docker](https://docs.docker.com/engine/install/ubuntu/)
+2. Install [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+3. Start your cluster `minikube start`
+
+You should now be able to follow the [Helm tutorial](https://helm.sh/docs/intro/quickstart/) and interact with Helm normally. 
 
 ## Choosing a task
 If you are completely new to the project its recommended to look for tasks labled: `good first issue`.
