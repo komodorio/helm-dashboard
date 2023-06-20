@@ -80,7 +80,7 @@ jobs:
         with:
           context: .
           push: true # TODO  ${{ github.event_name != 'pull_request' }}
-          tags: komodorio/helm-dashboard:undera
+          tags: komodorio/helm-dashboard:unstable
           labels: ${{ steps.meta.outputs.labels }}
           build-args: VER=0.0.0-dev
           platforms: linux/amd64,linux/arm64
