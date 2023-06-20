@@ -71,7 +71,7 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v4
-        if: github.event_name != 'pull_request'
+        # if: github.event_name != 'pull_request'
         with:
           context: .
           push: true # ${{ github.event_name != 'pull_request' }}

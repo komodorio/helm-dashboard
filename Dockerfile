@@ -1,7 +1,6 @@
 # Stage - builder
 FROM golang as builder
 
-
 #ENV GOOS=linux
 #ENV GOARCH=amd64
 ENV CGO_ENABLED=0
