@@ -65,7 +65,7 @@ jobs:
           images: komodorio/helm-dashboard
       - name: Login to DockerHub
         uses: docker/login-action@v1
-        if: github.event_name != 'pull_request'
+        # TODO if: github.event_name != 'pull_request'
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASS }}
@@ -76,10 +76,10 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v4
-        # if: github.event_name != 'pull_request'
+        # TODO if: github.event_name != 'pull_request'
         with:
           context: .
-          push: true # ${{ github.event_name != 'pull_request' }}
+          push: true # TODO  ${{ github.event_name != 'pull_request' }}
           tags: komodorio/helm-dashboard:undera
           labels: ${{ steps.meta.outputs.labels }}
           build-args: VER=0.0.0-dev
