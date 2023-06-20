@@ -1,5 +1,8 @@
 # Stage - builder
-FROM golang as builder
+FROM --platform=$BUILDPLATFORM golang as builder
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
 #ENV GOOS=linux
 #ENV GOARCH=amd64
@@ -22,7 +25,11 @@ WORKDIR /build/src
 RUN make build
 
 # Stage - runner
-FROM alpine
+FROM --platform=$TARGETPLATFORM alpine
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 EXPOSE 8080
 
 # Python
