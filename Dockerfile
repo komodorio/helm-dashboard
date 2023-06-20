@@ -24,7 +24,7 @@ ADD . src
 
 WORKDIR /build/src
 
-RUN make build
+RUN env && make build
 
 # Stage - runner
 FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine
@@ -51,4 +51,4 @@ ENTRYPOINT ["/bin/helm-dashboard", "--no-browser", "--bind=0.0.0.0", "--port=808
 ## Install QEMU
 # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 ## Run a build for the different platforms
-# docker buildx build -t komodorio/helm-dashboard:0.0.0 --platform=linux/arm64,linux/amd64 --output type=local,dest=hdb.image . && kind load docker-image komodorio/helm-dashboard:0.0.0
+# docker buildx build -t komodorio/helm-dashboard:0.0.0 --platform=linux/arm64,linux/amd64 --output type=local,dest=hdb.image --progress=plain . && kind load docker-image komodorio/helm-dashboard:0.0.0
