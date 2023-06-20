@@ -1,9 +1,13 @@
 # Stage - builder
-FROM golang as builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} golang as builder
 
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 
-ENV GOOS=linux
-ENV GOARCH=amd64
+ENV GOOS=${TARGETOS}
+ENV GOARCH=${TARGETARCH}
 ENV CGO_ENABLED=0
 
 WORKDIR /build
@@ -23,7 +27,7 @@ WORKDIR /build/src
 RUN make build
 
 # Stage - runner
-FROM alpine
+FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine
 EXPOSE 8080
 
 # Python
@@ -40,4 +44,11 @@ COPY --from=builder /build/src/bin/dashboard /bin/helm-dashboard
 
 ENTRYPOINT ["/bin/helm-dashboard", "--no-browser", "--bind=0.0.0.0", "--port=8080"]
 
-# docker build . -t komodorio/helm-dashboard:0.0.0 && kind load docker-image komodorio/helm-dashboard:0.0.0
+## Have Docker download the latest buildx plugin
+# docker buildx install
+## Create a buildkit daemon with the name "multiarch"
+# docker buildx create --use --name=multiarch --node=multiarch
+## Install QEMU
+# docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+## Run a build for the different platforms
+# docker buildx build -t komodorio/helm-dashboard:0.0.0 --platform=linux/arm64,linux/amd64 --output type=local,dest=hdb.image . && kind load docker-image komodorio/helm-dashboard:0.0.0
