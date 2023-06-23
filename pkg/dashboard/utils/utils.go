@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -34,12 +33,12 @@ func ChartAndVersion(x string) (string, string, error) {
 }
 
 func TempFile(txt string) (string, func(), error) {
-	file, err := ioutil.TempFile("", "helm_dahsboard_*.yaml")
+	file, err := os.CreateTemp("", "helm_dahsboard_*.yaml")
 	if err != nil {
 		return "", nil, err
 	}
 
-	err = ioutil.WriteFile(file.Name(), []byte(txt), 0600)
+	err = os.WriteFile(file.Name(), []byte(txt), 0600)
 	if err != nil {
 		return "", nil, err
 	}

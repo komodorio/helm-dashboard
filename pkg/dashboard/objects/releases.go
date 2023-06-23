@@ -2,9 +2,8 @@ package objects
 
 import (
 	"bytes"
-	"fmt"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"sync"
@@ -51,25 +50,26 @@ func (a *Releases) List() ([]*Release, error) {
 			return nil, errorx.Decorate(err, "failed to get list of releases")
 		}
 		for _, r := range rels {
-			releases = append(releases, &Release{HelmConfig: a.HelmConfig, Orig: r, Settings: a.Settings})
+			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings))
 		}
 	}
 	return releases, nil
 }
 
 func (a *Releases) ByName(namespace string, name string) (*Release, error) {
-	rels, err := a.List()
+	log.Debugf("Getting release by ns+name: %s/%s", namespace, name)
+	hc, err := a.HelmConfig(namespace)
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get list of releases")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
 
-	for _, r := range rels {
-		if r.Orig.Namespace == namespace && r.Orig.Name == name {
-			return r, nil
-		}
+	client := action.NewGet(hc)
+	rel, err := client.Run(name)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get helm release")
 	}
 
-	return nil, errorx.DataUnavailable.New(fmt.Sprintf("release '%s' is not found in namespace '%s'", name, namespace))
+	return NewRelease(a.HelmConfig, rel, a.Settings), nil
 }
 
 func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
@@ -140,7 +140,7 @@ func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.E
 			err = errorx.Decorate(err, "An error occurred while checking for chart dependencies. You may need to run `helm dependency build` to fetch missing dependencies")
 			if true { // client.DependencyUpdate
 				man := &downloader.Manager{
-					Out:              ioutil.Discard,
+					Out:              io.Discard,
 					ChartPath:        cp,
 					Keyring:          pathOpts.Keyring,
 					SkipUpdate:       false,
@@ -191,7 +191,7 @@ func (r *Release) History() ([]*Release, error) {
 
 	r.revisions = []*Release{}
 	for _, rev := range revs {
-		r.revisions = append(r.revisions, &Release{HelmConfig: r.HelmConfig, Orig: rev, Settings: r.Settings})
+		r.revisions = append(r.revisions, NewRelease(r.HelmConfig, rev, r.Settings))
 	}
 
 	return r.revisions, nil
@@ -347,7 +347,7 @@ func (r *Release) restoreChart() (string, error) {
 	// we're unlikely to have the original chart, let's try the cheesy thing...
 
 	log.Infof("Attempting to restore the chart for %s", r.Orig.Name)
-	dir, err := ioutil.TempDir("", "khd-*")
+	dir, err := os.MkdirTemp("", "khd-*")
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to get temporary directory")
 	}
@@ -357,7 +357,7 @@ func (r *Release) restoreChart() (string, error) {
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to restore Chart.yaml")
 	}
-	err = ioutil.WriteFile(path.Join(dir, "Chart.yaml"), cdata, 0644)
+	err = os.WriteFile(path.Join(dir, "Chart.yaml"), cdata, 0644)
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to write file Chart.yaml")
 	}
@@ -367,7 +367,7 @@ func (r *Release) restoreChart() (string, error) {
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to restore values.yaml")
 	}
-	err = ioutil.WriteFile(path.Join(dir, "values.yaml"), vdata, 0644)
+	err = os.WriteFile(path.Join(dir, "values.yaml"), vdata, 0644)
 	if err != nil {
 		return "", errorx.Decorate(err, "failed to write file values.yaml")
 	}
@@ -381,7 +381,7 @@ func (r *Release) restoreChart() (string, error) {
 			return "", errorx.Decorate(err, "failed to create directory for file: %s", fname)
 		}
 
-		err = ioutil.WriteFile(fname, f.Data, 0644)
+		err = os.WriteFile(fname, f.Data, 0644)
 		if err != nil {
 			return "", errorx.Decorate(err, "failed to write file to restore chart: %s", fname)
 		}
@@ -398,4 +398,12 @@ func checkIfInstallable(ch *chart.Chart) error {
 		return nil
 	}
 	return errors.Errorf("%s charts are not installable", ch.Metadata.Type)
+}
+
+func NewRelease(hc HelmNSConfigGetter, orig *release.Release, settings *cli.EnvSettings) *Release {
+	return &Release{
+		HelmConfig: hc,
+		Orig:       orig,
+		Settings:   settings,
+	}
 }
