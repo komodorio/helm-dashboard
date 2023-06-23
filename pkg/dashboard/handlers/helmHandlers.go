@@ -23,7 +23,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/repo"
 	helmtime "helm.sh/helm/v3/pkg/time"
 	"k8s.io/utils/strings/slices"
 )
@@ -278,32 +277,11 @@ func (h *HelmHandler) RepoCharts(c *gin.Context) {
 		return
 	}
 
-	// TODO installed, err := app.Releases.List()
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	//TODO enrichRepoChartsWithInstalled(charts, installed)
-
 	sort.Slice(charts, func(i, j int) bool {
 		return charts[i].Name < charts[j].Name
 	})
 
 	c.IndentedJSON(http.StatusOK, charts)
-}
-
-func enrichRepoChartsWithInstalled(charts []*repo.ChartVersion, installed []*objects.Release) {
-	for _, rchart := range charts {
-		for _, rel := range installed {
-			if rchart.Metadata.Name == rel.Orig.Chart.Name() {
-				log.Debugf("Matched") // TODO: restore implementation
-				// TODO: there can be more than one
-				//rchart.InstalledNamespace = rel.Orig.Namespace
-				//rchart.InstalledName = rel.Orig.Name
-			}
-		}
-	}
 }
 
 func (h *HelmHandler) RepoUpdate(c *gin.Context) {
