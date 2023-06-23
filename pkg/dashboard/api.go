@@ -23,6 +23,11 @@ func noCache(c *gin.Context) {
 	c.Next()
 }
 
+func allowCORS(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Next()
+}
+
 func errorHandler(c *gin.Context) {
 	c.Next()
 
@@ -72,6 +77,10 @@ func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool)
 	api.Use(contextSetter(data))
 	api.Use(noCache)
 	api.Use(errorHandler)
+
+	if os.Getenv("HD_CORS") != "" {
+		api.Use(allowCORS)
+	}
 
 	configureStatic(api)
 	configureRoutes(abortWeb, data, api)
