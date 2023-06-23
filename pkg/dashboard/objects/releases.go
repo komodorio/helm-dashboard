@@ -66,7 +66,7 @@ func (a *Releases) ByName(namespace string, name string) (*Release, error) {
 	client := action.NewGet(hc)
 	rel, err := client.Run(name)
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm release", "")
+		return nil, errorx.Decorate(err, "failed to get helm release")
 	}
 
 	return NewRelease(a.HelmConfig, rel, a.Settings), nil
