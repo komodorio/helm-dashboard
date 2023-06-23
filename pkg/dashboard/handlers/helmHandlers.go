@@ -278,13 +278,13 @@ func (h *HelmHandler) RepoCharts(c *gin.Context) {
 		return
 	}
 
-	installed, err := app.Releases.List()
+	// TODO installed, err := app.Releases.List()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	enrichRepoChartsWithInstalled(charts, installed)
+	//TODO enrichRepoChartsWithInstalled(charts, installed)
 
 	sort.Slice(charts, func(i, j int) bool {
 		return charts[i].Name < charts[j].Name
