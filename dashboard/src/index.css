@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 @layer components{
+
+*, button {
+  font-family: 'Roboto', sans-serif;
+}
 .card {
     background-color: theme('colors.white');
     border-radius: theme('borderRadius.lg');
@@ -34,4 +38,13 @@
     width: 40%;
     left: 30%;
     position: absolute;
+}
+
+.require:after {
+    content: ' *';
+    color: red;
+}
+
+.input-box-shadow:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
 }

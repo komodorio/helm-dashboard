@@ -14,6 +14,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const { data: charts, isLoading } = useQuery<Chart[]>({
     queryKey: ["charts", repository],
     queryFn: apiService.getRepositoryCharts,
+    refetchOnWindowFocus: false,
   });
 
   const update = async () => {
