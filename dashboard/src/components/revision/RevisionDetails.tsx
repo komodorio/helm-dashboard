@@ -9,7 +9,7 @@ import {
 import { Release } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
 import StatusLabel from "../common/StatusLabel";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
@@ -161,15 +161,31 @@ const RunTests = () => {};
 
 const Uninstall = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const { namespace = "", chart = "" } = useParams();
   const { data: resources } = useGetResources(namespace, chart, {
     enabled: isOpen,
   });
 
-  const uninstallMutation = useMutation(["uninstall", namespace, chart], () =>
-    callApi("/api/helm/releases/" + namespace + "/" + chart, {
-      method: "delete",
-    })
+  const uninstallMutation = useMutation(
+    ["uninstall", namespace, chart],
+    () =>
+      fetch(
+        // Todo: Change to BASE_URL from env
+        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        {
+          method: "delete",
+        }
+      ),
+    {
+      onSuccess: () => {
+        window.location.href = "/";
+      },
+      onError: (error, variables, context) => {
+        // An error happened!
+        console.log(`rolling back optimistic update with id `);
+      },
+    }
   );
   const uninstallTitle = (
     <div className="font-bold text-2xl">
