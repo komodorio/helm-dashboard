@@ -4,14 +4,14 @@ import { Chart, Repository } from "../../data/types";
 import ChartViewer from "./ChartViewer";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
+import Spinner from "../Spinner";
 
 type RepositoryViewerProps = {
   repository: Repository | undefined;
 };
 
 function RepositoryViewer({ repository }: RepositoryViewerProps) {
-  
-  const { data: charts } = useQuery<Chart[]>({
+  const { data: charts, isLoading } = useQuery<Chart[]>({
     queryKey: ["charts", repository],
     queryFn: apiService.getRepositoryCharts,
   });
@@ -38,6 +38,9 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
       }
     }
   };
+
+  const numOfCharts = charts?.length;
+  const showNoChartsAlert = Boolean(!numOfCharts && numOfCharts == 0);
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3 bg-white drop-shadow-lg">
@@ -71,9 +74,20 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         <span className="col-span-1">VERSION</span>
         <span className="col-span-1"></span>
       </div>
-      {charts?.map((chart: Chart) => (
-        <ChartViewer key={chart.name} chart={chart} />
-      ))}
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        charts?.map((chart: Chart) => (
+          <ChartViewer key={chart.name} chart={chart} />
+        ))
+      )}
+
+      {showNoChartsAlert && (
+        <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+          Looks like you don't have any repositories installed. You can add one
+          with the "Add Repository" button on the left side bar.
+        </div>
+      )}
     </div>
   );
 }

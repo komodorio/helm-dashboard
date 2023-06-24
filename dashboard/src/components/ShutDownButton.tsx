@@ -1,43 +1,23 @@
 import { BsPower } from "react-icons/bs";
-import { useState } from "react";
-import Modal, { ModalAction, ModalButtonStyle } from "./modal/Modal";
+
+import Modal from "./modal/Modal";
 import { useShutdownHelmDashboard } from "../API/other";
 
 function ShutDownButton() {
-  const { mutate, status } = useShutdownHelmDashboard();
-  const onClose = () => {
-    console.log("close button clicked");
-  };
-  const [signOut, setSignOut] = useState(false);
+  const { mutate: signOut, status } = useShutdownHelmDashboard();
 
   const handleClick = async () => {
-    setSignOut(true);
+    signOut();
   };
 
-  const confirmModalActions: ModalAction[] = [
-    {
-      id: "2",
-      text: "Confirm",
-      callback: () => {
-        mutate();
-      },
-      variant: ModalButtonStyle.error,
-    },
-  ];
-
   return (
-    <div className="ShutDownButton">
-      {signOut && (
-        <Modal actions={status == "success" ? [] : confirmModalActions} title={"Session Ended"} isOpen={true} onClose={onClose}>
-          {status == "success" ? <p>
-            Helm Dashboard application has been successfully shutdown.
-          </p> :
-          <p>
-          Are you sure you wish to shutdown the Helm Dashboard application?
-          </p>
-          }
-        </Modal>
-      )}
+    <div>
+      <Modal title="Session Ended" isOpen={status === "error"}>
+        <p>
+          The Helm Dashboard application has been shut down. You can now close
+          the browser tab.
+        </p>
+      </Modal>
 
       <button
         onClick={handleClick}

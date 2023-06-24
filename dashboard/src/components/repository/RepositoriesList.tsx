@@ -37,6 +37,7 @@ function RepositoriesList({
                 onClick={() => {
                   onRepositoryChanged(repository);
                 }}
+                title={repository.url}
               >
                 <input
                   className="cursor-pointer"
