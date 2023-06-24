@@ -3,14 +3,15 @@ package dashboard
 import (
 	"context"
 	"embed"
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	log "github.com/sirupsen/logrus"
 	"html"
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	log "github.com/sirupsen/logrus"
 )
 
 //go:embed static/*
@@ -20,6 +21,11 @@ func noCache(c *gin.Context) {
 	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
 		c.Header("Cache-Control", "no-cache")
 	}
+
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
 	c.Next()
 }
 

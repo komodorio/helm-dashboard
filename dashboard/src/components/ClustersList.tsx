@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Cluster, Release } from "../data/types";
 import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
+import { InstalledReleases } from "../API/releases";
 
 type ClustersListProps = {
-  installedReleases?: Release[];
+  installedReleases?: InstalledReleases[];
 };
 
 function ClustersList({ installedReleases }: ClustersListProps) {
