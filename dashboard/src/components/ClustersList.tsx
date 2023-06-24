@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { InstalledReleases } from "../API/releases";
 
 type ClustersListProps = {
+  setSelectedCluster: React.Dispatch<React.SetStateAction<string | undefined>>;
+  selectedCluster: string | undefined;
   installedReleases?: InstalledReleases[];
 };
 
@@ -30,7 +32,7 @@ function getCleanClusterName(rawClusterName: string) {
   return rawClusterName;
 }
 
-function ClustersList({ installedReleases }: ClustersListProps) {
+function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }: ClustersListProps) {
   const [namespaces, setNamespaces] =
     useState<{ name: string; amount: number }[]>();
 
@@ -67,9 +69,10 @@ function ClustersList({ installedReleases }: ClustersListProps) {
         ?.sort((a, b) =>
           getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
         )
-        ?.map((cluster) => (
+        ?.map((cluster, i) => (
           <span key={cluster.Name} className="flex items-center">
             <input
+              onChange={e => setSelectedCluster(e.target.value)}
               type="radio"
               id={cluster.Name}
               value={cluster.Name}
