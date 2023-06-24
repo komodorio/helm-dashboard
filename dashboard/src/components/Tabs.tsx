@@ -18,7 +18,7 @@ export default function Tabs({
 // setActiveTab,
 // setTabContent
 TabsProps) {
-  const [activeTab, setActiveTab] = useState(2);
+  const [activeTab, setActiveTab] = useState(0);
 
   return (
     <div className="flex flex-col">
