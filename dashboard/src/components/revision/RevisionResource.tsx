@@ -81,13 +81,24 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         direction="right"
         className="min-w-[60%] max-w-[80%]"
       >
-        <DescribeResource resource={resource} />
+        <DescribeResource
+          resource={resource}
+          closeDrawer={() => {
+            setIsOpen(false);
+          }}
+        />
       </Drawer>
     </>
   );
 };
 
-const DescribeResource = ({ resource }: { resource: StructuredResources }) => {
+const DescribeResource = ({
+  resource,
+  closeDrawer,
+}: {
+  resource: StructuredResources;
+  closeDrawer: () => void;
+}) => {
   const {
     kind,
     metadata: { name },
@@ -131,6 +142,7 @@ const DescribeResource = ({ resource }: { resource: StructuredResources }) => {
             className="h-fit"
             data-bs-dismiss="offcanvas"
             aria-label="Close"
+            onClick={closeDrawer}
           >
             <img src={closeIcon} alt="close" className="w-[16px] h-[16px]" />
           </button>

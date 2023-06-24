@@ -32,8 +32,7 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
   ];
   const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
   const [isChecking, setChecking] = useState(false);
-  const { context, namespace } = useParams();
-
+  const { context, namespace, chart } = useParams();
   const checkUpgradeable = async () => {
     try {
       const response = await axios.get(
@@ -84,7 +83,7 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
     <div className="flex flex-col px-16 pt-5 gap-3">
       <StatusLabel status="deployed" />
       <div className="flex justify-between">
-        <span className="text-[#3d4048] text-4xl">airFlow</span>
+        <span className="text-[#3d4048] text-4xl">{chart}</span>
         <div className="flex flex-row gap-3">
           <div className="flex flex-col">
             <button onClick={checkUpgradeable}>
