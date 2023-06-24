@@ -83,7 +83,7 @@ class ApiService {
     if (release == undefined) return null;
 
     const response = await fetch(
-      `${this.baseUrl}/api/helm/releases/${release.namespace}/${release.chartName}/history`
+      `${this.baseUrl}/api/helm/releases/${release.namespace}/${release.name}/history`
     );
     const data = await response.json();
 
