@@ -163,7 +163,7 @@ const DescribeResource = ({
       </div>
 
       {isLoading ? (
-        "loading..."
+        <Spinner />
       ) : (
         <div className="h-full overflow-y-auto">
           <pre
