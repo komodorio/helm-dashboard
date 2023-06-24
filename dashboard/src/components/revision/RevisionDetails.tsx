@@ -33,6 +33,7 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
   const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
   const [isChecking, setChecking] = useState(false);
   const { context, namespace, chart } = useParams();
+
   const checkUpgradeable = async () => {
     try {
       const response = await axios.get(

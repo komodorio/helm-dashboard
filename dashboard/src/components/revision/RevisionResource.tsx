@@ -16,9 +16,10 @@ import "react-modern-drawer/dist/index.css";
 
 import Button from "../Button";
 import Badge from "../Badge";
+import Spinner from "../Spinner";
 export default function RevisionResource() {
   const { namespace = "", chart = "" } = useParams();
-  const { data: resources } = useGetResources(namespace, chart);
+  const { data: resources, isLoading } = useGetResources(namespace, chart);
 
   return (
     <div>
@@ -32,11 +33,23 @@ export default function RevisionResource() {
             <td className="rounded"></td>
           </tr>
         </thead>
-        <tbody className="bg-white mt-4 h-8 rounded w-full">
-          {resources?.map((resource: StructuredResources) => (
-            <ResourceRow resource={resource} />
-          ))}
-        </tbody>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <tbody className="bg-white mt-4 h-8 rounded w-full">
+            {resources?.length ? (
+              resources.map((resource: StructuredResources) => (
+                <ResourceRow resource={resource} />
+              ))
+            ) : (
+              <tr>
+                <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+                  Looks like you don't have any resources.
+                </div>
+              </tr>
+            )}
+          </tbody>
+        )}
       </table>
     </div>
   );

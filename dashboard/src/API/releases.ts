@@ -88,12 +88,12 @@ function useGetNotes(ns: string, name: string, revision?: string, revisionDiff?:
 export function useGetResources(
   ns: string,
   name: string,
-  options?: UseQueryOptions<StructuredResources>
+  options?: UseQueryOptions<StructuredResources[]>
 ) {
-  return useQuery<StructuredResources>(
+  return useQuery<StructuredResources[]>(
     ["resources", ns, name],
     () =>
-      callApi<StructuredResources>(
+      callApi<StructuredResources[]>(
         `/api/helm/releases/${ns}/${name}/resources?health=true`
       ),
     options
