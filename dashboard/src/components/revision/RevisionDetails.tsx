@@ -8,29 +8,28 @@ import {
 } from "react-icons/bs";
 import { Release } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
-import RevisionTabs from "./RevisionTabs";
 import StatusLabel from "../common/StatusLabel";
 import { useParams } from "react-router-dom";
+import RevisionDiff from "./RevisionDiff";
+import RevisionResource from "./RevisionResource";
+import Tabs from "../Tabs";
 
 type RevisionTagProps = {
   caption: string;
   text: string;
 };
 
-function RevisionTag({ caption, text }: RevisionTagProps) {
-  return (
-    <span className="bg-[#d6effe] px-2">
-      <span>{caption}:</span>
-      <span className="font-bold"> {text}</span>
-    </span>
-  );
-}
-
 type RevisionDetailsProps = {
   release: Release;
 };
 
-function RevisionDetails({ release }: RevisionDetailsProps) {
+export default function RevisionDetails({ release }: RevisionDetailsProps) {
+  const revisionTabs = [
+    { label: "Resources", content: <RevisionResource release={release} /> },
+    { label: "Manifests", content: <RevisionDiff /> },
+    { label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
+    { label: "Notes", content: <RevisionDiff /> },
+  ];
   const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
   const [isChecking, setChecking] = useState(false);
   const { context, namespace } = useParams();
@@ -57,25 +56,6 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
         //     btnUpgradeCheck.text("Check for new version")
         elm = data[0];
       }
-
-      // $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
-      // const verCur = $("#specRev").data("last-chart-ver");
-      // btnUpgradeCheck.data("repo", elm.repository)
-      // btnUpgradeCheck.data("chart", elm.name)
-
-      // const canUpgrade = isNewerVersion(verCur, elm.version);
-      // btnUpgradeCheck.prop("disabled", false)
-      // if (canUpgrade) {
-      //     $("#btnUpgrade span").text("Upgrade to " + elm.version)
-      //     $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-arrow-up")
-      // } else {
-      //     $("#btnUpgrade span").text("Reconfigure")
-      //     $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-pencil")
-      // }
-
-      // $("#btnUpgrade").off("click").click(function () {
-      //     popUpUpgrade(elm, getHashParam("namespace"), getHashParam("chart"), verCur, $("#specRev").data("last-rev"))
-      // })
     } catch (error) {
       //errorAlert-"Failed to find chart in repo"
     }
@@ -165,12 +145,15 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
       </div>
       <div className="flex flex-wrap gap-4">
         <RevisionTag caption="chart version" text={release.chart} />
-        <RevisionTag caption="app version" text={release.app_version} />
+        <RevisionTag
+          caption="app version"
+          text={release.app_version || "N/A"}
+        />
         <RevisionTag caption="namespace" text={namespace ?? ""} />
         <RevisionTag caption="cluster" text={context ?? ""} />
       </div>
       <span>{release.description}</span>
-      <RevisionTabs />
+      <Tabs tabs={revisionTabs} />
       <UninstallModal
         uninstallTarget="airflow"
         namespace="default"
@@ -188,4 +171,11 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
   );
 }
 
-export default RevisionDetails;
+function RevisionTag({ caption, text }: RevisionTagProps) {
+  return (
+    <span className="bg-[#d6effe] px-2">
+      <span>{caption}:</span>
+      <span className="font-bold"> {text}</span>
+    </span>
+  );
+}
