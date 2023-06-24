@@ -14,9 +14,7 @@ import axios from "axios";
 import { useGetApplicationStatus } from "../API/other";
 
 export default function Header() {
-  const { data: statusData } = useGetApplicationStatus()
-
-  console.log(statusData);
+  const { data: statusData } = useGetApplicationStatus();
 
   function isNewerVersion(oldVersion: string, newVersion: string) {
     oldVersion = oldVersion?.replace("v", "");
