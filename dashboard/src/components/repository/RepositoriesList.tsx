@@ -28,25 +28,27 @@ function RepositoriesList({
       <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5 gap-3">
         <label className="font-bold">Repositories</label>
         <div className="flex flex-col gap-1">
-          {repositories?.map((repository) => (
-            <span
-              className="flex items-center"
-              key={repository.url}
-              onClick={() => {
-                onRepositoryChanged(repository);
-              }}
-            >
-              <input
-                className="cursor-pointer"
-                type="radio"
-                id={repository.url}
-                value={repository.name}
-                checked={repository.url === selectedRepository?.url}
-                name="clusters"
-              />
-              <label className="ml-1">{repository.name}</label>
-            </span>
-          ))}
+          {repositories
+            ?.sort((a, b) => a.name.localeCompare(b.name))
+            .map((repository) => (
+              <span
+                className="flex items-center"
+                key={repository.url}
+                onClick={() => {
+                  onRepositoryChanged(repository);
+                }}
+              >
+                <input
+                  className="cursor-pointer"
+                  type="radio"
+                  id={repository.url}
+                  value={repository.name}
+                  checked={repository.url === selectedRepository?.url}
+                  name="clusters"
+                />
+                <label className="ml-1">{repository.name}</label>
+              </span>
+            ))}
         </div>
         <button
           type="button"

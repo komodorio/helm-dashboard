@@ -1,10 +1,4 @@
-import {
-  Chart,
-  ChartVersion,
-  Release,
-  ReleaseRevision,
-  Repository,
-} from "../data/types";
+import { Chart, ChartVersion, Release, Repository } from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
