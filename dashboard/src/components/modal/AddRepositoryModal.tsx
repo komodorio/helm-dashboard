@@ -20,7 +20,6 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const addRepository = () => {
     setIsLoading(true);
     onClose();
-    console.log(formData);
   };
 
   return (
