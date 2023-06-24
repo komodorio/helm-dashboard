@@ -25,7 +25,7 @@ type RevisionDetailsProps = {
 
 export default function RevisionDetails({ release }: RevisionDetailsProps) {
   const revisionTabs = [
-    { label: "Resources", content: <RevisionResource release={release} /> },
+    { label: "Resources", content: <RevisionResource /> },
     { label: "Manifests", content: <RevisionDiff /> },
     { label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
     { label: "Notes", content: <RevisionDiff /> },

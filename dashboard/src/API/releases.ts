@@ -178,7 +178,36 @@ interface ValuesYamlText {}
 
 interface NotesText {}
 
-interface StructuredResources {}
+export interface StructuredResources {
+  kind: string;
+  apiVersion: string;
+  metadata: Metadata;
+  spec: Spec;
+  status: Status;
+}
+
+export interface Metadata {
+  name: string;
+  namespace: string;
+  creationTimestamp: any;
+  labels: any;
+}
+
+export interface Spec {
+  [key: string]: any;
+}
+
+export interface Status {
+  conditions: Condition[];
+}
+
+export interface Condition {
+  type: string;
+  status: string;
+  lastProbeTime: any;
+  lastTransitionTime: any;
+  reason: string;
+}
 
 export async function callApi<T>(
   url: string,
