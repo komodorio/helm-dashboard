@@ -167,6 +167,8 @@ export default function Header() {
               <a
                 href="https://github.com/komodorio/helm-dashboard/releases"
                 className="text-upgrade-color"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Upgrade to {latestVersion}
               </a>
