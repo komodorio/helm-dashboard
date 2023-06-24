@@ -14,6 +14,7 @@ export interface ModalAction {
   text: string;
   variant?: ModalButtonStyle;
   className?: string;
+  disabled?: boolean;
 }
 
 export interface ModalProps extends PropsWithChildren {
@@ -54,11 +55,6 @@ const Modal = ({
       "text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
     ],
   ]);
-
-  // todo: remove
-  // useEffect(() => {
-  //   setIsVisible(isOpen);
-  // }, [isOpen]);
 
   const getClassName = (action: ModalAction) => {
     if (action.className) return action.className;
@@ -124,6 +120,7 @@ const Modal = ({
                       type="button"
                       className={getClassName(action)}
                       onClick={action.callback}
+                      disabled={action.disabled}
                     >
                       {action.text}
                     </button>

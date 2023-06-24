@@ -188,8 +188,8 @@ const Uninstall = () => {
     }
   );
   const uninstallTitle = (
-    <div className="font-bold text-2xl">
-      Uninstall <span className="text-red-500">{chart}</span> from namespace
+    <div className="font-semibold text-lg">
+      Uninstall <span className="text-red-500">{chart}</span> from namespace{" "}
       <span className="text-red-500">{namespace}</span>
     </div>
   );
@@ -210,20 +210,21 @@ const Uninstall = () => {
           actions={[
             {
               id: "1",
-              text: uninstallMutation.isLoading ? "Uninstalling..." : "Confirm",
+              text: uninstallMutation.isLoading
+                ? "Uninstalling..."
+                : "Uninstall",
               callback: uninstallMutation.mutate,
               variant: ModalButtonStyle.error,
+              disabled: uninstallMutation.isLoading,
             },
           ]}
         >
           <div>Following resources will be deleted from the cluster:</div>
           <div>
             {resources?.map((resource) => (
-              <div className="flex gap-7 w-100 mb-3">
-                <span className="text-right w-1/5 font-medium italic">
-                  {resource.kind}
-                </span>
-                <span className="text-left w-4/5 font-bold">
+              <div className="flex justify-start gap-1 w-full mb-3">
+                <span className=" w-1/5  italic">{resource.kind}</span>
+                <span className=" w-4/5 font-semibold">
                   {resource.metadata.name}
                 </span>
               </div>
