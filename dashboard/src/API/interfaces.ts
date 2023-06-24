@@ -1,32 +1,32 @@
 export interface HelmRepository {
-    name: string;
-    url: string;
-  }
-  
-export interface ChartVersion {
-    name: string;
-    version: string;
-  }
-  
-export interface K8sContext {
-    name: string;
-  }
-  
-export interface K8sResource {
-    kind: string;
-    name: string;
-    namespace: string;
-  }
+  name: string;
+  url: string;
+}
 
-export  interface Scanner {
-    id: string;
-    name: string;
-    type: string;
-  }
-  
+export interface ChartVersion {
+  name: string;
+  version: string;
+}
+
+export interface K8sContext {
+  name: string;
+}
+
+export interface K8sResource {
+  kind: string;
+  name: string;
+  namespace: string;
+}
+
+export interface Scanner {
+  id: string;
+  name: string;
+  type: string;
+}
+
 export interface ScanResult {
-    scannerType: string;
-    result: any;
+  scannerType: string;
+  result: any;
 }
 
 export interface ScannersList {
@@ -38,60 +38,57 @@ export interface ScanResults {
 }
 
 export interface ApplicationStatus {
-  Analytics: boolean
+  Analytics: boolean;
   CacheHitRatio: number;
-  ClusterMode: boolean
+  ClusterMode: boolean;
   CurVer: string;
   LatestVer: string;
 }
 
-  export interface KubectlContexts {
-    contexts: string[];
-  }
-  
-  export interface K8sResource {
-    // Implementation depends on the specific kubernetes resource structure
-  }
-  
-  export interface K8sResourceList {
-    items: K8sResource[];
-  }
-  
-  export interface HelmRepositories {
-    repositories: Repository[];
-  }
-  
-  export interface ChartList {
-    charts: Chart[];
-  }
-  
-  export interface LatestChartVersion {
-    name: string;
-    version: string;
-  }
-  
-  export   interface ChartVersions {
-    versions: string[];
-  }
-  
+export interface KubectlContexts {
+  contexts: string[];
+}
+
+export interface K8sResource {
+  // Implementation depends on the specific kubernetes resource structure
+}
+
+export interface K8sResourceList {
+  items: K8sResource[];
+}
+
+export type HelmRepositories = Repository[];
+
+export interface ChartList {
+  charts: Chart[];
+}
+
+export interface LatestChartVersion {
+  name: string;
+  version: string;
+}
+
+export interface ChartVersions {
+  versions: string[];
+}
+
 export interface ValuesYamlText {
-    content: string;
-  }
-  
+  content: string;
+}
+
 export interface Repository {
-    name: string;
-    url: string;
-  }
-  
+  name: string;
+  url: string;
+}
+
 export interface Chart {
-    name: string;
-    repo: string;
-    version: string;
-    appVersion: string;
-    description: string;
-    created: string;
-    digest: string;
-    urls: string[];
-    icon: string;
-  }
-  
+  name: string;
+  repo: string;
+  version: string;
+  appVersion: string;
+  description: string;
+  created: string;
+  digest: string;
+  urls: string[];
+  icon: string;
+}
