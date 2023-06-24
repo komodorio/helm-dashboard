@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BsPencil,
   BsTrash3,
@@ -13,6 +13,9 @@ import { useParams } from "react-router-dom";
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
+import { callApi, useGetResources } from "../../API/releases";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import Modal, { ModalButtonStyle } from "../modal/Modal";
 
 type RevisionTagProps = {
   caption: string;
@@ -30,7 +33,6 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
     { label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
     { label: "Notes", content: <RevisionDiff /> },
   ];
-  const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
   const [isChecking, setChecking] = useState(false);
   const { context, namespace, chart } = useParams();
 
@@ -63,9 +65,7 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
     console.error("checkUpgradeable not implemented"); //todo: implement
   };
 
-  const unInstall = () => {
-    setIsOpenUninstallModal(true);
-  };
+  const runTests = () => {};
 
   const rollback = () => {
     throw new Error("not implemented");
@@ -73,11 +73,6 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
 
   const checkForNewVersion = () => {
     throw new Error("checkForNewVersion not implemented"); //todo: implement
-  };
-
-  const unInstallConfirmed = () => {
-    setIsOpenUninstallModal(false);
-    throw new Error("unInstallConfirmed not implemented"); //todo: implement
   };
 
   return (
@@ -118,12 +113,7 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
             </button>
           </div>
           <div className="h-1/2">
-            <button onClick={unInstall}>
-              <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                <BsTrash3 />
-                Uninstall
-              </span>
-            </button>
+            <Uninstall />
           </div>
         </div>
       </div>
@@ -154,19 +144,6 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
       </div>
       <span>{release.description}</span>
       <Tabs tabs={revisionTabs} />
-      <UninstallModal
-        uninstallTarget="airflow"
-        namespace="default"
-        isOpen={isOpenUninstallModal}
-        resources={[
-          { id: "1", type: "ServiceAccount", name: "airflow-redis" },
-          { id: "2", type: "Secret", name: "postgresql" },
-          { id: "3", type: "Secret", name: "airflow-redis" },
-          { id: "4", type: "Secret", name: "airflow" },
-          { id: "5", type: "ConfigMap", name: "airflow-redis-configuration" },
-        ]}
-        onConfirm={unInstallConfirmed}
-      />
     </div>
   );
 }
@@ -179,3 +156,65 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
     </span>
   );
 }
+
+const RunTests = () => {};
+
+const Uninstall = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { namespace = "", chart = "" } = useParams();
+  const { data: resources } = useGetResources(namespace, chart, {
+    enabled: isOpen,
+  });
+
+  const uninstallMutation = useMutation(["uninstall", namespace, chart], () =>
+    callApi("/api/helm/releases/" + namespace + "/" + chart, {
+      method: "delete",
+    })
+  );
+  const uninstallTitle = (
+    <div className="font-bold text-2xl">
+      Uninstall <span className="text-red-500">{chart}</span> from namespace
+      <span className="text-red-500">{namespace}</span>
+    </div>
+  );
+
+  return (
+    <>
+      <button onClick={() => setIsOpen(true)}>
+        <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+          <BsTrash3 />
+          Uninstall
+        </span>
+      </button>
+      {resources?.length ? (
+        <Modal
+          title={uninstallTitle}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          actions={[
+            {
+              id: "1",
+              text: uninstallMutation.isLoading ? "Uninstalling..." : "Confirm",
+              callback: uninstallMutation.mutate,
+              variant: ModalButtonStyle.error,
+            },
+          ]}
+        >
+          <div>Following resources will be deleted from the cluster:</div>
+          <div>
+            {resources?.map((resource) => (
+              <div className="flex gap-7 w-100 mb-3">
+                <span className="text-right w-1/5 font-medium italic">
+                  {resource.kind}
+                </span>
+                <span className="text-left w-4/5 font-bold">
+                  {resource.metadata.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Modal>
+      ) : null}
+    </>
+  );
+};
