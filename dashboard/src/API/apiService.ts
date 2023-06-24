@@ -105,6 +105,12 @@ class ApiService {
   };
 }
 
-const apiService = new ApiService("http://localhost:8080");
+let baseURL = "";
+
+if (import.meta.env.DEV) {
+  baseURL = "http://localhost:8080";
+}
+
+const apiService = new ApiService(baseURL);
 
 export default apiService;

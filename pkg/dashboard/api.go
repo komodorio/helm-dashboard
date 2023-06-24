@@ -3,14 +3,15 @@ package dashboard
 import (
 	"context"
 	"embed"
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	log "github.com/sirupsen/logrus"
 	"html"
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	log "github.com/sirupsen/logrus"
 )
 
 //go:embed static/*
@@ -35,6 +36,16 @@ func noCache(c *gin.Context) {
 	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
 		c.Header("Cache-Control", "no-cache")
 	}
+
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	c.Next()
+}
+
+func allowCORS(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.Next()
 }
 
@@ -88,6 +99,10 @@ func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool)
 	api.Use(noCache)
 	api.Use(errorHandler)
 	api.Use(corsMiddleware())
+
+	if os.Getenv("HD_CORS") != "" {
+		api.Use(allowCORS)
+	}
 
 	configureStatic(api)
 	configureRoutes(abortWeb, data, api)

@@ -35,7 +35,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: "1.20"
       - name: git cleanup
         run: git clean -f
       - name: Run GoReleaser
@@ -62,15 +62,20 @@ jobs:
         with:
           images: komodorio/helm-dashboard
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         if: github.event_name != 'pull_request'
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASS }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         if: github.event_name != 'pull_request'
         with:
           context: .
@@ -78,6 +83,7 @@ jobs:
           tags: komodorio/helm-dashboard:${{ needs.pre_release.outputs.release_tag }},komodorio/helm-dashboard:latest
           labels: ${{ steps.meta.outputs.labels }}
           build-args: VER=${{ needs.pre_release.outputs.release_tag }}
+          platforms: linux/amd64,linux/arm64
 
   publish_chart:
     runs-on: ubuntu-latest
@@ -112,4 +118,4 @@ jobs:
           user_email: "komi@komodor.io"
           user_name: "komodor-bot"
           destination_branch: "master"
-          commit_msg: "feat(helm-dashboard): ${{ github.event.head_commit.message }}" #important!! don't change this commit message unless you change the condition in pipeline.yml on helm-charts repo
+          commit_msg: "feat(OSS helm-dashboard): ${{ github.event.head_commit.message }}" #important!! don't change this commit message unless you change the condition in pipeline.yml on helm-charts repo

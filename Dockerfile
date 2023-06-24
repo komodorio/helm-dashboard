@@ -8,10 +8,15 @@ COPY dashboard ./
 RUN npm i && npm run build
 
 # Stage - builder
-FROM golang as builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} golang as builder
 
-ENV GOOS=linux
-ENV GOARCH=amd64
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
+
+ENV GOOS=${TARGETOS:-linux}
+ENV GOARCH=${TARGETARCH:-amd64}
 ENV CGO_ENABLED=0
 
 WORKDIR /build
@@ -33,7 +38,11 @@ WORKDIR /build/src
 RUN make build
 
 # Stage - runner
-FROM alpine
+FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 EXPOSE 8080
 
 # Python
@@ -44,7 +53,7 @@ RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/
 RUN trivy --version
 
 # Checkov scanner
-RUN pip3 install checkov packaging==21.3 && checkov --version
+RUN (pip3 install checkov packaging==21.3 && checkov --version) || echo Failed to install optional Checkov
 
 COPY --from=builder /build/src/bin/dashboard /bin/helm-dashboard
 

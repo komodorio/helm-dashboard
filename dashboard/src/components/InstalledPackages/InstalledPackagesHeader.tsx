@@ -1,8 +1,9 @@
+import { InstalledReleases } from "../../API/releases";
 import HeaderLogo from "../../assets/packges-header.svg";
 import { Release } from "../../data/types";
 
 type InstalledPackagesHeaderProps = {
-  installedPackages: Release[] | undefined;
+  installedPackages?: InstalledReleases[];
 };
 
 export default function InstalledPackagesHeader({

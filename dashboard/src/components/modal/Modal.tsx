@@ -55,6 +55,7 @@ const Modal = ({
     ],
   ]);
 
+  // todo: remove
   useEffect(() => {
     setIsVisible(isOpen);
   }, [isOpen]);
