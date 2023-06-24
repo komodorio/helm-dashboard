@@ -100,6 +100,24 @@ export function useGetResources(
   );
 }
 
+export function useGetResourceDescription(
+  ns: string,
+  name: string,
+  options?: UseQueryOptions<string>
+) {
+  return useQuery<string>(
+    ["describe", ns, name],
+    () =>
+      callApi<string>(
+        `/api/k8s/statefulset/describe?name=${name}&namespace=${ns}`,
+        {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        }
+      ),
+    options
+  );
+}
+
 // Rollback the release to a previous revision
 function useRollbackRelease(
   options?: UseMutationOptions<
@@ -222,6 +240,11 @@ export async function callApi<T>(
     );
   }
 
-  const data = await response.json();
+  let data;
+  if (response.headers.get("Content-Type")?.includes("text/plain")) {
+    data = await response.text();
+  } else {
+    data = await response.json();
+  }
   return data;
 }

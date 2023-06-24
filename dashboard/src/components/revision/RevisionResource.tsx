@@ -1,12 +1,17 @@
 import { uniqueId } from "lodash";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { StructuredResources, useGetResources } from "../../API/releases";
+import hljs from "highlight.js";
+import { marked } from "marked";
 
-// import component 👇
+import {
+  StructuredResources,
+  useGetResourceDescription,
+  useGetResources,
+} from "../../API/releases";
+import closeIcon from "../../assets/close.png";
+
 import Drawer from "react-modern-drawer";
-
-//import styles 👇
 import "react-modern-drawer/dist/index.css";
 
 import Button from "../Button";
@@ -38,7 +43,6 @@ export default function RevisionResource() {
 }
 
 const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
-  console.log(resource);
   const {
     kind,
     metadata: { name },
@@ -50,7 +54,6 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
   };
   const { reason = "", status = "" } = conditions?.[0] || {};
   const cellClassnames = "py-2";
-  const rowId = useMemo(() => uniqueId(), []);
 
   const successStatus = reason.toLowerCase() === "exists" || "available";
   return (
@@ -76,36 +79,77 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         open={isOpen}
         onClose={toggleDrawer}
         direction="right"
-        className="bla bla bla"
+        className="min-w-[60%] max-w-[80%]"
       >
-        <div className="offcanvas-header border-bottom p-4">
-          <div>
-            <h5 id="describeModalLabel">
-              my-release-mysql
-              <span className="badge me-2 fw-normal bg-success text-dark bg-opacity-50 ms-3 small">
-                Exists
-              </span>
-            </h5>
-            <p className="m-0 mt-4">StatefulSet</p>
-          </div>
-          <div>
-            <a
-              href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&amp;utm_source=helm-dash&amp;utm_medium=cta&amp;utm_content=helm-dash"
-              className="btn btn-primary btn-sm me-2"
-              target="_blank"
-            >
-              See more details in Komodor{" "}
-              <i className="bi-box-arrow-up-right"></i>
-            </a>
-            <button
-              type="button"
-              className="btn-close text-reset"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
-          </div>
-        </div>
+        <DescribeResource resource={resource} />
       </Drawer>
+    </>
+  );
+};
+
+const DescribeResource = ({ resource }: { resource: StructuredResources }) => {
+  const {
+    kind,
+    metadata: { name },
+    status: { conditions },
+  } = resource;
+
+  const { reason = "" } = conditions?.[0] || {};
+
+  const successStatus = reason.toLowerCase() === "exists" || "available";
+  const { namespace = "", chart = "" } = useParams();
+  const { data, isLoading } = useGetResourceDescription(namespace, chart);
+  const [yamlFormattedData, setYamlFormattedData] = useState("");
+  useEffect(() => {
+    if (data) {
+      const val = hljs.highlight(data, { language: "yaml" }).value;
+      setYamlFormattedData(val);
+    }
+  }, [data]);
+
+  return (
+    <>
+      <div className="flex justify-between px-3 py-4 border-b">
+        <div>
+          <div className="flex gap-3">
+            <h3 className="font-medium text-xl">{name}</h3>
+            <Badge type={successStatus ? "success" : "error"}>{reason}</Badge>
+          </div>
+          <p className="m-0 mt-4">{kind}</p>
+        </div>
+
+        <div className="flex  items-center gap-4 pr-4">
+          <a
+            href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&amp;utm_source=helm-dash&amp;utm_medium=cta&amp;utm_content=helm-dash"
+            className="bg-blue-600 text-white p-3 text-md flex items-center rounded"
+            target="_blank"
+          >
+            See more details in Komodor
+          </a>
+          <button
+            type="button"
+            className="h-fit"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          >
+            <img src={closeIcon} alt="close" className="w-[16px] h-[16px]" />
+          </button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        "loading..."
+      ) : (
+        <div className="h-full overflow-y-auto">
+          <pre
+            className="bg-white rounded p-4 font-medium text-md w-full"
+            style={{ overflow: "unset" }}
+            dangerouslySetInnerHTML={{
+              __html: marked(yamlFormattedData),
+            }}
+          />
+        </div>
+      )}
     </>
   );
 };

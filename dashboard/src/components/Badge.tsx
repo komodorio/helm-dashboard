@@ -15,30 +15,33 @@
  * @param {string} children - The content of the badge.
  * @returns {JSX.Element} - The badge component.
  *
- * 
+ *
  */
 
-import React from 'react'
-import { BadgeCode } from '../global';
+import React from "react";
+import { BadgeCode } from "../global";
 
 export interface BadgeProps {
-  type: BadgeCode,
-  children: React.ReactNode
+  type: BadgeCode;
+  children: React.ReactNode;
 }
-export default function Badge (props: BadgeProps): JSX.Element {
+export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
-    error: 'bg-red-500 text-white',
-    success: 'bg-green-300 text-black-100 text-black-800',
-    info: 'bg-blue-200 text-black-800',
-    default: 'text-black-800'
-  }
+    error: "bg-red-500 text-white",
+    success: "bg-green-300 text-black-100 text-black-800",
+    info: "bg-blue-200 text-black-800",
+    default: "text-black-800",
+  };
 
-  const badgeBase = 'inline-flex items-center px-2.5 py-0.5 rounded text-sm'
+  const badgeBase =
+    "inline-flex items-center px-2.5 py-0.5 rounded text-sm font-medium";
   // the type of the badge is indicated by "type" prop.
   // the default type is "default".
   // the resulting span element is stored in badge_elem.
-  const badgeElem = <span className={`${badgeBase} ${colorVariants[props.type]}`}>{props.children}</span>
-  return (
-    badgeElem
-  )
+  const badgeElem = (
+    <span className={`${badgeBase} ${colorVariants[props.type]}`}>
+      {props.children}
+    </span>
+  );
+  return badgeElem;
 }
