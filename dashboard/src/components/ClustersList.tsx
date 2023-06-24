@@ -8,6 +8,28 @@ type ClustersListProps = {
   installedReleases?: InstalledReleases[];
 };
 
+function getCleanClusterName(rawClusterName: string) {
+  if (rawClusterName.indexOf("arn") === 0) {
+    // AWS cluster
+    const clusterSplit = rawClusterName.split(":");
+    const clusterName = clusterSplit.slice(-1)[0].replace("cluster/", "");
+    const region = clusterSplit.at(-3);
+    return region + "/" + clusterName + " [AWS]";
+  }
+
+  if (rawClusterName.indexOf("gke") === 0) {
+    // GKE cluster
+    return (
+      rawClusterName.split("_").at(-2) +
+      "/" +
+      rawClusterName.split("_").at(-1) +
+      " [GKE]"
+    );
+  }
+
+  return rawClusterName;
+}
+
 function ClustersList({ installedReleases }: ClustersListProps) {
   const [namespaces, setNamespaces] =
     useState<{ name: string; amount: number }[]>();
@@ -42,7 +64,9 @@ function ClustersList({ installedReleases }: ClustersListProps) {
     <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5">
       <label className="font-bold">Clusters</label>
       {clusters
-        ?.sort((a, b) => a.Name.localeCompare(b.Name))
+        ?.sort((a, b) =>
+          getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
+        )
         ?.map((cluster) => (
           <span key={cluster.Name} className="flex items-center">
             <input
