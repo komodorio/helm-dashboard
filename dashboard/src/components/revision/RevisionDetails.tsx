@@ -9,7 +9,7 @@ import {
 import { Release } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
 import StatusLabel from "../common/StatusLabel";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
@@ -161,7 +161,6 @@ const RunTests = () => {};
 
 const Uninstall = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
   const { namespace = "", chart = "" } = useParams();
   const { data: resources } = useGetResources(namespace, chart, {
     enabled: isOpen,
