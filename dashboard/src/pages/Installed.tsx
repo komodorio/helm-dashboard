@@ -1,15 +1,11 @@
 import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader";
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
-import { Release } from "../data/types";
-import { useQuery } from "@tanstack/react-query";
-import apiService from "../API/apiService";
 import { useGetInstalledReleases } from "../API/releases";
 
 function Installed() {
-  const { data: installedReleases } = useGetInstalledReleases()
-  
-  debugger;
+  const { data: installedReleases } = useGetInstalledReleases();
+
   return (
     <div className="flex flex-row">
       <ClustersList installedReleases={installedReleases} />
