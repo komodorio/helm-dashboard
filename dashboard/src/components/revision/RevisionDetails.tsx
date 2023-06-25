@@ -161,7 +161,7 @@ export default function RevisionDetails({
             </a>
           </div>
 
-          {namespace && chart ? (
+          {release.has_tests ? (
             <>
               {" "}
               <div className="h-1/2">
@@ -176,20 +176,6 @@ export default function RevisionDetails({
                 title="Tests results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
-                // actions={[
-                //   {
-                //     id: "1",
-                //     text: isRunningTests ? "Testing..." : "Run tests",
-                //     callback: () => {
-                //       runTests({
-                //         ns: namespace,
-                //         name: chart,
-                //       });
-                //     },
-                //     variant: ModalButtonStyle.success,
-                //     disabled: isRunningTests,
-                //   },
-                // ]}
               >
                 {isRunningTests ? <Spinner /> : displayTestResults()}
               </Modal>{" "}
