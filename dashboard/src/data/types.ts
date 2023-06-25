@@ -42,6 +42,7 @@ export type Release = {
   app_version: string;
   icon: string;
   description: string;
+  has_tests: boolean;
 };
 
 export type Repository = {
