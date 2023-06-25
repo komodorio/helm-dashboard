@@ -119,10 +119,9 @@ const DescribeResource = ({
   } = resource;
 
   const { reason = "" } = conditions?.[0] || {};
-
   const successStatus = reason.toLowerCase() === "exists" || "available";
   const { namespace = "", chart = "" } = useParams();
-  const { data, isLoading } = useGetResourceDescription(namespace, chart);
+  const { data, isLoading } = useGetResourceDescription(resource.kind, namespace, chart);
   const [yamlFormattedData, setYamlFormattedData] = useState("");
   useEffect(() => {
     if (data) {
