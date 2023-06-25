@@ -1,24 +1,28 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-interface Tab {
+export interface Tab {
+  value: string;
   label: string;
   content: ReactNode;
 }
 
 interface TabsProps {
   tabs: Tab[];
-  //   activeTab: string;
-  //   setActiveTab: (tab: string) => void;
-  //   setTabContent: (tab: string) => void;
+  selectedTab: Tab;
 }
 
 export default function Tabs({
   tabs,
-}: // activeTab,
-// setActiveTab,
-// setTabContent
-TabsProps) {
-  const [activeTab, setActiveTab] = useState(0);
+  selectedTab,
+}: TabsProps
+) {
+  
+  const navigate = useNavigate();
+  const {context, namespace, chart, revision} = useParams();
+  const moveTab = (tab : Tab) => {
+    navigate(`/revision/${context}/${namespace}/${chart}/${revision}/${tab.value}`)
+  }
 
   return (
     <div className="flex flex-col">
@@ -27,15 +31,15 @@ TabsProps) {
           <button
             key={tab.label}
             className={`cursor-pointer px-4 py-2 text-sm font-normal text-[#3B3D45] focus:outline-none"  
-              ${activeTab === index && "border-b-[3px] border-[#3B3D45]"}
+              ${selectedTab.value === tab.value && "border-b-[3px] border-[#3B3D45]"}
             `}
-            onClick={() => setActiveTab(index)}
+            onClick={() => moveTab(tab)}
           >
             {tab.label}
           </button>
         ))}
       </div>
-      <div>{tabs[activeTab].content}</div>
+      <div>{selectedTab.content}</div>
     </div>
   );
 }

@@ -1,4 +1,8 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useMemo, useState } from "react";
+import { useGetReleaseInfoByType } from "../../API/releases";
+import { useParams } from "react-router-dom";
+import hljs from "highlight.js";
+import { marked } from "marked";
 
 type RevisionDiffProps = {
   includeUserDefineOnly?: boolean;
@@ -10,6 +14,17 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
     setNotesContent(e.target.value);
   };
+  const params = useParams();
+  
+  const {data} = useGetReleaseInfoByType(params)
+
+  const yamlContent = useMemo(() => {
+    if (data) {
+      const val = hljs.highlight(data, { language: "yaml" }).value;
+      return val;
+    }
+    return '';
+  }, [data]);
 
   return (
     <div>
@@ -90,7 +105,13 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
         )}
       </div>
       <div className="bg-white w-full min-h-[200px]">
-        <pre className="bg-white rounded p-3">{notesContent}</pre>
+        <pre
+          className="bg-white rounded p-3"
+          dangerouslySetInnerHTML={{
+            __html: marked(yamlContent),
+          }}
+        >
+          </pre>
       </div>
     </div>
   );

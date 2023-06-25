@@ -119,6 +119,25 @@ export function useGetResourceDescription(
   );
 }
 
+
+export function useGetReleaseInfoByType(
+  params: ReleaseInfoParams,
+  options?: UseQueryOptions<string>
+) {
+  const {chart, namespace, tab, revision} = params;
+  return useQuery<string>(
+    [tab, namespace, chart, revision],
+    () =>
+      callApi<string>(
+        `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}`,
+        {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        }, 'html'
+      ),
+    options
+  );
+}
+
 // Rollback the release to a previous revision
 function useRollbackRelease(
   options?: UseMutationOptions<
@@ -157,6 +176,20 @@ function useTestRelease(
 }
 
 // Request objects
+interface ReleaseInfoParams {
+  chart: string;
+  tab: string;
+  namespace: string;
+  revision: string;
+}
+interface InstallReleaseRequest {
+  name: string;
+  chart: string;
+  version?: string;
+  values?: string;
+  preview?: boolean;
+}
+
 interface InstallReleaseRequest {
   name: string;
   chart: string;
@@ -230,7 +263,7 @@ export interface Condition {
 
 export async function callApi<T>(
   url: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const baseUrl = "http://localhost:8080";
   const response = await fetch(baseUrl + url, options);
@@ -240,8 +273,8 @@ export async function callApi<T>(
       `An error occurred while fetching data: ${response.statusText}`
     );
   }
-
   let data;
+  
   if (response.headers.get("Content-Type")?.includes("text/plain")) {
     data = await response.text();
   } else {
