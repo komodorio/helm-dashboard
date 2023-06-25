@@ -5,6 +5,9 @@ import ChartViewer from "./ChartViewer";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
+import { useDeleteRepo, useUpdateRepo } from "../../API/repositories";
+import useAlertError from "../../hooks/useAlertError";
+import { callApi } from "../../API/releases";
 import { useMemo, useState } from "react";
 
 type RepositoryViewerProps = {
@@ -19,22 +22,17 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     refetchOnWindowFocus: false,
   });
 
-  const update = async () => {
-    try {
-      const url = `/api/helm/repositories/${repository?.name}`;
-      await axios.post(url);
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const update = useUpdateRepo(repository?.name || "", { retry: false });
+  const alert = useAlertError();
 
   const removeRepository = async () => {
     if (confirm("Confirm removing repository?")) {
       try {
-        const repo = ""; // todo: take from real data
-        const url = `/api/helm/repositories/${repo}`;
-        await axios.delete(url);
+        const repo = repository?.name || ""
+        debugger;
+        await callApi<void>(`/api/helm/repositories/${repo}`, {
+          method: "DELETE",
+        });
         window.location.reload();
       } catch (error) {
         console.error(error);
@@ -54,34 +52,34 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     <div className="flex flex-col p-6 gap-3 bg-white drop-shadow-lg">
       <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
       <div className="flex justify-between">
-        <span className="text-[#3d4048] text-4xl font-semibold">airFlow</span>
+        <span className="text-[#3d4048] text-4xl font-semibold">{repository?.name}</span>
 
         <div className="flex flex-col">
           <div className="flex flex-row gap-2">
-            <button onClick={update}>
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                <BsArrowRepeat />
-                Update
-              </span>
-            </button>
-            <button onClick={removeRepository}>
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                <BsTrash3 />
-                Remove
-              </span>
-            </button>
-          </div>
-          <input
-            onChange={(e) => setSearchValue(e.target.value)}
-            type="text"
-            placeholder="Filter..."
-            className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
-          />
+          <button onClick={() => update.mutateAsync().catch((e) => alert.setShowErrorModal({ msg: e.message, title: "Unable to update" }))}>
+            <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+              <BsArrowRepeat />
+              Update
+            </span>
+          </button>
+          <button onClick={removeRepository}>
+            <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+              <BsTrash3 />
+              Remove
+            </span>
+          </button>
         </div>
+          <input
+              onChange={(e) => setSearchValue(e.target.value)}
+              type="text"
+              placeholder="Filter..."
+              className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
+          />
+      </div>
       </div>
       <span className="text-[#3d4048] text-sm bg-[#D6EFFE] px-3 py-1 rounded-md self-start">
         URL:{" "}
-        <span className="font-bold">https://charts.bitnami.com/bitnami</span>
+        <span className="font-bold">{repository?.url}</span>
       </span>
 
       <div className="bg-[#ECEFF2] grid grid-cols-6 text-xs font-bold p-2 px-4 mt-4 rounded-md">

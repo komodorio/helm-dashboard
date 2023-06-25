@@ -21,6 +21,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
+import useAlertError from "../../hooks/useAlertError";
 
 type RevisionTagProps = {
   caption: string;
@@ -86,17 +87,48 @@ export default function RevisionDetails({
     console.error("checkUpgradeable not implemented"); //todo: implement
   };
 
+  const { setShowErrorModal } = useAlertError();
   const {
     mutate: runTests,
     isLoading: isRunningTests,
     data: testResults,
-  } = useTestRelease();
+  } = useTestRelease({
+    onSuccess: () => {
+      setShowTestResults(true);
+    },
+    onError: (error) => {
+      setShowErrorModal({
+        title: "Failed to run tests for chart " + chart,
+        msg: error,
+      });
+      console.error("Failed to execute test for chart", error);
+    },
+  });
   const handleRunTests = () => {
+    runTests({
+      ns: namespace,
+      name: chart,
+    });
     setShowTestResults(true);
   };
 
   const checkForNewVersion = () => {
     throw new Error("checkForNewVersion not implemented"); //todo: implement
+  };
+
+  const displayTestResults = () => {
+    if (!testResults || (testResults as []).length === 0) {
+      return (
+        <div>
+          Tests executed successfully
+          <br />
+          <br />
+          <pre>Empty response from API</pre>
+        </div>
+      );
+    } else {
+      return (testResults as string).replaceAll("\n", "<br>");
+    }
   };
 
   return (
@@ -129,7 +161,7 @@ export default function RevisionDetails({
             </a>
           </div>
 
-          {release.namespace && release.chartName ? (
+          {release.has_tests ? (
             <>
               {" "}
               <div className="h-1/2">
@@ -144,22 +176,8 @@ export default function RevisionDetails({
                 title="Tests results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
-                actions={[
-                  {
-                    id: "1",
-                    text: isRunningTests ? "Testing..." : "Run tests",
-                    callback: () => {
-                      runTests({
-                        ns: release.namespace,
-                        name: release.chartName,
-                      });
-                    },
-                    variant: ModalButtonStyle.success,
-                    disabled: isRunningTests,
-                  },
-                ]}
               >
-                {isRunningTests ? <Spinner /> : testResults ?? null}
+                {isRunningTests ? <Spinner /> : displayTestResults()}
               </Modal>{" "}
             </>
           ) : null}
@@ -223,7 +241,6 @@ const Rollback = ({
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
-        console.log("settled");
         refetchRevisions();
       },
     });
