@@ -22,15 +22,12 @@ func noCache(c *gin.Context) {
 		c.Header("Cache-Control", "no-cache")
 	}
 
-	c.Header("Access-Control-Allow-Origin", "*")
-	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
 	c.Next()
 }
 
 func allowCORS(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Headers", "*")
 	c.Next()
 }
 
@@ -73,19 +70,19 @@ func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 
 // Middleware for CORS
 func corsMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "*")
 
-        // Handle preflight requests
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(http.StatusOK)
-            return
-        }
+		// Handle preflight requests
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
 
-        c.Next()
-    }
+		c.Next()
+	}
 }
 func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
