@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { InstalledReleases } from "../API/releases";
 
 type ClustersListProps = {
+  setSelectedCluster: React.Dispatch<React.SetStateAction<string | undefined>>;
+  selectedCluster: string | undefined;
   installedReleases?: InstalledReleases[];
 };
 
@@ -30,13 +32,20 @@ function getCleanClusterName(rawClusterName: string) {
   return rawClusterName;
 }
 
-function ClustersList({ installedReleases }: ClustersListProps) {
+function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }: ClustersListProps) {
   const [namespaces, setNamespaces] =
     useState<{ name: string; amount: number }[]>();
 
   const { data: clusters } = useQuery<Cluster[]>({
     queryKey: ["clusters"],
     queryFn: apiService.getClusters,
+    onSuccess(data) {
+      const sortedData = data?.sort((a, b) => a.Name.localeCompare(b.Name));
+      
+      if (sortedData && sortedData.length > 0 && !selectedCluster) {
+        setSelectedCluster(sortedData[0].Name);
+      }
+    },
   });
 
   useEffect(() => {
@@ -61,18 +70,21 @@ function ClustersList({ installedReleases }: ClustersListProps) {
   }, [installedReleases]);
 
   return (
-    <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5">
+    <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5 h-fit">
       <label className="font-bold">Clusters</label>
       {clusters
         ?.sort((a, b) =>
           getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
         )
-        ?.map((cluster) => (
+        ?.map((cluster, i) => (
           <span key={cluster.Name} className="flex items-center">
             <input
+              className="cursor-pointer"
+              onChange={e => setSelectedCluster(e.target.value)}
               type="radio"
               id={cluster.Name}
               value={cluster.Name}
+              checked={cluster.Name == selectedCluster}
               name="clusters"
             />
             <label className="ml-1">{cluster.Name}</label>

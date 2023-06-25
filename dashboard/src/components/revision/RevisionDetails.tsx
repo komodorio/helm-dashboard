@@ -37,14 +37,25 @@ export default function RevisionDetails({
   refetchRevisions,
 }: RevisionDetailsProps) {
   const revisionTabs = [
-    { label: "Resources", content: <RevisionResource /> },
-    { label: "Manifests", content: <RevisionDiff /> },
-    { label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
-    { label: "Notes", content: <RevisionDiff /> },
+    { value: "resources", label: "Resources", content: <RevisionResource /> },
+    {
+      value: "manifests",
+      label: "Manifests",
+      content: <RevisionDiff tab="manifests" />,
+    },
+    {
+      value: "values",
+      label: "Values",
+      content: <RevisionDiff includeUserDefineOnly={true} tab="values" />,
+    },
+    { value: "notes", label: "Notes", content: <RevisionDiff tab="notes" /> },
   ];
   const [isChecking, setChecking] = useState(false);
   const [showTestsResults, setShowTestResults] = useState(false);
-  const { context, namespace, chart } = useParams();
+  const { context, namespace, chart, tab } = useParams();
+
+  const selectedTab =
+    revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
 
   const checkUpgradeable = async () => {
     try {
@@ -185,7 +196,7 @@ export default function RevisionDetails({
         <RevisionTag caption="cluster" text={context ?? ""} />
       </div>
       <span>{release.description}</span>
-      <Tabs tabs={revisionTabs} />
+      <Tabs tabs={revisionTabs} selectedTab={selectedTab} />
     </div>
   );
 }

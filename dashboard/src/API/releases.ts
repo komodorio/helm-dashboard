@@ -5,13 +5,18 @@ import {
   UseMutationOptions,
 } from "@tanstack/react-query";
 
-export function useGetInstalledReleases(
+export function useGetInstalledReleases(context: string,
   options?: UseQueryOptions<InstalledReleases[]>
 ) {
+
   return useQuery<InstalledReleases[]>(
     ["installedReleases"],
-    () => callApi<InstalledReleases[]>("/api/helm/releases"),
-    options
+    () => callApi<InstalledReleases[]>("/api/helm/releases", {
+      headers: {
+        "X-Kubecontext": context,
+      }
+    }),
+    options,
   );
 }
 
@@ -101,6 +106,7 @@ export function useGetResources(
 }
 
 export function useGetResourceDescription(
+  type: string,
   ns: string,
   name: string,
   options?: UseQueryOptions<string>
@@ -109,10 +115,29 @@ export function useGetResourceDescription(
     ["describe", ns, name],
     () =>
       callApi<string>(
-        `/api/k8s/statefulset/describe?name=${name}&namespace=${ns}`,
+        `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
+      ),
+    options
+  );
+}
+
+
+export function useGetReleaseInfoByType(
+  params: ReleaseInfoParams,
+  options?: UseQueryOptions<string>
+) {
+  const {chart, namespace, tab, revision} = params;
+  return useQuery<string>(
+    [tab, namespace, chart, revision],
+    () =>
+      callApi<string>(
+        `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}`,
+        {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        }, 'html'
       ),
     options
   );
@@ -156,6 +181,20 @@ export function useTestRelease(
 }
 
 // Request objects
+interface ReleaseInfoParams {
+  chart: string;
+  tab: string;
+  namespace: string;
+  revision: string;
+}
+interface InstallReleaseRequest {
+  name: string;
+  chart: string;
+  version?: string;
+  values?: string;
+  preview?: boolean;
+}
+
 interface InstallReleaseRequest {
   name: string;
   chart: string;
@@ -229,7 +268,7 @@ export interface Condition {
 
 export async function callApi<T>(
   url: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const baseUrl = "http://localhost:8080";
   const response = await fetch(baseUrl + url, options);
@@ -239,8 +278,8 @@ export async function callApi<T>(
       `An error occurred while fetching data: ${response.statusText}`
     );
   }
-
   let data;
+  
   if (response.headers.get("Content-Type")?.includes("text/plain")) {
     data = await response.text();
   } else {
