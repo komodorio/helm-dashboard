@@ -2,21 +2,26 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
+import { useEffect, useState } from "react";
 import Spinner from "../components/Spinner";
 
 function Installed() {
-  const { data: installedReleases, isLoading } = useGetInstalledReleases();
+  const [selectedCluster, setSelectedCluster] = useState<string>();
+  const [filterKey, setFilterKey] = useState<string>("");
+  const { data: installedReleases, isLoading, refetch }  = useGetInstalledReleases(selectedCluster || "", {retry: false});
+
+  useEffect(() => { refetch() }, [selectedCluster])
 
   return (
     <div className="flex flex-row">
-      <ClustersList installedReleases={installedReleases} />
+      <ClustersList selectedCluster={selectedCluster} setSelectedCluster={setSelectedCluster} installedReleases={installedReleases} />
       <div className="p-5 w-4/5">
-        <InstalledPackagesHeader installedPackages={installedReleases} />
+        <InstalledPackagesHeader isLoading={isLoading} installedPackages={installedReleases} setFilterKey={setFilterKey} />
 
         {isLoading ? (
           <Spinner />
         ) : (
-          <InstalledPackagesList installedReleases={installedReleases} />
+          <InstalledPackagesList installedReleases={installedReleases} filterKey={filterKey} />
         )}
       </div>
     </div>
