@@ -51,6 +51,13 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     );
   }, [searchValue]);
 
+  if (repository == undefined) {
+    return (<div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+          Looks like you don't have any repositories installed. You can add one
+          with the "Add Repository" button on the left side bar.
+        </div>)
+  }
+
   return (
     <div className="flex flex-col p-6 gap-3 bg-white drop-shadow-lg">
       <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
