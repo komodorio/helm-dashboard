@@ -11,12 +11,12 @@ function RepositoryPage() {
   };
 
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row m-5 gap-4">
       <RepositoriesList
         onRepositoryChanged={handleRepositoryChanged}
         selectedRepository={selectedRepository}
       />
-      <div className="p-5 w-4/5">
+      <div className="w-10/12">
         <RepositoryViewer repository={selectedRepository} />
       </div>
     </div>
