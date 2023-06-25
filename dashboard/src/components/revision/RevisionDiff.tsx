@@ -1,6 +1,8 @@
-import React, { ChangeEvent, useMemo, useState } from "react";
+import React, { ChangeEvent, useMemo, useState, useRef } from "react";
+import { Diff2HtmlUI, Diff2HtmlUIConfig } from 'diff2html/lib/ui/js/diff2html-ui-slim.js';
 import { useGetReleaseInfoByType } from "../../API/releases";
 import { useParams } from "react-router-dom";
+
 import hljs from "highlight.js";
 import { marked } from "marked";
 
@@ -10,21 +12,52 @@ type RevisionDiffProps = {
 
 function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const [notesContent, setNotesContent] = useState("view");
-
+  const diffElement = useRef<HTMLElement>({});
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
     setNotesContent(e.target.value);
   };
   const params = useParams();
   
-  const {data} = useGetReleaseInfoByType(params)
+  const additionalParams = useMemo(() => {
+      const revisionInt = parseInt(params.revision || '', 10)
+      if (notesContent === "diff-with-previous" && revisionInt > 1) {
+        return `&revisionDiff=${revisionInt - 1}`
+      }
+  }, [notesContent, params]);
+  const {data, isLoading} = useGetReleaseInfoByType(params, additionalParams)
 
-  const yamlContent = useMemo(() => {
-    if (data) {
-      const val = hljs.highlight(data, { language: "yaml" }).value;
-      return val;
+  const content = useMemo(() => {
+    if (data && !isLoading) {
+      switch (notesContent) {
+        case "view": {
+          const val = hljs.highlight(data, { language: "yaml" }).value;
+          return (
+            <pre
+              className="bg-white rounded p-3"
+              dangerouslySetInnerHTML={{
+                __html: marked(val),
+              }}
+            >
+              </pre>
+          );
+        }
+        case "diff-with-previous": {
+          const configuration : Diff2HtmlUIConfig = {
+          
+            matching: 'lines',
+            outputFormat: 'side-by-side',
+          
+            highlight: true,
+            renderNothingWhenEmpty: false,
+          };
+          const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
+          diff2htmlUi.draw();
+          diff2htmlUi.highlightCode();
+        }
+      }
     }
     return '';
-  }, [data]);
+  }, [data, notesContent, isLoading]);
 
   return (
     <div>
@@ -104,14 +137,8 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
           </div>
         )}
       </div>
-      <div className="bg-white w-full min-h-[200px]">
-        <pre
-          className="bg-white rounded p-3"
-          dangerouslySetInnerHTML={{
-            __html: marked(yamlContent),
-          }}
-        >
-          </pre>
+      <div className="bg-white w-full relative" ref={diffElement}>
+        {content}
       </div>
     </div>
   );
