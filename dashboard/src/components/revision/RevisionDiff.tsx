@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useMemo, useState, useRef } from "react";
+import React, { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
 import { Diff2HtmlUI, Diff2HtmlUIConfig } from 'diff2html/lib/ui/js/diff2html-ui-slim.js';
 import { useGetReleaseInfoByType } from "../../API/releases";
 import { useParams } from "react-router-dom";
@@ -12,6 +12,7 @@ type RevisionDiffProps = {
 
 function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const [notesContent, setNotesContent] = useState("view");
+  const [specificVersion, setSpecificVersion] = useState("1");
   const diffElement = useRef<HTMLElement>({});
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
     setNotesContent(e.target.value);
@@ -23,42 +24,42 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       if (notesContent === "diff-with-previous" && revisionInt > 1) {
         return `&revisionDiff=${revisionInt - 1}`
       }
-  }, [notesContent, params]);
+      const specificRevisionInt = parseInt(specificVersion || '', 10);
+      if (notesContent === "diff-with-specific-revision" && revisionInt > 1 && !Number.isNaN(specificRevisionInt)) {
+        return `&revisionDiff=${specificVersion}`
+      }
+  }, [notesContent, specificVersion, params]);
   const {data, isLoading} = useGetReleaseInfoByType(params, additionalParams)
 
   const content = useMemo(() => {
-    if (data && !isLoading) {
-      switch (notesContent) {
-        case "view": {
-          const val = hljs.highlight(data, { language: "yaml" }).value;
-          return (
-            <pre
-              className="bg-white rounded p-3"
-              dangerouslySetInnerHTML={{
-                __html: marked(val),
-              }}
-            >
-              </pre>
-          );
-        }
-        case "diff-with-previous": {
-          const configuration : Diff2HtmlUIConfig = {
-          
-            matching: 'lines',
-            outputFormat: 'side-by-side',
-          
-            highlight: true,
-            renderNothingWhenEmpty: false,
-          };
-          const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
-          diff2htmlUi.draw();
-          diff2htmlUi.highlightCode();
-        }
-      }
+    if (data && !isLoading && (notesContent === "view" || !additionalParams)) {  
+      return hljs.highlight(data, { language: "yaml" }).value;
     }
     return '';
   }, [data, notesContent, isLoading]);
 
+  useEffect(() => {
+    if (notesContent !== "view" && additionalParams && data && !isLoading) {
+      const configuration : Diff2HtmlUIConfig = {
+        
+        matching: 'lines',
+        outputFormat: 'side-by-side',
+      
+        highlight: true,
+        renderNothingWhenEmpty: false,
+      };
+      const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
+      diff2htmlUi.draw();
+      diff2htmlUi.highlightCode();
+      
+    } else if (notesContent === "view") {
+      diffElement.current.innerHTML = '';
+      
+    } else if (!additionalParams) {
+      diffElement.current.innerHTML = 'No Diff to present';
+      
+    }
+  }, [notesContent, additionalParams, data, isLoading]);
   return (
     <div>
       <div className="flex mb-3 p-2 border border-[#DCDDDF] flex-row items-center justify-between w-full bg-white rounded">
@@ -115,7 +116,8 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
               <input
                 className="border ml-2 border-gray-500 w-10 p-1 rounded-sm"
                 type="text"
-                value="1"
+                value={specificVersion}
+                onChange={e => setSpecificVersion(e.target.value)}
               ></input>
             </div>
           </label>
@@ -137,8 +139,18 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
           </div>
         )}
       </div>
+      {notesContent  === "view" && content ? (
+        <div className="bg-white w-full relative">
+          <pre
+          className="bg-white rounded p-3"
+          dangerouslySetInnerHTML={{
+            __html: marked(content),
+          }}
+        ></pre>  
+        </div>
+      ) : ''}
       <div className="bg-white w-full relative" ref={diffElement}>
-        {content}
+        
       </div>
     </div>
   );
