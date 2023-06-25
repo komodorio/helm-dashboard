@@ -101,6 +101,7 @@ export function useGetResources(
 }
 
 export function useGetResourceDescription(
+  type: string,
   ns: string,
   name: string,
   options?: UseQueryOptions<string>
@@ -109,7 +110,7 @@ export function useGetResourceDescription(
     ["describe", ns, name],
     () =>
       callApi<string>(
-        `/api/k8s/statefulset/describe?name=${name}&namespace=${ns}`,
+        `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }

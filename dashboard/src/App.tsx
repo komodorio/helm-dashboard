@@ -1,5 +1,5 @@
 import Header from "./layout/Header";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Route, Routes } from "react-router-dom";
 import "./index.css";
 import Installed from "./pages/Installed";
 import NotFound from "./pages/NotFound";
@@ -13,7 +13,7 @@ export default function App() {
   return (
     <div>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <HashRouter>
           <Header />
           <div className="bg-body-background h-screen ">
             <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen max-h-full overflow-y-auto ">
@@ -28,7 +28,7 @@ export default function App() {
               </Routes>
             </div>
           </div>
-        </BrowserRouter>
+        </HashRouter>
       </QueryClientProvider>
     </div>
   );
