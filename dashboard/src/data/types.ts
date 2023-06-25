@@ -33,7 +33,7 @@ export type Release = {
   id: string;
   name: string;
   namespace: string;
-  revision: string;
+  revision: number;
   updated: string;
   status: string;
   chart: string;

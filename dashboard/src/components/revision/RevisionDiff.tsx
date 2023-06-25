@@ -31,6 +31,14 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   }, [notesContent, specificVersion, params]);
   const {data, isLoading} = useGetReleaseInfoByType(params, additionalParams)
 
+  const yamlContent = useMemo(() => {
+    if (data) {
+      const val = hljs.highlight(data, { language: "yaml" }).value;
+      return val;
+    }
+    return '';
+  }, [data]);
+
   const content = useMemo(() => {
     if (data && !isLoading && (notesContent === "view" || !additionalParams)) {  
       return hljs.highlight(data, { language: "yaml" }).value;

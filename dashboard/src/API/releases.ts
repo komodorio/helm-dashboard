@@ -5,13 +5,18 @@ import {
   UseMutationOptions,
 } from "@tanstack/react-query";
 
-export function useGetInstalledReleases(
+export function useGetInstalledReleases(context: string,
   options?: UseQueryOptions<InstalledReleases[]>
 ) {
+
   return useQuery<InstalledReleases[]>(
     ["installedReleases"],
-    () => callApi<InstalledReleases[]>("/api/helm/releases"),
-    options
+    () => callApi<InstalledReleases[]>("/api/helm/releases", {
+      headers: {
+        "X-Kubecontext": context,
+      }
+    }),
+    options,
   );
 }
 
@@ -139,8 +144,9 @@ export function useGetReleaseInfoByType(
   );
 }
 
+
 // Rollback the release to a previous revision
-function useRollbackRelease(
+export function useRollbackRelease(
   options?: UseMutationOptions<
     void,
     unknown,
@@ -163,7 +169,7 @@ function useRollbackRelease(
 }
 
 // Run the tests on a release
-function useTestRelease(
+export function useTestRelease(
   options?: UseMutationOptions<void, unknown, { ns: string; name: string }>
 ) {
   return useMutation<void, unknown, { ns: string; name: string }>(

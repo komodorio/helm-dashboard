@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import { useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
@@ -31,41 +31,57 @@ const releaseRevisions: ReleaseRevision[] = [
   },
 ];
 
-const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) => (r1.revision - r2.revision < 0 ? 1 : -1)
-
+const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) =>
+  r1.revision - r2.revision < 0 ? 1 : -1;
 
 function Revision() {
   const { state: release } = useLocation();
-  const { revision = '', ...restParams } = useParams();
-  
+  const { revision = "", ...restParams } = useParams();
+
   const selectedRevision = revision ? parseInt(revision, 10) : 0;
 
-  const { data: releaseRevisions } = useQuery<ReleaseRevision[]>({
+  const { data: releaseRevisions, refetch: refetchRevisions } = useQuery<
+    ReleaseRevision[]
+  >({
     queryKey: ["releasesHisotry", restParams],
     queryFn: apiService.getReleasesHistory,
   });
-  const sortedReleases = useMemo(() => releaseRevisions?.sort(descendingSort), [releaseRevisions]);
-  
+  const sortedReleases = useMemo(
+    () => releaseRevisions?.sort(descendingSort),
+    [releaseRevisions]
+  );
+
   const selectedRelease = useMemo(() => {
     if (selectedRevision && releaseRevisions) {
-
-      return releaseRevisions.find((r : ReleaseRevision) => r.revision === selectedRevision);
+      return releaseRevisions.find(
+        (r: ReleaseRevision) => r.revision === selectedRevision
+      );
     }
     return null;
   }, [releaseRevisions, selectedRevision]);
   if (!releaseRevisions) return <></>;
-  
+
   return (
     <div className="flex">
       <div className="flex flex-col gap-2 w-1/6 h-screen bg-[#E8EDF2]">
         <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">
           Revisions
         </label>
-        <RevisionsList releaseRevisions={sortedReleases} selectedRevision={selectedRevision} />
+        <RevisionsList
+          releaseRevisions={sortedReleases}
+          selectedRevision={selectedRevision}
+        />
       </div>
 
       <div className="w-full h-screen bg-[#F4F7FA]">
-        {selectedRelease ? <RevisionDetails release={selectedRelease} /> : ''}
+        {selectedRelease ? (
+          <RevisionDetails
+            release={selectedRelease}
+            refetchRevisions={refetchRevisions}
+          />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

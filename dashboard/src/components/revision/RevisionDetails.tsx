@@ -1,21 +1,26 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   BsPencil,
   BsTrash3,
   BsHourglassSplit,
   BsArrowRepeat,
+  BsCheckCircle,
 } from "react-icons/bs";
 import { Release } from "../../data/types";
-import UninstallModal from "../modal/UninstallModal";
 import StatusLabel from "../common/StatusLabel";
 import { useParams } from "react-router-dom";
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
-import { callApi, useGetResources } from "../../API/releases";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useGetResources,
+  useRollbackRelease,
+  useTestRelease,
+} from "../../API/releases";
+import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
+import Spinner from "../Spinner";
 
 type RevisionTagProps = {
   caption: string;
@@ -24,9 +29,13 @@ type RevisionTagProps = {
 
 type RevisionDetailsProps = {
   release: Release;
+  refetchRevisions: () => void;
 };
 
-export default function RevisionDetails({ release }: RevisionDetailsProps) {
+export default function RevisionDetails({
+  release,
+  refetchRevisions,
+}: RevisionDetailsProps) {
   const revisionTabs = [
     { value: 'resources', label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff tab="manifests" /> },
@@ -37,6 +46,7 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
   const { context, namespace, chart, tab } = useParams();
 
   const selectedTab = revisionTabs.find(t => t.value === tab) || revisionTabs[0];
+  const [showTestsResults, setShowTestResults] = useState(false);
 
   const checkUpgradeable = async () => {
     try {
@@ -67,10 +77,13 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
     console.error("checkUpgradeable not implemented"); //todo: implement
   };
 
-  const runTests = () => {};
-
-  const rollback = () => {
-    throw new Error("not implemented");
+  const {
+    mutate: runTests,
+    isLoading: isRunningTests,
+    data: testResults,
+  } = useTestRelease();
+  const handleRunTests = () => {
+    setShowTestResults(true);
   };
 
   const checkForNewVersion = () => {
@@ -106,14 +119,43 @@ export default function RevisionDetails({ release }: RevisionDetailsProps) {
               check for new version
             </a>
           </div>
-          <div className="h-1/2">
-            <button onClick={rollback}>
-              <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                <BsArrowRepeat />
-                Rollback to #1
-              </span>
-            </button>
-          </div>
+
+          {release.namespace && release.chartName ? (
+            <>
+              {" "}
+              <div className="h-1/2">
+                <button onClick={handleRunTests}>
+                  <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+                    <BsCheckCircle />
+                    Run tests
+                  </span>
+                </button>
+              </div>
+              <Modal
+                title="Tests results"
+                isOpen={showTestsResults}
+                onClose={() => setShowTestResults(false)}
+                actions={[
+                  {
+                    id: "1",
+                    text: isRunningTests ? "Testing..." : "Run tests",
+                    callback: () => {
+                      runTests({
+                        ns: release.namespace,
+                        name: release.chartName,
+                      });
+                    },
+                    variant: ModalButtonStyle.success,
+                    disabled: isRunningTests,
+                  },
+                ]}
+              >
+                {isRunningTests ? <Spinner /> : testResults ?? null}
+              </Modal>{" "}
+            </>
+          ) : null}
+
+          <Rollback release={release} refetchRevisions={refetchRevisions} />
           <div className="h-1/2">
             <Uninstall />
           </div>
@@ -159,7 +201,72 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
   );
 }
 
-const RunTests = () => {};
+const Rollback = ({
+  release,
+  refetchRevisions,
+}: {
+  release: Release;
+  refetchRevisions: () => void;
+}) => {
+  const { namespace, chart } = useParams();
+
+  const [showRollbackDiff, setShowRollbackDiff] = useState(false);
+  const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
+    useRollbackRelease({
+      onSettled: () => {
+        console.log("settled");
+        refetchRevisions();
+      },
+    });
+  const handleRollback = () => {
+    setShowRollbackDiff(true);
+  };
+
+  const rollbackTitle = (
+    <div className="font-semibold text-lg">
+      Rollback <span className="text-red-500">{chart}</span> from revision{" "}
+      {release.revision} to {release.revision - 1}
+    </div>
+  );
+
+  if (release.revision <= 1) return null;
+
+  return (
+    <>
+      <div className="h-1/2">
+        <button onClick={handleRollback}>
+          <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+            <BsArrowRepeat />
+            Rollback to #{release.revision - 1}
+          </span>
+        </button>
+      </div>
+      <Modal
+        title={rollbackTitle}
+        isOpen={showRollbackDiff}
+        onClose={() => setShowRollbackDiff(false)}
+        actions={[
+          {
+            id: "1",
+            text: isRollingBackRelease ? "Rolling back..." : "Rollback",
+            callback: () => {
+              rollbackRelease({
+                ns: namespace,
+                name: String(chart),
+                revision: release.revision,
+              });
+              setShowRollbackDiff(false);
+            },
+            variant: ModalButtonStyle.success,
+            disabled: isRollingBackRelease,
+          },
+        ]}
+      >
+        Display diff here
+      </Modal>{" "}
+    </>
+  );
+};
 
 const Uninstall = () => {
   const [isOpen, setIsOpen] = useState(false);
