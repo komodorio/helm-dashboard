@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
 import { callApi } from "../../API/releases";
+import Spinner from "../Spinner";
 
 interface FormKeys {
   name: string;
@@ -48,7 +49,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             className="text-white font-bold px-3 py-1.5 bg-[#1347FF] hover:bg-[#0b5ed7] focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             onClick={addRepository}
           >
-            Add Repository
+            {isLoading ? <Spinner/> : "Add Repository"}
           </button>
         </div>
       }
