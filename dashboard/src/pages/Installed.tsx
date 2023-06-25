@@ -3,10 +3,11 @@ import InstalledPackagesList from "../components/InstalledPackages/InstalledPack
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
 import { useState } from "react";
+import Spinner from "../components/Spinner";
 
 function Installed() {
   const [selectedCluster, setSelectedCluster] = useState<string>();
-  const { data: installedReleases } = useGetInstalledReleases({ });
+  const { data: installedReleases, isLoading } = useGetInstalledReleases();
 
   return (
     <div className="flex flex-row">
@@ -14,7 +15,11 @@ function Installed() {
       <div className="p-5 w-4/5">
         <InstalledPackagesHeader installedPackages={installedReleases} />
 
-        <InstalledPackagesList installedReleases={installedReleases} />
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <InstalledPackagesList installedReleases={installedReleases} />
+        )}
       </div>
     </div>
   );

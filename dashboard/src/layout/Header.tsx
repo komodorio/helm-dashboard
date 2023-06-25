@@ -14,9 +14,7 @@ import axios from "axios";
 import { useGetApplicationStatus } from "../API/other";
 
 export default function Header() {
-  const { data: statusData } = useGetApplicationStatus()
-
-  console.log(statusData);
+  const { data: statusData } = useGetApplicationStatus();
 
   function isNewerVersion(oldVersion: string, newVersion: string) {
     oldVersion = oldVersion?.replace("v", "");
@@ -64,7 +62,7 @@ export default function Header() {
         </NavLink>
         <span className="w-[1px] h-3/4 bg-gray-200" />
         <div className="inline-block">
-          <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-normal md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <NavLink
                 to="/"
@@ -142,6 +140,8 @@ export default function Header() {
             <a
               href="https://komodor.com/helm-dash/"
               className="text-[#0d6efd] font-bold"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <div className="flex items-center gap-2">
                 Upgrade your HELM experience - Free

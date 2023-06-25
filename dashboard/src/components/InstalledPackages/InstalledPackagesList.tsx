@@ -12,7 +12,7 @@ export default function InstalledPackagesList({
     <div>
       {installedReleases?.map((installedPackage: Release) => (
         <InstalledPackageCard
-          key={installedPackage.id}
+          key={installedPackage.name}
           release={installedPackage}
         />
       ))}

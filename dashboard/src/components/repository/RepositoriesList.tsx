@@ -1,8 +1,8 @@
 import { useState } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import { Repository } from "../../data/types";
-import { useQuery } from "@tanstack/react-query";
-import apiService from "../../API/apiService";
+import { useGetRepositories } from "../../API/repositories";
+import { HelmRepositories } from "../../API/interfaces";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
@@ -15,11 +15,13 @@ function RepositoriesList({
 }: RepositoriesListProps) {
   const [showAddRepositoryModal, setShowAddRepositoryModal] = useState(false);
 
-  const { data: repositories } = useQuery<Repository[]>({
-    queryKey: ["repositories"],
-    queryFn: apiService.getRepositories,
-    onSuccess: (data: Repository[]) => {
-      onRepositoryChanged(data[0]);
+  const { data: repositories } = useGetRepositories({
+    onSuccess: (data: HelmRepositories) => {
+      const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (sortedData && sortedData.length > 0 && !selectedRepository) {
+        onRepositoryChanged(sortedData[0]);
+      }
     },
   });
 
@@ -28,27 +30,26 @@ function RepositoriesList({
       <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5 gap-3">
         <label className="font-bold">Repositories</label>
         <div className="flex flex-col gap-1">
-          {repositories
-            ?.sort((a, b) => a.name.localeCompare(b.name))
-            .map((repository) => (
-              <span
-                className="flex items-center"
-                key={repository.url}
-                onClick={() => {
-                  onRepositoryChanged(repository);
-                }}
-              >
-                <input
-                  className="cursor-pointer"
-                  type="radio"
-                  id={repository.url}
-                  value={repository.name}
-                  checked={repository.url === selectedRepository?.url}
-                  name="clusters"
-                />
-                <label className="ml-1">{repository.name}</label>
-              </span>
-            ))}
+          {repositories?.map((repository) => (
+            <span
+              className="flex items-center"
+              key={repository.url}
+              onClick={() => {
+                onRepositoryChanged(repository);
+              }}
+              title={repository.url}
+            >
+              <input
+                className="cursor-pointer"
+                type="radio"
+                id={repository.url}
+                value={repository.name}
+                checked={repository.url === selectedRepository?.url}
+                name="clusters"
+              />
+              <label className="ml-1">{repository.name}</label>
+            </span>
+          ))}
         </div>
         <button
           type="button"
