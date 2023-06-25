@@ -1,6 +1,7 @@
 import { InstalledReleases } from "../../API/releases";
 import HeaderLogo from "../../assets/packges-header.svg";
 import { Release } from "../../data/types";
+import useAlertError from "../../hooks/useAlertError";
 
 type InstalledPackagesHeaderProps = {
   installedPackages?: InstalledReleases[];
@@ -9,7 +10,6 @@ type InstalledPackagesHeaderProps = {
 export default function InstalledPackagesHeader({
   installedPackages,
 }: InstalledPackagesHeaderProps) {
-
   const numOfPackages = installedPackages?.length;
   const showNoPackageAlert = Boolean(numOfPackages !== undefined && numOfPackages == 0);
 
