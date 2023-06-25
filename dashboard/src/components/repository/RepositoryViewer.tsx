@@ -8,12 +8,14 @@ import Spinner from "../Spinner";
 import { useDeleteRepo, useUpdateRepo } from "../../API/repositories";
 import useAlertError from "../../hooks/useAlertError";
 import { callApi } from "../../API/releases";
+import { useMemo, useState } from "react";
 
 type RepositoryViewerProps = {
   repository: Repository | undefined;
 };
 
 function RepositoryViewer({ repository }: RepositoryViewerProps) {
+  const [searchValue, setSearchValue] = useState("");
   const { data: charts, isLoading } = useQuery<Chart[]>({
     queryKey: ["charts", repository],
     queryFn: apiService.getRepositoryCharts,
@@ -40,43 +42,56 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
   const numOfCharts = charts?.length;
   const showNoChartsAlert = Boolean(!numOfCharts && numOfCharts == 0);
+  const filteredCharts = useMemo(() => {
+    return charts?.filter((ch: Chart) =>
+      ch.name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }, [searchValue]);
 
   return (
-    <div className="flex flex-col px-16 pt-5 gap-3 bg-white drop-shadow-lg">
+    <div className="flex flex-col p-6 gap-3 bg-white drop-shadow-lg">
       <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
       <div className="flex justify-between">
-        <span className="text-[#3d4048] text-4xl">{repository?.name}</span>
+        <span className="text-[#3d4048] text-4xl font-semibold">{repository?.name}</span>
 
-        <div className="flex flex-row gap-3">
+        <div className="flex flex-col">
+          <div className="flex flex-row gap-2">
           <button onClick={() => update.mutateAsync().catch((e) => alert.setShowErrorModal({ msg: e.message, title: "Unable to update" }))}>
-            <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+            <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
               <BsArrowRepeat />
               Update
             </span>
           </button>
           <button onClick={removeRepository}>
-            <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+            <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
               <BsTrash3 />
               Remove
             </span>
           </button>
         </div>
+          <input
+              onChange={(e) => setSearchValue(e.target.value)}
+              type="text"
+              placeholder="Filter..."
+              className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
+          />
+      </div>
       </div>
       <span className="text-[#3d4048] text-sm bg-[#D6EFFE] px-3 py-1 rounded-md self-start">
         URL:{" "}
         <span className="font-bold">{repository?.url}</span>
       </span>
 
-      <div className="bg-[#ECEFF2] grid grid-cols-5 text-xs font-bold p-2 px-4 rounded-md">
+      <div className="bg-[#ECEFF2] grid grid-cols-6 text-xs font-bold p-2 px-4 mt-4 rounded-md">
         <span className="col-span-1">CHART NAME</span>
-        <span className="col-span-2">DESCRIPTION</span>
-        <span className="col-span-1">VERSION</span>
-        <span className="col-span-1"></span>
+        <span className="col-span-3">DESCRIPTION</span>
+        <span className="col-span-1 text-center">VERSION</span>
+        <span className="col-span-1 text-center"></span>
       </div>
       {isLoading ? (
         <Spinner />
       ) : (
-        charts?.map((chart: Chart) => (
+        (filteredCharts || charts)?.map((chart: Chart) => (
           <ChartViewer key={chart.name} chart={chart} />
         ))
       )}
