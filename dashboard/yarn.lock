@@ -8834,6 +8834,13 @@
     "is-plain-object" "5.0.0"
     "react-is" "17.0.2"
 
+"react-error-boundary@^4.0.10":
+  "integrity" "sha512-pvVKdi77j2OoPHo+p3rorgE43OjDWiqFkaqkJz8sJKK6uf/u8xtzuaVfj5qJ2JnDLIgF1De3zY5AJDijp+LVPA=="
+  "resolved" "https://registry.npmjs.org/react-error-boundary/-/react-error-boundary-4.0.10.tgz"
+  "version" "4.0.10"
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+
 "react-icons@^4.8.0":
   "integrity" "sha512-N6+kOLcihDiAnj5Czu637waJqSnwlMNROzVZMhfX68V/9bu9qHaMIJC4UdozWoOk57gahFCNHwVvWzm0MTzRjg=="
   "resolved" "https://registry.npmjs.org/react-icons/-/react-icons-4.8.0.tgz"

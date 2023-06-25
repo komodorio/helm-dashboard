@@ -12,7 +12,6 @@ export default function InstalledPackagesHeader({
   setFilterKey,
   isLoading
 }: InstalledPackagesHeaderProps) {
-
   const numOfPackages = installedPackages?.length;
   const showNoPackageAlert = Boolean(!isLoading && (numOfPackages == undefined || numOfPackages == 0));
   return (
