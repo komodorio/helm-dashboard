@@ -5,13 +5,18 @@ import {
   UseMutationOptions,
 } from "@tanstack/react-query";
 
-export function useGetInstalledReleases(
+export function useGetInstalledReleases(context: string,
   options?: UseQueryOptions<InstalledReleases[]>
 ) {
+
   return useQuery<InstalledReleases[]>(
     ["installedReleases"],
-    () => callApi<InstalledReleases[]>("/api/helm/releases"),
-    options
+    () => callApi<InstalledReleases[]>("/api/helm/releases", {
+      headers: {
+        "X-Kubecontext": context,
+      }
+    }),
+    options,
   );
 }
 
