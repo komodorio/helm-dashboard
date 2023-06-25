@@ -3,23 +3,44 @@ package dashboard
 import (
 	"context"
 	"embed"
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	log "github.com/sirupsen/logrus"
 	"html"
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	log "github.com/sirupsen/logrus"
 )
 
 //go:embed static/*
 var staticFS embed.FS
+// Middleware for CORS
+func corsMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
+        // Handle preflight requests
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(http.StatusOK)
+            return
+        }
+
+        c.Next()
+    }
+}
 func noCache(c *gin.Context) {
 	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
 		c.Header("Cache-Control", "no-cache")
 	}
+
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
 	c.Next()
 }
 
@@ -77,6 +98,7 @@ func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool)
 	api.Use(contextSetter(data))
 	api.Use(noCache)
 	api.Use(errorHandler)
+	api.Use(corsMiddleware())
 
 	if os.Getenv("HD_CORS") != "" {
 		api.Use(allowCORS)

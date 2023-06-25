@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChartVersion, Release } from "../../data/types";
+import { ChartVersion, Cluster, Release } from "../../data/types";
 import { BsArrowUpCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
@@ -20,6 +20,11 @@ export default function InstalledPackageCard({
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(true);
 
+  const { data: clusters } = useQuery<Cluster[]>({
+    queryKey: ["clusters"],
+    queryFn: () => apiService.getClusters(),
+  });
+
   const { data: latestVersionResult } = useQuery<ChartVersion>({
     queryKey: ["chartName", release.chartName],
     queryFn: () => apiService.getRepositoryLatestVersion(release.chartName),
@@ -33,8 +38,17 @@ export default function InstalledPackageCard({
   };
 
   const handleOnClick = () => {
+    const { name, namespace } = release;
+    const selectedCluster = clusters?.find((cluster) => cluster.IsCurrent);
+
+    if (!selectedCluster) {
+      throw new Error(
+        "Couldn't find selected cluster! cannot navigate to revision page"
+      );
+    }
+
     navigate(
-      `/revision/${"docker-desktop"}/${"default"}/${release.name}/${
+      `/revision/${selectedCluster?.Name}/${namespace}/${name}/${
         release.revision
       }/${"resources"}`,
       { state: release }

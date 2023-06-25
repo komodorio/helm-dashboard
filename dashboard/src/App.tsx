@@ -15,8 +15,8 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Header />
-          <div className="bg-body-background h-screen">
-            <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen">
+          <div className="bg-body-background h-screen ">
+            <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen max-h-full overflow-y-auto ">
               <Routes>
                 <Route path="/" element={<Installed />} />
                 <Route

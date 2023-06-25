@@ -1,8 +1,8 @@
 import { useState } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import { Repository } from "../../data/types";
-import { useQuery } from "@tanstack/react-query";
-import apiService from "../../API/apiService";
+import { useGetRepositories } from "../../API/repositories";
+import { HelmRepositories } from "../../API/interfaces";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
@@ -15,11 +15,13 @@ function RepositoriesList({
 }: RepositoriesListProps) {
   const [showAddRepositoryModal, setShowAddRepositoryModal] = useState(false);
 
-  const { data: repositories } = useQuery<Repository[]>({
-    queryKey: ["repositories"],
-    queryFn: apiService.getRepositories,
-    onSuccess: (data: Repository[]) => {
-      onRepositoryChanged(data[0]);
+  const { data: repositories } = useGetRepositories({
+    onSuccess: (data: HelmRepositories) => {
+      const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (sortedData && sortedData.length > 0 && !selectedRepository) {
+        onRepositoryChanged(sortedData[0]);
+      }
     },
   });
 
@@ -35,6 +37,7 @@ function RepositoriesList({
               onClick={() => {
                 onRepositoryChanged(repository);
               }}
+              title={repository.url}
             >
               <input
                 className="cursor-pointer"

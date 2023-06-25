@@ -1,10 +1,4 @@
-import {
-  Chart,
-  ChartVersion,
-  Release,
-  ReleaseRevision,
-  Repository,
-} from "../data/types";
+import { Chart, ChartVersion, Release, Repository } from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
@@ -83,7 +77,7 @@ class ApiService {
     if (release == undefined) return null;
 
     const response = await fetch(
-      `${this.baseUrl}/api/helm/releases/${release.namespace}/${release.chartName}/history`
+      `${this.baseUrl}/api/helm/releases/${release.namespace}/${release.name}/history`
     );
     const data = await response.json();
 
@@ -105,10 +99,10 @@ class ApiService {
   };
 }
 
-let baseURL = ""
+let baseURL = "";
 
 if (import.meta.env.DEV) {
-  baseURL = "http://localhost:8080"
+  baseURL = "http://localhost:8080";
 }
 
 const apiService = new ApiService(baseURL);

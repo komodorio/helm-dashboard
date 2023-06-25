@@ -1,36 +1,23 @@
 import { BsPower } from "react-icons/bs";
-import { useState } from "react";
+
 import Modal from "./modal/Modal";
-import axios from "axios";
+import { useShutdownHelmDashboard } from "../API/other";
 
 function ShutDownButton() {
-  const onClose = () => {
-    console.log("close button clicked");
-  };
-  const [signOut, setSignOut] = useState(false);
+  const { mutate: signOut, status } = useShutdownHelmDashboard();
 
   const handleClick = async () => {
-    await axios
-      .delete("/")
-      .then(() => {
-        setSignOut(true);
-        window.close();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    signOut();
   };
 
   return (
-    <div className="ShutDownButton">
-      {signOut && (
-        <Modal title={"Session Ended"} isOpen={true} onClose={onClose}>
-          <p>
-            The Helm Dashboard application has been shutdown. You can now close
-            the browser tab.
-          </p>
-        </Modal>
-      )}
+    <div>
+      <Modal title="Session Ended" isOpen={status === "error"}>
+        <p>
+          The Helm Dashboard application has been shut down. You can now close
+          the browser tab.
+        </p>
+      </Modal>
 
       <button
         onClick={handleClick}

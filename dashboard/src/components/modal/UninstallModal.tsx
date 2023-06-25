@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
+import { StructuredResources } from "../../API/releases";
+import Button from "../Button";
 import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
-
-interface UninstallResource {
-  id: string;
-  type: string;
-  name: string;
-}
 
 interface UninstallModalProps {
   isOpen: boolean;
   onConfirm: () => void;
   uninstallTarget: string;
   namespace: string;
-  resources: UninstallResource[];
+  resources: StructuredResources[];
+  onClose: () => void;
 }
 
 export default function UninstallModal({
@@ -21,6 +18,7 @@ export default function UninstallModal({
   uninstallTarget,
   namespace,
   resources,
+  onClose,
 }: UninstallModalProps) {
   const uninstallTitle = (
     <div className="font-bold text-2xl">
@@ -47,17 +45,19 @@ export default function UninstallModal({
     <Modal
       title={uninstallTitle}
       isOpen={isOpen}
-      onClose={onConfirm}
+      onClose={onClose}
       actions={confirmModalActions}
     >
       <div>Following resources will be deleted from the cluster:</div>
       <div>
         {resources.map((resource) => (
-          <div key={resource.id} className="flex gap-7 w-100 mb-3">
+          <div className="flex gap-7 w-100 mb-3">
             <span className="text-right w-1/5 font-medium italic">
-              {resource.type}
+              {resource.kind}
             </span>
-            <span className="text-left w-4/5 font-bold">{resource.name}</span>
+            <span className="text-left w-4/5 font-bold">
+              {resource.metadata.name}
+            </span>
           </div>
         ))}
       </div>
