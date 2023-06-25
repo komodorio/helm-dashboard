@@ -55,7 +55,6 @@ function DropDown({ items }: DropDownProps) {
       <div className="relative flex flex-col items-center">
         <button
           onClick={(e) => {
-            console.log(e);
             setPopupState((prev) => ({
               ...prev,
               isOpen: !prev.isOpen,

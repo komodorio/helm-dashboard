@@ -241,7 +241,6 @@ const Rollback = ({
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
-        console.log("settled");
         refetchRevisions();
       },
     });
