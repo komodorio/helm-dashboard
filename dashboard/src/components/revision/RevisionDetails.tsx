@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BsPencil,
   BsTrash3,
@@ -8,32 +8,33 @@ import {
 } from "react-icons/bs";
 import { Release } from "../../data/types";
 import UninstallModal from "../modal/UninstallModal";
-import RevisionTabs from "./RevisionTabs";
 import StatusLabel from "../common/StatusLabel";
 import { useParams } from "react-router-dom";
+import RevisionDiff from "./RevisionDiff";
+import RevisionResource from "./RevisionResource";
+import Tabs from "../Tabs";
+import { callApi, useGetResources } from "../../API/releases";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import Modal, { ModalButtonStyle } from "../modal/Modal";
 
 type RevisionTagProps = {
   caption: string;
   text: string;
 };
 
-function RevisionTag({ caption, text }: RevisionTagProps) {
-  return (
-    <span className="bg-[#d6effe] px-2">
-      <span>{caption}:</span>
-      <span className="font-bold"> {text}</span>
-    </span>
-  );
-}
-
 type RevisionDetailsProps = {
   release: Release;
 };
 
-function RevisionDetails({ release }: RevisionDetailsProps) {
-  const [isOpenUninstallModal, setIsOpenUninstallModal] = useState(false);
+export default function RevisionDetails({ release }: RevisionDetailsProps) {
+  const revisionTabs = [
+    { label: "Resources", content: <RevisionResource /> },
+    { label: "Manifests", content: <RevisionDiff /> },
+    { label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
+    { label: "Notes", content: <RevisionDiff /> },
+  ];
   const [isChecking, setChecking] = useState(false);
-  const { context, namespace } = useParams();
+  const { context, namespace, chart } = useParams();
 
   const checkUpgradeable = async () => {
     try {
@@ -57,25 +58,6 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
         //     btnUpgradeCheck.text("Check for new version")
         elm = data[0];
       }
-
-      // $("#btnUpgrade .icon").removeClass("bi-arrow-up bi-pencil").addClass("bi-hourglass-split")
-      // const verCur = $("#specRev").data("last-chart-ver");
-      // btnUpgradeCheck.data("repo", elm.repository)
-      // btnUpgradeCheck.data("chart", elm.name)
-
-      // const canUpgrade = isNewerVersion(verCur, elm.version);
-      // btnUpgradeCheck.prop("disabled", false)
-      // if (canUpgrade) {
-      //     $("#btnUpgrade span").text("Upgrade to " + elm.version)
-      //     $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-arrow-up")
-      // } else {
-      //     $("#btnUpgrade span").text("Reconfigure")
-      //     $("#btnUpgrade .icon").removeClass("bi-hourglass-split").addClass("bi-pencil")
-      // }
-
-      // $("#btnUpgrade").off("click").click(function () {
-      //     popUpUpgrade(elm, getHashParam("namespace"), getHashParam("chart"), verCur, $("#specRev").data("last-rev"))
-      // })
     } catch (error) {
       //errorAlert-"Failed to find chart in repo"
     }
@@ -83,9 +65,7 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
     console.error("checkUpgradeable not implemented"); //todo: implement
   };
 
-  const unInstall = () => {
-    setIsOpenUninstallModal(true);
-  };
+  const runTests = () => {};
 
   const rollback = () => {
     throw new Error("not implemented");
@@ -95,16 +75,11 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
     throw new Error("checkForNewVersion not implemented"); //todo: implement
   };
 
-  const unInstallConfirmed = () => {
-    setIsOpenUninstallModal(false);
-    throw new Error("unInstallConfirmed not implemented"); //todo: implement
-  };
-
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
       <StatusLabel status="deployed" />
       <div className="flex justify-between">
-        <span className="text-[#3d4048] text-4xl">airFlow</span>
+        <span className="text-[#3d4048] text-4xl">{chart}</span>
         <div className="flex flex-row gap-3">
           <div className="flex flex-col">
             <button onClick={checkUpgradeable}>
@@ -138,12 +113,7 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
             </button>
           </div>
           <div className="h-1/2">
-            <button onClick={unInstall}>
-              <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                <BsTrash3 />
-                Uninstall
-              </span>
-            </button>
+            <Uninstall />
           </div>
         </div>
       </div>
@@ -165,27 +135,102 @@ function RevisionDetails({ release }: RevisionDetailsProps) {
       </div>
       <div className="flex flex-wrap gap-4">
         <RevisionTag caption="chart version" text={release.chart} />
-        <RevisionTag caption="app version" text={release.app_version} />
+        <RevisionTag
+          caption="app version"
+          text={release.app_version || "N/A"}
+        />
         <RevisionTag caption="namespace" text={namespace ?? ""} />
         <RevisionTag caption="cluster" text={context ?? ""} />
       </div>
       <span>{release.description}</span>
-      <RevisionTabs />
-      <UninstallModal
-        uninstallTarget="airflow"
-        namespace="default"
-        isOpen={isOpenUninstallModal}
-        resources={[
-          { id: "1", type: "ServiceAccount", name: "airflow-redis" },
-          { id: "2", type: "Secret", name: "postgresql" },
-          { id: "3", type: "Secret", name: "airflow-redis" },
-          { id: "4", type: "Secret", name: "airflow" },
-          { id: "5", type: "ConfigMap", name: "airflow-redis-configuration" },
-        ]}
-        onConfirm={unInstallConfirmed}
-      />
+      <Tabs tabs={revisionTabs} />
     </div>
   );
 }
 
-export default RevisionDetails;
+function RevisionTag({ caption, text }: RevisionTagProps) {
+  return (
+    <span className="bg-[#d6effe] px-2">
+      <span>{caption}:</span>
+      <span className="font-bold"> {text}</span>
+    </span>
+  );
+}
+
+const RunTests = () => {};
+
+const Uninstall = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { namespace = "", chart = "" } = useParams();
+  const { data: resources } = useGetResources(namespace, chart, {
+    enabled: isOpen,
+  });
+
+  const uninstallMutation = useMutation(
+    ["uninstall", namespace, chart],
+    () =>
+      fetch(
+        // Todo: Change to BASE_URL from env
+        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        {
+          method: "delete",
+        }
+      ),
+    {
+      onSuccess: () => {
+        window.location.href = "/";
+      },
+      onError: (error, variables, context) => {
+        // An error happened!
+        console.log(`rolling back optimistic update with id `);
+      },
+    }
+  );
+  const uninstallTitle = (
+    <div className="font-semibold text-lg">
+      Uninstall <span className="text-red-500">{chart}</span> from namespace{" "}
+      <span className="text-red-500">{namespace}</span>
+    </div>
+  );
+
+  return (
+    <>
+      <button onClick={() => setIsOpen(true)}>
+        <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+          <BsTrash3 />
+          Uninstall
+        </span>
+      </button>
+      {resources?.length ? (
+        <Modal
+          title={uninstallTitle}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          actions={[
+            {
+              id: "1",
+              text: uninstallMutation.isLoading
+                ? "Uninstalling..."
+                : "Uninstall",
+              callback: uninstallMutation.mutate,
+              variant: ModalButtonStyle.error,
+              disabled: uninstallMutation.isLoading,
+            },
+          ]}
+        >
+          <div>Following resources will be deleted from the cluster:</div>
+          <div>
+            {resources?.map((resource) => (
+              <div className="flex justify-start gap-1 w-full mb-3">
+                <span className=" w-1/5  italic">{resource.kind}</span>
+                <span className=" w-4/5 font-semibold">
+                  {resource.metadata.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Modal>
+      ) : null}
+    </>
+  );
+};

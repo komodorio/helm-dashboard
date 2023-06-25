@@ -17,8 +17,10 @@ module.exports = {
     },
   },
   plugins: [],
+
   fontFamily: {
     sans: ["Graphik", "sans-serif"],
     serif: ["Merriweather", "serif"],
+    roboto: ['Roboto', 'sans-serif'],
   },
 };

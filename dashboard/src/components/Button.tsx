@@ -16,16 +16,20 @@
 import React from "react";
 // this is a type declaration for the action prop.
 // it is a function that takes a string as an argument and returns void.
-export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement>{
+export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   onClick: () => void;
+  className?: string;
 }
 export default function Button(props: ButtonProps): JSX.Element {
   return (
     <>
       <button
         onClick={props.onClick}
-        className="border border-gray-500 bg-gray-100 hover:bg-gray-200 text-black  py-2 px-4 rounded"
+        className={
+          "border border-gray-500 bg-gray-100 hover:bg-gray-200 text-black  py-2 px-4 rounded " +
+            props.className || ""
+        }
       >
         {props.children}
       </button>

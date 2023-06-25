@@ -62,7 +62,7 @@ export default function Header() {
         </NavLink>
         <span className="w-[1px] h-3/4 bg-gray-200" />
         <div className="inline-block">
-          <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-normal md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <ul className=" flex md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <NavLink
                 to="/"

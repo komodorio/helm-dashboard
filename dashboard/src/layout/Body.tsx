@@ -4,7 +4,7 @@ import Body_header from "./Body_header";
 
 export default function Body() {
   return (
-    <div className="bg-[url('../assets/body-background.svg)] bg-cover bg-body-background w-full h-screen">
+    <div className="bg-[url('../assets/body-background.svg)] bg-cover bg-body-background w-full h-screen max-h-screen overflow-y-auto">
       <Body_header />
       <Body_content />
     </div>
