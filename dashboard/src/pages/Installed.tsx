@@ -8,7 +8,7 @@ import Spinner from "../components/Spinner";
 function Installed() {
   const [selectedCluster, setSelectedCluster] = useState<string>();
   const [filterKey, setFilterKey] = useState<string>("");
-  const { data: installedReleases, isLoading, refetch }  = useGetInstalledReleases(selectedCluster || "");
+  const { data: installedReleases, isLoading, refetch }  = useGetInstalledReleases(selectedCluster || "", {retry: false});
 
   useEffect(() => { refetch() }, [selectedCluster])
 
