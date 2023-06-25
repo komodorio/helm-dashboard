@@ -16,6 +16,7 @@ type RepositoryViewerProps = {
 
 function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const [searchValue, setSearchValue] = useState("");
+  const [isRemoveLoading, setIsRemove] = useState(false);
   const { data: charts, isLoading } = useQuery<Chart[]>({
     queryKey: ["charts", repository],
     queryFn: apiService.getRepositoryCharts,
@@ -28,6 +29,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const removeRepository = async () => {
     if (confirm("Confirm removing repository?")) {
       try {
+        setIsRemove(true)
         const repo = repository?.name || ""
         await callApi<void>(`/api/helm/repositories/${repo}`, {
           method: "DELETE",
@@ -35,6 +37,8 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         window.location.reload();
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsRemove(false)
       }
     }
   };
@@ -55,15 +59,18 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
         <div className="flex flex-col">
           <div className="flex flex-row gap-2">
-          <button onClick={() => update.mutateAsync().catch((e) => alert.setShowErrorModal({ msg: e.message, title: "Unable to update" }))}>
+          <button onClick={() => update.mutate()}>
             <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
               {update.isLoading ? <Spinner size={4}/> : <BsArrowRepeat />}
               Update
             </span>
           </button>
-          <button onClick={removeRepository}>
+          <button onClick={() => {
+            removeRepository()
+            window.location.reload();
+          }}>
             <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-              <BsTrash3 />
+            {isRemoveLoading ? <Spinner size={4}/> : <BsTrash3 />}
               Remove
             </span>
           </button>

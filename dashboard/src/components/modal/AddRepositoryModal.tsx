@@ -32,6 +32,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
     }).finally(() => {
       setIsLoading(false);
       onClose();
+      window.location.reload();
     })
   };
 
