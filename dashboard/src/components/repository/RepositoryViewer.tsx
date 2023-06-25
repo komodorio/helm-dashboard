@@ -27,7 +27,6 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     if (confirm("Confirm removing repository?")) {
       try {
         const repo = repository?.name || ""
-        debugger;
         await callApi<void>(`/api/helm/repositories/${repo}`, {
           method: "DELETE",
         });
@@ -50,7 +49,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         <div className="flex flex-row gap-3">
           <button onClick={() => update.mutateAsync().catch((e) => alert.setShowErrorModal({ msg: e.message, title: "Unable to update" }))}>
             <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-              <BsArrowRepeat />
+              {update.isLoading ? <Spinner/> : <BsArrowRepeat />}
               Update
             </span>
           </button>
