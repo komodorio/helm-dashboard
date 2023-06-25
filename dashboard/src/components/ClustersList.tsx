@@ -87,7 +87,7 @@ function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }
               checked={cluster.Name == selectedCluster}
               name="clusters"
             />
-            <label className="ml-1">{cluster.Name}</label>
+            <label htmlFor={cluster.Name} className="ml-1">{cluster.Name}</label>
           </span>
         ))}
 
