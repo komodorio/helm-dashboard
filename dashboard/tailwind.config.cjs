@@ -3,8 +3,21 @@
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    fontFamily: {
+      'roboto': ['Roboto', 'serif'],
+    },
+    fontWeight: {
+      thin: '100',
+      hairline: '100',
+      extralight: '200',
+      light: '300',
+      normal: '400',
+      semibold: '500',
+      extrabold: '600'
+    },
     extend: {
       colors: {
+        'grey': '#3d4048',
         error: {
           "border-color": "#DC3545",
           background: "#F9D7DA",
@@ -19,8 +32,7 @@ module.exports = {
   plugins: [],
 
   fontFamily: {
-    sans: ["Graphik", "sans-serif"],
+    sans: ["Roboto", "Graphik", "sans-serif"],
     serif: ["Merriweather", "serif"],
-    roboto: ['Roboto', 'sans-serif'],
   },
 };
