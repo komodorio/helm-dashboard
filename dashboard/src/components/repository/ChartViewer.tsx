@@ -20,20 +20,17 @@ function ChartViewer({ chart }: ChartViewerProps) {
   return (
     <>
       <div
-        className="grid grid-cols-5 hover:bg-[#f4f7fa] p-4"
+        className="grid grid-cols-6 gap-3 hover:bg-[#f4f7fa] p-4"
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
         <span className="col-span-1 font-semibold flex flex-row items-center gap-1">
-          <img
-            src= {chart.icon}
-            className="h-4"
-          />
+          <img src={chart.icon} className="h-4" />
           {chart.name}
         </span>
-        <span className="col-span-2 text-sm">{chart.description}</span>
-        <span className="col-span-1">{chart.version}</span>
-        <span className="col-span-1">
+        <span className="col-span-3 text-sm">{chart.description}</span>
+        <span className="col-span-1 text-center">{chart.version}</span>
+        <span className="col-span-1 text-center">
           {showInstallButton && (
             <button
               className="bg-white border border-gray-300 p-1 px-2 rounded-md font-semibold"
