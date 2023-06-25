@@ -1,4 +1,5 @@
-import { useLocation } from "react-router-dom";
+import {useMemo, useState} from 'react';
+import { useLocation, useParams } from "react-router-dom";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
 import { Release, ReleaseRevision } from "../data/types";
@@ -30,27 +31,41 @@ const releaseRevisions: ReleaseRevision[] = [
   },
 ];
 
+const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) => (r1.revision - r2.revision < 0 ? 1 : -1)
+
+
 function Revision() {
   const { state: release } = useLocation();
+  const { revision = '', ...restParams } = useParams();
+  
+  const selectedRevision = revision ? parseInt(revision, 10) : 0;
 
   const { data: releaseRevisions } = useQuery<ReleaseRevision[]>({
-    queryKey: ["releasesHisotry", release],
+    queryKey: ["releasesHisotry", restParams],
     queryFn: apiService.getReleasesHistory,
   });
+  const sortedReleases = useMemo(() => releaseRevisions?.sort(descendingSort), [releaseRevisions]);
+  
+  const selectedRelease = useMemo(() => {
+    if (selectedRevision && releaseRevisions) {
 
+      return releaseRevisions.find((r : ReleaseRevision) => r.revision === selectedRevision);
+    }
+    return null;
+  }, [releaseRevisions, selectedRevision]);
   if (!releaseRevisions) return <></>;
-
+  
   return (
     <div className="flex">
       <div className="flex flex-col gap-2 w-1/6 h-screen bg-[#E8EDF2]">
         <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">
           Revisions
         </label>
-        <RevisionsList releaseRevisions={releaseRevisions} />
+        <RevisionsList releaseRevisions={sortedReleases} selectedRevision={selectedRevision} />
       </div>
 
       <div className="w-full h-screen bg-[#F4F7FA]">
-        <RevisionDetails release={releaseRevisions[0]} />
+        {selectedRelease ? <RevisionDetails release={selectedRelease} /> : ''}
       </div>
     </div>
   );

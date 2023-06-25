@@ -72,12 +72,12 @@ class ApiService {
   getReleasesHistory = async ({
     queryKey,
   }: QueryFunctionContext<Release[], Release>) => {
-    const [_, release] = queryKey;
-
-    if (release == undefined) return null;
+    const [_, params] = queryKey;
+  
+    if (!params.namespace || !params.chart) return null;
 
     const response = await fetch(
-      `${this.baseUrl}/api/helm/releases/${release.namespace}/${release.name}/history`
+      `${this.baseUrl}/api/helm/releases/${params.namespace}/${params.chart}/history`
     );
     const data = await response.json();
 
