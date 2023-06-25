@@ -87,7 +87,7 @@ function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }
               checked={cluster.Name == selectedCluster}
               name="clusters"
             />
-            <label className="ml-1">{cluster.Name}</label>
+            <label htmlFor={cluster.Name} className="ml-1">{cluster.Name}</label>
           </span>
         ))}
 
@@ -96,8 +96,8 @@ function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }
         ?.sort((a, b) => a.name.localeCompare(b.name))
         ?.map((namespace) => (
           <span key={namespace.name} className="flex items-center">
-            <input type="checkbox" />
-            <label className="ml-1">{`${namespace.name} [${namespace.amount}]`}</label>
+            <input type="checkbox" id={namespace.name}/>
+            <label htmlFor={namespace.name} className="ml-1">{`${namespace.name} [${namespace.amount}]`}</label>
           </span>
         ))}
     </div>

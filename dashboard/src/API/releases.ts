@@ -156,15 +156,16 @@ export function useGetVersions(
 
 export function useGetReleaseInfoByType(
   params: ReleaseInfoParams,
+  additionalParams: string = "",
   options?: UseQueryOptions<string>
 ) {
   const { chart, namespace, tab, revision } = params;
   console.log({ params });
   return useQuery<string>(
-    [tab, namespace, chart, revision],
+    [tab, namespace, chart, revision, additionalParams],
     () =>
       callApi<string>(
-        `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}`,
+        `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         },
@@ -173,6 +174,7 @@ export function useGetReleaseInfoByType(
     options
   );
 }
+
 export function useGetChartValues(
   namespace: string,
   chartName: string,
@@ -180,7 +182,7 @@ export function useGetChartValues(
   version: string,
   options?: UseQueryOptions<any>
 ) {
-  return useQuery(
+  return useQuery<any>(
     ["values", namespace, chartName, repository],
     () =>
       callApi<any>(

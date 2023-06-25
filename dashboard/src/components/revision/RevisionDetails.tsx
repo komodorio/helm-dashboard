@@ -16,8 +16,6 @@ import Tabs from "../Tabs";
 import {
   useGetChartValues,
   useGetLatestVersion,
-  useGetRelease,
-  useGetReleaseInfoByType,
   useGetResources,
   useGetVersions,
   useRollbackRelease,
@@ -28,6 +26,7 @@ import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import { marked } from "marked";
 import hljs from "highlight.js";
+import useAlertError from "../../hooks/useAlertError";
 
 type RevisionTagProps = {
   caption: string;
@@ -45,19 +44,15 @@ export default function RevisionDetails({
 }: RevisionDetailsProps) {
   const revisionTabs = [
     { value: "resources", label: "Resources", content: <RevisionResource /> },
-    {
-      value: "manifests",
-      label: "Manifests",
-      content: <RevisionDiff tab="manifests" />,
-    },
+    { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
     {
       value: "values",
       label: "Values",
-      content: <RevisionDiff includeUserDefineOnly={true} tab="values" />,
+      content: <RevisionDiff includeUserDefineOnly={true} />,
     },
-    { value: "notes", label: "Notes", content: <RevisionDiff tab="notes" /> },
+    { value: "notes", label: "Notes", content: <RevisionDiff /> },
   ];
-  const [showTestsResults, setShowTestResults] = useState(false);
+
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
   const { context, namespace, chart, tab } = useParams();
@@ -71,6 +66,7 @@ export default function RevisionDetails({
 
   const selectedTab =
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
+  const [showTestsResults, setShowTestResults] = useState(false);
 
   const checkUpgradeable = async () => {
     try {
@@ -101,17 +97,48 @@ export default function RevisionDetails({
     console.error("checkUpgradeable not implemented"); //todo: implement
   };
 
+  const { setShowErrorModal } = useAlertError();
   const {
     mutate: runTests,
     isLoading: isRunningTests,
     data: testResults,
-  } = useTestRelease();
+  } = useTestRelease({
+    onSuccess: () => {
+      setShowTestResults(true);
+    },
+    onError: (error) => {
+      setShowErrorModal({
+        title: "Failed to run tests for chart " + chart,
+        msg: error,
+      });
+      console.error("Failed to execute test for chart", error);
+    },
+  });
   const handleRunTests = () => {
+    runTests({
+      ns: namespace,
+      name: chart,
+    });
     setShowTestResults(true);
   };
 
   const checkForNewVersion = () => {
     throw new Error("checkForNewVersion not implemented"); //todo: implement
+  };
+
+  const displayTestResults = () => {
+    if (!testResults || (testResults as []).length === 0) {
+      return (
+        <div>
+          Tests executed successfully
+          <br />
+          <br />
+          <pre>Empty response from API</pre>
+        </div>
+      );
+    } else {
+      return (testResults as string).replaceAll("\n", "<br>");
+    }
   };
 
   return (
@@ -162,7 +189,7 @@ export default function RevisionDetails({
             )}
           </div>
 
-          {release.namespace && release.chart_name ? (
+          {release.has_tests ? (
             <>
               {" "}
               <div className="h-1/2">
@@ -177,22 +204,8 @@ export default function RevisionDetails({
                 title="Tests results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
-                actions={[
-                  {
-                    id: "1",
-                    text: isRunningTests ? "Testing..." : "Run tests",
-                    callback: () => {
-                      runTests({
-                        ns: release.namespace,
-                        name: release.chart_name,
-                      });
-                    },
-                    variant: ModalButtonStyle.success,
-                    disabled: isRunningTests,
-                  },
-                ]}
               >
-                {isRunningTests ? <Spinner /> : testResults ?? null}
+                {isRunningTests ? <Spinner /> : displayTestResults()}
               </Modal>{" "}
             </>
           ) : null}
@@ -256,7 +269,6 @@ const Rollback = ({
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
-        console.log("settled");
         refetchRevisions();
       },
     });
