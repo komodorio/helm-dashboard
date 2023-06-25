@@ -1,4 +1,4 @@
-import { useState, useEffect, PropsWithChildren, ReactNode } from "react";
+import { useState, PropsWithChildren, ReactNode } from "react";
 import ReactDom from "react-dom";
 
 export enum ModalButtonStyle {
@@ -6,6 +6,7 @@ export enum ModalButtonStyle {
   info,
   error,
   success,
+  disabled,
 }
 
 export interface ModalAction {
@@ -54,10 +55,16 @@ const Modal = ({
       ModalButtonStyle.error,
       "text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
     ],
+    [
+      ModalButtonStyle.disabled,
+      "text-gray-500 bg-gray-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 ",
+    ],
   ]);
 
   const getClassName = (action: ModalAction) => {
     if (action.className) return action.className;
+
+    if (action.disabled) return colorVariants.get(ModalButtonStyle.disabled);
 
     return action.variant
       ? colorVariants.get(action.variant)
