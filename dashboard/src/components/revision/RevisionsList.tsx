@@ -1,22 +1,25 @@
 import { BsArrowUpRight } from "react-icons/bs";
+import { useNavigate, useParams } from "react-router-dom";
 import { ReleaseRevision } from "../../data/types";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 
 type RevisionsListProps = {
   releaseRevisions: ReleaseRevision[];
-  selectedRevisionIndex: number;
-  setSelectedRevisionIndex: Function;
+  selectedRevision: number;
 };
 
 
 export default function RevisionsList({
   releaseRevisions,
-  selectedRevisionIndex,
-  setSelectedRevisionIndex,
+  selectedRevision,
 }: RevisionsListProps) {
 
-  
+  const navigate = useNavigate();
+  const {context, namespace, chart, tab} = useParams();
+  const changeRelease = (newRevision : number) => {
+    navigate(`/revision/${context}/${namespace}/${chart}/${newRevision}/${tab}`)
+  }
   return (
     <>
       {releaseRevisions?.map((release, idx) => {
@@ -24,10 +27,10 @@ export default function RevisionsList({
         const prevRelease = hasMultipleReleases ? releaseRevisions[idx + 1] : null;
         return (
           <div
-            onClick={() => setSelectedRevisionIndex(idx)}
+            onClick={() => changeRelease(release.revision)}
             key={release.revision}
             className={`flex flex-col border rounded-md mx-5 p-2 gap-4 cursor-pointer ${
-              idx === selectedRevisionIndex
+              release.revision === selectedRevision
                 ? "border-[#007bff] bg-white"
                 : "border-[#DCDDDF] bg-[#F4F7FA]"
             }`}
