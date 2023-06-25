@@ -396,6 +396,7 @@ const ReconfigureModal = ({
   release: Release;
 }) => {
   const navigate = useNavigate();
+  const { chart_ver } = release;
 
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
@@ -405,7 +406,7 @@ const ReconfigureModal = ({
   const { data: versions } = useGetVersions(chart_name);
   const { context, namespace, chart } = useParams();
 
-  const [selectedVersion, setSelectedVersion] = useState(release.chart_ver);
+  const [selectedVersion, setSelectedVersion] = useState(chart_ver);
   const { data: chartValues, refetch } = useGetChartValues(
     namespace || "",
     chart_name,
@@ -422,7 +423,7 @@ const ReconfigureModal = ({
     async () => {
       setErrorMessage("");
       const formData = new FormData();
-      formData.append("preview", "true");
+      formData.append("preview", "false");
       formData.append("chart", `${selectedRepo}/${chart_name}`);
       formData.append("version", selectedVersion);
       formData.append("values", userValues);
@@ -442,7 +443,8 @@ const ReconfigureModal = ({
     },
     {
       onSuccess: async (res) => {
-        navigate(window.location.href, { replace: true });
+        onClose();
+        navigate(`/`);
       },
       onError: (error, variables, context) => {
         setErrorMessage(error?.message || "Failed to update");
@@ -451,7 +453,9 @@ const ReconfigureModal = ({
   );
 
   useEffect(() => {
-    setSelectedRepo(versions?.[0]?.repository || "");
+    if (versions?.length) {
+      setSelectedRepo(versions[0].repository);
+    }
   }, [versions]);
 
   useEffect(() => {
@@ -459,8 +463,8 @@ const ReconfigureModal = ({
   }, [selectedRepo, selectedVersion]);
 
   const VersionToInstall = () => {
-    const { chart_ver } = release;
     const currentVersion = `current version is: ${chart_ver}`;
+
     return (
       <div>
         {versions?.length ? (
@@ -470,6 +474,7 @@ const ReconfigureModal = ({
               className="border-2 text-blue-500 rounded"
               onChange={(e) => setSelectedVersion(e.target.value)}
               value={selectedVersion}
+              defaultValue={chart_ver}
             >
               {versions?.map(({ repository, version }) => (
                 <option
@@ -482,46 +487,6 @@ const ReconfigureModal = ({
         ) : null}
 
         {currentVersion}
-      </div>
-    );
-  };
-
-  const GeneralDetails = () => {
-    return (
-      <div className="flex gap-8">
-        <div>
-          <h4>Release name:</h4>
-          <div className="p-2 bg-gray-200 rounded">{release.chart_name}</div>
-        </div>
-        <div>
-          <h4>Namespace (optional):</h4>
-          <div className="p-2 bg-gray-200 rounded">{namespace}</div>
-        </div>
-        <div>
-          <h4>Cluster:</h4>
-          <div className="p-2 bg-gray-200 rounded">{context}</div>
-        </div>
-      </div>
-    );
-  };
-
-  const ChartValues = () => {
-    return (
-      <div className="w-1/2">
-        <label
-          className="block tracking-wide text-gray-700 text-xl font-medium mb-2"
-          htmlFor="grid-user-defined-values"
-        >
-          Chart value reference
-        </label>
-        <pre
-          className=" w-1/2 bg-gray-100 rounded p-4 font-medium text-md w-full max-h-[300px] block overflow-y-auto"
-          dangerouslySetInnerHTML={{
-            __html: marked(
-              hljs.highlight(chartValues || "", { language: "yaml" }).value
-            ),
-          }}
-        />
       </div>
     );
   };
@@ -545,10 +510,10 @@ const ReconfigureModal = ({
       ]}
     >
       <VersionToInstall />
-      <GeneralDetails />
+      <GeneralDetails {...release} />
       <div className="flex w-full gap-6 mt-4">
         <UserDefinedValues val={userValues} setVal={setUserValues} />
-        <ChartValues />
+        <ChartValues chartValues={chartValues} />
       </div>
 
       <div>
@@ -581,6 +546,48 @@ const UserDefinedValues = ({ val, setVal }: { val: string; setVal: any }) => {
         rows={14}
         className="block p-2.5 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none"
       ></textarea>
+    </div>
+  );
+};
+
+const GeneralDetails = ({ chart_name }: { chart_name: string }) => {
+  const { context, namespace } = useParams();
+
+  return (
+    <div className="flex gap-8">
+      <div>
+        <h4>Release name:</h4>
+        <div className="p-2 bg-gray-200 rounded">{chart_name}</div>
+      </div>
+      <div>
+        <h4>Namespace (optional):</h4>
+        <div className="p-2 bg-gray-200 rounded">{namespace}</div>
+      </div>
+      <div>
+        <h4>Cluster:</h4>
+        <div className="p-2 bg-gray-200 rounded">{context}</div>
+      </div>
+    </div>
+  );
+};
+
+const ChartValues = ({ chartValues }: { chartValues: string }) => {
+  return (
+    <div className="w-1/2">
+      <label
+        className="block tracking-wide text-gray-700 text-xl font-medium mb-2"
+        htmlFor="grid-user-defined-values"
+      >
+        Chart value reference
+      </label>
+      <pre
+        className=" w-1/2 bg-gray-100 rounded p-4 font-medium text-md w-full max-h-[300px] block overflow-y-auto"
+        dangerouslySetInnerHTML={{
+          __html: marked(
+            hljs.highlight(chartValues || "", { language: "yaml" }).value
+          ),
+        }}
+      />
     </div>
   );
 };
