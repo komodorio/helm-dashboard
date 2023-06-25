@@ -56,7 +56,7 @@ function useGetChartsInRepo(
 }
 
 // Update repository from remote
-function useUpdateRepo(
+export function useUpdateRepo(
   repo: string,
   options?: UseMutationOptions<void, unknown, void>
 ) {
@@ -68,7 +68,7 @@ function useUpdateRepo(
 }
 
 // Remove repository
-function useDeleteRepo(
+export function useDeleteRepo(
   repo: string,
   options?: UseMutationOptions<void, unknown, void>
 ) {

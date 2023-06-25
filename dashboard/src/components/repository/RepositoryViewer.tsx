@@ -5,6 +5,9 @@ import ChartViewer from "./ChartViewer";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
+import { useDeleteRepo, useUpdateRepo } from "../../API/repositories";
+import useAlertError from "../../hooks/useAlertError";
+import { callApi } from "../../API/releases";
 
 type RepositoryViewerProps = {
   repository: Repository | undefined;
@@ -17,22 +20,17 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     refetchOnWindowFocus: false,
   });
 
-  const update = async () => {
-    try {
-      const url = `/api/helm/repositories/${repository?.name}`;
-      await axios.post(url);
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const update = useUpdateRepo(repository?.name || "", { retry: false });
+  const alert = useAlertError();
 
   const removeRepository = async () => {
     if (confirm("Confirm removing repository?")) {
       try {
-        const repo = ""; // todo: take from real data
-        const url = `/api/helm/repositories/${repo}`;
-        await axios.delete(url);
+        const repo = repository?.name || ""
+        debugger;
+        await callApi<void>(`/api/helm/repositories/${repo}`, {
+          method: "DELETE",
+        });
         window.location.reload();
       } catch (error) {
         console.error(error);
@@ -47,10 +45,10 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     <div className="flex flex-col px-16 pt-5 gap-3 bg-white drop-shadow-lg">
       <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
       <div className="flex justify-between">
-        <span className="text-[#3d4048] text-4xl">airFlow</span>
+        <span className="text-[#3d4048] text-4xl">{repository?.name}</span>
 
         <div className="flex flex-row gap-3">
-          <button onClick={update}>
+          <button onClick={() => update.mutateAsync().catch((e) => alert.setShowErrorModal({ msg: e.message, title: "Unable to update" }))}>
             <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
               <BsArrowRepeat />
               Update
@@ -66,7 +64,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
       </div>
       <span className="text-[#3d4048] text-sm bg-[#D6EFFE] px-3 py-1 rounded-md self-start">
         URL:{" "}
-        <span className="font-bold">https://charts.bitnami.com/bitnami</span>
+        <span className="font-bold">{repository?.url}</span>
       </span>
 
       <div className="bg-[#ECEFF2] grid grid-cols-5 text-xs font-bold p-2 px-4 rounded-md">
