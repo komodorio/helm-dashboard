@@ -11,7 +11,6 @@ function Installed() {
   const { data: installedReleases, isLoading, refetch, isRefetching }  = useGetInstalledReleases(selectedCluster || "", {retry: false});
 
   useEffect(() => { refetch() }, [selectedCluster])
-  useEffect(() => { console.log("ada") }, [selectedCluster])
 
   return (
     <div className="flex flex-row">

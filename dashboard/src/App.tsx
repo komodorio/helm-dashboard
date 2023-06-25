@@ -17,7 +17,6 @@ export default function App() {
   const [shouldShowErrorModal, setShowErrorModal] = useState<ErrorAlert | undefined>(undefined);
   const value = { shouldShowErrorModal, setShowErrorModal };
   
-  console.log(shouldShowErrorModal)
   return (
     <div>
     <ErrorModalContext.Provider value={value}>

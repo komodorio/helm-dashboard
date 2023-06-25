@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
+import { callApi } from "../../API/releases";
 
 interface FormKeys {
   name: string;
@@ -18,8 +19,19 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const addRepository = () => {
+    const body = new FormData();
+    body.append("name", formData.name);
+    body.append("url", formData.url);
+
     setIsLoading(true);
-    onClose();
+
+    callApi<void>("/api/helm/repositories", {
+      method: "POST",
+      body,
+    }).finally(() => {
+      setIsLoading(false);
+      onClose();
+    })
   };
 
   return (
