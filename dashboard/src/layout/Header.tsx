@@ -140,6 +140,8 @@ export default function Header() {
             <a
               href="https://komodor.com/helm-dash/"
               className="text-[#0d6efd] font-bold"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <div className="flex items-center gap-2">
                 Upgrade your HELM experience - Free
