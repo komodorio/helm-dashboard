@@ -23,7 +23,6 @@
 # Go workspace file
 go.work
 
-pkg/dashboard/static
 /bin
 /.idea/
 
