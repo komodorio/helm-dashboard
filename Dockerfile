@@ -19,19 +19,19 @@ ENV GOOS=${TARGETOS:-linux}
 ENV GOARCH=${TARGETARCH:-amd64}
 ENV CGO_ENABLED=0
 
-WORKDIR /build
+ARG VER=0.0.0
+ENV VERSION=${VER}
 
-COPY --from=frontend /pkg/frontend/dist /build/pkg/frontend/dist/
+WORKDIR /build
 
 COPY go.mod ./
 COPY go.sum ./
 COPY main.go ./
 RUN go mod download
 
-ARG VER=0.0.0
-ENV VERSION=${VER}
-
 ADD . src
+
+COPY --from=frontend /pkg/frontend/dist ./src/pkg/frontend/dist/
 
 WORKDIR /build/src
 
