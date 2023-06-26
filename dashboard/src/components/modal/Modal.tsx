@@ -1,4 +1,4 @@
-import { useState, PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import ReactDom from "react-dom";
 
 export enum ModalButtonStyle {
@@ -36,8 +36,6 @@ const Modal = ({
   containerClassNames,
   bottomContent,
 }: ModalProps) => {
-  const [isVisible, setIsVisible] = useState<boolean>(isOpen);
-
   const colorVariants = new Map<ModalButtonStyle, string>([
     [
       ModalButtonStyle.default,
@@ -137,6 +135,7 @@ const Modal = ({
         </div>
       )}
     </>,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     document.getElementById("portal")!
   );
 };

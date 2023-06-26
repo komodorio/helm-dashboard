@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { StructuredResources } from "../../API/releases";
-import Button from "../Button";
 import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
 
 interface UninstallModalProps {
