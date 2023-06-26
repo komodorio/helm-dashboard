@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     assetsDir: "./assets",
-    outDir: '../pkg/dashboard/static',
+    outDir: '../pkg/frontend/dist',
     emptyOutDir: true,
   }
 })

@@ -2,7 +2,7 @@ package dashboard
 
 import (
 	"context"
-	"embed"
+	"github.com/komodorio/helm-dashboard/pkg/frontend"
 	"html"
 	"net/http"
 	"os"
@@ -13,9 +13,6 @@ import (
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	log "github.com/sirupsen/logrus"
 )
-
-//go:embed static/*
-var staticFS embed.FS
 
 func noCache(c *gin.Context) {
 	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
@@ -193,34 +190,19 @@ func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
 }
 
 func configureStatic(api *gin.Engine) {
-	fs := http.FS(staticFS)
+	fs := http.FS(frontend.StaticFS)
 
-	// local dev speed-up
-	localDevPath := "pkg/dashboard/static"
-	if _, err := os.Stat(localDevPath); err == nil {
-		log.Warnf("Using local development path to serve static files")
+	api.GET("/", func(c *gin.Context) {
+		c.FileFromFS("/dist/", fs)
+	})
 
-		// the root page
-		api.GET("/", func(c *gin.Context) {
-			c.File(path.Join(localDevPath, "index.html"))
-		})
+	api.GET("/assets/*filepath", func(c *gin.Context) {
+		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
+	})
 
-		// serve a directory called static
-		api.GET("/assets/*filepath", func(c *gin.Context) {
-			joined := path.Join(localDevPath, "assets", c.Param("filepath"))
-			c.File(joined)
-		})
-	} else {
-		// the root page
-		api.GET("/", func(c *gin.Context) {
-			c.FileFromFS("/static/", fs)
-		})
-
-		// serve a directory called static
-		api.GET("/assets/*filepath", func(c *gin.Context) {
-			c.FileFromFS(path.Join("static", c.Request.URL.Path), fs)
-		})
-	}
+	api.GET("/scripts/*filepath", func(c *gin.Context) {
+		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
+	})
 }
 
 func configureScanners(api *gin.RouterGroup, data *objects.DataLayer) {

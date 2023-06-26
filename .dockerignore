@@ -2,4 +2,5 @@ Dockerfile
 *.md
 bin
 .idea
+.git
 dashboard/node_modules
