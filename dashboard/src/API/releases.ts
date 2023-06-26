@@ -169,7 +169,6 @@ export function useGetReleaseInfoByType(
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         },
-        "html"
       ),
     options
   );
@@ -194,6 +193,7 @@ export function useGetChartValues(
     options
   );
 }
+
 
 // Rollback the release to a previous revision
 export function useRollbackRelease(

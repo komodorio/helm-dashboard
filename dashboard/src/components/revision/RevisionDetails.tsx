@@ -43,19 +43,19 @@ export default function RevisionDetails({
   refetchRevisions,
 }: RevisionDetailsProps) {
   const revisionTabs = [
-    { value: "resources", label: "Resources", content: <RevisionResource /> },
+    { value: 'resources', label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
-    {
-      value: "values",
-      label: "Values",
-      content: <RevisionDiff includeUserDefineOnly={true} />,
-    },
-    { value: "notes", label: "Notes", content: <RevisionDiff /> },
+    { value: 'values', label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
+    { value: 'notes', label: "Notes", content: <RevisionDiff /> },
   ];
+  const [isChecking, setChecking] = useState(false);
+  const { context, namespace, chart, tab } = useParams();
+
+  const selectedTab = revisionTabs.find(t => t.value === tab) || revisionTabs[0];
+ 
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
-  const { context, namespace, chart, tab } = useParams();
 
   const {
     data: latestVerData,
@@ -64,8 +64,6 @@ export default function RevisionDetails({
     isRefetching: isRefetchingLatestVersion,
   } = useGetLatestVersion(release.chart_name, { cacheTime: 0 });
 
-  const selectedTab =
-    revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
   const [showTestsResults, setShowTestResults] = useState(false);
 
   const { setShowErrorModal } = useAlertError();
