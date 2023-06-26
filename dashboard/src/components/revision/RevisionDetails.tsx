@@ -1,5 +1,6 @@
-import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Diff2HtmlUI, Diff2HtmlUIConfig } from 'diff2html/lib/ui/js/diff2html-ui-slim.js';
+
 import {
   BsPencil,
   BsTrash3,
@@ -9,7 +10,9 @@ import {
 } from "react-icons/bs";
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams} from "react-router-dom";
+import { useGetReleaseInfoByType } from "../../API/releases";
+
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
@@ -42,6 +45,7 @@ export default function RevisionDetails({
   release,
   refetchRevisions,
 }: RevisionDetailsProps) {
+  const [searchParams] = useSearchParams();
   const revisionTabs = [
     { value: 'resources', label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
@@ -49,8 +53,8 @@ export default function RevisionDetails({
     { value: 'notes', label: "Notes", content: <RevisionDiff /> },
   ];
   const [isChecking, setChecking] = useState(false);
-  const { context, namespace, chart, tab } = useParams();
-
+  const { context, namespace, chart } = useParams();
+  const tab = searchParams.get('tab');
   const selectedTab = revisionTabs.find(t => t.value === tab) || revisionTabs[0];
  
 
@@ -228,9 +232,13 @@ const Rollback = ({
   release: Release;
   refetchRevisions: () => void;
 }) => {
-  const { namespace, chart } = useParams();
+  const { chart, namespace, revision } = useParams();
 
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
+  const revisionInt = parseInt(revision || '', 10);
+  const prevRevision = revisionInt - 1;
+  const response = useGetReleaseInfoByType({chart, namespace, revision , tab: 'manifests'}, `&revisionDiff=${prevRevision}`);
+
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
@@ -248,6 +256,7 @@ const Rollback = ({
     </div>
   );
 
+
   if (release.revision <= 1) return null;
 
   return (
@@ -264,6 +273,7 @@ const Rollback = ({
         title={rollbackTitle}
         isOpen={showRollbackDiff}
         onClose={() => setShowRollbackDiff(false)}
+        containerClassNames="w-[800px]"
         actions={[
           {
             id: "1",
@@ -281,11 +291,33 @@ const Rollback = ({
           },
         ]}
       >
-        Display diff here
+          <RollbackModalContent dataResponse={response} />
       </Modal>{" "}
     </>
   );
 };
+
+const RollbackModalContent = ({dataResponse}) => {
+  const {data, isLoading, isSuccess: fetchedDataSuccessfully} = dataResponse;
+  const diffElement = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (data && fetchedDataSuccessfully && diffElement?.current) {
+      const configuration : Diff2HtmlUIConfig = {
+        matching: 'lines',
+        outputFormat: 'side-by-side',
+        highlight: true,
+        renderNothingWhenEmpty: false,
+      };
+      const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
+      diff2htmlUi.draw();
+      diff2htmlUi.highlightCode();
+    }
+  }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
+  return (
+    <div className="relative" ref={diffElement}/>
+  )
+}
 
 const Uninstall = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -374,7 +406,7 @@ const ReconfigureModal = ({
 }) => {
   const navigate = useNavigate();
   const { chart_ver } = release;
-
+ 
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -384,6 +416,17 @@ const ReconfigureModal = ({
   const { context, namespace, chart } = useParams();
 
   const [selectedVersion, setSelectedVersion] = useState(chart_ver);
+  const { data: currChartValue } = useGetChartValues(
+    namespace || "",
+    chart_name,
+    selectedRepo,
+    chart_ver,
+    {
+      enabled: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+  console.log("a", currChartValue)
   const { data: chartValues, refetch } = useGetChartValues(
     namespace || "",
     chart_name,

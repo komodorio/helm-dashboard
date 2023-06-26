@@ -74,7 +74,7 @@ function Revision() {
         />
       </div>
 
-      <div className="w-full h-screen bg-[#F4F7FA]">
+      <div className="w-5/6 h-screen bg-[#F4F7FA]">
         {selectedRelease ? (
           <RevisionDetails
             release={selectedRelease}
