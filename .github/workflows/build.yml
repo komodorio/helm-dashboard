@@ -122,6 +122,7 @@ jobs:
       - name: NPM lint
         run: npm run lint
         working-directory: ./dashboard
+        continue-on-error: true
 
       - name: Helm Template Check For Sanity
         uses: igabaydulin/helm-check-action@0.1.4

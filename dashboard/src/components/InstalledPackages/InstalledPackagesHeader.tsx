@@ -16,7 +16,7 @@ export default function InstalledPackagesHeader({
   const showNoPackageAlert = Boolean(!isLoading && (numOfPackages == undefined || numOfPackages == 0));
   return (
     <div className="drop-shadow">
-      <div className="flex items-center justify-between bg-white rounded-t-md p-2">
+      <div className="flex items-center justify-between bg-white rounded-md p-2">
         <div className="flex items-center">
           <img
             src={HeaderLogo}
@@ -35,15 +35,7 @@ export default function InstalledPackagesHeader({
           />
         </div>
       </div>
-      <div className="grid grid-cols-12 text-xs font-medium bg-[#ECEFF2] p-2">
-        <span className="col-span-1" />
-        <span className="col-span-3">NAME</span>
-        <span className="col-span-3">RELEASE STATUS</span>
-        <span className="col-span-2">CHART</span>
-        <span className="col-span-1">REVISION</span>
-        <span className="col-span-1">NAMESPACE</span>
-        <span className="col-span-1">UPDATED</span>
-      </div>
+
 
       {showNoPackageAlert && <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">Looks like you don't have any charts
           installed. "Repository" section may be a good place to start.
