@@ -26,8 +26,8 @@ export default function InstalledPackageCard({
   });
 
   const { data: latestVersionResult } = useQuery<ChartVersion>({
-    queryKey: ["chartName", release.chartName],
-    queryFn: () => apiService.getRepositoryLatestVersion(release.chartName),
+    queryKey: ["chartName", release.chart_name],
+    queryFn: () => apiService.getRepositoryLatestVersion(release.chart_name),
   });
 
   const handleMouseOver = () => {
@@ -48,9 +48,7 @@ export default function InstalledPackageCard({
     }
 
     navigate(
-      `/revision/${selectedCluster?.Name}/${namespace}/${name}/${
-        release.revision
-      }/${"resources"}`,
+      `/revision/${selectedCluster?.Name}/${namespace}/${name}/${release.revision}/`,
       { state: release }
     );
   };

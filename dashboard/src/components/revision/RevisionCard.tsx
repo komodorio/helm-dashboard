@@ -48,16 +48,16 @@
  *
  * Props:
  * @param props with the interface:
-  * {
-  *   revision: string;
-  *   revisionDate: Date;
-  *   previousVersion: string;
-  *   currentVersion: string;
-  *   statusCode: StatusCode;
-  *   isActive: boolean;
-  *   isRefreshable: boolean;
-  *   onClick: () => void;
-  * }
+ * {
+ *   revision: string;
+ *   revisionDate: Date;
+ *   previousVersion: string;
+ *   currentVersion: string;
+ *   statusCode: StatusCode;
+ *   isActive: boolean;
+ *   isRefreshable: boolean;
+ *   onClick: () => void;
+ * }
  * @param {string} revision - the revision number
  * @param {Date} revisionDate - the revision date
  * @param {string} previousVersion - the previous version
@@ -70,10 +70,9 @@
  *
  */
 
-import React from "react";
 import { StatusCode } from "../global";
 import Status from "./Status";
-import {getAge} from '../timeUtils';
+import { getAge } from "../timeUtils";
 
 export interface RevisionCardProps {
   revision: string;
@@ -87,13 +86,11 @@ export interface RevisionCardProps {
   onRefreshClick: () => void;
 }
 
-export default function RevisionCard(
-  props: RevisionCardProps
-): JSX.Element {
+export default function RevisionCard(props: RevisionCardProps): JSX.Element {
   const isActiveStr = props.isActive ? "true" : "false";
   const activeVariants = {
     true: "border-1 border-blue-500",
-    false: "border-1 border-gray-300"
+    false: "border-1 border-gray-300",
   };
   return (
     <div
@@ -102,7 +99,10 @@ export default function RevisionCard(
     >
       {/* the status is displayed in the top left corner, using the Status component */}
       <div className="absolute top-0 left-0 mt-4 ml-4">
-        <Status isRefreshable={props.isRefreshable} statusCode={props.statusCode} />
+        <Status
+          isRefreshable={props.isRefreshable}
+          statusCode={props.statusCode}
+        />
       </div>
 
       {/* the revision number is displayed in the top right corner */}
@@ -124,12 +124,8 @@ export default function RevisionCard(
         <span className="text-sm font-light">{props.currentVersion}</span>
       </div>
 
-
       <div className="absolute bottom-0 right-0 mb-4 mr-4">
-        <span>
-
-          {props.revisionDate && getAge(props.revisionDate)}
-        </span>
+        <span>{props.revisionDate && getAge(props.revisionDate)}</span>
       </div>
     </div>
   );
