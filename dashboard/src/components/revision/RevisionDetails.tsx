@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BsPencil,
   BsTrash3,
@@ -9,18 +9,24 @@ import {
 } from "react-icons/bs";
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
 import {
+  useGetChartValues,
+  useGetLatestVersion,
   useGetResources,
+  useGetVersions,
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
 import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
+import { marked } from "marked";
+import hljs from "highlight.js";
+import useAlertError from "../../hooks/useAlertError";
 
 type RevisionTagProps = {
   caption: string;
@@ -46,48 +52,58 @@ export default function RevisionDetails({
   const { context, namespace, chart, tab } = useParams();
 
   const selectedTab = revisionTabs.find(t => t.value === tab) || revisionTabs[0];
+ 
+
+  const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
+
+
+  const {
+    data: latestVerData,
+    refetch: refetchLatestVersion,
+    isLoading: isLoadingLatestVersion,
+    isRefetching: isRefetchingLatestVersion,
+  } = useGetLatestVersion(release.chart_name, { cacheTime: 0 });
+
   const [showTestsResults, setShowTestResults] = useState(false);
 
-  const checkUpgradeable = async () => {
-    try {
-      const response = await axios.get(
-        "/api/helm/repositories/latestver?name=" + release.chartName
-      );
-      const data = response.data;
-
-      let elm = { name: "", version: "0" };
-      // const btnUpgradeCheck = $("#btnUpgradeCheck");
-      if (!data || !data.length) {
-        //     btnUpgradeCheck.prop("disabled", true)
-        //     btnUpgradeCheck.text("")
-        //     $("#btnAddRepository").text("Add repository for it").data("suggestRepo", "")
-      } else if (data[0].isSuggestedRepo) {
-        //     btnUpgradeCheck.prop("disabled", true)
-        //     btnUpgradeCheck.text("")
-        //     $("#btnAddRepository").text("Add repository for it: "+data[0].repository).data("suggestRepo", data[0].repository).data("suggestRepoUrl", data[0].urls[0])
-      } else {
-        //     $("#btnAddRepository").text("")
-        //     btnUpgradeCheck.text("Check for new version")
-        elm = data[0];
-      }
-    } catch (error) {
-      //errorAlert-"Failed to find chart in repo"
-    }
-
-    console.error("checkUpgradeable not implemented"); //todo: implement
-  };
-
+  const { setShowErrorModal } = useAlertError();
   const {
     mutate: runTests,
     isLoading: isRunningTests,
     data: testResults,
-  } = useTestRelease();
+  } = useTestRelease({
+    onSuccess: () => {
+      setShowTestResults(true);
+    },
+    onError: (error) => {
+      setShowErrorModal({
+        title: "Failed to run tests for chart " + chart,
+        msg: error,
+      });
+      console.error("Failed to execute test for chart", error);
+    },
+  });
   const handleRunTests = () => {
+    runTests({
+      ns: namespace,
+      name: chart,
+    });
     setShowTestResults(true);
   };
 
-  const checkForNewVersion = () => {
-    throw new Error("checkForNewVersion not implemented"); //todo: implement
+  const displayTestResults = () => {
+    if (!testResults || (testResults as []).length === 0) {
+      return (
+        <div>
+          Tests executed successfully
+          <br />
+          <br />
+          <pre>Empty response from API</pre>
+        </div>
+      );
+    } else {
+      return (testResults as string).replaceAll("\n", "<br>");
+    }
   };
 
   return (
@@ -97,9 +113,9 @@ export default function RevisionDetails({
         <span className="text-[#3d4048] text-4xl">{chart}</span>
         <div className="flex flex-row gap-3">
           <div className="flex flex-col">
-            <button onClick={checkUpgradeable}>
+            <button onClick={() => setIsReconfigureModalOpen(true)}>
               <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                {isChecking ? (
+                {isLoadingLatestVersion || isRefetchingLatestVersion ? (
                   <>
                     <BsHourglassSplit />
                     Checking...
@@ -112,15 +128,33 @@ export default function RevisionDetails({
                 )}
               </span>
             </button>
-            <a
-              onClick={checkForNewVersion}
-              className="underline text-sm cursor-pointer"
-            >
-              check for new version
-            </a>
+            <ReconfigureModal
+              isOpen={isReconfigureModalOpen}
+              release={release}
+              onClose={() => {
+                setIsReconfigureModalOpen(false);
+              }}
+            />
+            {latestVerData?.[0]?.isSuggestedRepo ? (
+              <a
+                onClick={() => {
+                  console.log("implement redirect to repository");
+                }}
+                className="underline text-sm cursor-pointer"
+              >
+                Add repository for it: {latestVerData[0].repository}
+              </a>
+            ) : (
+              <span
+                onClick={() => refetchLatestVersion()}
+                className="underline text-sm cursor-pointer"
+              >
+                check for new version
+              </span>
+            )}
           </div>
 
-          {release.namespace && release.chartName ? (
+          {release.has_tests ? (
             <>
               {" "}
               <div className="h-1/2">
@@ -135,22 +169,8 @@ export default function RevisionDetails({
                 title="Tests results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
-                actions={[
-                  {
-                    id: "1",
-                    text: isRunningTests ? "Testing..." : "Run tests",
-                    callback: () => {
-                      runTests({
-                        ns: release.namespace,
-                        name: release.chartName,
-                      });
-                    },
-                    variant: ModalButtonStyle.success,
-                    disabled: isRunningTests,
-                  },
-                ]}
               >
-                {isRunningTests ? <Spinner /> : testResults ?? null}
+                {isRunningTests ? <Spinner /> : displayTestResults()}
               </Modal>{" "}
             </>
           ) : null}
@@ -214,7 +234,6 @@ const Rollback = ({
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
-        console.log("settled");
         refetchRevisions();
       },
     });
@@ -341,5 +360,211 @@ const Uninstall = () => {
         </Modal>
       ) : null}
     </>
+  );
+};
+
+const ReconfigureModal = ({
+  isOpen,
+  onClose,
+  release,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  release: Release;
+}) => {
+  const navigate = useNavigate();
+  const { chart_ver } = release;
+
+  const [selectedRepo, setSelectedRepo] = useState("");
+  const [userValues, setUserValues] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const { chart_name } = release;
+  const { data: versions } = useGetVersions(chart_name);
+  const { context, namespace, chart } = useParams();
+
+  const [selectedVersion, setSelectedVersion] = useState(chart_ver);
+  const { data: chartValues, refetch } = useGetChartValues(
+    namespace || "",
+    chart_name,
+    selectedRepo,
+    selectedVersion,
+    {
+      enabled: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const setReleaseVersionMutation = useMutation(
+    ["setVersion", namespace, chart, selectedVersion, selectedRepo],
+    async () => {
+      setErrorMessage("");
+      const formData = new FormData();
+      formData.append("preview", "false");
+      formData.append("chart", `${selectedRepo}/${chart_name}`);
+      formData.append("version", selectedVersion);
+      formData.append("values", userValues);
+
+      const res = await fetch(
+        // Todo: Change to BASE_URL from env
+        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        {
+          method: "post",
+          body: formData,
+        }
+      );
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      return res.json();
+    },
+    {
+      onSuccess: async (res) => {
+        onClose();
+        navigate(`/`);
+      },
+      onError: (error, variables, context) => {
+        setErrorMessage(error?.message || "Failed to update");
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (versions?.length) {
+      setSelectedRepo(versions[0].repository);
+    }
+  }, [versions]);
+
+  useEffect(() => {
+    refetch();
+  }, [selectedRepo, selectedVersion]);
+
+  const VersionToInstall = () => {
+    const currentVersion = `current version is: ${chart_ver}`;
+
+    return (
+      <div>
+        {versions?.length ? (
+          <>
+            Version to install:{" "}
+            <select
+              className="border-2 text-blue-500 rounded"
+              onChange={(e) => setSelectedVersion(e.target.value)}
+              value={selectedVersion}
+              defaultValue={chart_ver}
+            >
+              {versions?.map(({ repository, version }) => (
+                <option
+                  value={version}
+                  key={version}
+                >{`${repository} @ ${version}`}</option>
+              ))}
+            </select>{" "}
+          </>
+        ) : null}
+
+        {currentVersion}
+      </div>
+    );
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Upgrade ${release.chart_name}`}
+      containerClassNames="w-2/3"
+      actions={[
+        {
+          id: "1",
+          text: setReleaseVersionMutation.isLoading
+            ? "Submitting..."
+            : "Confirm",
+          callback: setReleaseVersionMutation.mutate,
+          variant: ModalButtonStyle.info,
+          disabled: setReleaseVersionMutation.isLoading,
+        },
+      ]}
+    >
+      <VersionToInstall />
+      <GeneralDetails {...release} />
+      <div className="flex w-full gap-6 mt-4">
+        <UserDefinedValues val={userValues} setVal={setUserValues} />
+        <ChartValues chartValues={chartValues} />
+      </div>
+
+      <div>
+        DIFF PLACEHOLDER
+        {/* TODO: Put placeholder here SAPERRRR */}
+        {/* use <chartValues> for diff */}
+      </div>
+      {errorMessage && (
+        <div>
+          <p className="text-red-600 text-lg">
+            Failed to get upgrade info: {errorMessage}
+          </p>
+        </div>
+      )}
+    </Modal>
+  );
+};
+const UserDefinedValues = ({ val, setVal }: { val: string; setVal: any }) => {
+  return (
+    <div className="w-1/2">
+      <label
+        className="block tracking-wide text-gray-700 text-xl font-medium mb-2"
+        htmlFor="grid-user-defined-values"
+      >
+        User defined values:
+      </label>
+      <textarea
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        rows={14}
+        className="block p-2.5 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none"
+      ></textarea>
+    </div>
+  );
+};
+
+const GeneralDetails = ({ chart_name }: { chart_name: string }) => {
+  const { context, namespace } = useParams();
+
+  return (
+    <div className="flex gap-8">
+      <div>
+        <h4>Release name:</h4>
+        <div className="p-2 bg-gray-200 rounded">{chart_name}</div>
+      </div>
+      <div>
+        <h4>Namespace (optional):</h4>
+        <div className="p-2 bg-gray-200 rounded">{namespace}</div>
+      </div>
+      <div>
+        <h4>Cluster:</h4>
+        <div className="p-2 bg-gray-200 rounded">{context}</div>
+      </div>
+    </div>
+  );
+};
+
+const ChartValues = ({ chartValues }: { chartValues: string }) => {
+  return (
+    <div className="w-1/2">
+      <label
+        className="block tracking-wide text-gray-700 text-xl font-medium mb-2"
+        htmlFor="grid-user-defined-values"
+      >
+        Chart value reference
+      </label>
+      <pre
+        className=" w-1/2 bg-gray-100 rounded p-4 font-medium text-md w-full max-h-[300px] block overflow-y-auto"
+        dangerouslySetInnerHTML={{
+          __html: marked(
+            hljs.highlight(chartValues || "", { language: "yaml" }).value
+          ),
+        }}
+      />
+    </div>
   );
 };

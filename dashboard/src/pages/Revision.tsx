@@ -59,6 +59,7 @@ function Revision() {
     }
     return null;
   }, [releaseRevisions, selectedRevision]);
+
   if (!releaseRevisions) return <></>;
 
   return (

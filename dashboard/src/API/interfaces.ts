@@ -66,6 +66,8 @@ export interface ChartList {
 export interface LatestChartVersion {
   name: string;
   version: string;
+  isSuggestedRepo: boolean;
+  repository: string;
 }
 
 export interface ChartVersions {

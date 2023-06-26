@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
+import { callApi } from "../../API/releases";
+import Spinner from "../Spinner";
 
 interface FormKeys {
   name: string;
@@ -18,14 +20,26 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const addRepository = () => {
+    const body = new FormData();
+    body.append("name", formData.name);
+    body.append("url", formData.url);
+
     setIsLoading(true);
-    onClose();
+
+    callApi<void>("/api/helm/repositories", {
+      method: "POST",
+      body,
+    }).finally(() => {
+      setIsLoading(false);
+      onClose();
+      window.location.reload();
+    })
   };
 
   return (
     <Modal
       containerClassNames={
-        "border-2 border-error-border-color bg-error-background sm:w-6/12 xl:w-7/12"
+        "border-2 border-error-border-color bg-error-background w-full max-w-5xl"
       }
       title="Add Chart Repository"
       isOpen={isOpen}
@@ -33,9 +47,11 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
       bottomContent={
         <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
           <button
-            className="text-white font-bold px-3 py-1.5 bg-[#1347FF] hover:bg-[#0b5ed7] focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="flex items-center text-white font-medium px-3 py-1.5 bg-[#1347FF] hover:bg-[#0b5ed7] focus:ring-4 focus:outline-none focus:ring-blue-300 disabled:bg-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             onClick={addRepository}
+            disabled={isLoading}
           >
+            {isLoading && <Spinner size={4} />}
             Add Repository
           </button>
         </div>
@@ -52,7 +68,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             id="name"
             type="text"
             placeholder="Komodorio"
-            className="rounded-lg p-2 w-full border border-gray-300  focus:outline-none focus:border-sky-500 input-box-shadow"
+            className="rounded-lg p-2 w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
           />
         </label>
         <label className="flex-1" htmlFor="url">

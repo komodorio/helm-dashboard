@@ -8,7 +8,7 @@ import Spinner from "../components/Spinner";
 function Installed() {
   const [selectedCluster, setSelectedCluster] = useState<string>();
   const [filterKey, setFilterKey] = useState<string>("");
-  const { data: installedReleases, isLoading, refetch }  = useGetInstalledReleases(selectedCluster || "", {retry: false});
+  const { data: installedReleases, isLoading, refetch, isRefetching }  = useGetInstalledReleases(selectedCluster || "", {retry: false});
 
   useEffect(() => { refetch() }, [selectedCluster])
 
@@ -16,9 +16,9 @@ function Installed() {
     <div className="flex flex-row">
       <ClustersList selectedCluster={selectedCluster} setSelectedCluster={setSelectedCluster} installedReleases={installedReleases} />
       <div className="p-5 w-4/5">
-        <InstalledPackagesHeader isLoading={isLoading} installedPackages={installedReleases} setFilterKey={setFilterKey} />
+        <InstalledPackagesHeader isLoading={isLoading || isRefetching} installedPackages={installedReleases} setFilterKey={setFilterKey} />
 
-        {isLoading ? (
+        {isLoading || isRefetching ? (
           <Spinner />
         ) : (
           <InstalledPackagesList installedReleases={installedReleases} filterKey={filterKey} />

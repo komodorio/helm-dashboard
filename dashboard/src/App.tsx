@@ -6,21 +6,27 @@ import NotFound from "./pages/NotFound";
 import RepositoryPage from "./pages/Repository";
 import Revision from "./pages/Revision";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ErrorModal from "./components/modal/ErrorModal";
 import { useState } from "react";
 import { ErrorAlert, ErrorModalContext } from "./context/ErrorModalContext";
 import GlobalErrorModal from "./components/modal/GlobalErrorModal";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export default function App() {
-  const [shouldShowErrorModal, setShowErrorModal] = useState<ErrorAlert | undefined>(undefined);
+  const [shouldShowErrorModal, setShowErrorModal] = useState<
+    ErrorAlert | undefined
+  >(undefined);
   const value = { shouldShowErrorModal, setShowErrorModal };
-  
-  console.log(shouldShowErrorModal)
+
   return (
     <div>
-    <ErrorModalContext.Provider value={value}>
+      <ErrorModalContext.Provider value={value}>
         <QueryClientProvider client={queryClient}>
           <HashRouter>
             <Header />
@@ -37,7 +43,12 @@ export default function App() {
                 </Routes>
               </div>
             </div>
-            <GlobalErrorModal isOpen={!!shouldShowErrorModal} onClose={() => setShowErrorModal(undefined)} titleText={shouldShowErrorModal?.title  || ""} contentText={shouldShowErrorModal?.msg || ""}/>
+            <GlobalErrorModal
+              isOpen={!!shouldShowErrorModal}
+              onClose={() => setShowErrorModal(undefined)}
+              titleText={shouldShowErrorModal?.title || ""}
+              contentText={shouldShowErrorModal?.msg || ""}
+            />
           </HashRouter>
         </QueryClientProvider>
       </ErrorModalContext.Provider>

@@ -23,7 +23,6 @@
 # Go workspace file
 go.work
 
-pkg/dashboard/static
 /bin
 /.idea/
 
@@ -31,3 +30,4 @@ pkg/dashboard/static
 .DS_Store
 .vscode/
 /pkg/dashboard/objects/testdata/hello-world-0.1.0.tgz
+/pkg/frontend/dist/*
