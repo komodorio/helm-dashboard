@@ -68,35 +68,6 @@ export default function RevisionDetails({
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
   const [showTestsResults, setShowTestResults] = useState(false);
 
-  const checkUpgradeable = async () => {
-    try {
-      const response = await axios.get(
-        "/api/helm/repositories/latestver?name=" + release.chart_name
-      );
-      const data = response.data;
-
-      let elm = { name: "", version: "0" };
-      // const btnUpgradeCheck = $("#btnUpgradeCheck");
-      if (!data || !data.length) {
-        //     btnUpgradeCheck.prop("disabled", true)
-        //     btnUpgradeCheck.text("")
-        //     $("#btnAddRepository").text("Add repository for it").data("suggestRepo", "")
-      } else if (data[0].isSuggestedRepo) {
-        //     btnUpgradeCheck.prop("disabled", true)
-        //     btnUpgradeCheck.text("")
-        //     $("#btnAddRepository").text("Add repository for it: "+data[0].repository).data("suggestRepo", data[0].repository).data("suggestRepoUrl", data[0].urls[0])
-      } else {
-        //     $("#btnAddRepository").text("")
-        //     btnUpgradeCheck.text("Check for new version")
-        elm = data[0];
-      }
-    } catch (error) {
-      //errorAlert-"Failed to find chart in repo"
-    }
-
-    console.error("checkUpgradeable not implemented"); //todo: implement
-  };
-
   const { setShowErrorModal } = useAlertError();
   const {
     mutate: runTests,
@@ -120,10 +91,6 @@ export default function RevisionDetails({
       name: chart,
     });
     setShowTestResults(true);
-  };
-
-  const checkForNewVersion = () => {
-    throw new Error("checkForNewVersion not implemented"); //todo: implement
   };
 
   const displayTestResults = () => {
