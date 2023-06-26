@@ -58,14 +58,6 @@ jobs:
           name: binaries
           path: dist/
           retention-days: 1
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3.3.1
-        with:
-          # version: latest
-          # skip-go-installation: true
-          skip-pkg-cache: true
-          skip-build-cache: true
-          # args: --timeout=15m
 
   image:
     runs-on: ubuntu-latest
@@ -102,13 +94,35 @@ jobs:
           build-args: VER=0.0.0-dev
           platforms: linux/amd64,linux/arm64
 
-  helm_check:
+  static_and_lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3.3.1
+        with:
+          # version: latest
+          # skip-go-installation: true
+          skip-pkg-cache: true
+          skip-build-cache: true
+          # args: --timeout=15m
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: ./dashboard/package-lock.json
+      - name: NPM install
+        run: npm i
+        working-directory: ./dashboard
+      - name: NPM lint
+        run: npm run lint
+        working-directory: ./dashboard
+
       - name: Helm Template Check For Sanity
         uses: igabaydulin/helm-check-action@0.1.4
         env:
