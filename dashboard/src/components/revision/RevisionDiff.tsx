@@ -1,53 +1,57 @@
-import React, { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
+import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
 import { Diff2HtmlUI, Diff2HtmlUIConfig } from 'diff2html/lib/ui/js/diff2html-ui-slim.js';
 import { useGetReleaseInfoByType } from "../../API/releases";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
+import parse from 'html-react-parser';
 
 import hljs from "highlight.js";
-import { marked } from "marked";
+import Spinner from "../Spinner";
 
 type RevisionDiffProps = {
   includeUserDefineOnly?: boolean;
 };
 
+const TAB_VIEW_VIEW_ONLY = 'view';
+const TAB_VIEW_DIFF_PREV = 'diff-with-previous';
+const TAB_VIEW_DIFF_SPECIFIC = 'diff-with-specific-revision';
+
 function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
-  const [notesContent, setNotesContent] = useState("view");
+  const [tabView, setTabView] = useState(TAB_VIEW_VIEW_ONLY);
   const [specificVersion, setSpecificVersion] = useState("1");
+  const [searchParams] = useSearchParams();
+  const tab = searchParams.get('tab');
   const diffElement = useRef<HTMLElement>({});
+
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
-    setNotesContent(e.target.value);
+    setTabView(e.target.value);
   };
   const params = useParams();
-  
+  const revisionInt = parseInt(params.revision || '', 10)
+  const hasMultipleRevisions = revisionInt > 1;
+
   const additionalParams = useMemo(() => {
-      const revisionInt = parseInt(params.revision || '', 10)
-      if (notesContent === "diff-with-previous" && revisionInt > 1) {
+      if (tabView === TAB_VIEW_DIFF_PREV && hasMultipleRevisions) {
         return `&revisionDiff=${revisionInt - 1}`
       }
       const specificRevisionInt = parseInt(specificVersion || '', 10);
-      if (notesContent === "diff-with-specific-revision" && revisionInt > 1 && !Number.isNaN(specificRevisionInt)) {
+      if (tabView === TAB_VIEW_DIFF_SPECIFIC && hasMultipleRevisions && !Number.isNaN(specificRevisionInt)) {
         return `&revisionDiff=${specificVersion}`
       }
-  }, [notesContent, specificVersion, params]);
-  const {data, isLoading} = useGetReleaseInfoByType(params, additionalParams)
+  }, [tabView, specificVersion, revisionInt, hasMultipleRevisions]);
 
-  const yamlContent = useMemo(() => {
-    if (data) {
-      const val = hljs.highlight(data, { language: "yaml" }).value;
-      return val;
-    }
-    return '';
-  }, [data]);
+  const hasRevisionToDiff = !!additionalParams;
+
+  const {data, isLoading, isSuccess: fetchedDataSuccessfully} = useGetReleaseInfoByType({...params, tab}, additionalParams);
 
   const content = useMemo(() => {
-    if (data && !isLoading && (notesContent === "view" || !additionalParams)) {  
+    if (data && !isLoading && (tabView === TAB_VIEW_VIEW_ONLY || !hasRevisionToDiff)) {  
       return hljs.highlight(data, { language: "yaml" }).value;
     }
     return '';
-  }, [data, notesContent, isLoading]);
+  }, [data, tabView, isLoading]);
 
   useEffect(() => {
-    if (notesContent !== "view" && additionalParams && data && !isLoading) {
+    if (tabView !== TAB_VIEW_VIEW_ONLY && hasRevisionToDiff && data && !isLoading) {
       const configuration : Diff2HtmlUIConfig = {
         
         matching: 'lines',
@@ -60,20 +64,20 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
       
-    } else if (notesContent === "view") {
+    } else if (tabView === TAB_VIEW_VIEW_ONLY) {
       diffElement.current.innerHTML = '';
       
-    } else if (!additionalParams) {
-      diffElement.current.innerHTML = 'No Diff to present';
+    } else if (fetchedDataSuccessfully && (!hasRevisionToDiff || !data)) {
+      diffElement.current.innerHTML = 'No differences to display';
       
     }
-  }, [notesContent, additionalParams, data, isLoading]);
+  }, [tabView, hasRevisionToDiff, data, isLoading, fetchedDataSuccessfully, diffElement]);
   return (
     <div>
       <div className="flex mb-3 p-2 border border-[#DCDDDF] flex-row items-center justify-between w-full bg-white rounded">
         <div className="flex items-center">
           <input
-            checked={notesContent === "view"}
+            checked={tabView === "view"}
             onChange={handleChanged}
             id="view"
             type="radio"
@@ -90,7 +94,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
         </div>
         <div className="flex items-center">
           <input
-            checked={notesContent === "diff-with-previous"}
+            checked={tabView === "diff-with-previous"}
             onChange={handleChanged}
             id="diff-with-previous"
             type="radio"
@@ -107,7 +111,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
         </div>
         <div className="flex items-center">
           <input
-            checked={notesContent === "diff-with-specific-revision"}
+            checked={tabView === "diff-with-specific-revision"}
             onChange={handleChanged}
             id="diff-with-specific-revision"
             type="radio"
@@ -147,17 +151,15 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
           </div>
         )}
       </div>
-      {notesContent  === "view" && content ? (
-        <div className="bg-white w-full relative">
-          <pre
-          className="bg-white rounded p-3"
-          dangerouslySetInnerHTML={{
-            __html: marked(content),
-          }}
-        ></pre>  
+      {isLoading ? <Spinner /> : ''}
+      {tabView  === TAB_VIEW_VIEW_ONLY && content ? (
+        <div className="bg-white overflow-x-auto w-full relative">
+          <pre className="bg-white rounded p-3">
+                {parse(content)}
+          </pre>  
         </div>
       ) : ''}
-      <div className="bg-white w-full relative" ref={diffElement}>
+      <div className="bg-white overflow-x-auto w-full relative" ref={diffElement}>
         
       </div>
     </div>
