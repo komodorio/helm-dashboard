@@ -21,7 +21,7 @@ ENV CGO_ENABLED=0
 
 WORKDIR /build
 
-COPY --from=frontend /pkg/dashboard/static /build/pkg/dashboard/static/
+COPY --from=frontend /pkg/frontend/dist /build/pkg/frontend/dist/
 
 COPY go.mod ./
 COPY go.sum ./
