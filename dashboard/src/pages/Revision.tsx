@@ -59,6 +59,8 @@ function Revision() {
     }
     return null;
   }, [releaseRevisions, selectedRevision]);
+
+  console.log({ selectedRelease });
   if (!releaseRevisions) return <></>;
 
   return (

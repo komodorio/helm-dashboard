@@ -4,19 +4,23 @@ import {
   useMutation,
   UseMutationOptions,
 } from "@tanstack/react-query";
+import { ChartVersion } from "../data/types";
+import apiService from "./apiService";
+import { LatestChartVersion } from "./interfaces";
 
-export function useGetInstalledReleases(context: string,
+export function useGetInstalledReleases(
+  context: string,
   options?: UseQueryOptions<InstalledReleases[]>
 ) {
-
   return useQuery<InstalledReleases[]>(
     ["installedReleases"],
-    () => callApi<InstalledReleases[]>("/api/helm/releases", {
-      headers: {
-        "X-Kubecontext": context,
-      }
-    }),
-    options,
+    () =>
+      callApi<InstalledReleases[]>("/api/helm/releases", {
+        headers: {
+          "X-Kubecontext": context,
+        },
+      }),
+    options
   );
 }
 
@@ -123,14 +127,40 @@ export function useGetResourceDescription(
     options
   );
 }
-
+export function useGetLatestVersion(
+  chartName: string,
+  options?: UseQueryOptions<ChartVersion[]>
+) {
+  return useQuery<ChartVersion[]>(
+    ["latestver", chartName],
+    () =>
+      callApi<ChartVersion[]>(
+        `/api/helm/repositories/versions?name=${chartName}`
+      ),
+    options
+  );
+}
+export function useGetVersions(
+  chartName: string,
+  options?: UseQueryOptions<LatestChartVersion[]>
+) {
+  return useQuery<LatestChartVersion[]>(
+    ["versions", chartName],
+    () =>
+      callApi<LatestChartVersion[]>(
+        `/api/helm/repositories/versions?name=${chartName}`
+      ),
+    options
+  );
+}
 
 export function useGetReleaseInfoByType(
   params: ReleaseInfoParams,
   additionalParams: string = "",
   options?: UseQueryOptions<string>
 ) {
-  const {chart, namespace, tab, revision} = params;
+  const { chart, namespace, tab, revision } = params;
+  console.log({ params });
   return useQuery<string>(
     [tab, namespace, chart, revision, additionalParams],
     () =>
@@ -138,12 +168,32 @@ export function useGetReleaseInfoByType(
         `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
-        }
+        },
+        "html"
       ),
     options
   );
 }
 
+export function useGetChartValues(
+  namespace: string,
+  chartName: string,
+  repository: string,
+  version: string,
+  options?: UseQueryOptions<any>
+) {
+  return useQuery<any>(
+    ["values", namespace, chartName, repository],
+    () =>
+      callApi<any>(
+        `/api/helm/repositories/values?chart=${repository}/${chartName}&version=${version}`,
+        {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        }
+      ),
+    options
+  );
+}
 
 // Rollback the release to a previous revision
 export function useRollbackRelease(
@@ -270,7 +320,7 @@ export interface Condition {
 
 export async function callApi<T>(
   url: string,
-  options?: RequestInit,
+  options?: RequestInit
 ): Promise<T> {
   const baseUrl = "http://localhost:8080";
   const response = await fetch(baseUrl + url, options);
@@ -281,7 +331,7 @@ export async function callApi<T>(
     );
   }
   let data;
-  
+
   if (response.headers.get("Content-Type")?.includes("text/plain")) {
     data = await response.text();
   } else {

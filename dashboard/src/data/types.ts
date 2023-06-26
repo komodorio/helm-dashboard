@@ -37,8 +37,8 @@ export type Release = {
   updated: string;
   status: string;
   chart: string;
-  chartName: string;
-  chartVersion: string;
+  chart_name: string;
+  chart_ver: string;
   app_version: string;
   icon: string;
   description: string;
