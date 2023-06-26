@@ -508,7 +508,7 @@ const ReconfigureModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title={`Upgrade ${release.chart_name}`}
-      containerClassNames="w-[600px]"
+      containerClassNames="w-2/3"
       actions={[
         {
           id: "1",

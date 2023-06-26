@@ -83,7 +83,7 @@ const Modal = ({
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
           <div className="flex justify-center">
             <div
-              className={`relative bg-white rounded-lg shadow  m-7 w-2/5${
+              className={`relative bg-white rounded-lg shadow  m-7 w-2/5 ${
                 containerClassNames ?? ""
               }`}
             >
