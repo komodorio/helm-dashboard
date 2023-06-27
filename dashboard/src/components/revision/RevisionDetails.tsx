@@ -343,7 +343,7 @@ const Uninstall = () => {
     () =>
       fetch(
         // Todo: Change to BASE_URL from env
-        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "delete",
         }
@@ -452,7 +452,7 @@ const ReconfigureModal = ({
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "post",
           body: formData,
@@ -646,7 +646,7 @@ const ManifestDiff = ({
   const fetchVersionData = async (version: string) => {
     const formData = getVersionManifestFormData(version);
     const response = await fetch(
-      `http://localhost:8080/api/helm/releases/${namespace}/${chart}`,
+      `/api/helm/releases/${namespace}/${chart}`,
       {
         method: "post",
         body: formData,
@@ -665,7 +665,7 @@ const ManifestDiff = ({
     formData.append("a", currentVerData.manifest);
     formData.append("b", selectedVerData.manifest);
 
-    const response = await fetch("http://localhost:8080/diff", {
+    const response = await fetch("/diff", {
       method: "post",
       body: formData,
     });
