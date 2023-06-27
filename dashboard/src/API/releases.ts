@@ -164,7 +164,6 @@ export function useGetReleaseInfoByType(
   options?: UseQueryOptions<string>
 ) {
   const { chart, namespace, tab, revision } = params;
-  console.log({ params });
   return useQuery<string>(
     [tab, namespace, chart, revision, additionalParams],
     () =>

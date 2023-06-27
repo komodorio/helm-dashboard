@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import useCustomSearchParams from '../hooks/useCustomSearchParams'
 
 export interface Tab {
   value: string;
@@ -20,10 +21,10 @@ export default function Tabs({
   
   const navigate = useNavigate();
   const {context, namespace, chart, revision} = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams, addSearchParam] = useCustomSearchParams();
 
   const moveTab = (tab : Tab) => {
-    setSearchParams(`tab=${tab.value}`)
+    addSearchParam('tab', tab.value)
   }
 
   return (
