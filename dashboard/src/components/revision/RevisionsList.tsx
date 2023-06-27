@@ -9,22 +9,27 @@ type RevisionsListProps = {
   selectedRevision: number;
 };
 
-
 export default function RevisionsList({
   releaseRevisions,
   selectedRevision,
 }: RevisionsListProps) {
-
   const navigate = useNavigate();
-  const {context, namespace, chart, tab} = useParams();
-  const changeRelease = (newRevision : number) => {
-    navigate(`/revision/${context}/${namespace}/${chart}/${newRevision}/${tab}`)
-  }
+  const { context, namespace, chart, tab } = useParams();
+  const changeRelease = (newRevision: number) => {
+    navigate(
+      `/revision/${context}/${namespace}/${chart}/${newRevision}/${
+        tab ? tab : ""
+      }`
+    );
+  };
   return (
     <>
       {releaseRevisions?.map((release, idx) => {
-        const hasMultipleReleases = releaseRevisions.length > 1 && idx < releaseRevisions.length - 1;
-        const prevRelease = hasMultipleReleases ? releaseRevisions[idx + 1] : null;
+        const hasMultipleReleases =
+          releaseRevisions.length > 1 && idx < releaseRevisions.length - 1;
+        const prevRelease = hasMultipleReleases
+          ? releaseRevisions[idx + 1]
+          : null;
         return (
           <div
             onClick={() => changeRelease(release.revision)}
@@ -45,13 +50,15 @@ export default function RevisionsList({
                   <span className="line-through">{prevRelease.chart_ver}</span>
                   <BsArrowUpRight />
                   <span>{release.chart_ver}</span>
-                </> 
-            ) :'' }
+                </>
+              ) : (
+                ""
+              )}
               <span>AGE:{getAge(release.updated)}</span>
             </div>
           </div>
-       );
-              })}
+        );
+      })}
     </>
   );
 }

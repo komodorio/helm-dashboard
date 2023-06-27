@@ -10,8 +10,12 @@ import {
 } from "react-icons/bs";
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
-import { useNavigate, useParams, useSearchParams} from "react-router-dom";
-import { useGetReleaseInfoByType } from "../../API/releases";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useGetDiff,
+  useGetReleaseInfoByType,
+  useGetReleaseManifest,
+} from "../../API/releases";
 
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
@@ -24,7 +28,7 @@ import {
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import { marked } from "marked";
@@ -47,10 +51,14 @@ export default function RevisionDetails({
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
   const revisionTabs = [
-    { value: 'resources', label: "Resources", content: <RevisionResource /> },
+    { value: "resources", label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
-    { value: 'values', label: "Values", content: <RevisionDiff includeUserDefineOnly={true} /> },
-    { value: 'notes', label: "Notes", content: <RevisionDiff /> },
+    {
+      value: "values",
+      label: "Values",
+      content: <RevisionDiff includeUserDefineOnly={true} />,
+    },
+    { value: "notes", label: "Notes", content: <RevisionDiff /> },
   ];
   const [isChecking, setChecking] = useState(false);
   const { context, namespace, chart } = useParams();
@@ -59,7 +67,6 @@ export default function RevisionDetails({
  
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
-
 
   const {
     data: latestVerData,
@@ -235,9 +242,12 @@ const Rollback = ({
   const { chart, namespace, revision } = useParams();
 
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
-  const revisionInt = parseInt(revision || '', 10);
+  const revisionInt = parseInt(revision || "", 10);
   const prevRevision = revisionInt - 1;
-  const response = useGetReleaseInfoByType({chart, namespace, revision , tab: 'manifests'}, `&revisionDiff=${prevRevision}`);
+  const response = useGetReleaseInfoByType(
+    { chart, namespace, revision, tab: "manifests" },
+    `&revisionDiff=${prevRevision}`
+  );
 
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
@@ -413,21 +423,11 @@ const ReconfigureModal = ({
 
   const { chart_name } = release;
   const { data: versions } = useGetVersions(chart_name);
-  const { context, namespace, chart } = useParams();
+  const { context: clusterName, namespace, chart } = useParams();
 
   const [selectedVersion, setSelectedVersion] = useState(chart_ver);
-  const { data: currChartValue } = useGetChartValues(
-    namespace || "",
-    chart_name,
-    selectedRepo,
-    chart_ver,
-    {
-      enabled: false,
-      refetchOnWindowFocus: false,
-    }
-  );
-  console.log("a", currChartValue)
-  const { data: chartValues, refetch } = useGetChartValues(
+
+  const { data: chartValues, refetch: refetchChartValues } = useGetChartValues(
     namespace || "",
     chart_name,
     selectedRepo,
@@ -479,7 +479,9 @@ const ReconfigureModal = ({
   }, [versions]);
 
   useEffect(() => {
-    refetch();
+    if (selectedRepo) {
+      refetchChartValues();
+    }
   }, [selectedRepo, selectedVersion]);
 
   const VersionToInstall = () => {
@@ -516,7 +518,7 @@ const ReconfigureModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title={`Upgrade ${release.chart_name}`}
-      containerClassNames="w-2/3"
+      containerClassNames="w-5/6"
       actions={[
         {
           id: "1",
@@ -536,11 +538,12 @@ const ReconfigureModal = ({
         <ChartValues chartValues={chartValues} />
       </div>
 
-      <div>
-        DIFF PLACEHOLDER
-        {/* TODO: Put placeholder here SAPERRRR */}
-        {/* use <chartValues> for diff */}
-      </div>
+      <ManifestDiff
+        currentVersion={chart_ver}
+        selectedVersion={selectedVersion}
+        selectedRepo={selectedRepo}
+        chart_name={chart_name}
+      />
       {errorMessage && (
         <div>
           <p className="text-red-600 text-lg">
@@ -609,5 +612,98 @@ const ChartValues = ({ chartValues }: { chartValues: string }) => {
         }}
       />
     </div>
+  );
+};
+
+const ManifestDiff = ({
+  currentVersion,
+  selectedVersion,
+  selectedRepo,
+  chart_name,
+}: {
+  currentVersion: string;
+  selectedVersion: string;
+  selectedRepo: string;
+  chart_name: string;
+}) => {
+  console.log({ currentVersion, selectedVersion });
+  const { namespace, chart } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [diff, setDiff] = useState("");
+  const getVersionManifestFormData = (version: string) => {
+    const formData = new FormData();
+    formData.append("chart", `${selectedRepo}/${chart_name}`);
+    formData.append("version", version);
+    formData.append("values", "");
+    formData.append("preview", "true");
+
+    return formData;
+  };
+
+  const fetchVersionData = async (version: string) => {
+    const formData = getVersionManifestFormData(version);
+    const response = await fetch(
+      `http://localhost:8080/api/helm/releases/${namespace}/${chart}`,
+      {
+        method: "post",
+        body: formData,
+      }
+    );
+    const data = await response.json();
+    return data;
+  };
+
+  const fetchDiff = async () => {
+    const [currentVerData, selectedVerData] = await Promise.all([
+      fetchVersionData(currentVersion),
+      fetchVersionData(selectedVersion),
+    ]);
+    const formData = new FormData();
+    formData.append("a", currentVerData.manifest);
+    formData.append("b", selectedVerData.manifest);
+
+    const response = await fetch("http://localhost:8080/diff", {
+      method: "post",
+      body: formData,
+    });
+    const diff = await response.text();
+    setDiff(diff);
+  };
+
+  useEffect(() => {
+    if (selectedVersion !== currentVersion) {
+      fetchDiff();
+    }
+  }, [selectedVersion]);
+  const diffContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (diff && diffContainerRef.current) {
+      const configuration: Diff2HtmlUIConfig = {
+        matching: "lines",
+        outputFormat: "side-by-side",
+        highlight: true,
+        renderNothingWhenEmpty: false,
+      };
+      const diff2htmlUi = new Diff2HtmlUI(
+        diffContainerRef.current,
+        diff,
+        configuration
+      );
+      diff2htmlUi.draw();
+      diff2htmlUi.highlightCode();
+    }
+  }, [diff]);
+  if (isLoading) {
+    return (
+      <div>
+        <Spinner />
+        Loading diff...
+      </div>
+    );
+  }
+  return (
+    <div ref={diffContainerRef} className="relative overflow-y-auto"></div>
   );
 };

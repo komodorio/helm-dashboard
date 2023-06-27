@@ -24,9 +24,12 @@ export default function InstallModal({
     </div>
   );
 
-  const { data: chartVersions } = useQuery<ChartVersion[]>({
+  const { data: chartVersions, refetch: refetchVersions } = useQuery<
+    ChartVersion[]
+  >({
     queryKey: ["chartVersions", chart],
     queryFn: apiService.getChartVersions,
+    enabled: false,
   });
 
   const [confirmModalActions, setConfirmModalActions] =
@@ -44,6 +47,12 @@ export default function InstallModal({
       },
     ]);
   }, [onConfirm]);
+
+  useEffect(() => {
+    if (isOpen) {
+      refetchVersions();
+    }
+  }, [isOpen]);
 
   const { data: chartValues, refetch } = useQuery(
     ["values", { namespace, chart, version: versionToInstall }],

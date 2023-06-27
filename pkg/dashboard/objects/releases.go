@@ -3,6 +3,7 @@ package objects
 import (
 	"bytes"
 	"gopkg.in/yaml.v3"
+	"helm.sh/helm/v3/pkg/registry"
 	"io"
 	"os"
 	"path"
@@ -132,6 +133,16 @@ func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.E
 		return nil, err
 	}
 
+	registryClient, err := registry.NewClient(
+		registry.ClientOptDebug(false),
+		registry.ClientOptEnableCache(true),
+		//registry.ClientOptWriter(out),
+		registry.ClientOptCredentialsFile(settings.RegistryConfig),
+	)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to crete helm config object")
+	}
+
 	if req := chartRequested.Metadata.Dependencies; req != nil {
 		// If CheckDependencies returns an error, we have unfulfilled dependencies.
 		// As of Helm 2.4.0, this is treated as a stopping condition:
@@ -148,6 +159,7 @@ func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.E
 					RepositoryConfig: settings.RepositoryConfig,
 					RepositoryCache:  settings.RepositoryCache,
 					Debug:            settings.Debug,
+					RegistryClient:   registryClient, // added on top of Helm code
 				}
 				if err := man.Update(); err != nil {
 					return nil, err

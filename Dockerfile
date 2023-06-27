@@ -35,7 +35,7 @@ COPY --from=frontend /pkg/frontend/dist ./src/pkg/frontend/dist/
 
 WORKDIR /build/src
 
-RUN make build
+RUN make build_go
 
 # Stage - runner
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine

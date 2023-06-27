@@ -106,6 +106,8 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: make dir for frontend results # don't delete this step, it will break goreleaser
+        run: mkdir pkg/frontend/dist && touch pkg/frontend/dist/.gitkeep
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.3.1
         with:
