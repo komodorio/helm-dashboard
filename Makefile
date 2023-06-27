@@ -15,7 +15,7 @@ pull: ; $(info $(M) Pulling source...) @
 
 .PHONY: build
 build: $(BIN) ; $(info $(M) Building executable...) @ ## Build program binary
-	go build \
+	cd dashboard && npm run build && cd .. && go build \
 		-ldflags '-X main.version=$(VERSION) -X main.buildDate=$(DATE)' \
 		-o bin/dashboard .
 
