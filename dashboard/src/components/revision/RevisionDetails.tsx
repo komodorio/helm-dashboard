@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { Diff2HtmlUI, Diff2HtmlUIConfig } from 'diff2html/lib/ui/js/diff2html-ui-slim.js';
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Diff2HtmlUI,
+  Diff2HtmlUIConfig,
+} from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 
 import {
   BsPencil,
@@ -62,8 +65,9 @@ export default function RevisionDetails({
   ];
   const [isChecking, setChecking] = useState(false);
   const { context, namespace, chart } = useParams();
-  const tab = searchParams.get('tab');
-  const selectedTab = revisionTabs.find(t => t.value === tab) || revisionTabs[0];
+  const tab = searchParams.get("tab");
+  const selectedTab =
+    revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
  
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
@@ -324,9 +328,7 @@ const RollbackModalContent = ({dataResponse}) => {
       diff2htmlUi.highlightCode();
     }
   }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
-  return (
-    <div className="relative" ref={diffElement}/>
-  )
+  return <div className="relative" ref={diffElement} />;
 }
 
 const Uninstall = () => {
