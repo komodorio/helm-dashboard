@@ -62,15 +62,19 @@ function useUpgradeRelease(
   }, options);
 }
 
-// Get revision history for release
-function useGetReleaseRevisions(
+export function useGetReleaseManifest(
   ns: string,
   name: string,
-  options?: UseQueryOptions<ReleaseRevisions>
+  formData: FormData,
+  options?: UseQueryOptions<any>
 ) {
-  return useQuery<ReleaseRevisions>(
-    ["releaseRevisions", ns, name],
-    () => callApi<ReleaseRevisions>(`/api/helm/releases/${ns}/${name}/history`),
+  return useQuery<any>(
+    ["manifest", ns, name],
+    () =>
+      callApi<any>(`/api/helm/releases/${ns}/${name}`, {
+        method: "post",
+        body: formData,
+      }),
     options
   );
 }
@@ -168,7 +172,7 @@ export function useGetReleaseInfoByType(
         `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
-        },
+        }
       ),
     options
   );
@@ -193,7 +197,22 @@ export function useGetChartValues(
     options
   );
 }
+export function useGetDiff(
+  formData: FormData,
+  options?: UseQueryOptions<string>
+) {
+  return useQuery<string>(
+    ["diff", formData],
+    () => {
+      return callApi<string>(`/diff`, {
+        body: formData,
 
+        method: "POST",
+      });
+    },
+    options
+  );
+}
 
 // Rollback the release to a previous revision
 export function useRollbackRelease(

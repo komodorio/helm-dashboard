@@ -48,7 +48,7 @@ export default function InstalledPackageCard({
     }
 
     navigate(
-      `/revision/${selectedCluster?.Name}/${namespace}/${name}/${release.revision}/`,
+      `/revision/${selectedCluster?.Name}/${namespace}/${name}/${release.revision}`,
       { state: release }
     );
   };
