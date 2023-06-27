@@ -53,6 +53,7 @@ export default function RevisionDetails({
   refetchRevisions,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
+  
   const revisionTabs = [
     { value: "resources", label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
