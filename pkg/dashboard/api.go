@@ -200,7 +200,7 @@ func configureStatic(api *gin.Engine) {
 		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
 	})
 
-	api.GET("/scripts/*filepath", func(c *gin.Context) {
+	api.GET("/static/*filepath", func(c *gin.Context) {
 		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
 	})
 }
