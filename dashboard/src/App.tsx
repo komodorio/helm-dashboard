@@ -31,7 +31,7 @@ export default function App() {
           <HashRouter>
             <Header />
             <div className="bg-body-background h-screen">
-              <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen max-h-full overflow-y-auto ">
+              <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen max-h-full">
                 <Routes>
                   <Route path="/" element={<Installed />} />
                   <Route
