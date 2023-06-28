@@ -53,7 +53,7 @@ export default function RevisionDetails({
   refetchRevisions,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
-  
+
   const revisionTabs = [
     { value: "resources", label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
@@ -169,6 +169,7 @@ export default function RevisionDetails({
             )}
           </div>
 
+          <Rollback release={release} refetchRevisions={refetchRevisions} />
           {release.has_tests ? (
             <>
               {" "}
@@ -190,7 +191,6 @@ export default function RevisionDetails({
             </>
           ) : null}
 
-          <Rollback release={release} refetchRevisions={refetchRevisions} />
           <div className="h-1/2">
             <Uninstall />
           </div>
@@ -290,7 +290,7 @@ const Rollback = ({
         actions={[
           {
             id: "1",
-            text: isRollingBackRelease ? "Rolling back..." : "Rollback",
+            text: isRollingBackRelease ? "Rolling back..." : "Confirm",
             callback: () => {
               rollbackRelease({
                 ns: namespace,
@@ -299,7 +299,7 @@ const Rollback = ({
               });
               setShowRollbackDiff(false);
             },
-            variant: ModalButtonStyle.success,
+            variant: ModalButtonStyle.info,
             disabled: isRollingBackRelease,
           },
         ]}
@@ -331,7 +331,12 @@ const RollbackModalContent = ({ dataResponse }) => {
       diff2htmlUi.highlightCode();
     }
   }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
-  return <div className="relative" ref={diffElement} />;
+  return (
+    <div className="flex flex-col space-y-4">
+      <p>Following changes will happen to cluster:</p>
+      <div className="relative" ref={diffElement} />;
+    </div>
+  );
 };
 
 const Uninstall = () => {
@@ -384,11 +389,9 @@ const Uninstall = () => {
           actions={[
             {
               id: "1",
-              text: uninstallMutation.isLoading
-                ? "Uninstalling..."
-                : "Uninstall",
+              text: uninstallMutation.isLoading ? "Uninstalling..." : "Confirm",
               callback: uninstallMutation.mutate,
-              variant: ModalButtonStyle.error,
+              variant: ModalButtonStyle.info,
               disabled: uninstallMutation.isLoading,
             },
           ]}
@@ -631,7 +634,6 @@ const ManifestDiff = ({
   selectedRepo: string;
   chart_name: string;
 }) => {
-  console.log({ currentVersion, selectedVersion });
   const { namespace, chart } = useParams();
   const [isLoading, setIsLoading] = useState(false);
 
