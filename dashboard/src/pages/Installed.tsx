@@ -9,26 +9,46 @@ import useAlertError from "../hooks/useAlertError";
 function Installed() {
   const [selectedCluster, setSelectedCluster] = useState<string>();
   const [filterKey, setFilterKey] = useState<string>("");
-  const { data, isLoading, refetch, isRefetching }  = useGetInstalledReleases(selectedCluster || "", {retry: false});
-  const a = useAlertError()
-  
-  useEffect(() => { 
-    refetch().then(e => {}).catch(e => a.setShowErrorModal({
-      title: "Unable to load installed packages",
-      msg: e.message
-    }))
-   }, [selectedCluster])
+  const { data, isLoading, refetch, isRefetching } = useGetInstalledReleases(
+    selectedCluster || "",
+    { retry: false }
+  );
+  const a = useAlertError();
+
+  useEffect(() => {
+    refetch()
+      .then((e) => {})
+      .catch((e) =>
+        a.setShowErrorModal({
+          title: "Unable to load installed packages",
+          msg: e.message,
+        })
+      );
+  }, [selectedCluster]);
 
   return (
     <div className="flex flex-row">
-      <ClustersList selectedCluster={selectedCluster} setSelectedCluster={setSelectedCluster} installedReleases={data} />
+      <ClustersList
+        selectedCluster={selectedCluster}
+        setSelectedCluster={setSelectedCluster}
+        installedReleases={data}
+      />
       <div className="p-5 w-4/5">
-        <InstalledPackagesHeader isLoading={isLoading || isRefetching} installedPackages={data} setFilterKey={setFilterKey} />
+        <InstalledPackagesHeader
+          isLoading={isLoading || isRefetching}
+          installedPackages={data}
+          setFilterKey={setFilterKey}
+        />
 
         {isLoading || isRefetching ? (
-          <Spinner />
+          <div className="py-2">
+            <Spinner />
+          </div>
         ) : (
-          <InstalledPackagesList installedReleases={data} filterKey={filterKey} />
+          <InstalledPackagesList
+            installedReleases={data}
+            filterKey={filterKey}
+          />
         )}
       </div>
     </div>

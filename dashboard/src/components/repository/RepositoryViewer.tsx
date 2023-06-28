@@ -69,7 +69,10 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
         <div className="flex flex-col">
           <div className="flex flex-row gap-2">
-            <button onClick={() => update.mutate()}>
+            <button onClick={() => {
+              update.mutate()
+              window.location.reload();
+            }}>
               <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
                 {update.isLoading ? <Spinner size={4} /> : <BsArrowRepeat />}
                 Update

@@ -31,7 +31,7 @@ export default function App() {
           <HashRouter>
             <Header />
             <div className="bg-body-background h-screen">
-              <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen max-h-full overflow-y-auto ">
+              <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen max-h-full">
                 <Routes>
                   <Route path="/" element={<Installed />} />
                   <Route
@@ -39,7 +39,7 @@ export default function App() {
                     element={<Revision />}
                   />
                   <Route path="/repository" element={<RepositoryPage />} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route path="*" element={<Installed />}/>
                 </Routes>
               </div>
             </div>
