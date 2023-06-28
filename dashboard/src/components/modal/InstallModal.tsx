@@ -78,6 +78,7 @@ export default function InstallModal({
       isOpen={isOpen}
       onClose={onConfirm}
       actions={confirmModalActions}
+      containerClassNames="w-4/5 2xl:w-2/3"
     >
       <div>
         <div>
