@@ -39,7 +39,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   return (
     <Modal
       containerClassNames={
-        "border-2 border-error-border-color bg-error-background w-full max-w-5xl"
+        "border-2 bg-error-background w-full max-w-5xl"
       }
       title="Add Chart Repository"
       isOpen={isOpen}
