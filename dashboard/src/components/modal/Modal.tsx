@@ -36,7 +36,6 @@ const Modal = ({
   containerClassNames,
   bottomContent,
 }: ModalProps) => {
-  console.log(title, containerClassNames);
   const colorVariants = new Map<ModalButtonStyle, string>([
     [
       ModalButtonStyle.default,
