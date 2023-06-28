@@ -2,7 +2,10 @@ import React from 'react'
 
 function NotFound() {
   return (
-    <div>404 page not found</div>
+    <div style={{
+      display: "flex",
+      flex: 1
+    }}>404 page not found</div>
   )
 }
 

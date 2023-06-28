@@ -39,7 +39,7 @@ export default function App() {
                     element={<Revision />}
                   />
                   <Route path="/repository" element={<RepositoryPage />} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route path="*" element={<Installed />}/>
                 </Routes>
               </div>
             </div>
