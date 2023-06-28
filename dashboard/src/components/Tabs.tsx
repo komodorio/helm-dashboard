@@ -21,8 +21,8 @@ export default function Tabs({
   
   const navigate = useNavigate();
   const {context, namespace, chart, revision} = useParams();
-  const [searchParams, setSearchParams, addSearchParam] = useCustomSearchParams();
-
+  const {searchParamsObject: searchParams, addSearchParam} = useCustomSearchParams();
+  
   const moveTab = (tab : Tab) => {
     addSearchParam('tab', tab.value)
   }
