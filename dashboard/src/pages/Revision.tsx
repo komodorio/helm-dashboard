@@ -64,7 +64,7 @@ function Revision() {
 
   return (
     <div className="flex">
-      <div className="flex flex-col gap-2 w-1/6 h-screen bg-[#E8EDF2]">
+      <div className="flex flex-col gap-2 w-1/6 min-h-screen bg-[#E8EDF2]">
         <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">
           Revisions
         </label>
@@ -74,7 +74,7 @@ function Revision() {
         />
       </div>
 
-      <div className="w-5/6 h-screen bg-[#F4F7FA]">
+      <div className="w-5/6 min-h-screen bg-[#F4F7FA]">
         {selectedRelease ? (
           <RevisionDetails
             release={selectedRelease}
