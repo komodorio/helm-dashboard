@@ -400,6 +400,7 @@ const Uninstall = () => {
               disabled: uninstallMutation.isLoading,
             },
           ]}
+          containerClassNames="w-[800px]"
         >
           <div>Following resources will be deleted from the cluster:</div>
           <div>
