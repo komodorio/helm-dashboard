@@ -3,32 +3,24 @@ const VIEW_MODE_VIEW_ONLY = 'view';
 const VIEW_MODE_DIFF_PREV = 'diff-with-previous';
 const VIEW_MODE_DIFF_SPECIFIC = 'diff-with-specific-revision';
 
-enum Mode {
-    VIEW_MODE_VIEW_ONLY,
-    VIEW_MODE_DIFF_PREV,
-    VIEW_MODE_DIFF_SPECIFIC,
-}
-enum Tab {
-    'resources', 'manifests', 'values', 'notes'
-}
-type searchParamsTypes = {
-    mode: Mode;
-    tab: Tab;
-}
-
 const useCustomSearchParams = () => {
     const [search, setSearch] = useSearchParams();
-    const searchAsObject : searchParamsTypes = Object.fromEntries(
+    const searchAsObject : object = Object.fromEntries(
       new URLSearchParams(search)
     );
 
-    const addSearchParam = (k : string, value : Mode | Tab) => {
+    const addSearchParam = (k : string, value : string) => {
         const copySearchParams = new URLSearchParams(search)
         copySearchParams.set(k, value);
         setSearch(copySearchParams);
     }
+    const removeSearchParam = (k : string) => {
+        const copySearchParams = new URLSearchParams(search)
+        copySearchParams.delete(k);
+        setSearch(copySearchParams);
+    }
   
-    return [searchAsObject, setSearch, addSearchParam];
+    return {searchParamsObject: searchAsObject, setSearchParams: setSearch, addSearchParam, removeSearchParam};
   };
 
   export default useCustomSearchParams;

@@ -17,7 +17,7 @@ export default function RevisionsList({
 }: RevisionsListProps) {
   const navigate = useNavigate();
   const { context, namespace, chart } = useParams();
-  const [searchParams] = useCustomSearchParams();
+  const {searchParamsObject: searchParams} = useCustomSearchParams();
   const {tab, mode} = searchParams;
   const changeRelease = (newRevision: number) => {
     navigate(

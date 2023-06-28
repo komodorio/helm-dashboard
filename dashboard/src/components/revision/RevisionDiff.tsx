@@ -19,28 +19,42 @@ const VIEW_MODE_DIFF_SPECIFIC = 'diff-with-specific-revision';
 
 function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const [specificVersion, setSpecificVersion] = useState("1");
-  const [searchParams, setSearchParams, addSearchParam] = useCustomSearchParams();
-  const {tab, mode: viewMode = VIEW_MODE_VIEW_ONLY} = searchParams;
+  const {searchParamsObject: searchParams, addSearchParam, removeSearchParam} = useCustomSearchParams();
+  const {tab, mode: viewMode = VIEW_MODE_VIEW_ONLY, 'user-defined': userDefinedValue} = searchParams;
   
   const diffElement = useRef<HTMLElement>({});
 
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
     addSearchParam('mode', e.target.value);
   };
+
+  const handleUserDefinedCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      addSearchParam('user-defined', `${e.target.checked}`);
+    } else {
+      removeSearchParam('user-defined')
+    }
+  };
   const params = useParams();
   const revisionInt = parseInt(params.revision || '', 10)
   const hasMultipleRevisions = revisionInt > 1;
 
   const additionalParams = useMemo(() => {
-      if (viewMode === VIEW_MODE_DIFF_PREV && hasMultipleRevisions) {
-        return `&revisionDiff=${revisionInt - 1}`
-      }
-      const specificRevisionInt = parseInt(specificVersion || '', 10);
-      if (viewMode === VIEW_MODE_DIFF_SPECIFIC && hasMultipleRevisions && !Number.isNaN(specificRevisionInt)) {
-        return `&revisionDiff=${specificVersion}`
-      }
-  }, [viewMode, specificVersion, revisionInt, hasMultipleRevisions]);
-
+    let additionalParamStr = ''
+    console.log(userDefinedValue)
+    if (!!userDefinedValue) {
+      additionalParamStr += '&userDefined=true'
+    }
+    if (viewMode === VIEW_MODE_DIFF_PREV && hasMultipleRevisions) {
+      additionalParamStr += `&revisionDiff=${revisionInt - 1}`
+    }
+    const specificRevisionInt = parseInt(specificVersion || '', 10);
+    if (viewMode === VIEW_MODE_DIFF_SPECIFIC && hasMultipleRevisions && !Number.isNaN(specificRevisionInt)) {
+      additionalParamStr += `&revisionDiff=${specificVersion}`
+    }
+    return additionalParamStr;
+  }, [viewMode, userDefinedValue, specificVersion, revisionInt, hasMultipleRevisions]);
+  console.log(additionalParams)
   const hasRevisionToDiff = !!additionalParams;
 
   const {data, isLoading, isSuccess: fetchedDataSuccessfully} = useGetReleaseInfoByType({...params, tab}, additionalParams);
@@ -48,6 +62,9 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const content = useMemo(() => {
     if (data && !isLoading && (viewMode === VIEW_MODE_VIEW_ONLY || !hasRevisionToDiff)) {  
       return hljs.highlight(data, { language: "yaml" }).value;
+    }
+    if (fetchedDataSuccessfully && !data && viewMode === VIEW_MODE_VIEW_ONLY) {
+      return "No value to display";
     }
     return '';
   }, [data, viewMode, isLoading]);
@@ -74,6 +91,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       
     }
   }, [viewMode, hasRevisionToDiff, data, isLoading, fetchedDataSuccessfully, diffElement]);
+  console.log(userDefinedValue)
   return (
     <div>
       <div className="flex mb-3 p-2 border border-[#DCDDDF] flex-row items-center justify-between w-full bg-white rounded">
@@ -141,7 +159,8 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
             <input
               id="user-define-only-checkbox"
               type="checkbox"
-              value=""
+              onChange={handleUserDefinedCheckbox}
+              checked={!!userDefinedValue}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
             <label
@@ -155,8 +174,8 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       </div>
       {isLoading ? <Spinner /> : ''}
       {viewMode  === VIEW_MODE_VIEW_ONLY && content ? (
-        <div className="bg-white overflow-x-auto w-full relative">
-          <pre className="bg-white rounded p-3">
+        <div className="bg-white overflow-x-auto w-full p-3 relative">
+          <pre className="bg-white rounded">
                 {parse(content)}
           </pre>  
         </div>
