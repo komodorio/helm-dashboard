@@ -8,9 +8,6 @@ import { ChartVersion } from "../data/types";
 import apiService from "./apiService";
 import { LatestChartVersion } from "./interfaces";
 
-export const EXISTS_REASON = "exists";
-export const AVAILABLE_REASON = "available";
-
 export function useGetInstalledReleases(
   context: string,
   options?: UseQueryOptions<InstalledReleases[]>

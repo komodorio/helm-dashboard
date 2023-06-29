@@ -5,8 +5,6 @@ import hljs from "highlight.js";
 import { marked } from "marked";
 
 import {
-  // AVAILABLE_REASON,
-  EXISTS_REASON,
   StructuredResources,
   useGetResourceDescription,
   useGetResources,
@@ -84,7 +82,7 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         <td className={cellClassnames}>
           <Badge
             type={badgeType}
-            className={isExistsReason ? "bg-opacity-50" : ""}
+            additionalClassNames={isExistsReason ? "bg-opacity-50" : ""}
           >
             {reason}
           </Badge>

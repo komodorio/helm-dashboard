@@ -32,7 +32,7 @@ export const BadgeCodes = Object.freeze({
 export interface BadgeProps {
   type: BadgeCode;
   children: React.ReactNode;
-  className?: string;
+  additionalClassNames?: string;
 }
 export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
@@ -51,7 +51,7 @@ export default function Badge(props: BadgeProps): JSX.Element {
   const badgeElem = (
     <span
       className={`${badgeBase} ${colorVariants[props.type]} ${
-        props.className ?? ""
+        props.additionalClassNames ?? ""
       }`}
     >
       {props.children}
