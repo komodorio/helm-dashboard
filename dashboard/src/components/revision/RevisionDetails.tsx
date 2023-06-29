@@ -337,8 +337,12 @@ const RollbackModalContent = ({ dataResponse }) => {
   }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
   return (
     <div className="flex flex-col space-y-4">
-      <p>Following changes will happen to cluster:</p>
-      <div className="relative" ref={diffElement} />;
+      {data ? (
+        <p>Following changes will happen to cluster:</p>
+      ) : (
+        <p>No changes will happen to cluster</p>
+      )}
+      <div className="relative" ref={diffElement} />
     </div>
   );
 };
