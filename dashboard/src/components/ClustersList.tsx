@@ -91,7 +91,7 @@ function ClustersList({
               name="clusters"
             />
             <label htmlFor={cluster.Name} className="ml-1">
-              {cluster.Name}
+              {getCleanClusterName(cluster.Name)}
             </label>
           </span>
         ))}

@@ -381,7 +381,7 @@ const Uninstall = () => {
       onSuccess: () => {
         window.location.href = "/";
       },
-      onError: (error, variables, context) => {
+      onError: () => {
         // An error happened!
         console.log(`rolling back optimistic update with id `);
       },

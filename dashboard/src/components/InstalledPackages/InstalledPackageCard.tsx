@@ -26,8 +26,8 @@ export default function InstalledPackageCard({
   });
 
   const { data: latestVersionResult } = useQuery<ChartVersion>({
-    queryKey: ["chartName", release.chart_name],
-    queryFn: () => apiService.getRepositoryLatestVersion(release.chart_name),
+    queryKey: ["chartName", release.name],
+    queryFn: () => apiService.getRepositoryLatestVersion(release.name),
   });
 
   const handleMouseOver = () => {
@@ -86,7 +86,9 @@ export default function InstalledPackageCard({
           </div>
         </div>
         <div className="grid grid-cols-11 text-xs mt-3">
-          <div className="col-span-3 h-12 line-clamp-3 mr-1">{release.description}</div>
+          <div className="col-span-3 h-12 line-clamp-3 mr-1">
+            {release.description}
+          </div>
           <div className="col-span-3">
             <HealthStatus />
           </div>
