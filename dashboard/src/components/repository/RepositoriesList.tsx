@@ -2,11 +2,10 @@ import { useState } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import { Repository } from "../../data/types";
 
-
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
   onRepositoryChanged: (selectedRepository: Repository) => void;
-  repositories: Repository[],
+  repositories: Repository[];
 };
 
 function RepositoriesList({
@@ -33,12 +32,14 @@ function RepositoriesList({
               <input
                 className="cursor-pointer"
                 type="radio"
-                id={repository.url}
+                id={repository.name}
                 value={repository.name}
-                checked={repository.url === selectedRepository?.url}
+                checked={repository.name === selectedRepository?.name}
                 name="clusters"
               />
-              <label htmlFor={repository.url} className="ml-1">{repository.name}</label>
+              <label htmlFor={repository.name} className="ml-1">
+                {repository.name}
+              </label>
             </span>
           ))}
         </div>
