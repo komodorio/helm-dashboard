@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { Cluster } from "../data/types";
+import { Cluster, Release } from "../data/types";
 import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
-import { InstalledReleases } from "../API/releases";
 
 type ClustersListProps = {
   setSelectedCluster: React.Dispatch<React.SetStateAction<string | undefined>>;
   selectedCluster: string | undefined;
-  installedReleases?: InstalledReleases[];
+  installedReleases?: Release[];
 };
 
 function getCleanClusterName(rawClusterName: string) {
@@ -32,7 +31,11 @@ function getCleanClusterName(rawClusterName: string) {
   return rawClusterName;
 }
 
-function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }: ClustersListProps) {
+function ClustersList({
+  installedReleases,
+  selectedCluster,
+  setSelectedCluster,
+}: ClustersListProps) {
   const [namespaces, setNamespaces] =
     useState<{ name: string; amount: number }[]>();
 
@@ -41,7 +44,7 @@ function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }
     queryFn: apiService.getClusters,
     onSuccess(data) {
       const sortedData = data?.sort((a, b) => a.Name.localeCompare(b.Name));
-      
+
       if (sortedData && sortedData.length > 0 && !selectedCluster) {
         setSelectedCluster(sortedData[0].Name);
       }
@@ -80,14 +83,16 @@ function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }
           <span key={cluster.Name} className="flex items-center">
             <input
               className="cursor-pointer"
-              onChange={e => setSelectedCluster(e.target.value)}
+              onChange={(e) => setSelectedCluster(e.target.value)}
               type="radio"
               id={cluster.Name}
               value={cluster.Name}
               checked={cluster.Name == selectedCluster}
               name="clusters"
             />
-            <label htmlFor={cluster.Name} className="ml-1">{cluster.Name}</label>
+            <label htmlFor={cluster.Name} className="ml-1">
+              {getCleanClusterName(cluster.Name)}
+            </label>
           </span>
         ))}
 
@@ -96,8 +101,11 @@ function ClustersList({ installedReleases, selectedCluster, setSelectedCluster }
         ?.sort((a, b) => a.name.localeCompare(b.name))
         ?.map((namespace) => (
           <span key={namespace.name} className="flex items-center">
-            <input type="checkbox" id={namespace.name}/>
-            <label htmlFor={namespace.name} className="ml-1">{`${namespace.name} [${namespace.amount}]`}</label>
+            <input type="checkbox" id={namespace.name} />
+            <label
+              htmlFor={namespace.name}
+              className="ml-1"
+            >{`${namespace.name} [${namespace.amount}]`}</label>
           </span>
         ))}
     </div>

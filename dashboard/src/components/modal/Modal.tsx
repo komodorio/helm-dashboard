@@ -81,9 +81,11 @@ const Modal = ({
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
           <div className="flex justify-center">
             <div
-              className={`relative bg-white rounded-lg shadow  m-7 w-2/5 max-w-[1000px] ${
-                containerClassNames ?? ""
-              }`}
+              className={`relative rounded-lg shadow  m-7 w-2/5 max-w-[1000px] ${
+                containerClassNames && !containerClassNames.includes("bg-")
+                  ? "bg-white"
+                  : ""
+              } ${containerClassNames ?? ""}`}
             >
               {title && (
                 <div className="flex items-start justify-between p-4 border-b rounded-t ">
@@ -115,7 +117,9 @@ const Modal = ({
               >
                 {children}
               </div>
-              {bottomContent ?? (
+              {bottomContent ? (
+                <div className="p-5 border-t text-sm">{bottomContent}</div>
+              ) : (
                 <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b ">
                   {actions?.map((action) => (
                     <button

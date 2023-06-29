@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Diff2HtmlUI,
   Diff2HtmlUIConfig,
@@ -14,11 +14,7 @@ import {
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import {
-  useGetDiff,
-  useGetReleaseInfoByType,
-  useGetReleaseManifest,
-} from "../../API/releases";
+import { useGetReleaseInfoByType } from "../../API/releases";
 
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
@@ -31,7 +27,7 @@ import {
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import { marked } from "marked";
@@ -64,7 +60,6 @@ export default function RevisionDetails({
     },
     { value: "notes", label: "Notes", content: <RevisionDiff /> },
   ];
-  const [isChecking, setChecking] = useState(false);
   const { context, namespace, chart } = useParams();
   const tab = searchParams.get("tab");
   const selectedTab =
@@ -94,12 +89,20 @@ export default function RevisionDetails({
     onError: (error) => {
       setShowErrorModal({
         title: "Failed to run tests for chart " + chart,
-        msg: error,
+        msg: error as string,
       });
       console.error("Failed to execute test for chart", error);
     },
   });
   const handleRunTests = () => {
+    if (!namespace || !chart) {
+      setShowErrorModal({
+        title: "Missing data to run test",
+        msg: "Missing chart and/or namespace",
+      });
+      return;
+    }
+
     runTests({
       ns: namespace,
       name: chart,
@@ -118,7 +121,16 @@ export default function RevisionDetails({
         </div>
       );
     } else {
-      return (testResults as string).replaceAll("\n", "<br>");
+      return (
+        <div>
+          {(testResults as string).split("\n").map((line, index) => (
+            <div key={index} className="mb-2">
+              {line}
+              <br />
+            </div>
+          ))}
+        </div>
+      );
     }
   };
 
@@ -183,7 +195,8 @@ export default function RevisionDetails({
                 </button>
               </div>
               <Modal
-                title="Tests results"
+                containerClassNames="w-3/5"
+                title="Test results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
               >
@@ -335,8 +348,12 @@ const RollbackModalContent = ({dataResponse}) => {
   }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
   return (
     <div className="flex flex-col space-y-4">
-      <p>Following changes will happen to cluster:</p>
-      <div className="relative" ref={diffElement} />;
+      {data ? (
+        <p>Following changes will happen to cluster:</p>
+      ) : (
+        <p>No changes will happen to cluster</p>
+      )}
+      <div className="relative" ref={diffElement} />
     </div>
   );
 };
@@ -362,7 +379,7 @@ const Uninstall = () => {
       onSuccess: () => {
         window.location.href = "/";
       },
-      onError: (error, variables, context) => {
+      onError: () => {
         // An error happened!
         console.log(`rolling back optimistic update with id `);
       },
@@ -402,7 +419,7 @@ const Uninstall = () => {
           <div>
             {resources?.map((resource) => (
               <div className="flex justify-start gap-1 w-full mb-3">
-                <span className=" w-1/5  italic">{resource.kind}</span>
+                <span className=" w-3/5  italic">{resource.kind}</span>
                 <span className=" w-4/5 font-semibold">
                   {resource.metadata.name}
                 </span>

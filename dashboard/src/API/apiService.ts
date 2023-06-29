@@ -50,7 +50,7 @@ class ApiService {
     const [_, repository] = queryKey;
 
     const response = await fetch(
-      `/api/helm/repositories/${repository.name}`
+      `/api/helm/repositories/${repository}`
     );
     const data = await response.json();
     return data;

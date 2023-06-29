@@ -4,18 +4,17 @@ import {
   useMutation,
   UseMutationOptions,
 } from "@tanstack/react-query";
-import { ChartVersion } from "../data/types";
-import apiService from "./apiService";
+import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
 
 export function useGetInstalledReleases(
   context: string,
-  options?: UseQueryOptions<InstalledReleases[]>
+  options?: UseQueryOptions<Release[]>
 ) {
-  return useQuery<InstalledReleases[]>(
-    ["installedReleases"],
+  return useQuery<Release[]>(
+    ["installedReleases", context],
     () =>
-      callApi<InstalledReleases[]>("/api/helm/releases", {
+      callApi<Release[]>("/api/helm/releases", {
         headers: {
           "X-Kubecontext": context,
         },
@@ -103,7 +102,7 @@ export function useGetResources(
   name: string,
   options?: UseQueryOptions<StructuredResources[]>
 ) {
-  return useQuery<StructuredResources[]>(
+  const { data, ...rest } = useQuery<StructuredResources[]>(
     ["resources", ns, name],
     () =>
       callApi<StructuredResources[]>(
@@ -111,6 +110,27 @@ export function useGetResources(
       ),
     options
   );
+
+  return {
+    data: data
+      ?.map((resource) => ({
+        ...resource,
+        status: {
+          ...resource.status,
+          conditions: resource.status.conditions.filter(
+            (c) => c.type === "hdHealth" // it's our custom condition type, only one exists
+          ),
+        },
+      }))
+      .sort((a, b) => {
+        const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
+        return (
+          interestingResources.indexOf(b.kind.toUpperCase()) -
+          interestingResources.indexOf(a.kind.toUpperCase())
+        );
+      }),
+    ...rest,
+  };
 }
 
 export function useGetResourceDescription(
@@ -160,7 +180,7 @@ export function useGetVersions(
 
 export function useGetReleaseInfoByType(
   params: ReleaseInfoParams,
-  additionalParams: string = "",
+  additionalParams = "",
   options?: UseQueryOptions<string>
 ) {
   const { chart, namespace, tab, revision } = params;
@@ -281,30 +301,6 @@ interface UpgradeReleaseRequest {
   preview?: boolean;
 }
 
-// Response objects
-export interface InstalledReleases {
-  id: string;
-  name: string;
-  namespace: string;
-  revision: string;
-  updated: string;
-  status: string;
-  chart: string;
-  chartName: string;
-  chartVersion: string;
-  app_version: string;
-  icon: string;
-  description: string;
-}
-
-interface ReleaseRevisions {}
-
-interface ManifestText {}
-
-interface ValuesYamlText {}
-
-interface NotesText {}
-
 export interface StructuredResources {
   kind: string;
   apiVersion: string;
@@ -334,6 +330,7 @@ export interface Condition {
   lastProbeTime: any;
   lastTransitionTime: any;
   reason: string;
+  message: string;
 }
 
 export async function callApi<T>(
@@ -344,9 +341,8 @@ export async function callApi<T>(
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    throw new Error(
-      `An error occurred while fetching data: ${response.statusText}`
-    );
+    const error = await response.text();
+    throw new Error(error);
   }
   let data;
 

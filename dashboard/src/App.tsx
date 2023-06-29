@@ -2,7 +2,6 @@ import Header from "./layout/Header";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import "./index.css";
 import Installed from "./pages/Installed";
-import NotFound from "./pages/NotFound";
 import RepositoryPage from "./pages/Repository";
 import Revision from "./pages/Revision";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -39,7 +38,11 @@ export default function App() {
                     element={<Revision />}
                   />
                   <Route path="/repository" element={<RepositoryPage />} />
-                  <Route path="*" element={<Installed />}/>
+                  <Route
+                    path="/repository/:selectedRepo"
+                    element={<RepositoryPage />}
+                  />
+                  <Route path="*" element={<Installed />} />
                 </Routes>
               </div>
             </div>

@@ -21,13 +21,23 @@
 import React from "react";
 import { BadgeCode } from "../global";
 
+export const BadgeCodes = Object.freeze({
+  ERROR: "error",
+  WARNING: "warning",
+  SUCCESS: "success",
+  INFO: "info",
+  DEFAULT: "default",
+});
+
 export interface BadgeProps {
   type: BadgeCode;
   children: React.ReactNode;
+  additionalClassNames?: string;
 }
 export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
     error: "bg-red-500 text-white",
+    warning: "bg-yellow-400 text-white",
     success: "bg-green-300 text-black-100 text-black-800",
     info: "bg-blue-200 text-black-800",
     default: "text-black-800",
@@ -39,9 +49,25 @@ export default function Badge(props: BadgeProps): JSX.Element {
   // the default type is "default".
   // the resulting span element is stored in badge_elem.
   const badgeElem = (
-    <span className={`${badgeBase} ${colorVariants[props.type]}`}>
+    <span
+      className={`${badgeBase} ${colorVariants[props.type]} ${
+        props.additionalClassNames ?? ""
+      }`}
+    >
       {props.children}
     </span>
   );
   return badgeElem;
 }
+
+export const getBadgeType = (status: string) => {
+  if (status === "Unknown") {
+    return BadgeCodes.INFO;
+  } else if (status === "Healthy") {
+    return BadgeCodes.SUCCESS;
+  } else if (status === "Progressing") {
+    return BadgeCodes.WARNING;
+  } else {
+    return BadgeCodes.ERROR;
+  }
+};

@@ -2,29 +2,26 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
 
 function Installed() {
   const [selectedCluster, setSelectedCluster] = useState<string>();
   const [filterKey, setFilterKey] = useState<string>("");
-  const { data, isLoading, refetch, isRefetching } = useGetInstalledReleases(
-    selectedCluster || "",
-    { retry: false }
-  );
   const alertError = useAlertError();
-
-  useEffect(() => {
-    refetch()
-      .then((e) => {})
-      .catch((e) =>
+  const { data, isLoading, isRefetching } = useGetInstalledReleases(
+    selectedCluster || "",
+    {
+      retry: false,
+      onError: (e) => {
         alertError.setShowErrorModal({
-          title: "Unable to load installed packages",
-          msg: e.message,
-        })
-      );
-  }, [selectedCluster]);
+          title: "Failed to get list of charts",
+          msg: (e as Error).message,
+        });
+      },
+    }
+  );
 
   return (
     <div className="flex flex-row">
