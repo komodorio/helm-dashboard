@@ -421,7 +421,7 @@ const Uninstall = () => {
           <div>
             {resources?.map((resource) => (
               <div className="flex justify-start gap-1 w-full mb-3">
-                <span className=" w-1/5  italic">{resource.kind}</span>
+                <span className=" w-3/5  italic">{resource.kind}</span>
                 <span className=" w-4/5 font-semibold">
                   {resource.metadata.name}
                 </span>

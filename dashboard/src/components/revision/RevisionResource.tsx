@@ -1,5 +1,4 @@
-import { uniqueId } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import hljs from "highlight.js";
 import { marked } from "marked";
@@ -17,6 +16,7 @@ import "react-modern-drawer/dist/index.css";
 import Button from "../Button";
 import Badge, { BadgeCodes, getBadgeType } from "../Badge";
 import Spinner from "../Spinner";
+
 export default function RevisionResource() {
   const { namespace = "", chart = "" } = useParams();
   const { data: resources, isLoading } = useGetResources(namespace, chart);
