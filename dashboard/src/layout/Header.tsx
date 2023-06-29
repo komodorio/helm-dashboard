@@ -33,7 +33,7 @@ export default function Header() {
   };
 
   const openAPI = () => {
-    window.open("http://localhost:8080/static/api-docs.html", "_blank");
+    window.open("/static/api-docs.html", "_blank");
   };
 
   return (
