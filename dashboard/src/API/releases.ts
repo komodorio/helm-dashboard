@@ -114,18 +114,25 @@ export function useGetResources(
       ),
     options
   );
+
   return {
-    data: data?.sort((a, b) => {
-      const aReason = a.status?.conditions[0]?.reason?.toLowerCase();
-      const bReason = b.status?.conditions[0]?.reason?.toLowerCase();
-      if (aReason === EXISTS_REASON && bReason !== EXISTS_REASON) {
-        return 1;
-      }
-      if (aReason !== EXISTS_REASON && bReason === EXISTS_REASON) {
-        return -1;
-      }
-      return 0;
-    }),
+    data: data
+      ?.map((resource) => ({
+        ...resource,
+        status: {
+          ...resource.status,
+          conditions: resource.status.conditions.filter(
+            (c) => c.type === "hdHealth" // it's our custom condition type, only one exists
+          ),
+        },
+      }))
+      .sort((a, b) => {
+        const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
+        return (
+          interestingResources.indexOf(b.kind.toUpperCase()) -
+          interestingResources.indexOf(a.kind.toUpperCase())
+        );
+      }),
     ...rest,
   };
 }
@@ -351,6 +358,7 @@ export interface Condition {
   lastProbeTime: any;
   lastTransitionTime: any;
   reason: string;
+  message: string;
 }
 
 export async function callApi<T>(
