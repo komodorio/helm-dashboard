@@ -5,6 +5,8 @@ import hljs from "highlight.js";
 import { marked } from "marked";
 
 import {
+  // AVAILABLE_REASON,
+  EXISTS_REASON,
   StructuredResources,
   useGetResourceDescription,
   useGetResources,
@@ -68,7 +70,10 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
   const { reason = "", status = "" } = conditions?.[0] || {};
   const cellClassnames = "py-2";
 
-  const successStatus = reason.toLowerCase() === "exists" || "available";
+  const successStatus =
+    reason.toLowerCase() === EXISTS_REASON ||
+    reason.toLowerCase().includes("available");
+  console.log(name, successStatus, reason);
   return (
     <>
       <tr className="min-w-[100%] min-h[70px]">

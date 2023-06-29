@@ -8,6 +8,9 @@ import { ChartVersion } from "../data/types";
 import apiService from "./apiService";
 import { LatestChartVersion } from "./interfaces";
 
+export const EXISTS_REASON = "exists";
+export const AVAILABLE_REASON = "available";
+
 export function useGetInstalledReleases(
   context: string,
   options?: UseQueryOptions<InstalledReleases[]>
@@ -103,7 +106,7 @@ export function useGetResources(
   name: string,
   options?: UseQueryOptions<StructuredResources[]>
 ) {
-  return useQuery<StructuredResources[]>(
+  const { data, ...rest } = useQuery<StructuredResources[]>(
     ["resources", ns, name],
     () =>
       callApi<StructuredResources[]>(
@@ -111,6 +114,20 @@ export function useGetResources(
       ),
     options
   );
+  return {
+    data: data?.sort((a, b) => {
+      const aReason = a.status?.conditions[0]?.reason?.toLowerCase();
+      const bReason = b.status?.conditions[0]?.reason?.toLowerCase();
+      if (aReason === EXISTS_REASON && bReason !== EXISTS_REASON) {
+        return 1;
+      }
+      if (aReason !== EXISTS_REASON && bReason === EXISTS_REASON) {
+        return -1;
+      }
+      return 0;
+    }),
+    ...rest,
+  };
 }
 
 export function useGetResourceDescription(
