@@ -1,18 +1,39 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
+
 import RepositoriesList from "../components/repository/RepositoriesList";
 import RepositoryViewer from "../components/repository/RepositoryViewer";
 import { Repository } from "../data/types";
+import { useGetRepositories } from "../API/repositories";
+import { HelmRepositories } from "../API/interfaces";
+import { useParams, useNavigate } from "react-router-dom";
 
 function RepositoryPage() {
-  const [selectedRepository, setSelectedRepository] = useState<Repository>();
-
+  const {selectedRepo: repoFromParams} = useParams();
+  const navigate = useNavigate();
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    setSelectedRepository(selectedRepository);
+    navigate(`/repository/${selectedRepository.name}`)
   };
+  
+  const { data: repositories = [] } = useGetRepositories({
+    onSuccess: (data: HelmRepositories) => {
+      const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
 
+      if (sortedData && sortedData.length > 0 && !repoFromParams) {
+        handleRepositoryChanged(sortedData[0]);
+      }
+    },
+  });
+
+  const selectedRepository = useMemo(() => {
+    if (repoFromParams) {
+      return repositories?.find(repo => repo.name === repoFromParams)
+    }
+  }, [repositories, repoFromParams]);
+  
   return (
     <div className="flex flex-row m-5 gap-4">
       <RepositoriesList
+        repositories={repositories}
         onRepositoryChanged={handleRepositoryChanged}
         selectedRepository={selectedRepository}
       />
@@ -22,5 +43,6 @@ function RepositoryPage() {
     </div>
   );
 }
+
 
 export default RepositoryPage;

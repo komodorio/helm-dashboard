@@ -70,23 +70,23 @@ export default function InstalledPackageCard({
 
       <div className="col-span-11 text-sm">
         <div className="grid grid-cols-11">
-          <div className="col-span-3 font-medium text-lg">{release.name}</div>
+          <div className="col-span-3 font-bold text-xl">{release.name}</div>
           <div className="col-span-3">
             <StatusLabel status={release.status} />
           </div>
-          <div className="col-span-2">{release.chart}</div>
-          <div className="col-span-1 font-semibold text-xs">
+          <div className="col-span-2 font-bold">{release.chart}</div>
+          <div className="col-span-1 font-bold text-xs">
             #{release.revision}
           </div>
-          <div className="col-span-1 font-semibold text-xs">
+          <div className="col-span-1 font-bold text-xs">
             {release.namespace}
           </div>
-          <div className="col-span-1 font-semibold text-xs">
+          <div className="col-span-1 font-bold text-xs">
             {getAge(release.updated)}
           </div>
         </div>
-        <div className="grid grid-cols-11 text-xs">
-          <div className="col-span-3">{release.description}</div>
+        <div className="grid grid-cols-11 text-xs mt-3">
+          <div className="col-span-3 h-12 line-clamp-3 mr-1">{release.description}</div>
           <div className="col-span-3">
             <HealthStatus />
           </div>
