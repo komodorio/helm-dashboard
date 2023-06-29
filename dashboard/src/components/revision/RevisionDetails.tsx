@@ -64,6 +64,7 @@ export default function RevisionDetails({
   const tab = searchParams.get("tab");
   const selectedTab =
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
+ 
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
@@ -283,6 +284,7 @@ const Rollback = ({
     </div>
   );
 
+
   if (release.revision <= 1) return null;
 
   return (
@@ -316,21 +318,21 @@ const Rollback = ({
           },
         ]}
       >
-        <RollbackModalContent dataResponse={response} />
+          <RollbackModalContent dataResponse={response} />
       </Modal>{" "}
     </>
   );
 };
 
-const RollbackModalContent = ({ dataResponse }) => {
-  const { data, isLoading, isSuccess: fetchedDataSuccessfully } = dataResponse;
+const RollbackModalContent = ({dataResponse}) => {
+  const {data, isLoading, isSuccess: fetchedDataSuccessfully} = dataResponse;
   const diffElement = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (data && fetchedDataSuccessfully && diffElement?.current) {
-      const configuration: Diff2HtmlUIConfig = {
-        matching: "lines",
-        outputFormat: "side-by-side",
+      const configuration : Diff2HtmlUIConfig = {
+        matching: 'lines',
+        outputFormat: 'side-by-side',
         highlight: true,
         renderNothingWhenEmpty: false,
         rawTemplates: {
@@ -339,11 +341,7 @@ const RollbackModalContent = ({ dataResponse }) => {
             '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
         },
       };
-      const diff2htmlUi = new Diff2HtmlUI(
-        diffElement.current,
-        data,
-        configuration
-      );
+      const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
     }
@@ -372,7 +370,7 @@ const Uninstall = () => {
     () =>
       fetch(
         // Todo: Change to BASE_URL from env
-        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "delete",
         }
@@ -445,7 +443,7 @@ const ReconfigureModal = ({
 }) => {
   const navigate = useNavigate();
   const { chart_ver } = release;
-
+ 
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -479,7 +477,7 @@ const ReconfigureModal = ({
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "post",
           body: formData,
@@ -669,7 +667,7 @@ const ManifestDiff = ({
   const fetchVersionData = async (version: string) => {
     const formData = getVersionManifestFormData(version);
     const response = await fetch(
-      `http://localhost:8080/api/helm/releases/${namespace}/${chart}`,
+      `/api/helm/releases/${namespace}/${chart}`,
       {
         method: "post",
         body: formData,
@@ -688,7 +686,7 @@ const ManifestDiff = ({
     formData.append("a", currentVerData.manifest);
     formData.append("b", selectedVerData.manifest);
 
-    const response = await fetch("http://localhost:8080/diff", {
+    const response = await fetch("/diff", {
       method: "post",
       body: formData,
     });

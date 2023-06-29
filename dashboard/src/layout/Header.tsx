@@ -10,7 +10,6 @@ import {
   BsBraces,
   BsBoxArrowUpRight,
 } from "react-icons/bs";
-import axios from "axios";
 import { useGetApplicationStatus } from "../API/other";
 
 export default function Header() {
@@ -26,7 +25,7 @@ export default function Header() {
 
   const resetCache = async () => {
     try {
-      await axios.delete("/api/cache");
+      await fetch("/api/cache", { method: 'DELETE' })
       window.location.reload();
     } catch (error) {
       console.error(error);

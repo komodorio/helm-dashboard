@@ -337,8 +337,8 @@ export async function callApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const baseUrl = "http://localhost:8080";
-  const response = await fetch(baseUrl + url, options);
+  
+  const response = await fetch(url, options);
 
   if (!response.ok) {
     const error = await response.text();

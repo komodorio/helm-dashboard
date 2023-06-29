@@ -7,5 +7,12 @@ export default defineConfig({
     assetsDir: "./assets",
     outDir: '../pkg/frontend/dist',
     emptyOutDir: true,
+  },
+  server: {
+    proxy: {
+       "^/api/*": "http://localhost:8080",
+       "^/status*": "http://localhost:8080",
+       "^/diff*": "http://localhost:8080",
+    },
   }
 })
