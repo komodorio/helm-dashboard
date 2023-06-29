@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Diff2HtmlUI,
   Diff2HtmlUIConfig,
@@ -14,11 +14,7 @@ import {
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import {
-  useGetDiff,
-  useGetReleaseInfoByType,
-  useGetReleaseManifest,
-} from "../../API/releases";
+import { useGetReleaseInfoByType } from "../../API/releases";
 
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
@@ -31,7 +27,7 @@ import {
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import { marked } from "marked";
@@ -64,7 +60,6 @@ export default function RevisionDetails({
     },
     { value: "notes", label: "Notes", content: <RevisionDiff /> },
   ];
-  const [isChecking, setChecking] = useState(false);
   const { context, namespace, chart } = useParams();
   const tab = searchParams.get("tab");
   const selectedTab =
@@ -93,12 +88,20 @@ export default function RevisionDetails({
     onError: (error) => {
       setShowErrorModal({
         title: "Failed to run tests for chart " + chart,
-        msg: error,
+        msg: error as string,
       });
       console.error("Failed to execute test for chart", error);
     },
   });
   const handleRunTests = () => {
+    if (!namespace || !chart) {
+      setShowErrorModal({
+        title: "Missing data to run test",
+        msg: "Missing chart and/or namespace",
+      });
+      return;
+    }
+
     runTests({
       ns: namespace,
       name: chart,
@@ -117,7 +120,16 @@ export default function RevisionDetails({
         </div>
       );
     } else {
-      return (testResults as string).replaceAll("\n", "<br>");
+      return (
+        <div>
+          {(testResults as string).split("\n").map((line, index) => (
+            <div key={index} className="mb-2">
+              {line}
+              <br />
+            </div>
+          ))}
+        </div>
+      );
     }
   };
 
@@ -182,7 +194,8 @@ export default function RevisionDetails({
                 </button>
               </div>
               <Modal
-                title="Tests results"
+                containerClassNames="w-3/5"
+                title="Test results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
               >
