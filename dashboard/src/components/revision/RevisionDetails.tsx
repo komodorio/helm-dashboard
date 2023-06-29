@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Diff2HtmlUI,
   Diff2HtmlUIConfig,
@@ -14,11 +14,7 @@ import {
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import {
-  useGetDiff,
-  useGetReleaseInfoByType,
-  useGetReleaseManifest,
-} from "../../API/releases";
+import { useGetReleaseInfoByType } from "../../API/releases";
 
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
@@ -31,7 +27,7 @@ import {
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import { marked } from "marked";
@@ -64,11 +60,11 @@ export default function RevisionDetails({
     },
     { value: "notes", label: "Notes", content: <RevisionDiff /> },
   ];
-  const [isChecking, setChecking] = useState(false);
   const { context, namespace, chart } = useParams();
   const tab = searchParams.get("tab");
   const selectedTab =
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
+ 
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
@@ -93,12 +89,20 @@ export default function RevisionDetails({
     onError: (error) => {
       setShowErrorModal({
         title: "Failed to run tests for chart " + chart,
-        msg: error,
+        msg: error as string,
       });
       console.error("Failed to execute test for chart", error);
     },
   });
   const handleRunTests = () => {
+    if (!namespace || !chart) {
+      setShowErrorModal({
+        title: "Missing data to run test",
+        msg: "Missing chart and/or namespace",
+      });
+      return;
+    }
+
     runTests({
       ns: namespace,
       name: chart,
@@ -117,7 +121,16 @@ export default function RevisionDetails({
         </div>
       );
     } else {
-      return (testResults as string).replaceAll("\n", "<br>");
+      return (
+        <div>
+          {(testResults as string).split("\n").map((line, index) => (
+            <div key={index} className="mb-2">
+              {line}
+              <br />
+            </div>
+          ))}
+        </div>
+      );
     }
   };
 
@@ -182,7 +195,8 @@ export default function RevisionDetails({
                 </button>
               </div>
               <Modal
-                title="Tests results"
+                containerClassNames="w-3/5"
+                title="Test results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
               >
@@ -270,6 +284,7 @@ const Rollback = ({
     </div>
   );
 
+
   if (release.revision <= 1) return null;
 
   return (
@@ -290,7 +305,6 @@ const Rollback = ({
         actions={[
           {
             id: "1",
-            text: isRollingBackRelease ? "Rolling back..." : "Confirm",
             callback: () => {
               rollbackRelease({
                 ns: namespace,
@@ -300,25 +314,25 @@ const Rollback = ({
               setShowRollbackDiff(false);
             },
             variant: ModalButtonStyle.info,
-            disabled: isRollingBackRelease,
+            isLoading: isRollingBackRelease,
           },
         ]}
       >
-        <RollbackModalContent dataResponse={response} />
+          <RollbackModalContent dataResponse={response} />
       </Modal>{" "}
     </>
   );
 };
 
-const RollbackModalContent = ({ dataResponse }) => {
-  const { data, isLoading, isSuccess: fetchedDataSuccessfully } = dataResponse;
+const RollbackModalContent = ({dataResponse}) => {
+  const {data, isLoading, isSuccess: fetchedDataSuccessfully} = dataResponse;
   const diffElement = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (data && fetchedDataSuccessfully && diffElement?.current) {
-      const configuration: Diff2HtmlUIConfig = {
-        matching: "lines",
-        outputFormat: "side-by-side",
+      const configuration : Diff2HtmlUIConfig = {
+        matching: 'lines',
+        outputFormat: 'side-by-side',
         highlight: true,
         renderNothingWhenEmpty: false,
         rawTemplates: {
@@ -327,19 +341,19 @@ const RollbackModalContent = ({ dataResponse }) => {
             '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
         },
       };
-      const diff2htmlUi = new Diff2HtmlUI(
-        diffElement.current,
-        data,
-        configuration
-      );
+      const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
     }
   }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
   return (
     <div className="flex flex-col space-y-4">
-      <p>Following changes will happen to cluster:</p>
-      <div className="relative" ref={diffElement} />;
+      {data ? (
+        <p>Following changes will happen to cluster:</p>
+      ) : (
+        <p>No changes will happen to cluster</p>
+      )}
+      <div className="relative" ref={diffElement} />
     </div>
   );
 };
@@ -356,7 +370,7 @@ const Uninstall = () => {
     () =>
       fetch(
         // Todo: Change to BASE_URL from env
-        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "delete",
         }
@@ -365,7 +379,7 @@ const Uninstall = () => {
       onSuccess: () => {
         window.location.href = "/";
       },
-      onError: (error, variables, context) => {
+      onError: () => {
         // An error happened!
         console.log(`rolling back optimistic update with id `);
       },
@@ -394,10 +408,9 @@ const Uninstall = () => {
           actions={[
             {
               id: "1",
-              text: uninstallMutation.isLoading ? "Uninstalling..." : "Confirm",
               callback: uninstallMutation.mutate,
               variant: ModalButtonStyle.info,
-              disabled: uninstallMutation.isLoading,
+              isLoading: uninstallMutation.isLoading,
             },
           ]}
           containerClassNames="w-[800px]"
@@ -406,7 +419,7 @@ const Uninstall = () => {
           <div>
             {resources?.map((resource) => (
               <div className="flex justify-start gap-1 w-full mb-3">
-                <span className=" w-1/5  italic">{resource.kind}</span>
+                <span className=" w-3/5  italic">{resource.kind}</span>
                 <span className=" w-4/5 font-semibold">
                   {resource.metadata.name}
                 </span>
@@ -430,7 +443,7 @@ const ReconfigureModal = ({
 }) => {
   const navigate = useNavigate();
   const { chart_ver } = release;
-
+ 
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -464,7 +477,7 @@ const ReconfigureModal = ({
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        "http://localhost:8080/api/helm/releases/" + namespace + "/" + chart,
+        "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "post",
           body: formData,
@@ -536,12 +549,9 @@ const ReconfigureModal = ({
       actions={[
         {
           id: "1",
-          text: setReleaseVersionMutation.isLoading
-            ? "Submitting..."
-            : "Confirm",
           callback: setReleaseVersionMutation.mutate,
           variant: ModalButtonStyle.info,
-          disabled: setReleaseVersionMutation.isLoading,
+          isLoading: setReleaseVersionMutation.isLoading,
         },
       ]}
     >
@@ -657,7 +667,7 @@ const ManifestDiff = ({
   const fetchVersionData = async (version: string) => {
     const formData = getVersionManifestFormData(version);
     const response = await fetch(
-      `http://localhost:8080/api/helm/releases/${namespace}/${chart}`,
+      `/api/helm/releases/${namespace}/${chart}`,
       {
         method: "post",
         body: formData,
@@ -676,7 +686,7 @@ const ManifestDiff = ({
     formData.append("a", currentVerData.manifest);
     formData.append("b", selectedVerData.manifest);
 
-    const response = await fetch("http://localhost:8080/diff", {
+    const response = await fetch("/diff", {
       method: "post",
       body: formData,
     });

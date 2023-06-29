@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Modal from "./Modal";
 import { callApi } from "../../API/releases";
 import Spinner from "../Spinner";
+import useAlertError from "../../hooks/useAlertError";
 
 interface FormKeys {
   name: string;
@@ -18,27 +19,40 @@ type AddRepositoryModalProps = {
 function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const [formData, setFormData] = useState<FormKeys>({} as FormKeys);
   const [isLoading, setIsLoading] = useState(false);
+  const alertError = useAlertError();
 
   const addRepository = () => {
     const body = new FormData();
-    body.append("name", formData.name);
-    body.append("url", formData.url);
+    body.append("name", formData.name ?? "");
+    body.append("url", formData.url ?? "");
+    body.append("username", formData.username ?? "");
+    body.append("password", formData.password ?? "");
 
     setIsLoading(true);
 
     callApi<void>("/api/helm/repositories", {
       method: "POST",
       body,
-    }).finally(() => {
-      setIsLoading(false);
-      onClose();
-      window.location.reload();
-    });
+    })
+      .then(() => {
+        setIsLoading(false);
+        onClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        alertError.setShowErrorModal({
+          title: "Failed to add repo",
+          msg: error.message,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
     <Modal
-      containerClassNames={"bg-error-background w-full max-w-5xl"}
+      containerClassNames={"w-full max-w-5xl"}
       title="Add Chart Repository"
       isOpen={isOpen}
       onClose={onClose}
@@ -84,26 +98,26 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
         </label>
       </div>
       <div className="flex gap-x-3">
-        <label className="flex-1 " htmlFor="Username">
+        <label className="flex-1 " htmlFor="username">
           <div className="mb-2 text-sm">Username</div>
           <input
             onChange={(e) =>
               setFormData({ ...formData, [e.target.id]: e.target.value })
             }
             required
-            id="Username"
+            id="username"
             type="text"
             className="rounded-lg p-2 w-full border border-gray-300  focus:outline-none focus:border-sky-500 input-box-shadow"
           />
         </label>
-        <label className="flex-1" htmlFor="Password">
+        <label className="flex-1" htmlFor="password">
           <div className="mb-2 text-sm">Password</div>
           <input
             onChange={(e) =>
               setFormData({ ...formData, [e.target.id]: e.target.value })
             }
             required
-            id="Password"
+            id="password"
             type="text"
             className="rounded-lg p-2 w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
           />

@@ -1,29 +1,19 @@
 import { useState } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import { Repository } from "../../data/types";
-import { useGetRepositories } from "../../API/repositories";
-import { HelmRepositories } from "../../API/interfaces";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
   onRepositoryChanged: (selectedRepository: Repository) => void;
+  repositories: Repository[];
 };
 
 function RepositoriesList({
   onRepositoryChanged,
   selectedRepository,
+  repositories,
 }: RepositoriesListProps) {
   const [showAddRepositoryModal, setShowAddRepositoryModal] = useState(false);
-
-  const { data: repositories } = useGetRepositories({
-    onSuccess: (data: HelmRepositories) => {
-      const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
-
-      if (sortedData && sortedData.length > 0 && !selectedRepository) {
-        onRepositoryChanged(sortedData[0]);
-      }
-    },
-  });
 
   return (
     <>
@@ -42,12 +32,14 @@ function RepositoriesList({
               <input
                 className="cursor-pointer"
                 type="radio"
-                id={repository.url}
+                id={repository.name}
                 value={repository.name}
-                checked={repository.url === selectedRepository?.url}
+                checked={repository.name === selectedRepository?.name}
                 name="clusters"
               />
-              <label htmlFor={repository.url} className="ml-1">{repository.name}</label>
+              <label htmlFor={repository.name} className="ml-1">
+                {repository.name}
+              </label>
             </span>
           ))}
         </div>

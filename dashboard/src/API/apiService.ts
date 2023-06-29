@@ -3,44 +3,43 @@ import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
   constructor(
-    protected readonly baseUrl: string,
     protected readonly isMockMode: boolean = false
   ) {}
 
   getToolVersion = async () => {
-    const response = await fetch(`${this.baseUrl}/status`);
+    const response = await fetch(`/status`);
     const data = await response.json();
     return data;
   };
 
   getRepositoryLatestVersion = async (repositoryName: string) => {
     const response = await fetch(
-      `${this.baseUrl}/api/helm/repositories/latestver?name=${repositoryName}`
+      `/api/helm/repositories/latestver?name=${repositoryName}`
     );
     const data = await response.json();
     return data;
   };
 
   getInstalledReleases = async () => {
-    const response = await fetch(`${this.baseUrl}/api/helm/releases`);
+    const response = await fetch(`/api/helm/releases`);
     const data = await response.json();
     return data;
   };
 
   getClusters = async () => {
-    const response = await fetch(`${this.baseUrl}/api/k8s/contexts`);
+    const response = await fetch(`/api/k8s/contexts`);
     const data = await response.json();
     return data;
   };
 
   getNamespaces = async () => {
-    const response = await fetch(`${this.baseUrl}/api/k8s/namespaces/list`);
+    const response = await fetch(`/api/k8s/namespaces/list`);
     const data = await response.json();
     return data;
   };
 
   getRepositories = async () => {
-    const response = await fetch(`${this.baseUrl}/api/helm/repositories`);
+    const response = await fetch(`/api/helm/repositories`);
     const data = await response.json();
     return data;
   };
@@ -51,7 +50,7 @@ class ApiService {
     const [_, repository] = queryKey;
 
     const response = await fetch(
-      `${this.baseUrl}/api/helm/repositories/${repository.name}`
+      `/api/helm/repositories/${repository}`
     );
     const data = await response.json();
     return data;
@@ -63,7 +62,7 @@ class ApiService {
     const [_, chart] = queryKey;
 
     const response = await fetch(
-      `${this.baseUrl}/api/helm/repositories/versions?name=${chart.name}`
+      `/api/helm/repositories/versions?name=${chart.name}`
     );
     const data = await response.json();
     return data;
@@ -77,7 +76,7 @@ class ApiService {
     if (!params.namespace || !params.chart) return null;
 
     const response = await fetch(
-      `${this.baseUrl}/api/helm/releases/${params.namespace}/${params.chart}/history`
+      `/api/helm/releases/${params.namespace}/${params.chart}/history`
     );
     const data = await response.json();
 
@@ -91,7 +90,7 @@ class ApiService {
     if (!namespace || !chart || !chart.name || version === undefined)
       return Promise.reject(new Error("missing parameters"));
 
-    const url = `${this.baseUrl}/api/helm/repositories/values?chart=${namespace}/${chart.name}&version=${version}`;
+    const url = `/api/helm/repositories/values?chart=${namespace}/${chart.name}&version=${version}`;
     const response = await fetch(url);
     const data = await response.text();
 
@@ -99,12 +98,6 @@ class ApiService {
   };
 }
 
-let baseURL = "";
-
-if (import.meta.env.DEV) {
-  baseURL = "http://localhost:8080";
-}
-
-const apiService = new ApiService(baseURL);
+const apiService = new ApiService();
 
 export default apiService;

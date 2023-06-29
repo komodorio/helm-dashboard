@@ -1,5 +1,4 @@
-import { uniqueId } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import hljs from "highlight.js";
 import { marked } from "marked";
@@ -15,8 +14,9 @@ import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 
 import Button from "../Button";
-import Badge from "../Badge";
+import Badge, { BadgeCodes, getBadgeType } from "../Badge";
 import Spinner from "../Spinner";
+
 export default function RevisionResource() {
   const { namespace = "", chart = "" } = useParams();
   const { data: resources, isLoading } = useGetResources(namespace, chart);
@@ -65,20 +65,30 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
   const toggleDrawer = () => {
     setIsOpen((prevState) => !prevState);
   };
-  const { reason = "", status = "" } = conditions?.[0] || {};
+  const { reason = "", status = "", message = "" } = conditions?.[0] || {};
   const cellClassnames = "py-2";
 
-  const successStatus = reason.toLowerCase() === "exists" || "available";
+  let badgeType = getBadgeType(status);
+  const isExistsReason = ["Exists"].includes(reason);
+  if (isExistsReason) {
+    badgeType = BadgeCodes.SUCCESS;
+  }
+
   return (
     <>
       <tr className="min-w-[100%] min-h[70px]">
         <td className={"pl-6 rounded " + cellClassnames}>{kind}</td>
         <td className={"font-bold" + cellClassnames}>{name}</td>
         <td className={cellClassnames}>
-          <Badge type={successStatus ? "success" : "error"}>{reason}</Badge>
+          <Badge
+            type={badgeType}
+            additionalClassNames={isExistsReason ? "bg-opacity-50" : ""}
+          >
+            {reason}
+          </Badge>
         </td>
-        <td className={"rounded " + cellClassnames}>
-          {successStatus ? status : ""}
+        <td className={"rounded text-gray-400 " + cellClassnames}>
+          {message ?? ""}
         </td>
         <td className={"rounded " + cellClassnames}>
           <div className="flex justify-end items-center pr-4">

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
-import DropDown, { DropDownItem } from "../components/common/DropDown";
+import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
 import ShutDownButton from "../components/ShutDownButton";
 import {
@@ -10,24 +10,10 @@ import {
   BsBraces,
   BsBoxArrowUpRight,
 } from "react-icons/bs";
-import axios from "axios";
 import { useGetApplicationStatus } from "../API/other";
 
 export default function Header() {
   const { data: statusData } = useGetApplicationStatus();
-
-  function isNewerVersion(oldVersion: string, newVersion: string) {
-    oldVersion = oldVersion?.replace("v", "");
-    newVersion = newVersion?.replace("v", "");
-
-    const oldParts = oldVersion.split(".").map((part) => parseInt(part));
-    const newParts = newVersion.split(".").map((part) => parseInt(part));
-
-    return (
-      newParts.some((part, index) => part > oldParts[index]) ||
-      oldParts.length < newParts.length
-    );
-  }
 
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
@@ -39,7 +25,7 @@ export default function Header() {
 
   const resetCache = async () => {
     try {
-      await axios.delete("/api/cache");
+      await fetch("/api/cache", { method: 'DELETE' })
       window.location.reload();
     } catch (error) {
       console.error(error);
@@ -47,11 +33,11 @@ export default function Header() {
   };
 
   const openAPI = () => {
-    window.open("http://localhost:8080/static/api-docs.html", "_blank");
+    window.open("/static/api-docs.html", "_blank");
   };
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white">
+    <div className="h-16 flex items-center justify-between bg-white min-w-[1000px]">
       <div className="h-16 flex items-center gap-6 ">
         <NavLink to="/">
           <img
@@ -75,7 +61,8 @@ export default function Header() {
             </li>
             <li>
               <NavLink
-                to="/Repository"
+                to="/repository"
+                end={false}
                 className={({ isActive }) =>
                   isActive ? "p-2 text-[#1347FF] bg-[#EBEFFF]" : "p-2"
                 }
