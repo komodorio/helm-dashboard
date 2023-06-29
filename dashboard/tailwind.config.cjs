@@ -13,7 +13,8 @@ module.exports = {
       light: '300',
       normal: '400',
       semibold: '500',
-      extrabold: '600'
+      extrabold: '600',
+      bold: '700',
     },
     extend: {
       colors: {
