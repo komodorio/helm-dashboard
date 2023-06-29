@@ -21,14 +21,14 @@ export default function InstalledPackagesHeader({
           <img
             src={HeaderLogo}
             alt="Helm-DashBoard"
-            className="display-inline h-12 ml-3 w-[140px] "
+            className="display-inline h-12 ml-3 mr-3 w-[28px] "
           />
-          <h2 className="display-inline font-bold text-xl ">{`Installed Charts (${numOfPackages || "0"})`}</h2>
+          <h2 className="display-inline font-bold text-base ">{`Installed Charts (${numOfPackages || "0"})`}</h2>
         </div>
 
         <div className="w-1/4">
           <input
-            className="border-2 border-inherit rounded-md p-1 placeholder:text-black w-11/12"
+            className="border border-[#ced4da] rounded-sm p-1 text-sm w-11/12"
             placeholder="Filter..."
             type="text"
             onChange={ev => setFilterKey(ev.target.value)}

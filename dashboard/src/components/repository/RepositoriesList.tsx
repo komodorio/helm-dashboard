@@ -1,29 +1,20 @@
 import { useState } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import { Repository } from "../../data/types";
-import { useGetRepositories } from "../../API/repositories";
-import { HelmRepositories } from "../../API/interfaces";
+
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
   onRepositoryChanged: (selectedRepository: Repository) => void;
+  repositories: Repository[],
 };
 
 function RepositoriesList({
   onRepositoryChanged,
   selectedRepository,
+  repositories,
 }: RepositoriesListProps) {
   const [showAddRepositoryModal, setShowAddRepositoryModal] = useState(false);
-
-  const { data: repositories } = useGetRepositories({
-    onSuccess: (data: HelmRepositories) => {
-      const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
-
-      if (sortedData && sortedData.length > 0 && !selectedRepository) {
-        onRepositoryChanged(sortedData[0]);
-      }
-    },
-  });
 
   return (
     <>

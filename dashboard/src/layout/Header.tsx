@@ -75,7 +75,7 @@ export default function Header() {
             </li>
             <li>
               <NavLink
-                to="/Repository"
+                to="/repository/"
                 className={({ isActive }) =>
                   isActive ? "p-2 text-[#1347FF] bg-[#EBEFFF]" : "p-2"
                 }
