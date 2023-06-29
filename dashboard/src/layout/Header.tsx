@@ -51,7 +51,7 @@ export default function Header() {
   };
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white">
+    <div className="h-16 flex items-center justify-between bg-white min-w-[1000px]">
       <div className="h-16 flex items-center gap-6 ">
         <NavLink to="/">
           <img

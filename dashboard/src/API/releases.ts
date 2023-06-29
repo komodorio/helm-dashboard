@@ -103,7 +103,7 @@ export function useGetResources(
   name: string,
   options?: UseQueryOptions<StructuredResources[]>
 ) {
-  return useQuery<StructuredResources[]>(
+  const { data, ...rest } = useQuery<StructuredResources[]>(
     ["resources", ns, name],
     () =>
       callApi<StructuredResources[]>(
@@ -111,6 +111,27 @@ export function useGetResources(
       ),
     options
   );
+
+  return {
+    data: data
+      ?.map((resource) => ({
+        ...resource,
+        status: {
+          ...resource.status,
+          conditions: resource.status.conditions.filter(
+            (c) => c.type === "hdHealth" // it's our custom condition type, only one exists
+          ),
+        },
+      }))
+      .sort((a, b) => {
+        const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
+        return (
+          interestingResources.indexOf(b.kind.toUpperCase()) -
+          interestingResources.indexOf(a.kind.toUpperCase())
+        );
+      }),
+    ...rest,
+  };
 }
 
 export function useGetResourceDescription(
@@ -334,6 +355,7 @@ export interface Condition {
   lastProbeTime: any;
   lastTransitionTime: any;
   reason: string;
+  message: string;
 }
 
 export async function callApi<T>(
