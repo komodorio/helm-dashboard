@@ -290,7 +290,6 @@ const Rollback = ({
         actions={[
           {
             id: "1",
-            text: isRollingBackRelease ? "Rolling back..." : "Confirm",
             callback: () => {
               rollbackRelease({
                 ns: namespace,
@@ -300,7 +299,7 @@ const Rollback = ({
               setShowRollbackDiff(false);
             },
             variant: ModalButtonStyle.info,
-            disabled: isRollingBackRelease,
+            isLoading: isRollingBackRelease,
           },
         ]}
       >
@@ -394,10 +393,9 @@ const Uninstall = () => {
           actions={[
             {
               id: "1",
-              text: uninstallMutation.isLoading ? "Uninstalling..." : "Confirm",
               callback: uninstallMutation.mutate,
               variant: ModalButtonStyle.info,
-              disabled: uninstallMutation.isLoading,
+              isLoading: uninstallMutation.isLoading,
             },
           ]}
           containerClassNames="w-[800px]"
@@ -536,12 +534,9 @@ const ReconfigureModal = ({
       actions={[
         {
           id: "1",
-          text: setReleaseVersionMutation.isLoading
-            ? "Submitting..."
-            : "Confirm",
           callback: setReleaseVersionMutation.mutate,
           variant: ModalButtonStyle.info,
-          disabled: setReleaseVersionMutation.isLoading,
+          isLoading: setReleaseVersionMutation.isLoading,
         },
       ]}
     >

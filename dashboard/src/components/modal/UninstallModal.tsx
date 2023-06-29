@@ -33,7 +33,6 @@ export default function UninstallModal({
     setConfirmModalActions([
       {
         id: "1",
-        text: "Confirm",
         callback: onConfirm,
         variant: ModalButtonStyle.info,
       },

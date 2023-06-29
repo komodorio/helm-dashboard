@@ -13,13 +13,13 @@ function Installed() {
     selectedCluster || "",
     { retry: false }
   );
-  const a = useAlertError();
+  const alertError = useAlertError();
 
   useEffect(() => {
     refetch()
       .then((e) => {})
       .catch((e) =>
-        a.setShowErrorModal({
+        alertError.setShowErrorModal({
           title: "Unable to load installed packages",
           msg: e.message,
         })

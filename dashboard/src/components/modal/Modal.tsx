@@ -1,5 +1,6 @@
 import { PropsWithChildren, ReactNode } from "react";
 import ReactDom from "react-dom";
+import Spinner from "../Spinner";
 
 export enum ModalButtonStyle {
   default,
@@ -12,10 +13,11 @@ export enum ModalButtonStyle {
 export interface ModalAction {
   id: string;
   callback: () => void;
-  text: string;
+  text?: string;
   variant?: ModalButtonStyle;
   className?: string;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export interface ModalProps extends PropsWithChildren {
@@ -39,19 +41,19 @@ const Modal = ({
   const colorVariants = new Map<ModalButtonStyle, string>([
     [
       ModalButtonStyle.default,
-      "text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 ",
+      "text-gray-500 bg-white hover:bg-gray-100 disabled:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 ",
     ],
     [
       ModalButtonStyle.info,
-      "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
+      "text-white bg-blue-700 hover:bg-blue-800 disabled:bg-blue-700/80 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
     ],
     [
       ModalButtonStyle.success,
-      "text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
+      "text-white bg-green-700 hover:bg-green-800 disabled:bg-green-700/80 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
     ],
     [
       ModalButtonStyle.error,
-      "text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
+      "text-white bg-red-700 hover:bg-red-800 disabled:bg-red-700/80 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ",
     ],
     [
       ModalButtonStyle.disabled,
@@ -61,8 +63,6 @@ const Modal = ({
 
   const getClassName = (action: ModalAction) => {
     if (action.className) return action.className;
-
-    if (action.disabled) return colorVariants.get(ModalButtonStyle.disabled);
 
     return action.variant
       ? colorVariants.get(action.variant)
@@ -121,11 +121,18 @@ const Modal = ({
                     <button
                       key={action.id}
                       type="button"
-                      className={getClassName(action)}
+                      className={
+                        action.isLoading
+                          ? `flex items-center justify-around space-x-1 ${getClassName(
+                              action
+                            )}`
+                          : getClassName(action)
+                      }
                       onClick={action.callback}
-                      disabled={action.disabled}
+                      disabled={action.disabled || action.isLoading}
                     >
-                      {action.text}
+                      {action.isLoading ? <Spinner size={4} /> : null}
+                      {action.text ?? "Confirm"}
                     </button>
                   ))}
                 </div>
