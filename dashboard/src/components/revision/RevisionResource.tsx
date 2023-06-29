@@ -94,12 +94,14 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         direction="right"
         className="min-w-[60%] max-w-[80%]"
       >
-        <DescribeResource
-          resource={resource}
-          closeDrawer={() => {
-            setIsOpen(false);
-          }}
-        />
+        {isOpen ? (
+          <DescribeResource
+            resource={resource}
+            closeDrawer={() => {
+              setIsOpen(false);
+            }}
+          />
+        ) : null}
       </Drawer>
     </>
   );
@@ -121,8 +123,13 @@ const DescribeResource = ({
   const { reason = "" } = conditions?.[0] || {};
   const successStatus = reason.toLowerCase() === "exists" || "available";
   const { namespace = "", chart = "" } = useParams();
-  const { data, isLoading } = useGetResourceDescription(resource.kind, namespace, chart);
+  const { data, isLoading } = useGetResourceDescription(
+    resource.kind,
+    namespace,
+    chart
+  );
   const [yamlFormattedData, setYamlFormattedData] = useState("");
+
   useEffect(() => {
     if (data) {
       const val = hljs.highlight(data, { language: "yaml" }).value;

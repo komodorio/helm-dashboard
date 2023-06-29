@@ -120,7 +120,7 @@ export function useGetResourceDescription(
   options?: UseQueryOptions<string>
 ) {
   return useQuery<string>(
-    ["describe", ns, name],
+    ["describe", type, ns, name],
     () =>
       callApi<string>(
         `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
@@ -164,7 +164,6 @@ export function useGetReleaseInfoByType(
   options?: UseQueryOptions<string>
 ) {
   const { chart, namespace, tab, revision } = params;
-  console.log({ params });
   return useQuery<string>(
     [tab, namespace, chart, revision, additionalParams],
     () =>

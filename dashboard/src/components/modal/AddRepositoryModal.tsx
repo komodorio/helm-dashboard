@@ -33,14 +33,12 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
       setIsLoading(false);
       onClose();
       window.location.reload();
-    })
+    });
   };
 
   return (
     <Modal
-      containerClassNames={
-        "border-2 border-error-border-color bg-error-background w-full max-w-5xl"
-      }
+      containerClassNames={"bg-error-background w-full max-w-5xl"}
       title="Add Chart Repository"
       isOpen={isOpen}
       onClose={onClose}

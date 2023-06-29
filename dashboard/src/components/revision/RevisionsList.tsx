@@ -1,5 +1,7 @@
 import { BsArrowUpRight } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
+import useCustomSearchParams from '../../hooks/useCustomSearchParams'
+
 import { ReleaseRevision } from "../../data/types";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
@@ -14,12 +16,15 @@ export default function RevisionsList({
   selectedRevision,
 }: RevisionsListProps) {
   const navigate = useNavigate();
-  const { context, namespace, chart, tab } = useParams();
+  const { context, namespace, chart } = useParams();
+  const {searchParamsObject: searchParams} = useCustomSearchParams();
+  const {tab, mode} = searchParams;
   const changeRelease = (newRevision: number) => {
     navigate(
-      `/revision/${context}/${namespace}/${chart}/${newRevision}/${
-        tab ? tab : ""
-      }`
+      {
+        pathname: `/revision/${context}/${namespace}/${chart}/${newRevision}`,
+        search: `?${tab ? `tab=${tab}` : ''}${mode ? `&mode=${mode}` : ''}`,
+      }
     );
   };
   return (
