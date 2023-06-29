@@ -5,9 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
 import { useUpdateRepo } from "../../API/repositories";
-import useAlertError from "../../hooks/useAlertError";
 import { callApi } from "../../API/releases";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 
 type RepositoryViewerProps = {
   repository: Repository | undefined;
@@ -16,14 +16,19 @@ type RepositoryViewerProps = {
 function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const [searchValue, setSearchValue] = useState("");
   const [isRemoveLoading, setIsRemove] = useState(false);
+  const { selectedRepo } = useParams();
+
   const { data: charts, isLoading } = useQuery<Chart[]>({
     queryKey: ["charts", repository?.name],
     queryFn: apiService.getRepositoryCharts,
     refetchOnWindowFocus: false,
   });
 
+  useEffect(() => {
+    setSearchValue("");
+  }, [repository, selectedRepo]);
+
   const update = useUpdateRepo(repository?.name || "", { retry: false });
-  const alert = useAlertError();
 
   const removeRepository = async () => {
     if (confirm("Confirm removing repository?")) {
@@ -69,10 +74,12 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
         <div className="flex flex-col">
           <div className="flex flex-row gap-2">
-            <button onClick={() => {
-              update.mutate()
-              window.location.reload();
-            }}>
+            <button
+              onClick={() => {
+                update.mutate();
+                window.location.reload();
+              }}
+            >
               <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
                 {update.isLoading ? <Spinner size={4} /> : <BsArrowRepeat />}
                 Update
@@ -92,6 +99,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
           </div>
           <input
             onChange={(e) => setSearchValue(e.target.value)}
+            value={searchValue}
             type="text"
             placeholder="Filter..."
             className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
