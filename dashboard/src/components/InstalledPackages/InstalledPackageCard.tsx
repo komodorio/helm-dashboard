@@ -7,6 +7,7 @@ import StatusLabel from "../common/StatusLabel";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import HealthStatus from "./HealthStatus";
+import HelmGrayIcon from "../../assets/helm-gray-50.svg";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -63,8 +64,8 @@ export default function InstalledPackageCard({
       onClick={handleOnClick}
     >
       <img
-        src={release.icon}
-        alt="Helm-DashBoard"
+        src={release.icon || HelmGrayIcon}
+        alt="helm release icon"
         className="w-[40px] mx-4 col-span-1"
       />
 
