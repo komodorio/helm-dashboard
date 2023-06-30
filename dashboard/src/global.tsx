@@ -25,4 +25,10 @@ import React from "react";
  * 3. "Failed"
  */
 export type StatusCode = "Deployed" | "Superseded" | "Failed";
-export type BadgeCode = "error" | "warning" | "success" | "info" | "default";
+export type BadgeCode =
+  | "error"
+  | "warning"
+  | "success"
+  | "info"
+  | "default"
+  | "unknown";

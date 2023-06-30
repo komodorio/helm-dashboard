@@ -27,6 +27,7 @@ export const BadgeCodes = Object.freeze({
   SUCCESS: "success",
   INFO: "info",
   DEFAULT: "default",
+  UNKNOWN: "unknown",
 });
 
 export interface BadgeProps {
@@ -36,11 +37,12 @@ export interface BadgeProps {
 }
 export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
-    error: "bg-red-500 text-white",
-    warning: "bg-yellow-400 text-white",
-    success: "bg-green-300 text-black-100 text-black-800",
-    info: "bg-blue-200 text-black-800",
-    default: "text-black-800",
+    [BadgeCodes.ERROR]: "bg-red-500 text-white",
+    [BadgeCodes.WARNING]: "bg-yellow-400 text-white",
+    [BadgeCodes.SUCCESS]: "bg-green-300 text-black-100 text-black-800",
+    [BadgeCodes.INFO]: "bg-blue-200 text-black-800",
+    [BadgeCodes.DEFAULT]: "text-black-800",
+    [BadgeCodes.UNKNOWN]: "text-red-500 bg-zinc-200",
   };
 
   const badgeBase =
@@ -62,7 +64,7 @@ export default function Badge(props: BadgeProps): JSX.Element {
 
 export const getBadgeType = (status: string) => {
   if (status === "Unknown") {
-    return BadgeCodes.INFO;
+    return BadgeCodes.UNKNOWN;
   } else if (status === "Healthy") {
     return BadgeCodes.SUCCESS;
   } else if (status === "Progressing") {
