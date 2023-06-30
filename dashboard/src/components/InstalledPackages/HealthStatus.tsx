@@ -1,3 +1,5 @@
+import { ReleaseHealthStatus } from "../../data/types";
+
 const items = [
   { id: 1 },
   { id: 2, is: true },
@@ -9,19 +11,13 @@ const items = [
 ];
 
 interface Props {
-  statusData: any
+  statusData: ReleaseHealthStatus[]
 }
 
 const HealthStatus = ({ statusData }: Props) => {
-  const a = statusData.map((item: any) => {
+  const a = statusData.map(item => {
     for (let i = 0; i < item.status.conditions.length; i++) {
-      const cond: {
-        lastProbeTime: string
-        lastTransitionTime: string
-        reason: string
-        status: string
-        type: string
-      } = item.status.conditions[i];
+      const cond = item.status.conditions[i];
 
       if (cond.type !== "hdHealth") { // it's our custom condition type
           continue
