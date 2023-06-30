@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Diff2HtmlUI,
   Diff2HtmlUIConfig,
@@ -155,9 +155,11 @@ export default function RevisionDetails({
                 )}
               </span>
             </button>
-            <ReconfigureModal
+            <InstallVersionModal
               isOpen={isReconfigureModalOpen}
-              release={release}
+              chartName={release.chart_name}
+              chartVersion={release.chart_ver}
+              isUpgrade={true}
               onClose={() => {
                 setIsReconfigureModalOpen(false);
               }}
@@ -322,7 +324,7 @@ const Rollback = ({
   );
 };
 
-const RollbackModalContent = ({ dataResponse }) => {
+const RollbackModalContent = ({ dataResponse }: { dataResponse: any }) => {
   const { data, isLoading, isSuccess: fetchedDataSuccessfully } = dataResponse;
   const diffElement = useRef<HTMLDivElement | null>(null);
 
@@ -434,31 +436,43 @@ const Uninstall = () => {
   );
 };
 
-const ReconfigureModal = ({
+export const InstallVersionModal = ({
   isOpen,
   onClose,
-  release,
+  chartName,
+  chartVersion,
+  isUpgrade = false,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  release: Release;
+  chartName: string;
+  chartVersion: string;
+  isUpgrade?: boolean;
 }) => {
   const navigate = useNavigate();
-  const { chart_ver } = release;
 
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const { namespace: queryNamespace } = useParams();
+  const [namespace, setNamespace] = useState(queryNamespace);
+  const [chart, setChart] = useState(chartName);
 
-  const { chart_name } = release;
-  const { data: versions } = useGetVersions(chart_name);
-  const { context: clusterName, namespace, chart } = useParams();
+  const {
+    error: versionsError,
+    data: versions,
+    refetch: fetchVersion,
+  } = useGetVersions(chart);
 
-  const [selectedVersion, setSelectedVersion] = useState(chart_ver);
+  useEffect(() => {
+    fetchVersion();
+  }, [chart, namespace]);
+
+  const [selectedVersion, setSelectedVersion] = useState(chartVersion);
 
   const { data: chartValues, refetch: refetchChartValues } = useGetChartValues(
     namespace || "",
-    chart_name,
+    chart,
     selectedRepo,
     selectedVersion,
     {
@@ -473,7 +487,7 @@ const ReconfigureModal = ({
       setErrorMessage("");
       const formData = new FormData();
       formData.append("preview", "false");
-      formData.append("chart", `${selectedRepo}/${chart_name}`);
+      formData.append("chart", `${selectedRepo}/${chart}`);
       formData.append("version", selectedVersion);
       formData.append("values", userValues);
 
@@ -491,12 +505,12 @@ const ReconfigureModal = ({
       return res.json();
     },
     {
-      onSuccess: async (res) => {
+      onSuccess: async () => {
         onClose();
         navigate(`/`);
       },
-      onError: (error, variables, context) => {
-        setErrorMessage(error?.message || "Failed to update");
+      onError: (error) => {
+        setErrorMessage((error as Error)?.message || "Failed to update");
       },
     }
   );
@@ -511,10 +525,15 @@ const ReconfigureModal = ({
     if (selectedRepo) {
       refetchChartValues();
     }
-  }, [selectedRepo, selectedVersion]);
+  }, [selectedRepo, selectedVersion, namespace, chart]);
 
   const VersionToInstall = () => {
-    const currentVersion = `current version is: ${chart_ver}`;
+    const currentVersion = isUpgrade ? (
+      <>
+        current version is:{" "}
+        <span className="text-green-700">{chartVersion}</span>
+      </>
+    ) : null;
 
     return (
       <div>
@@ -525,12 +544,11 @@ const ReconfigureModal = ({
               className="border-2 text-blue-500 rounded"
               onChange={(e) => setSelectedVersion(e.target.value)}
               value={selectedVersion}
-              defaultValue={chart_ver}
             >
               {versions?.map(({ repository, version }) => (
                 <option
                   value={version}
-                  key={version}
+                  key={repository + version}
                 >{`${repository} @ ${version}`}</option>
               ))}
             </select>{" "}
@@ -546,8 +564,13 @@ const ReconfigureModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Upgrade ${release.chart_name}`}
-      containerClassNames="w-5/6"
+      title={
+        <div className="font-bold">
+          {`${isUpgrade ? "Upgrade" : "Install"} `}
+          <span className="text-green-700 ">{chartName}</span>
+        </div>
+      }
+      containerClassNames="w-5/6 text-2xl"
       actions={[
         {
           id: "1",
@@ -558,17 +581,26 @@ const ReconfigureModal = ({
       ]}
     >
       <VersionToInstall />
-      <GeneralDetails {...release} />
+      <GeneralDetails
+        chartName={chart}
+        isUpgrade={isUpgrade}
+        namespace={namespace}
+        onChartNameInput={(chartName) => setChart(chartName)}
+        onNamespaceInput={(namespace) => setNamespace(namespace)}
+      />
       <div className="flex w-full gap-6 mt-4">
         <UserDefinedValues val={userValues} setVal={setUserValues} />
         <ChartValues chartValues={chartValues} />
       </div>
 
       <ManifestDiff
-        currentVersion={chart_ver}
+        currentVersion={chartVersion}
         selectedVersion={selectedVersion}
         selectedRepo={selectedRepo}
-        chart_name={chart_name}
+        chartName={chart}
+        namespace={namespace}
+        isUpgrade={isUpgrade}
+        versionsError={versionsError}
       />
       {errorMessage && (
         <div>
@@ -580,6 +612,7 @@ const ReconfigureModal = ({
     </Modal>
   );
 };
+
 const UserDefinedValues = ({ val, setVal }: { val: string; setVal: any }) => {
   return (
     <div className="w-1/2">
@@ -599,23 +632,49 @@ const UserDefinedValues = ({ val, setVal }: { val: string; setVal: any }) => {
   );
 };
 
-const GeneralDetails = ({ chart_name }: { chart_name: string }) => {
-  const { context, namespace } = useParams();
-
+const GeneralDetails = ({
+  chartName,
+  namespace,
+  isUpgrade,
+  onNamespaceInput,
+  onChartNameInput,
+}: {
+  chartName: string;
+  namespace?: string;
+  isUpgrade: boolean;
+  onNamespaceInput: (namespace: string) => void;
+  onChartNameInput: (chartName: string) => void;
+}) => {
+  const { context } = useParams();
+  const inputClassName = `p-2 ${
+    isUpgrade ? "bg-gray-200" : "bg-white border-2 border-gray-300"
+  } rounded`;
   return (
     <div className="flex gap-8">
       <div>
         <h4>Release name:</h4>
-        <div className="p-2 bg-gray-200 rounded">{chart_name}</div>
+        <input
+          className={inputClassName}
+          value={chartName}
+          disabled={isUpgrade}
+          onChange={(e) => onChartNameInput(e.target.value)}
+        ></input>
       </div>
       <div>
         <h4>Namespace (optional):</h4>
-        <div className="p-2 bg-gray-200 rounded">{namespace}</div>
+        <input
+          className={inputClassName}
+          value={namespace}
+          disabled={isUpgrade}
+          onChange={(e) => onNamespaceInput(e.target.value)}
+        ></input>
       </div>
-      <div>
-        <h4>Cluster:</h4>
-        <div className="p-2 bg-gray-200 rounded">{context}</div>
-      </div>
+      {context ? (
+        <div>
+          <h4>Cluster:</h4>
+          {context}
+        </div>
+      ) : null}
     </div>
   );
 };
@@ -630,7 +689,7 @@ const ChartValues = ({ chartValues }: { chartValues: string }) => {
         Chart value reference
       </label>
       <pre
-        className=" w-1/2 bg-gray-100 rounded p-4 font-medium text-md w-full max-h-[300px] block overflow-y-auto"
+        className="bg-gray-100 rounded p-4 font-medium text-md w-full max-h-[300px] block overflow-y-auto"
         dangerouslySetInnerHTML={{
           __html: marked(
             hljs.highlight(chartValues || "", { language: "yaml" }).value
@@ -645,59 +704,84 @@ const ManifestDiff = ({
   currentVersion,
   selectedVersion,
   selectedRepo,
-  chart_name,
+  chartName,
+  namespace,
+  isUpgrade,
+  versionsError,
 }: {
   currentVersion: string;
   selectedVersion: string;
   selectedRepo: string;
-  chart_name: string;
+  chartName: string;
+  namespace?: string;
+  isUpgrade: boolean;
+  versionsError: unknown;
 }) => {
-  const { namespace, chart } = useParams();
   const [isLoading, setIsLoading] = useState(false);
 
   const [diff, setDiff] = useState("");
   const getVersionManifestFormData = (version: string) => {
     const formData = new FormData();
-    formData.append("chart", `${selectedRepo}/${chart_name}`);
+    formData.append("chart", `${selectedRepo}/${chartName}`);
     formData.append("version", version);
     formData.append("values", "");
     formData.append("preview", "true");
+    formData.append("name", chartName);
 
     return formData;
   };
 
   const fetchVersionData = async (version: string) => {
     const formData = getVersionManifestFormData(version);
-    const response = await fetch(`/api/helm/releases/${namespace}/${chart}`, {
-      method: "post",
-      body: formData,
-    });
+    const response = await fetch(
+      `/api/helm/releases/${namespace ? namespace : "[empty]"}`,
+      {
+        method: "post",
+        body: formData,
+      }
+    );
     const data = await response.json();
     return data;
   };
 
-  const fetchDiff = async () => {
-    const [currentVerData, selectedVerData] = await Promise.all([
-      fetchVersionData(currentVersion),
-      fetchVersionData(selectedVersion),
-    ]);
-    const formData = new FormData();
-    formData.append("a", currentVerData.manifest);
-    formData.append("b", selectedVerData.manifest);
+  const fetchDiff = useCallback(async () => {
+    if (versionsError) {
+      return;
+    }
+    if (isUpgrade && selectedVersion === currentVersion) {
+      return;
+    }
 
-    const response = await fetch("/diff", {
-      method: "post",
-      body: formData,
-    });
-    const diff = await response.text();
-    setDiff(diff);
-  };
+    setIsLoading(true);
+    try {
+      const [currentVerData, selectedVerData] = await Promise.all([
+        selectedVersion !== currentVersion
+          ? fetchVersionData(currentVersion)
+          : { manifest: "" },
+        fetchVersionData(selectedVersion),
+      ]);
+      const formData = new FormData();
+      formData.append("a", currentVerData.manifest);
+      formData.append("b", selectedVerData.manifest);
+
+      const response = await fetch("/diff", {
+        method: "post",
+        body: formData,
+      });
+
+      const diff = await response.text();
+      setDiff(diff);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedVersion, chartName, namespace, isUpgrade]);
 
   useEffect(() => {
-    if (selectedVersion !== currentVersion) {
-      fetchDiff();
-    }
-  }, [selectedVersion]);
+    fetchDiff();
+  }, [fetchDiff]);
+
   const diffContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -717,11 +801,21 @@ const ManifestDiff = ({
       diff2htmlUi.highlightCode();
     }
   }, [diff]);
+
   if (isLoading) {
     return (
       <div>
         <Spinner />
         Loading diff...
+      </div>
+    );
+  }
+
+  if (versionsError !== null) {
+    console.log(String(versionsError));
+    return (
+      <div className="flex h-full">
+        <p className="text-red-600 text-lg">{String(versionsError)}</p>
       </div>
     );
   }
