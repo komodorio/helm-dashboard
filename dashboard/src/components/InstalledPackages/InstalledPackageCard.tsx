@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import HealthStatus from "./HealthStatus";
 import HelmGrayIcon from "../../assets/helm-gray-50.svg";
+import Spinner from "../Spinner";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -98,7 +99,7 @@ export default function InstalledPackageCard({
             {release.description}
           </div>
           <div className="col-span-3">
-            {statusData && <HealthStatus statusData={statusData}/>}
+            {statusData ? <HealthStatus statusData={statusData}/> : <Spinner size={4}/>}
           </div>
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>
