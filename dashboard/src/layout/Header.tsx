@@ -25,7 +25,7 @@ export default function Header() {
 
   const resetCache = async () => {
     try {
-      await fetch("/api/cache", { method: 'DELETE' })
+      await fetch("/api/cache", { method: "DELETE" });
       window.location.reload();
     } catch (error) {
       console.error(error);
@@ -48,7 +48,7 @@ export default function Header() {
         </NavLink>
         <span className="w-[1px] h-3/4 bg-gray-200" />
         <div className="inline-block w-full">
-          <ul className="w-full items-center flex md:flex-row md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
+          <ul className="w-full items-center flex md:flex-row space-x-2 xl:space-x-4 2xl:space-x-8 md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <NavLink
                 to="/"
@@ -130,7 +130,7 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-[25%]">
                 Upgrade your HELM experience - Free
                 <BsBoxArrowUpRight className="w-[14px] h-[14px]" />
               </div>

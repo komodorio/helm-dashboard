@@ -7,6 +7,8 @@ import {
 import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
 
+const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
+
 export function useGetInstalledReleases(
   context: string,
   options?: UseQueryOptions<Release[]>
@@ -118,7 +120,7 @@ export function useGetResources(
         status: {
           ...resource.status,
           conditions: resource.status.conditions.filter(
-            (c) => c.type === "hdHealth" // it's our custom condition type, only one exists
+            (c) => c.type === HD_RESOURCE_CONDITION_TYPE
           ),
         },
       }))
@@ -337,7 +339,6 @@ export async function callApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  
   const response = await fetch(url, options);
 
   if (!response.ok) {

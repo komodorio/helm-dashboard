@@ -64,7 +64,6 @@ export default function RevisionDetails({
   const tab = searchParams.get("tab");
   const selectedTab =
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
- 
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
@@ -137,9 +136,9 @@ export default function RevisionDetails({
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
       <StatusLabel status="deployed" />
-      <div className="flex justify-between">
-        <span className="text-[#3d4048] text-4xl">{chart}</span>
-        <div className="flex flex-row gap-3">
+      <div>
+        <h1 className="text-[#3d4048] text-4xl float-left mb-1">{chart}</h1>
+        <div className="flex flex-row gap-3 float-right">
           <div className="flex flex-col">
             <button onClick={() => setIsReconfigureModalOpen(true)}>
               <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
@@ -284,7 +283,6 @@ const Rollback = ({
     </div>
   );
 
-
   if (release.revision <= 1) return null;
 
   return (
@@ -318,21 +316,21 @@ const Rollback = ({
           },
         ]}
       >
-          <RollbackModalContent dataResponse={response} />
+        <RollbackModalContent dataResponse={response} />
       </Modal>{" "}
     </>
   );
 };
 
-const RollbackModalContent = ({dataResponse}) => {
-  const {data, isLoading, isSuccess: fetchedDataSuccessfully} = dataResponse;
+const RollbackModalContent = ({ dataResponse }) => {
+  const { data, isLoading, isSuccess: fetchedDataSuccessfully } = dataResponse;
   const diffElement = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (data && fetchedDataSuccessfully && diffElement?.current) {
-      const configuration : Diff2HtmlUIConfig = {
-        matching: 'lines',
-        outputFormat: 'side-by-side',
+      const configuration: Diff2HtmlUIConfig = {
+        matching: "lines",
+        outputFormat: "side-by-side",
         highlight: true,
         renderNothingWhenEmpty: false,
         rawTemplates: {
@@ -341,7 +339,11 @@ const RollbackModalContent = ({dataResponse}) => {
             '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
         },
       };
-      const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
+      const diff2htmlUi = new Diff2HtmlUI(
+        diffElement.current,
+        data,
+        configuration
+      );
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
     }
@@ -443,7 +445,7 @@ const ReconfigureModal = ({
 }) => {
   const navigate = useNavigate();
   const { chart_ver } = release;
- 
+
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -666,13 +668,10 @@ const ManifestDiff = ({
 
   const fetchVersionData = async (version: string) => {
     const formData = getVersionManifestFormData(version);
-    const response = await fetch(
-      `/api/helm/releases/${namespace}/${chart}`,
-      {
-        method: "post",
-        body: formData,
-      }
-    );
+    const response = await fetch(`/api/helm/releases/${namespace}/${chart}`, {
+      method: "post",
+      body: formData,
+    });
     const data = await response.json();
     return data;
   };
