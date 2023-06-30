@@ -8,12 +8,12 @@ import { HelmRepositories } from "../API/interfaces";
 import { useParams, useNavigate } from "react-router-dom";
 
 function RepositoryPage() {
-  const {selectedRepo: repoFromParams} = useParams();
+  const { selectedRepo: repoFromParams } = useParams();
   const navigate = useNavigate();
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/repository/${selectedRepository.name}`)
+    navigate(`/repository/${selectedRepository.name}`);
   };
-  
+
   const { data: repositories = [] } = useGetRepositories({
     onSuccess: (data: HelmRepositories) => {
       const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
@@ -26,12 +26,12 @@ function RepositoryPage() {
 
   const selectedRepository = useMemo(() => {
     if (repoFromParams) {
-      return repositories?.find(repo => repo.name === repoFromParams)
+      return repositories?.find((repo) => repo.name === repoFromParams);
     }
   }, [repositories, repoFromParams]);
-  
+
   return (
-    <div className="flex flex-row m-5 gap-4">
+    <div className="flex flex-row p-5 gap-4">
       <RepositoriesList
         repositories={repositories}
         onRepositoryChanged={handleRepositoryChanged}
@@ -43,6 +43,5 @@ function RepositoryPage() {
     </div>
   );
 }
-
 
 export default RepositoryPage;
