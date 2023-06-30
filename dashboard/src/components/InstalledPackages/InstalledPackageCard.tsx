@@ -70,7 +70,9 @@ export default function InstalledPackageCard({
 
       <div className="col-span-11 text-sm">
         <div className="grid grid-cols-11">
-          <div className="col-span-3 font-bold text-xl">{release.name}</div>
+          <div className="col-span-3 font-bold text-xl mr-0.5">
+            {release.name}
+          </div>
           <div className="col-span-3">
             <StatusLabel status={release.status} />
           </div>
