@@ -23,13 +23,13 @@ function RepositoriesList({
           {repositories?.map((repository) => (
             <span
               className="flex items-center"
-              key={repository.url}
-              onClick={() => {
-                onRepositoryChanged(repository);
-              }}
+              key={repository.url + repository.name}
               title={repository.url}
             >
               <input
+                onChange={() => {
+                  onRepositoryChanged(repository);
+                }}
                 className="cursor-pointer"
                 type="radio"
                 id={repository.name}

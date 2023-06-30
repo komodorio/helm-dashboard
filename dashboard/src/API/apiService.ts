@@ -2,9 +2,7 @@ import { Chart, ChartVersion, Release, Repository } from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
-  constructor(
-    protected readonly isMockMode: boolean = false
-  ) {}
+  constructor(protected readonly isMockMode: boolean = false) {}
 
   getToolVersion = async () => {
     const response = await fetch(`/status`);
@@ -48,10 +46,7 @@ class ApiService {
     queryKey,
   }: QueryFunctionContext<Chart[], Repository>) => {
     const [_, repository] = queryKey;
-
-    const response = await fetch(
-      `/api/helm/repositories/${repository}`
-    );
+    const response = await fetch(`/api/helm/repositories/${repository}`);
     const data = await response.json();
     return data;
   };
@@ -72,7 +67,7 @@ class ApiService {
     queryKey,
   }: QueryFunctionContext<Release[], Release>) => {
     const [_, params] = queryKey;
-  
+
     if (!params.namespace || !params.chart) return null;
 
     const response = await fetch(

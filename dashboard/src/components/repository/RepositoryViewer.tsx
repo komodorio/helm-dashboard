@@ -19,7 +19,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const { selectedRepo } = useParams();
 
   const { data: charts, isLoading } = useQuery<Chart[]>({
-    queryKey: ["charts", repository?.name],
+    queryKey: ["charts", repository?.name ?? ""],
     queryFn: apiService.getRepositoryCharts,
     refetchOnWindowFocus: false,
   });
