@@ -29,8 +29,8 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <HashRouter>
             <Header />
-            <div className="bg-body-background h-screen">
-              <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] h-screen max-h-full">
+            <div className="bg-body-background min-h-screen min-w-screen">
+              <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] min-h-screen max-h-full min-w-screen">
                 <Routes>
                   <Route path="/" element={<Installed />} />
                   <Route
