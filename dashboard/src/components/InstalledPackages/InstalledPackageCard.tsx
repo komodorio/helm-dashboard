@@ -31,6 +31,11 @@ export default function InstalledPackageCard({
     queryFn: () => apiService.getRepositoryLatestVersion(release.name),
   });
 
+  const { data: statusData } = useQuery<any>({
+    queryKey: ["chartStatus"],
+    queryFn: () => apiService.getResourceStatus({release}),
+  });
+
   const handleMouseOver = () => {
     setIsMouseOver(true);
   };
@@ -93,7 +98,7 @@ export default function InstalledPackageCard({
             {release.description}
           </div>
           <div className="col-span-3">
-            <HealthStatus />
+            {statusData && <HealthStatus statusData={statusData}/>}
           </div>
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>

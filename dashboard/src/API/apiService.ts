@@ -63,6 +63,18 @@ class ApiService {
     return data;
   };
 
+  getResourceStatus = async ({
+    release,
+  }: { release: Release}) : Promise<any> => {
+    if (!release) return null;
+
+    const response = await fetch(
+      `/api/helm/releases/${release.namespace}/${release.name}/resources?health=true`
+    );
+    const data = await response.json()
+    return data;  
+  };
+
   getReleasesHistory = async ({
     queryKey,
   }: QueryFunctionContext<Release[], Release>) => {
