@@ -2,16 +2,37 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
+import { useNavigate, useParams } from "react-router-dom";
+import useCustomSearchParams from "../hooks/useCustomSearchParams";
+import { Release } from "../data/types";
 
 function Installed() {
-  const [selectedCluster, setSelectedCluster] = useState<string>();
+  const { searchParamsObject } = useCustomSearchParams();
+  const { context } = useParams();
+  const { filteredNamespace } = searchParamsObject;
+  const namespaces = filteredNamespace?.split("+") ?? [];
+  const navigate = useNavigate();
+
+  const handleClusterChange = (
+    clusterName: string,
+    namespaces: string[] = []
+  ) => {
+    navigate(
+      `/installed/${clusterName}?&filteredNamespace=${
+        namespaces.length > 0
+          ? `${namespaces.map((ns) => ns).join("+")}`
+          : "default"
+      }`
+    );
+  };
+
   const [filterKey, setFilterKey] = useState<string>("");
   const alertError = useAlertError();
   const { data, isLoading, isRefetching } = useGetInstalledReleases(
-    selectedCluster || "",
+    context ?? "",
     {
       retry: false,
       onError: (e) => {
@@ -23,17 +44,28 @@ function Installed() {
     }
   );
 
+  const filteredReleases = useMemo(() => {
+    return (
+      data?.filter(
+        (installedPackage: Release) =>
+          installedPackage.name.includes(filterKey) &&
+          namespaces.includes(installedPackage.namespace)
+      ) ?? []
+    );
+  }, [data, filterKey, namespaces]);
+
   return (
     <div className="flex flex-row">
       <ClustersList
-        selectedCluster={selectedCluster}
-        setSelectedCluster={setSelectedCluster}
+        selectedCluster={context ?? ""}
+        filteredNamespaces={namespaces}
+        onClusterChange={handleClusterChange}
         installedReleases={data}
       />
       <div className="p-5 w-4/5">
         <InstalledPackagesHeader
           isLoading={isLoading || isRefetching}
-          installedPackages={data}
+          filteredReleases={filteredReleases}
           setFilterKey={setFilterKey}
         />
 
@@ -42,10 +74,7 @@ function Installed() {
             <Spinner />
           </div>
         ) : (
-          <InstalledPackagesList
-            installedReleases={data}
-            filterKey={filterKey}
-          />
+          <InstalledPackagesList filteredReleases={filteredReleases} />
         )}
       </div>
     </div>

@@ -2,22 +2,22 @@ import InstalledPackageCard from "./InstalledPackageCard";
 import { Release } from "../../data/types";
 
 type InstalledPackagesListProps = {
-  installedReleases: Release[] | undefined;
-  filterKey: string,
+  filteredReleases: Release[];
 };
 
 export default function InstalledPackagesList({
-  installedReleases,
-  filterKey
+  filteredReleases,
 }: InstalledPackagesListProps) {
   return (
     <div>
-      {installedReleases?.filter(i => i.name.includes(filterKey)).map((installedPackage: Release) => (
-        <InstalledPackageCard
-          key={installedPackage.name}
-          release={installedPackage}
-        />
-      ))}
+      {filteredReleases.map((installedPackage: Release) => {
+        return (
+          <InstalledPackageCard
+            key={installedPackage.name}
+            release={installedPackage}
+          />
+        );
+      })}
     </div>
   );
 }

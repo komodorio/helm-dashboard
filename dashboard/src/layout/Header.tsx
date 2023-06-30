@@ -51,7 +51,7 @@ export default function Header() {
           <ul className="w-full items-center flex md:flex-row space-x-2 xl:space-x-4 2xl:space-x-8 md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <NavLink
-                to="/"
+                to="/installed"
                 className={({ isActive }) =>
                   isActive ? "p-2 text-[#1347FF]  bg-[#EBEFFF]" : "p-2"
                 }

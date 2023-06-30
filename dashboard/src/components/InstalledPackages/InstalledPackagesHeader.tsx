@@ -2,17 +2,17 @@ import HeaderLogo from "../../assets/packges-header.svg";
 import { Release } from "../../data/types";
 
 type InstalledPackagesHeaderProps = {
-  installedPackages?: Release[];
+  filteredReleases?: Release[];
   setFilterKey: React.Dispatch<React.SetStateAction<string>>;
   isLoading: boolean;
 };
 
 export default function InstalledPackagesHeader({
-  installedPackages,
+  filteredReleases,
   setFilterKey,
   isLoading,
 }: InstalledPackagesHeaderProps) {
-  const numOfPackages = installedPackages?.length;
+  const numOfPackages = filteredReleases?.length;
   const showNoPackageAlert = Boolean(
     !isLoading && (numOfPackages == undefined || numOfPackages == 0)
   );

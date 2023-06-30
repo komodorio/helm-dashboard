@@ -32,7 +32,7 @@ export default function App() {
             <div className="bg-body-background min-h-screen min-w-screen">
               <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] min-h-screen max-h-full">
                 <Routes>
-                  <Route path="/" element={<Installed />} />
+                  <Route path="/installed/:context" element={<Installed />} />
                   <Route
                     path="/revision/:context/:namespace/:chart/:revision"
                     element={<Revision />}

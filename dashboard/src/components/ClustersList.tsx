@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Cluster, Release } from "../data/types";
 import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
+import useCustomSearchParams from "../hooks/useCustomSearchParams";
 
 type ClustersListProps = {
-  setSelectedCluster: React.Dispatch<React.SetStateAction<string | undefined>>;
-  selectedCluster: string | undefined;
+  onClusterChange: (clusterName: string) => void;
+  selectedCluster: string;
+  filteredNamespaces: string[];
   installedReleases?: Release[];
 };
 
@@ -34,43 +36,52 @@ function getCleanClusterName(rawClusterName: string) {
 function ClustersList({
   installedReleases,
   selectedCluster,
-  setSelectedCluster,
+  filteredNamespaces,
+  onClusterChange,
 }: ClustersListProps) {
-  const [namespaces, setNamespaces] =
-    useState<{ name: string; amount: number }[]>();
+  const { addSearchParam, removeSearchParam } = useCustomSearchParams();
 
   const { data: clusters } = useQuery<Cluster[]>({
-    queryKey: ["clusters"],
+    queryKey: ["clusters", selectedCluster],
     queryFn: apiService.getClusters,
     onSuccess(data) {
-      const sortedData = data?.sort((a, b) => a.Name.localeCompare(b.Name));
+      const sortedData = data?.sort((a, b) =>
+        getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
+      );
 
       if (sortedData && sortedData.length > 0 && !selectedCluster) {
-        setSelectedCluster(sortedData[0].Name);
+        onClusterChange(sortedData[0].Name);
       }
     },
   });
 
-  useEffect(() => {
+  const namespaces = useMemo(() => {
     const mapNamespaces = new Map<string, number>();
 
     installedReleases?.forEach((release) => {
-      if (mapNamespaces.has(release.namespace)) {
-        const amount = mapNamespaces.get(release.namespace) ?? 0 + 1;
-        mapNamespaces.set(release.namespace, amount);
-      } else {
-        mapNamespaces.set(release.namespace, 1);
-      }
+      const amount = mapNamespaces.get(release.namespace) ?? 1;
+      mapNamespaces.set(release.namespace, amount);
     });
 
-    const tempNamespaces = Array.from(mapNamespaces, ([key, value]) => ({
+    return Array.from(mapNamespaces, ([key, value]) => ({
       id: crypto.randomUUID(),
       name: key,
       amount: value,
     }));
-
-    setNamespaces(tempNamespaces);
   }, [installedReleases]);
+
+  const onNamespaceChange = (namespace: string) => {
+    const newSelectedNamespaces = filteredNamespaces?.includes(namespace)
+      ? filteredNamespaces?.filter((ns) => ns !== namespace)
+      : [...(filteredNamespaces ?? []), namespace];
+    removeSearchParam("filteredNamespace");
+    if (newSelectedNamespaces.length > 0) {
+      addSearchParam(
+        "filteredNamespace",
+        newSelectedNamespaces.map((ns) => ns).join("+")
+      );
+    }
+  };
 
   return (
     <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-1/6 m-5 h-fit">
@@ -79,29 +90,41 @@ function ClustersList({
         ?.sort((a, b) =>
           getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
         )
-        ?.map((cluster, i) => (
-          <span key={cluster.Name} className="flex items-center">
-            <input
-              className="cursor-pointer"
-              onChange={(e) => setSelectedCluster(e.target.value)}
-              type="radio"
-              id={cluster.Name}
-              value={cluster.Name}
-              checked={cluster.Name == selectedCluster}
-              name="clusters"
-            />
-            <label htmlFor={cluster.Name} className="ml-1">
-              {getCleanClusterName(cluster.Name)}
-            </label>
-          </span>
-        ))}
+        ?.map((cluster) => {
+          return (
+            <span key={cluster.Name} className="flex items-center">
+              <input
+                className="cursor-pointer"
+                onChange={(e) => {
+                  onClusterChange(e.target.value);
+                }}
+                type="radio"
+                id={cluster.Name}
+                value={cluster.Name}
+                checked={cluster.Name == selectedCluster}
+                name="clusters"
+              />
+              <label htmlFor={cluster.Name} className="ml-1">
+                {getCleanClusterName(cluster.Name)}
+              </label>
+            </span>
+          );
+        })}
 
       <label className="font-bold mt-4">Namespaces</label>
       {namespaces
         ?.sort((a, b) => a.name.localeCompare(b.name))
         ?.map((namespace) => (
           <span key={namespace.name} className="flex items-center">
-            <input type="checkbox" id={namespace.name} />
+            <input
+              type="checkbox"
+              id={namespace.name}
+              onChange={(event) => {
+                onNamespaceChange(event.target.value);
+              }}
+              checked={filteredNamespaces?.includes(namespace.name)}
+              value={namespace.name}
+            />
             <label
               htmlFor={namespace.name}
               className="ml-1"

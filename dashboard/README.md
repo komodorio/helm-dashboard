@@ -80,11 +80,12 @@ You are also free to reachout to us on [Slack](https://join.slack.com/t/komodork
 ## Opening a pull request
 
 Inorder to open a pull request with your changes. \
- 1. make sure you are synced with `helm-dashboard-v2` and that all conflicts are resolved. \
- 2. commit your changes and push to your fork. \
- 3. then navigate to https://github.com/komodorio/helm-dashboard and open a pull request. Make sure you are merging from your branch to `helm-dashboard-v2`. \
- 4. you should now tag a main developer (@chad11111
-for example) and get your pull request reviewed.
+
+1.  make sure you are synced with `helm-dashboard-v2` and that all conflicts are resolved. \
+2.  commit your changes and push to your fork. \
+3.  then navigate to https://github.com/komodorio/helm-dashboard and open a pull request. Make sure you are merging from your branch to `helm-dashboard-v2`. \
+4.  you should now tag a main developer (@chad11111
+    for example) and get your pull request reviewed.
 
 # Component library
 
@@ -119,3 +120,5 @@ Refer to the [official documentation](https://storybook.js.org/docs/react/get-st
 - Prefer use fetch API over axios, if you see axios in the code, replace it with fetch.
 - Use <Outlet> for inner routes
 - User query params in the url for filters or any other state that can be represented
+- Hooks:
+  - useCustomSearchParams - for search params

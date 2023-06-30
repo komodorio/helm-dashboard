@@ -21,7 +21,7 @@ const Template: ComponentStory<typeof InstalledPackagesHeader> = (args) => (
 export const Default = Template.bind({});
 
 Default.args = {
-  installedPackages: [
+  filteredReleases: [
     {
       id: "package1",
       image: "img",
