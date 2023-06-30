@@ -34,7 +34,7 @@ export default function App() {
                 <Routes>
                   <Route path="/installed/:context" element={<Installed />} />
                   <Route
-                    path="/revision/:context/:namespace/:chart/:revision"
+                    path="/installed/revision/:context/:namespace/:chart/:revision"
                     element={<Revision />}
                   />
                   <Route path="/repository" element={<RepositoryPage />} />

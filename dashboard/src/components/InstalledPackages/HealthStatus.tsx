@@ -1,69 +1,43 @@
-const items = [
-  { id: 1 },
-  { id: 2, is: true },
-  { id: 3 },
-  { id: 4 },
-  { id: 5, is: true },
-  { id: 6 },
-  { id: 7 },
-];
+import { HD_RESOURCE_CONDITION_TYPE } from "../../API/releases";
+import { Tooltip } from "flowbite-react";
 
 interface Props {
-  statusData: any
+  statusData: any;
 }
 
 const HealthStatus = ({ statusData }: Props) => {
-  const a = statusData.map((item: any) => {
+  const statuses = statusData.map((item: any) => {
     for (let i = 0; i < item.status.conditions.length; i++) {
       const cond: {
-        lastProbeTime: string
-        lastTransitionTime: string
-        reason: string
-        status: string
-        type: string
+        lastProbeTime: string;
+        lastTransitionTime: string;
+        reason: string;
+        status: string;
+        type: string;
       } = item.status.conditions[i];
 
-      if (cond.type !== "hdHealth") { // it's our custom condition type
-          continue
+      if (cond.type !== HD_RESOURCE_CONDITION_TYPE) {
+        continue;
       }
 
-      if (cond.status === "Healthy") {
-          //square.addClass("bg-success")
-          return (
-            <span
-              title={cond.status+" "+item.kind+" '"+item.metadata.name+"'"}
-              key={item.metadata.name}
-              id="tooltip-default"
-              className={`inline-block bg-[#00c2ab] w-2 h-2 rounded-sm`}
-            ></span>
-          )
-      } else if (cond.status === "Progressing") {
-          //square.addClass("bg-warning")
-          return (
-            <span
-              title={cond.status+" "+item.kind+" '"+item.metadata.name+"'"}
-              key={item.metadata.name}
-              className={`inline-block bg-[#ffff00] w-2 h-2 rounded-sm`}
-            ></span>
-          )
-      } else {
-          //square.addClass("bg-danger")
-          return (
-            <span
-              title={cond.status+" "+item.kind+" '"+item.metadata.name+"'"}
-              key={item.metadata.name + cond.status}
-              className={`inline-block bg-[#DC3545] w-2 h-2 rounded-sm`}
-            ></span>
-          )
-      }
+      return (
+        <Tooltip content={`${cond.status} ${item.kind} ${item.metadata.name}`}>
+          <span
+            key={item.metadata.name}
+            className={`inline-block ${
+              cond.status === "Healthy"
+                ? "bg-[#00c2ab]"
+                : cond.status === "Progressing"
+                ? "bg-[#ffff00]"
+                : "bg-[#DC3545]"
+            } w-2 h-2 rounded-sm`}
+          ></span>
+        </Tooltip>
+      );
     }
-}).filter((element: any) => element !== undefined );
-  
-  return (
-    <div className="flex flex-wrap gap-1">
-      {a}
-    </div>
-  );
+  });
+
+  return <div className="flex flex-wrap gap-1">{statuses}</div>;
 };
 
 export default HealthStatus;

@@ -33,7 +33,8 @@ export default function InstalledPackageCard({
   });
 
   const { data: statusData } = useQuery<any>({
-    queryFn: () => apiService.getResourceStatus({release}),
+    queryKey: ["resourceStatus", release],
+    queryFn: () => apiService.getResourceStatus({ release }),
   });
 
   const handleMouseOver = () => {
@@ -54,7 +55,7 @@ export default function InstalledPackageCard({
     }
 
     navigate(
-      `/revision/${selectedCluster?.Name}/${namespace}/${name}/${release.revision}`,
+      `/installed/revision/${selectedCluster?.Name}/${namespace}/${name}/${release.revision}`,
       { state: release }
     );
   };
@@ -98,7 +99,11 @@ export default function InstalledPackageCard({
             {release.description}
           </div>
           <div className="col-span-3">
-            {statusData ? <HealthStatus statusData={statusData}/> : <Spinner size={4}/>}
+            {statusData ? (
+              <HealthStatus statusData={statusData} />
+            ) : (
+              <Spinner size={4} />
+            )}
           </div>
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>

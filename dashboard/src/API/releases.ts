@@ -7,7 +7,7 @@ import {
 import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
 
-const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
+export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
 export function useGetInstalledReleases(
   context: string,

@@ -7,6 +7,8 @@
     "@tanstack/react-query": "^4.29.1",
     "@types/marked": "^5.0.0",
     "diff2html": "^3.4.35",
+    "flowbite": "^1.6.6",
+    "flowbite-react": "^0.4.9",
     "highlight.js": "^11.8.0",
     "html-react-parser": "^4.0.0",
     "marked": "^5.1.0",
