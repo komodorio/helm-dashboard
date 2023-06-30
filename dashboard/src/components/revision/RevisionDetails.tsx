@@ -462,7 +462,7 @@ export const InstallVersionModal = ({
     error: versionsError,
     data: versions,
     refetch: fetchVersion,
-  } = useGetVersions(chart);
+  } = useGetVersions(chartName);
 
   useEffect(() => {
     fetchVersion();
@@ -472,7 +472,7 @@ export const InstallVersionModal = ({
 
   const { data: chartValues, refetch: refetchChartValues } = useGetChartValues(
     namespace || "",
-    chart,
+    chartName,
     selectedRepo,
     selectedVersion,
     {
@@ -487,13 +487,14 @@ export const InstallVersionModal = ({
       setErrorMessage("");
       const formData = new FormData();
       formData.append("preview", "false");
-      formData.append("chart", `${selectedRepo}/${chart}`);
+      formData.append("chart", `${selectedRepo}/${chartName}`);
       formData.append("version", selectedVersion);
       formData.append("values", userValues);
+      formData.append("name", chart);
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        "/api/helm/releases/" + namespace + "/" + chart,
+        `/api/helm/releases/${namespace ? namespace : "default"}`,
         {
           method: "post",
           body: formData,
@@ -597,7 +598,7 @@ export const InstallVersionModal = ({
         currentVersion={chartVersion}
         selectedVersion={selectedVersion}
         selectedRepo={selectedRepo}
-        chartName={chart}
+        chartName={chartName}
         namespace={namespace}
         isUpgrade={isUpgrade}
         versionsError={versionsError}
