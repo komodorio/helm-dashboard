@@ -1,4 +1,4 @@
-import { Chart, ChartVersion, Release, Repository } from "../data/types";
+import { Chart, ChartVersion, Release, ReleaseHealthStatus, Repository } from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
@@ -65,7 +65,7 @@ class ApiService {
 
   getResourceStatus = async ({
     release,
-  }: { release: Release}) : Promise<any> => {
+  }: { release: Release}) : Promise<ReleaseHealthStatus[] | null> => {
     if (!release) return null;
 
     const response = await fetch(

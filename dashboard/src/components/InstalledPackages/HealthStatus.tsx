@@ -1,20 +1,15 @@
 import { HD_RESOURCE_CONDITION_TYPE } from "../../API/releases";
 import { Tooltip } from "flowbite-react";
+import { ReleaseHealthStatus } from "../../data/types";
 
 interface Props {
-  statusData: any;
+  statusData: ReleaseHealthStatus[];
 }
 
 const HealthStatus = ({ statusData }: Props) => {
-  const statuses = statusData.map((item: any) => {
+  const statuses = statusData.map((item) => {
     for (let i = 0; i < item.status.conditions.length; i++) {
-      const cond: {
-        lastProbeTime: string;
-        lastTransitionTime: string;
-        reason: string;
-        status: string;
-        type: string;
-      } = item.status.conditions[i];
+      const cond = item.status.conditions[i];
 
       if (cond.type !== HD_RESOURCE_CONDITION_TYPE) {
         continue;
