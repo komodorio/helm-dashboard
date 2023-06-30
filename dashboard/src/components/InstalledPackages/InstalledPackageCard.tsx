@@ -33,7 +33,6 @@ export default function InstalledPackageCard({
   });
 
   const { data: statusData } = useQuery<any>({
-    queryKey: ["chartStatus"],
     queryFn: () => apiService.getResourceStatus({release}),
   });
 
