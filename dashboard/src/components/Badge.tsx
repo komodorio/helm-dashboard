@@ -39,14 +39,14 @@ export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
     [BadgeCodes.ERROR]: "bg-red-500 text-white",
     [BadgeCodes.WARNING]: "bg-yellow-400 text-white",
-    [BadgeCodes.SUCCESS]: "bg-green-300 text-black-100 text-black-800",
+    [BadgeCodes.SUCCESS]: "bg-green-300 text-black-50 text-black-800",
     [BadgeCodes.INFO]: "bg-blue-200 text-black-800",
     [BadgeCodes.DEFAULT]: "text-black-800",
     [BadgeCodes.UNKNOWN]: "text-red-500 bg-zinc-200",
   };
 
   const badgeBase =
-    "inline-flex items-center px-2.5 py-0.5 rounded text-sm font-medium";
+    "inline-flex items-center px-2.5 py-0.5 rounded text-sm font-light h-[30px]";
   // the type of the badge is indicated by "type" prop.
   // the default type is "default".
   // the resulting span element is stored in badge_elem.

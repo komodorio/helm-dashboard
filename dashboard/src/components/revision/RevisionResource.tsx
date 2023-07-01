@@ -22,36 +22,34 @@ export default function RevisionResource() {
   const { data: resources, isLoading } = useGetResources(namespace, chart);
 
   return (
-    <div>
-      <table className="border-spacing-y-4  font-semibold border-separate w-full text-xs mt-4 ">
-        <thead className="bg-zinc-200 font-bold h-8 rounded">
-          <tr>
-            <td className="pl-6 rounded">RESOURCE TYPE</td>
-            <td>NAME</td>
-            <td>STATUS</td>
-            <td>STATUS MESSAGE</td>
-            <td className="rounded"></td>
-          </tr>
-        </thead>
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <tbody className="bg-white mt-4 h-8 rounded w-full">
-            {resources?.length ? (
-              resources.map((resource: StructuredResources) => (
-                <ResourceRow resource={resource} />
-              ))
-            ) : (
-              <tr>
-                <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
-                  Looks like you don't have any resources.
-                </div>
-              </tr>
-            )}
-          </tbody>
-        )}
-      </table>
-    </div>
+    <table className="border-spacing-y-4  font-semibold border-separate w-full text-xs ">
+      <thead className="bg-zinc-200 font-bold h-8 rounded">
+        <tr>
+          <td className="pl-6 rounded">RESOURCE TYPE</td>
+          <td>NAME</td>
+          <td>STATUS</td>
+          <td>STATUS MESSAGE</td>
+          <td className="rounded"></td>
+        </tr>
+      </thead>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <tbody className="bg-white mt-4 h-8 rounded w-full">
+          {resources?.length ? (
+            resources.map((resource: StructuredResources) => (
+              <ResourceRow resource={resource} />
+            ))
+          ) : (
+            <tr>
+              <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+                Looks like you don't have any resources.
+              </div>
+            </tr>
+          )}
+        </tbody>
+      )}
+    </table>
   );
 }
 
@@ -80,21 +78,14 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         <td className={"pl-6 rounded " + cellClassnames}>{kind}</td>
         <td className={"font-bold" + cellClassnames}>{name}</td>
         <td className={cellClassnames}>
-          <Badge
-            type={badgeType}
-            additionalClassNames={isExistsReason ? "bg-opacity-50" : ""}
-          >
-            {reason}
-          </Badge>
+          <Badge type={badgeType}>{reason}</Badge>
         </td>
         <td className={"rounded text-gray-400 " + cellClassnames}>
           {message ?? ""}
         </td>
         <td className={"rounded " + cellClassnames}>
           <div className="flex justify-end items-center pr-4">
-            <Button onClick={toggleDrawer} className="bg-white">
-              Describe
-            </Button>
+            <Button onClick={toggleDrawer}>Describe</Button>
           </div>
         </td>
       </tr>
