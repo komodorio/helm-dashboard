@@ -27,7 +27,7 @@ export default function Button(props: ButtonProps): JSX.Element {
       <button
         onClick={props.onClick}
         className={
-          "border border-gray-500 bg-gray-100 hover:bg-gray-200 text-black  py-2 px-4 rounded " +
+          " bg-white border border-gray-300 bg-gray-100 hover:bg-gray-50 text-black  py-1 px-4 rounded " +
             props.className || ""
         }
       >
