@@ -345,9 +345,11 @@ export async function callApi<T>(
     const error = await response.text();
     throw new Error(error);
   }
-  let data;
 
-  if (response.headers.get("Content-Type")?.includes("text/plain")) {
+  let data;
+  if (!response.headers.get("Content-Type")) {
+    return {} as T;
+  } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
     data = await response.text();
   } else {
     data = await response.json();
