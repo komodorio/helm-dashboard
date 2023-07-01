@@ -161,7 +161,7 @@ export function useGetLatestVersion(
     ["latestver", chartName],
     () =>
       callApi<ChartVersion[]>(
-        `/api/helm/repositories/versions?name=${chartName}`
+        `/api/helm/repositories/latestver?name=${chartName}`
       ),
     options
   );
