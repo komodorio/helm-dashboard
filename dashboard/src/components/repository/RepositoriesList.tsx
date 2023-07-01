@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import { Repository } from "../../data/types";
+import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
@@ -15,6 +16,14 @@ function RepositoriesList({
 }: RepositoriesListProps) {
   const [showAddRepositoryModal, setShowAddRepositoryModal] = useState(false);
 
+  const { searchParamsObject } = useCustomSearchParams();
+
+  useEffect(() => {
+    if (searchParamsObject.add_repo) {
+      console.log("add repo modal");
+      setShowAddRepositoryModal(true);
+    }
+  }, []);
   return (
     <>
       <div className="h-fit bg-white w-2/12 flex flex-col p-3 rounded shadow-md text-[#3d4048] gap-3">

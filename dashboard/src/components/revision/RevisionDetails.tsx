@@ -14,7 +14,12 @@ import {
 } from "react-icons/bs";
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Navigate,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useGetReleaseInfoByType } from "../../API/releases";
 
 import RevisionDiff from "./RevisionDiff";
@@ -137,10 +142,11 @@ export default function RevisionDetails({
   };
 
   const Header = () => {
+    const navigate = useNavigate();
     return (
       <header className="flex flex-wrap justify-between">
         <h1 className="text-[#3d4048] text-4xl float-left mb-1">{chart}</h1>
-        <div className="flex flex-row flex-wrap gap-3 float-right">
+        <div className="flex flex-row flex-wrap gap-3 float-right h-fit">
           <div className="flex flex-col">
             <Button
               className="flex justify-center items-center gap-2 min-w-[150px]"
@@ -170,14 +176,14 @@ export default function RevisionDetails({
               }}
             />
             {latestVerData?.[0]?.isSuggestedRepo ? (
-              <a
+              <span
                 onClick={() => {
-                  console.log("implement redirect to repository");
+                  navigate("/Repository?add_repo=true");
                 }}
                 className="underline text-sm cursor-pointer"
               >
                 Add repository for it: {latestVerData[0].repository}
-              </a>
+              </span>
             ) : (
               <span
                 onClick={() => refetchLatestVersion()}
@@ -307,11 +313,9 @@ const Rollback = ({
   return (
     <>
       <div className="h-1/2">
-        <Button onClick={handleRollback}>
-          <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-            <BsArrowRepeat />
-            Rollback to #{release.revision - 1}
-          </span>
+        <Button onClick={handleRollback} className="flex items-center gap-2">
+          <BsArrowRepeat />
+          Rollback to #{release.revision - 1}
         </Button>
       </div>
       <Modal

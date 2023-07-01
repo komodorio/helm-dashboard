@@ -22,7 +22,10 @@ export default function RevisionResource() {
   const { data: resources, isLoading } = useGetResources(namespace, chart);
 
   return (
-    <table className="border-spacing-y-4  font-semibold border-separate w-full text-xs ">
+    <table
+      cellPadding={6}
+      className="border-spacing-y-4  font-semibold border-separate w-full text-xs "
+    >
       <thead className="bg-zinc-200 font-bold h-8 rounded">
         <tr>
           <td className="pl-6 rounded">RESOURCE TYPE</td>
@@ -67,10 +70,6 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
   const cellClassnames = "py-2";
 
   let badgeType = getBadgeType(status);
-  const isExistsReason = ["Exists"].includes(reason);
-  if (isExistsReason) {
-    badgeType = BadgeCodes.SUCCESS;
-  }
 
   return (
     <>
@@ -121,8 +120,7 @@ const DescribeResource = ({
     status: { conditions },
   } = resource;
 
-  const { reason = "" } = conditions?.[0] || {};
-  const successStatus = reason.toLowerCase() === "exists" || "available";
+  const { status, reason = "" } = conditions?.[0] || {};
   const { namespace = "", chart = "" } = useParams();
   const { data, isLoading } = useGetResourceDescription(
     resource.kind,
@@ -138,13 +136,14 @@ const DescribeResource = ({
     }
   }, [data]);
 
+  const badgeType = getBadgeType(status);
   return (
     <>
       <div className="flex justify-between px-3 py-4 border-b">
         <div>
           <div className="flex gap-3">
             <h3 className="font-medium text-xl">{name}</h3>
-            <Badge type={successStatus ? "success" : "error"}>{reason}</Badge>
+            <Badge type={badgeType}>{reason}</Badge>
           </div>
           <p className="m-0 mt-4">{kind}</p>
         </div>
