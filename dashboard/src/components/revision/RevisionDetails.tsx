@@ -33,6 +33,7 @@ import Spinner from "../Spinner";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import useAlertError from "../../hooks/useAlertError";
+import Button from "../Button";
 
 type RevisionTagProps = {
   caption: string;
@@ -140,21 +141,22 @@ export default function RevisionDetails({
         <h1 className="text-[#3d4048] text-4xl float-left mb-1">{chart}</h1>
         <div className="flex flex-row gap-3 float-right">
           <div className="flex flex-col">
-            <button onClick={() => setIsReconfigureModalOpen(true)}>
-              <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                {isLoadingLatestVersion || isRefetchingLatestVersion ? (
-                  <>
-                    <BsHourglassSplit />
-                    Checking...
-                  </>
-                ) : (
-                  <>
-                    <BsPencil />
-                    Reconfigure
-                  </>
-                )}
-              </span>
-            </button>
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => setIsReconfigureModalOpen(true)}
+            >
+              {isLoadingLatestVersion || isRefetchingLatestVersion ? (
+                <>
+                  <BsHourglassSplit />
+                  Checking...
+                </>
+              ) : (
+                <>
+                  <BsPencil />
+                  Reconfigure
+                </>
+              )}
+            </Button>
             <InstallVersionModal
               isOpen={isReconfigureModalOpen}
               chartName={release.chart_name}
@@ -188,12 +190,13 @@ export default function RevisionDetails({
             <>
               {" "}
               <div className="h-1/2">
-                <button onClick={handleRunTests}>
-                  <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-                    <BsCheckCircle />
-                    Run tests
-                  </span>
-                </button>
+                <Button
+                  onClick={handleRunTests}
+                  className="flex items-center gap-2"
+                >
+                  <BsCheckCircle />
+                  Run tests
+                </Button>
               </div>
               <Modal
                 containerClassNames="w-3/5"
@@ -290,12 +293,12 @@ const Rollback = ({
   return (
     <>
       <div className="h-1/2">
-        <button onClick={handleRollback}>
+        <Button onClick={handleRollback}>
           <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
             <BsArrowRepeat />
             Rollback to #{release.revision - 1}
           </span>
-        </button>
+        </Button>
       </div>
       <Modal
         title={rollbackTitle}
@@ -307,7 +310,7 @@ const Rollback = ({
             id: "1",
             callback: () => {
               rollbackRelease({
-                ns: namespace,
+                ns: namespace as string,
                 name: String(chart),
                 revision: release.revision,
               });
@@ -372,20 +375,12 @@ const Uninstall = () => {
   const uninstallMutation = useMutation(
     ["uninstall", namespace, chart],
     () =>
-      fetch(
-        // Todo: Change to BASE_URL from env
-        "/api/helm/releases/" + namespace + "/" + chart,
-        {
-          method: "delete",
-        }
-      ),
+      fetch("/api/helm/releases/" + namespace + "/" + chart, {
+        method: "delete",
+      }),
     {
       onSuccess: () => {
         window.location.href = "/";
-      },
-      onError: () => {
-        // An error happened!
-        console.log(`rolling back optimistic update with id `);
       },
     }
   );
@@ -398,12 +393,13 @@ const Uninstall = () => {
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)}>
-        <span className="flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
-          <BsTrash3 />
-          Uninstall
-        </span>
-      </button>
+      <Button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-2 hover:bg-red-300"
+      >
+        <BsTrash3 />
+        Uninstall
+      </Button>
       {resources?.length ? (
         <Modal
           title={uninstallTitle}
