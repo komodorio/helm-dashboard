@@ -46,6 +46,7 @@ function ChartViewer({ chart }: ChartViewerProps) {
         chartVersion={chart.version}
         isOpen={showInstallModal}
         onClose={() => setShowInstallModal(false)}
+        isInstall={true}
       />
     </>
   );

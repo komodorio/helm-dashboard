@@ -9,6 +9,7 @@ import {
   BsTrash3,
   BsHourglassSplit,
   BsArrowRepeat,
+  BsArrowUp,
   BsCheckCircle,
 } from "react-icons/bs";
 import { Release } from "../../data/types";
@@ -94,6 +95,7 @@ export default function RevisionDetails({
       console.error("Failed to execute test for chart", error);
     },
   });
+
   const handleRunTests = () => {
     if (!namespace || !chart) {
       setShowErrorModal({
@@ -134,6 +136,11 @@ export default function RevisionDetails({
     }
   };
 
+  const canUpgrade = isNewerVersion(
+    release.chart_ver,
+    latestVerData?.[0]?.version ?? ""
+  );
+
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
       <StatusLabel status="deployed" />
@@ -161,7 +168,8 @@ export default function RevisionDetails({
               isOpen={isReconfigureModalOpen}
               chartName={release.chart_name}
               chartVersion={release.chart_ver}
-              isUpgrade={true}
+              latestVersion={latestVerData?.[0]?.version}
+              isUpgrade={canUpgrade}
               onClose={() => {
                 setIsReconfigureModalOpen(false);
               }}
@@ -437,20 +445,28 @@ export const InstallVersionModal = ({
   onClose,
   chartName,
   chartVersion,
+  latestVersion,
   isUpgrade = false,
+  isInstall = false,
 }: {
   isOpen: boolean;
   onClose: () => void;
   chartName: string;
   chartVersion: string;
+  latestVersion?: string;
   isUpgrade?: boolean;
+  isInstall?: boolean;
 }) => {
   const navigate = useNavigate();
-
+  const { setShowErrorModal } = useAlertError();
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { namespace: queryNamespace } = useParams();
+  const {
+    namespace: queryNamespace,
+    chart: releaseName,
+    revision,
+  } = useParams();
   const [namespace, setNamespace] = useState(queryNamespace);
   const [chart, setChart] = useState(chartName);
 
@@ -464,7 +480,10 @@ export const InstallVersionModal = ({
     fetchVersion();
   }, [chart, namespace]);
 
-  const [selectedVersion, setSelectedVersion] = useState(chartVersion);
+  latestVersion = latestVersion ?? chartVersion; // a guard for typescript, latestVersion is always defined
+  const [selectedVersion, setSelectedVersion] = useState(
+    isUpgrade ? latestVersion : chartVersion
+  );
 
   const { data: chartValues, refetch: refetchChartValues } = useGetChartValues(
     namespace || "",
@@ -490,21 +509,36 @@ export const InstallVersionModal = ({
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        `/api/helm/releases/${namespace ? namespace : "default"}`,
+        `/api/helm/releases/${namespace ? namespace : "default"}${
+          !isInstall ? `/${releaseName}` : ""
+        }`,
         {
           method: "post",
           body: formData,
         }
       );
       if (!res.ok) {
-        throw new Error(await res.text());
+        setShowErrorModal({
+          title: `Failed to ${isInstall ? "install" : "upgrade"} the chart`,
+          msg: String(await res.text()),
+        });
       }
       return res.json();
     },
     {
       onSuccess: async () => {
         onClose();
-        navigate(`/`);
+        if (isInstall) {
+          navigate(`/`);
+        } else {
+          setSelectedVersion(""); //cleanup
+          navigate(
+            `/installed/revision/minikube/default/my-release/${
+              Number(revision) + 1
+            }`
+          );
+          window.location.reload();
+        }
       },
       onError: (error) => {
         setErrorMessage((error as Error)?.message || "Failed to update");
@@ -560,7 +594,10 @@ export const InstallVersionModal = ({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={() => {
+        setSelectedVersion("");
+        onClose();
+      }}
       title={
         <div className="font-bold">
           {`${isUpgrade ? "Upgrade" : "Install"} `}
@@ -809,7 +846,6 @@ const ManifestDiff = ({
   }
 
   if (versionsError !== null) {
-    console.log(String(versionsError));
     return (
       <div className="flex h-full">
         <p className="text-red-600 text-lg">{String(versionsError)}</p>
@@ -819,4 +855,24 @@ const ManifestDiff = ({
   return (
     <div ref={diffContainerRef} className="relative overflow-y-auto"></div>
   );
+};
+
+const isNewerVersion = (oldVer: string, newVer: string) => {
+  if (oldVer && oldVer[0] === "v") {
+    oldVer = oldVer.substring(1);
+  }
+
+  if (newVer && newVer[0] === "v") {
+    newVer = newVer.substring(1);
+  }
+
+  const oldParts = oldVer.split(".");
+  const newParts = newVer.split(".");
+  for (let i = 0; i < newParts.length; i++) {
+    const a = ~~newParts[i]; // parse int
+    const b = ~~oldParts[i]; // parse int
+    if (a > b) return true;
+    if (a < b) return false;
+  }
+  return false;
 };
