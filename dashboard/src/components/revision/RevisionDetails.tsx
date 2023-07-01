@@ -136,20 +136,14 @@ export default function RevisionDetails({
     }
   };
 
-  const canUpgrade = isNewerVersion(
-    release.chart_ver,
-    latestVerData?.[0]?.version ?? ""
-  );
-
-  return (
-    <div className="flex flex-col px-16 pt-5 gap-3">
-      <StatusLabel status="deployed" />
-      <div>
+  const Header = () => {
+    return (
+      <header className="flex flex-wrap justify-between">
         <h1 className="text-[#3d4048] text-4xl float-left mb-1">{chart}</h1>
-        <div className="flex flex-row gap-3 float-right">
+        <div className="flex flex-row flex-wrap gap-3 float-right">
           <div className="flex flex-col">
             <Button
-              className="flex items-center gap-2"
+              className="flex justify-center items-center gap-2 min-w-[150px]"
               onClick={() => setIsReconfigureModalOpen(true)}
             >
               {isLoadingLatestVersion || isRefetchingLatestVersion ? (
@@ -164,6 +158,7 @@ export default function RevisionDetails({
                 </>
               )}
             </Button>
+
             <InstallVersionModal
               isOpen={isReconfigureModalOpen}
               chartName={release.chart_name}
@@ -221,7 +216,18 @@ export default function RevisionDetails({
             <Uninstall />
           </div>
         </div>
-      </div>
+      </header>
+    );
+  };
+  const canUpgrade = isNewerVersion(
+    release.chart_ver,
+    latestVerData?.[0]?.version ?? ""
+  );
+
+  return (
+    <div className="flex flex-col px-16 pt-5 gap-3">
+      <StatusLabel status="deployed" />
+      <Header />
       <div className="flex flex-row gap-6">
         <span>
           Revision <span className="font-semibold">#{release.revision}</span>
@@ -255,7 +261,7 @@ export default function RevisionDetails({
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
   return (
-    <span className="bg-[#d6effe] px-2">
+    <span className="bg-[#d6effe] px-2 text-sm">
       <span>{caption}:</span>
       <span className="font-bold"> {text}</span>
     </span>
@@ -403,7 +409,7 @@ const Uninstall = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 hover:bg-red-300"
+        className="flex items-center gap-2 hover:bg-red-200"
       >
         <BsTrash3 />
         Uninstall
@@ -559,20 +565,20 @@ export const InstallVersionModal = ({
   }, [selectedRepo, selectedVersion, namespace, chart]);
 
   const VersionToInstall = () => {
-    const currentVersion = isUpgrade ? (
-      <>
+    const currentVersion = (
+      <p className="text-xl">
         current version is:{" "}
         <span className="text-green-700">{chartVersion}</span>
-      </>
-    ) : null;
+      </p>
+    );
 
     return (
-      <div>
+      <div className="flex gap-2 text-xl">
         {versions?.length ? (
           <>
             Version to install:{" "}
             <select
-              className="border-2 text-blue-500 rounded"
+              className=" py-1 border-2 border-gray-200 text-blue-500 rounded"
               onChange={(e) => setSelectedVersion(e.target.value)}
               value={selectedVersion}
             >
@@ -680,13 +686,13 @@ const GeneralDetails = ({
   onChartNameInput: (chartName: string) => void;
 }) => {
   const { context } = useParams();
-  const inputClassName = `p-2 ${
+  const inputClassName = ` text-lg py-1 px-2 ${
     isUpgrade ? "bg-gray-200" : "bg-white border-2 border-gray-300"
   } rounded`;
   return (
     <div className="flex gap-8">
       <div>
-        <h4>Release name:</h4>
+        <h4 className="text-lg">Release name:</h4>
         <input
           className={inputClassName}
           value={chartName}
@@ -695,7 +701,7 @@ const GeneralDetails = ({
         ></input>
       </div>
       <div>
-        <h4>Namespace (optional):</h4>
+        <h4 className="text-lg">Namespace (optional):</h4>
         <input
           className={inputClassName}
           value={namespace}
@@ -705,8 +711,8 @@ const GeneralDetails = ({
       </div>
       {context ? (
         <div>
-          <h4>Cluster:</h4>
-          {context}
+          <h4 className="text-lg">Cluster:</h4>
+          <p className="text-lg">{context}</p>
         </div>
       ) : null}
     </div>

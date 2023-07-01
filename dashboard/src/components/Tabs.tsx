@@ -21,7 +21,7 @@ export default function Tabs({ tabs, selectedTab }: TabsProps) {
 
   return (
     <div className="flex flex-col">
-      <div className="flex pb-4">
+      <div className="flex pb-2">
         {tabs.map((tab) => (
           <button
             key={tab.label}
