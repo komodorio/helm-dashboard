@@ -20,7 +20,6 @@ function RepositoriesList({
 
   useEffect(() => {
     if (searchParamsObject.add_repo) {
-      console.log("add repo modal");
       setShowAddRepositoryModal(true);
     }
   }, []);
