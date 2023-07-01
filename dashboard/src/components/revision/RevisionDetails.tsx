@@ -182,7 +182,7 @@ export default function RevisionDetails({
                 onClick={() => {
                   console.log("implement redirect to repository");
                 }}
-                className="underline text-sm cursor-pointer"
+                className="underline text-sm cursor-pointer text-blue-600"
               >
                 Add repository for it: {latestVerData[0].repository}
               </a>
