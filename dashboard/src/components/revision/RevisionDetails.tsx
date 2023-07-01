@@ -157,6 +157,11 @@ export default function RevisionDetails({
                   <BsHourglassSplit />
                   Checking...
                 </>
+              ) : canUpgrade ? (
+                <>
+                  <BsArrowUp />
+                  Upgrade to {latestVerData?.[0]?.version}
+                </>
               ) : (
                 <>
                   <BsPencil />
@@ -180,7 +185,7 @@ export default function RevisionDetails({
                 onClick={() => {
                   navigate("/Repository?add_repo=true");
                 }}
-                className="underline text-sm cursor-pointer"
+                className="underline text-sm cursor-pointer text-blue-600"
               >
                 Add repository for it: {latestVerData[0].repository}
               </span>
@@ -225,6 +230,7 @@ export default function RevisionDetails({
       </header>
     );
   };
+
   const canUpgrade = isNewerVersion(
     release.chart_ver,
     latestVerData?.[0]?.version ?? ""
