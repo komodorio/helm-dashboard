@@ -10,6 +10,7 @@ import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
+import { isNewerVersion } from "../../../utils";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -170,12 +171,16 @@ export const InstallChartModal = ({
               onChange={(e) => setSelectedVersion(e.target.value)}
               value={selectedVersion}
             >
-              {versions?.map(({ repository, version }) => (
-                <option
-                  value={version}
-                  key={repository + version}
-                >{`${repository} @ ${version}`}</option>
-              ))}
+              {versions
+                ?.sort((a, b) =>
+                  isNewerVersion(a.version, b.version) ? 1 : -1
+                )
+                .map(({ repository, version }) => (
+                  <option
+                    value={version}
+                    key={repository + version}
+                  >{`${repository} @ ${version}`}</option>
+                ))}
             </select>{" "}
           </>
         ) : null}
