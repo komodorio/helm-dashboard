@@ -2,12 +2,13 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
 import { useNavigate, useParams } from "react-router-dom";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { Release } from "../data/types";
+import { useAppContext } from "../context/AppContext";
 
 function Installed() {
   const { searchParamsObject } = useCustomSearchParams();
@@ -15,6 +16,7 @@ function Installed() {
   const { filteredNamespace } = searchParamsObject;
   const namespaces = filteredNamespace?.split("+") ?? [];
   const navigate = useNavigate();
+  const {setSelectedCluster, selectedCluster} = useAppContext();
 
   const handleClusterChange = (
     clusterName: string,
@@ -28,6 +30,18 @@ function Installed() {
       }`
     );
   };
+
+  useEffect(() => {
+    if (selectedCluster && !context) {
+      handleClusterChange(selectedCluster, namespaces)
+    }
+  }, [selectedCluster, context, namespaces]);
+
+  useEffect(() => {
+    if (context) {
+      setSelectedCluster(context);
+    }
+  }, [context]);
 
   const [filterKey, setFilterKey] = useState<string>("");
   const alertError = useAlertError();
