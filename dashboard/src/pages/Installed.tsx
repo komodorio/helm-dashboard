@@ -16,6 +16,7 @@ function Installed() {
   const namespaces = filteredNamespace?.split("+") ?? [];
   const navigate = useNavigate();
 
+
   const handleClusterChange = (
     clusterName: string,
     namespaces: string[] = []
@@ -28,7 +29,6 @@ function Installed() {
       }`
     );
   };
-
 
   const [filterKey, setFilterKey] = useState<string>("");
   const alertError = useAlertError();
