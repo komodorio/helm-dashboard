@@ -35,6 +35,7 @@ import { marked } from "marked";
 import hljs from "highlight.js";
 import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
+import { useAppContext } from "../../context/AppContext";
 
 type RevisionTagProps = {
   caption: string;
@@ -51,7 +52,7 @@ export default function RevisionDetails({
   refetchRevisions,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
-
+  const {selectedCluster} = useAppContext();
   const revisionTabs = [
     { value: "resources", label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
@@ -180,7 +181,7 @@ export default function RevisionDetails({
             {latestVerData?.[0]?.isSuggestedRepo ? (
               <span
                 onClick={() => {
-                  navigate("/repository?add_repo=true");
+                  navigate('/repository?add_repo=true');
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
               >
@@ -480,6 +481,7 @@ export const InstallVersionModal = ({
     chart: releaseName,
     revision,
   } = useParams();
+  const {selectedCluster} = useAppContext();
   const [namespace, setNamespace] = useState(queryNamespace);
   const [chart, setChart] = useState(chartName);
 
@@ -528,6 +530,9 @@ export const InstallVersionModal = ({
         {
           method: "post",
           body: formData,
+          headers: {
+            "X-Kubecontext": selectedCluster,
+          },
         }
       );
       if (!res.ok) {
@@ -693,7 +698,7 @@ const GeneralDetails = ({
   onNamespaceInput: (namespace: string) => void;
   onChartNameInput: (chartName: string) => void;
 }) => {
-  const { context } = useParams();
+  const { selectedCluster } = useAppContext();
   const inputClassName = ` text-lg py-1 px-2 ${
     isUpgrade ? "bg-gray-200" : "bg-white border-2 border-gray-300"
   } rounded`;
@@ -717,10 +722,10 @@ const GeneralDetails = ({
           onChange={(e) => onNamespaceInput(e.target.value)}
         ></input>
       </div>
-      {context ? (
-        <div>
+      {selectedCluster ? (
+        <div className="flex">
           <h4 className="text-lg">Cluster:</h4>
-          <p className="text-lg">{context}</p>
+          <p className="text-lg">{selectedCluster}</p>
         </div>
       ) : null}
     </div>
