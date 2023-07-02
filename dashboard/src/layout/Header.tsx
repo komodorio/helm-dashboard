@@ -15,7 +15,6 @@ import { useGetApplicationStatus } from "../API/other";
 export default function Header() {
   const { data: statusData } = useGetApplicationStatus();
   const {context} = useParams();
-  console.log(context)
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
   };
