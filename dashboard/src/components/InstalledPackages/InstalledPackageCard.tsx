@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ChartVersion, Cluster, Release } from "../../data/types";
-import { BsArrowUpCircleFill } from "react-icons/bs";
+import { Cluster, Release } from "../../data/types";
+import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
@@ -9,6 +9,9 @@ import apiService from "../../API/apiService";
 import HealthStatus from "./HealthStatus";
 import HelmGrayIcon from "../../assets/helm-gray-50.svg";
 import Spinner from "../Spinner";
+import { useGetLatestVersion } from "../../API/releases";
+import { isNewerVersion } from "../../utils";
+import { LatestChartVersion } from "../../API/interfaces";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -20,16 +23,15 @@ export default function InstalledPackageCard({
   const navigate = useNavigate();
 
   const [isMouseOver, setIsMouseOver] = useState(false);
-  const [showUpgrade, setShowUpgrade] = useState(true);
 
   const { data: clusters } = useQuery<Cluster[]>({
     queryKey: ["clusters"],
     queryFn: () => apiService.getClusters(),
   });
 
-  const { data: latestVersionResult } = useQuery<ChartVersion>({
-    queryKey: ["chartName", release.name],
-    queryFn: () => apiService.getRepositoryLatestVersion(release.name),
+  const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
+    queryKey: ["chartName", release.chartName],
+    cacheTime: 0,
   });
 
   const { data: statusData } = useQuery<any>({
@@ -37,9 +39,23 @@ export default function InstalledPackageCard({
     queryFn: () => apiService.getResourceStatus({ release }),
   });
 
+  console.log(release);
+  const latestVersionData: LatestChartVersion | undefined =
+    latestVersionResult?.[0];
+
+  const canUpgrade =
+    !latestVersionData?.version || !release.chartVersion
+      ? false
+      : isNewerVersion(release.chartVersion, latestVersionData?.version);
+
+  const installRepoSuggestion = latestVersionData?.isSuggestedRepo
+    ? latestVersionData.repository
+    : null;
+
   const handleMouseOver = () => {
     setIsMouseOver(true);
   };
+
   const handleMouseOut = () => {
     setIsMouseOver(false);
   };
@@ -107,14 +123,23 @@ export default function InstalledPackageCard({
           </div>
           <div className="col-span-2 text-[#707583] flex flex-col items">
             <span>CHART VERSION</span>
-            {showUpgrade && (
-              <span
+            {(canUpgrade || installRepoSuggestion) && (
+              <div
                 className="text-[#0d6efd] flex flex-row items-center gap-1 font-bold"
-                title={`upgrade available: ${latestVersionResult?.version} from ${latestVersionResult?.repository}`}
+                title={`upgrade available: ${latestVersionData?.version} from ${latestVersionData?.repository}`}
               >
-                <BsArrowUpCircleFill />
-                UPGRADE
-              </span>
+                {canUpgrade ? (
+                  <>
+                    <BsArrowUpCircleFill />
+                    UPGRADE
+                  </>
+                ) : (
+                  <>
+                    <BsPlusCircleFill />
+                    ADD REPO
+                  </>
+                )}
+              </div>
             )}
           </div>
           <div className="col-span-1 text-[#707583]">REVISION</div>
