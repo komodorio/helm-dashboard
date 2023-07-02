@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
-import { Release, ReleaseRevision } from "../data/types";
+import { ReleaseRevision } from "../data/types";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../API/apiService";
 
@@ -10,7 +10,6 @@ const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) =>
   r1.revision - r2.revision < 0 ? 1 : -1;
 
 function Revision() {
-  const { state: release } = useLocation();
   const { revision = "", ...restParams } = useParams();
 
   const selectedRevision = revision ? parseInt(revision, 10) : 0;
@@ -18,7 +17,7 @@ function Revision() {
   const { data: releaseRevisions, refetch: refetchRevisions } = useQuery<
     ReleaseRevision[]
   >({
-    queryKey: ["releasesHisotry", restParams],
+    queryKey: ["releasesHistory", restParams],
     queryFn: apiService.getReleasesHistory,
   });
   const sortedReleases = useMemo(

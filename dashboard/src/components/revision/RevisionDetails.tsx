@@ -14,12 +14,7 @@ import {
 } from "react-icons/bs";
 import { Release } from "../../data/types";
 import StatusLabel from "../common/StatusLabel";
-import {
-  Navigate,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useGetReleaseInfoByType } from "../../API/releases";
 
 import RevisionDiff from "./RevisionDiff";
@@ -170,20 +165,22 @@ export default function RevisionDetails({
               )}
             </Button>
 
-            <InstallVersionModal
-              isOpen={isReconfigureModalOpen}
-              chartName={release.chart_name}
-              chartVersion={release.chart_ver}
-              latestVersion={latestVerData?.[0]?.version}
-              isUpgrade={canUpgrade}
-              onClose={() => {
-                setIsReconfigureModalOpen(false);
-              }}
-            />
+            {isReconfigureModalOpen && (
+              <InstallVersionModal
+                isOpen={isReconfigureModalOpen}
+                chartName={release.chart_name}
+                chartVersion={release.chart_ver}
+                latestVersion={latestVerData?.[0]?.version}
+                isUpgrade={canUpgrade}
+                onClose={() => {
+                  setIsReconfigureModalOpen(false);
+                }}
+              />
+            )}
             {latestVerData?.[0]?.isSuggestedRepo ? (
               <span
                 onClick={() => {
-                  navigate("/Repository?add_repo=true");
+                  navigate("/repository?add_repo=true");
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
               >
@@ -502,7 +499,7 @@ export const InstallVersionModal = ({
   );
 
   const { data: chartValues, refetch: refetchChartValues } = useGetChartValues(
-    namespace || "",
+    namespace || "default",
     chartName,
     selectedRepo,
     selectedVersion,
@@ -651,6 +648,7 @@ export const InstallVersionModal = ({
         namespace={namespace}
         isUpgrade={isUpgrade}
         versionsError={versionsError}
+        isInstall={isInstall}
       />
       {errorMessage && (
         <div>
@@ -768,7 +766,6 @@ const ManifestDiff = ({
   versionsError: unknown;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-
   const [diff, setDiff] = useState("");
   const getVersionManifestFormData = (version: string) => {
     const formData = new FormData();
@@ -783,18 +780,20 @@ const ManifestDiff = ({
 
   const fetchVersionData = async (version: string) => {
     const formData = getVersionManifestFormData(version);
-    const response = await fetch(
-      `/api/helm/releases/${namespace ? namespace : "[empty]"}`,
-      {
-        method: "post",
-        body: formData,
-      }
-    );
+    const fetchUrl = `/api/helm/releases/${namespace ? namespace : "[empty]"}`;
+    const response = await fetch(fetchUrl, {
+      method: "post",
+      body: formData,
+    });
     const data = await response.json();
     return data;
   };
 
   const fetchDiff = useCallback(async () => {
+    if (!selectedRepo) {
+      return;
+    }
+
     if (versionsError) {
       return;
     }
@@ -818,7 +817,6 @@ const ManifestDiff = ({
         method: "post",
         body: formData,
       });
-
       const diff = await response.text();
       setDiff(diff);
     } catch (error) {
@@ -826,7 +824,7 @@ const ManifestDiff = ({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedVersion, chartName, namespace, isUpgrade]);
+  }, [selectedRepo, selectedVersion, chartName, namespace, isUpgrade]);
 
   useEffect(() => {
     fetchDiff();

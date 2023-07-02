@@ -41,13 +41,15 @@ function ChartViewer({ chart }: ChartViewerProps) {
           )}
         </span>
       </div>
-      <InstallVersionModal
-        chartName={chart.name}
-        chartVersion={chart.version}
-        isOpen={showInstallModal}
-        onClose={() => setShowInstallModal(false)}
-        isInstall={true}
-      />
+      {showInstallModal && (
+        <InstallVersionModal
+          chartName={chart.name}
+          chartVersion={chart.version}
+          isOpen={showInstallModal}
+          onClose={() => setShowInstallModal(false)}
+          isInstall={true}
+        />
+      )}
     </>
   );
 }
