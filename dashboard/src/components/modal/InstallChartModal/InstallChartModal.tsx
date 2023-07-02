@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useAlertError from "../../../hooks/useAlertError";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppContext } from "../../../context/AppContext";
 import { useGetChartValues, useGetVersions } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
@@ -10,6 +10,16 @@ import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 
+interface InstallChartModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  chartName: string;
+  chartVersion: string;
+  latestVersion?: string;
+  isUpgrade?: boolean;
+  isInstall?: boolean;
+}
+
 export const InstallChartModal = ({
   isOpen,
   onClose,
@@ -18,20 +28,15 @@ export const InstallChartModal = ({
   latestVersion,
   isUpgrade = false,
   isInstall = false,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  chartName: string;
-  chartVersion: string;
-  latestVersion?: string;
-  isUpgrade?: boolean;
-  isInstall?: boolean;
-}) => {
+}: InstallChartModalProps) => {
   const navigate = useNavigate();
   const { setShowErrorModal } = useAlertError();
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoadingDiff, setIsLoadingDiff] = useState(false);
+  const [diff, setDiff] = useState("");
+
   const {
     namespace: queryNamespace,
     chart: releaseName,
@@ -46,10 +51,6 @@ export const InstallChartModal = ({
     data: versions,
     refetch: fetchVersion,
   } = useGetVersions(chartName);
-
-  useEffect(() => {
-    fetchVersion();
-  }, [chart, namespace]);
 
   latestVersion = latestVersion ?? chartVersion; // a guard for typescript, latestVersion is always defined
   const [selectedVersion, setSelectedVersion] = useState(
@@ -70,6 +71,22 @@ export const InstallChartModal = ({
       refetchOnWindowFocus: false,
     }
   );
+
+  useEffect(() => {
+    fetchVersion();
+  }, [chart, namespace]);
+
+  useEffect(() => {
+    if (versions?.length) {
+      setSelectedRepo(versions[0].repository);
+    }
+  }, [versions]);
+
+  useEffect(() => {
+    if (selectedRepo) {
+      refetchChartValues();
+    }
+  }, [selectedRepo, selectedVersion, namespace, chart]);
 
   const setReleaseVersionMutation = useMutation(
     ["setVersion", namespace, chart, selectedVersion, selectedRepo],
@@ -124,18 +141,6 @@ export const InstallChartModal = ({
     }
   );
 
-  useEffect(() => {
-    if (versions?.length) {
-      setSelectedRepo(versions[0].repository);
-    }
-  }, [versions]);
-
-  useEffect(() => {
-    if (selectedRepo) {
-      refetchChartValues();
-    }
-  }, [selectedRepo, selectedVersion, namespace, chart]);
-
   const VersionToInstall = () => {
     const currentVersion = (
       <p className="text-xl">
@@ -169,6 +174,63 @@ export const InstallChartModal = ({
     );
   };
 
+  const getVersionManifestFormData = (version: string) => {
+    const formData = new FormData();
+    formData.append("chart", `${selectedRepo}/${chartName}`);
+    formData.append("version", version);
+    formData.append("values", "");
+    formData.append("preview", "true");
+    formData.append("name", chartName);
+
+    return formData;
+  };
+
+  const fetchVersionData = async (version: string) => {
+    const formData = getVersionManifestFormData(version);
+    const fetchUrl = `/api/helm/releases/${namespace ? namespace : "[empty]"}`;
+    const response = await fetch(fetchUrl, {
+      method: "post",
+      body: formData,
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  const fetchDiff = useCallback(async () => {
+    if (!selectedRepo || versionsError) {
+      return;
+    }
+
+    const currentVersion = chartVersion;
+    if (isUpgrade && selectedVersion === currentVersion) {
+      return;
+    }
+
+    setIsLoadingDiff(true);
+    try {
+      const [currentVerData, selectedVerData] = await Promise.all([
+        selectedVersion !== currentVersion
+          ? fetchVersionData(currentVersion)
+          : { manifest: "" },
+        fetchVersionData(selectedVersion),
+      ]);
+      const formData = new FormData();
+      formData.append("a", currentVerData.manifest);
+      formData.append("b", selectedVerData.manifest);
+
+      const response = await fetch("/diff", {
+        method: "post",
+        body: formData,
+      });
+      const diff = await response.text();
+      setDiff(diff);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingDiff(false);
+    }
+  }, [selectedRepo, selectedVersion, chartName, namespace, isUpgrade]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -189,7 +251,10 @@ export const InstallChartModal = ({
           callback: setReleaseVersionMutation.mutate,
           variant: ModalButtonStyle.info,
           isLoading: setReleaseVersionMutation.isLoading,
-          disabled: loadingChartValues || setReleaseVersionMutation.isLoading,
+          disabled:
+            loadingChartValues ||
+            isLoadingDiff ||
+            setReleaseVersionMutation.isLoading,
         },
       ]}
     >
@@ -208,12 +273,9 @@ export const InstallChartModal = ({
       </div>
 
       <ManifestDiff
-        currentVersion={chartVersion}
-        selectedVersion={selectedVersion}
-        selectedRepo={selectedRepo}
-        chartName={chartName}
-        namespace={namespace}
-        isUpgrade={isUpgrade}
+        diff={diff}
+        isLoading={isLoadingDiff}
+        fetchDiff={fetchDiff}
         versionsError={versionsError}
       />
       {errorMessage && (
