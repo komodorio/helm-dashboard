@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Diff2HtmlUI,
   Diff2HtmlUIConfig,
@@ -21,20 +21,17 @@ import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
 import {
-  useGetChartValues,
   useGetLatestVersion,
   useGetResources,
-  useGetVersions,
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
 import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
-import { marked } from "marked";
-import hljs from "highlight.js";
 import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
+import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
 
 type RevisionTagProps = {
   caption: string;
@@ -165,7 +162,7 @@ export default function RevisionDetails({
             </Button>
 
             {isReconfigureModalOpen && (
-              <InstallVersionModal
+              <InstallChartModal
                 isOpen={isReconfigureModalOpen}
                 chartName={release.chart_name}
                 chartVersion={release.chart_ver}
@@ -284,6 +281,9 @@ const Rollback = ({
   refetchRevisions: () => void;
 }) => {
   const { chart, namespace, revision } = useParams();
+  if (!chart || !namespace || !revision) {
+    return null;
+  }
 
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
   const revisionInt = parseInt(revision || "", 10);

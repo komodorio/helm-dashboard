@@ -111,10 +111,7 @@ const Modal = ({
                   </button>
                 </div>
               )}
-              <div
-                className="p-4 space-y-6 overflow-y-auto"
-                style={{ maxHeight: "500px" }}
-              >
+              <div className="p-4 space-y-6 overflow-y-auto max-h-[900px]">
                 {children}
               </div>
               {bottomContent ? (
