@@ -7,6 +7,16 @@ import hljs from "highlight.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Spinner from "../../Spinner";
 
+interface ManifestDiffProps {
+  currentVersion: string;
+  selectedVersion: string;
+  selectedRepo: string;
+  chartName: string;
+  namespace?: string;
+  isUpgrade: boolean;
+  versionsError: unknown;
+}
+
 export const ManifestDiff = ({
   currentVersion,
   selectedVersion,
@@ -15,15 +25,7 @@ export const ManifestDiff = ({
   namespace,
   isUpgrade,
   versionsError,
-}: {
-  currentVersion: string;
-  selectedVersion: string;
-  selectedRepo: string;
-  chartName: string;
-  namespace?: string;
-  isUpgrade: boolean;
-  versionsError: unknown;
-}) => {
+}: ManifestDiffProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [diff, setDiff] = useState("");
   const getVersionManifestFormData = (version: string) => {
