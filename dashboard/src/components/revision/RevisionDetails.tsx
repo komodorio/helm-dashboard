@@ -35,7 +35,6 @@ import { marked } from "marked";
 import hljs from "highlight.js";
 import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
-import { useAppContext } from "../../context/AppContext";
 
 type RevisionTagProps = {
   caption: string;
@@ -52,7 +51,6 @@ export default function RevisionDetails({
   refetchRevisions,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
-  const {selectedCluster} = useAppContext();
   const revisionTabs = [
     { value: "resources", label: "Resources", content: <RevisionResource /> },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
@@ -181,7 +179,7 @@ export default function RevisionDetails({
             {latestVerData?.[0]?.isSuggestedRepo ? (
               <span
                 onClick={() => {
-                  navigate('/repository?add_repo=true');
+                  navigate(`/repository/${context}?add_repo=true`);
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
               >
@@ -481,7 +479,6 @@ export const InstallVersionModal = ({
     chart: releaseName,
     revision,
   } = useParams();
-  const {selectedCluster} = useAppContext();
   const [namespace, setNamespace] = useState(queryNamespace);
   const [chart, setChart] = useState(chartName);
 
@@ -499,7 +496,7 @@ export const InstallVersionModal = ({
   const [selectedVersion, setSelectedVersion] = useState(
     isUpgrade ? latestVersion : chartVersion
   );
-
+  const {context: selectedCluster} = useParams();
   const { data: chartValues, refetch: refetchChartValues } = useGetChartValues(
     namespace || "default",
     chartName,
@@ -698,10 +695,10 @@ const GeneralDetails = ({
   onNamespaceInput: (namespace: string) => void;
   onChartNameInput: (chartName: string) => void;
 }) => {
-  const { selectedCluster } = useAppContext();
   const inputClassName = ` text-lg py-1 px-2 ${
     isUpgrade ? "bg-gray-200" : "bg-white border-2 border-gray-300"
   } rounded`;
+  const {context: selectedCluster} = useParams();
   return (
     <div className="flex gap-8">
       <div>

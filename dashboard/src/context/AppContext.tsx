@@ -1,8 +1,8 @@
 import { createContext, useState, useContext } from "react";
 
 export interface AppContextData {
-  selectedCluster: string;
-  setSelectedCluster: (newValue: string) => void;
+  selectedRepo: string;
+  setSelectedRepo: (newValue: string) => void;
 }
 
 const AppContext = createContext<AppContextData | undefined>(undefined);
@@ -10,18 +10,18 @@ const AppContext = createContext<AppContextData | undefined>(undefined);
 export const useAppContext = (): AppContextData => {
     const context = useContext(AppContext);
     if (!context) {
-      throw new Error('useMyContext must be used within a MyContextProvider');
+      throw new Error('useAppContext must be used within a AppContextProvider');
     }
     return context;
   };
 
 export const AppContextProvider: React.FC = ({ children }) => {
-    const [selectedCluster, setSelectedCluster] = useState('');
+    const [selectedRepo, setSelectedRepo] = useState('');
   
   
     const contextValue: AppContextData = {
-      selectedCluster,
-      setSelectedCluster,
+      selectedRepo,
+      setSelectedRepo,
     };
   
     return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;

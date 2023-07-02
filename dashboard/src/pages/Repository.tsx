@@ -8,10 +8,10 @@ import { HelmRepositories } from "../API/interfaces";
 import { useParams, useNavigate } from "react-router-dom";
 
 function RepositoryPage() {
-  const { selectedRepo: repoFromParams } = useParams();
+  const { selectedRepo: repoFromParams, context } = useParams();
   const navigate = useNavigate();
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/repository/${selectedRepository.name}`, { replace: true });
+    navigate(`/repository/${context}/${selectedRepository.name}`, { replace: true });
   };
 
   const { data: repositories = [] } = useGetRepositories({
