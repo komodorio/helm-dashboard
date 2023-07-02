@@ -18,6 +18,19 @@ const queryClient = new QueryClient({
   },
 });
 
+const PageLayout = ({children}) => {
+  return (
+    <>
+      <Header />
+      <div className="bg-body-background min-h-screen min-w-screen">
+        <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] min-h-screen max-h-full">
+          {children}
+        </div>
+      </div>
+    </>
+  )
+}
+
 export default function App() {
   const [shouldShowErrorModal, setShowErrorModal] = useState<
     ErrorAlert | undefined
@@ -30,24 +43,19 @@ export default function App() {
         <ErrorModalContext.Provider value={value}>
           <QueryClientProvider client={queryClient}>
             <HashRouter>
-              <Header />
-              <div className="bg-body-background min-h-screen min-w-screen">
-                <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] min-h-screen max-h-full">
-                  <Routes>
-                    <Route path="/installed/:context" element={<Installed />} />
-                    <Route
-                      path="/installed/revision/:context/:namespace/:chart/:revision"
-                      element={<Revision />}
-                    />
-                    <Route path="/repository" element={<RepositoryPage />} />
-                    <Route
-                      path="/repository/:selectedRepo"
-                      element={<RepositoryPage />}
-                    />
-                    <Route path="*" element={<Installed />} />
-                  </Routes>
-                </div>
-              </div>
+                <Routes>
+                  <Route path="/installed/:context" element={<PageLayout><Installed /></PageLayout>} />
+                  <Route
+                    path="/installed/revision/:context/:namespace/:chart/:revision"
+                    element={<PageLayout><Revision /></PageLayout>}
+                  />
+                  <Route path="/repository/:context" element={<PageLayout><RepositoryPage /></PageLayout>} />
+                  <Route
+                    path="/repository/:context/:selectedRepo"
+                    element={<PageLayout><RepositoryPage /></PageLayout>}
+                  />
+                  <Route path="*" element={<PageLayout><Installed /></PageLayout>} />
+                </Routes>
               <GlobalErrorModal
                 isOpen={!!shouldShowErrorModal}
                 onClose={() => setShowErrorModal(undefined)}

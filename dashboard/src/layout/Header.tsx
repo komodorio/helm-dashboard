@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -14,7 +14,7 @@ import { useGetApplicationStatus } from "../API/other";
 
 export default function Header() {
   const { data: statusData } = useGetApplicationStatus();
-
+  const {context} = useParams();
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
   };
@@ -61,7 +61,7 @@ export default function Header() {
             </li>
             <li>
               <NavLink
-                to="/repository"
+                to={`/repository/${context}`}
                 end={false}
                 className={({ isActive }) =>
                   isActive ? "p-2 text-[#1347FF] bg-[#EBEFFF]" : "p-2"
