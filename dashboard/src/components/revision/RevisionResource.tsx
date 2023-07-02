@@ -69,7 +69,7 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
   const { reason = "", status = "", message = "" } = conditions?.[0] || {};
   const cellClassnames = "py-2";
 
-  let badgeType = getBadgeType(status);
+  const badgeType = getBadgeType(status);
 
   return (
     <>
@@ -77,7 +77,7 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         <td className={"pl-6 rounded " + cellClassnames}>{kind}</td>
         <td className={"font-bold" + cellClassnames}>{name}</td>
         <td className={cellClassnames}>
-          <Badge type={badgeType}>{reason}</Badge>
+          {reason ? <Badge type={badgeType}>{reason}</Badge> : null}
         </td>
         <td className={"rounded text-gray-400 " + cellClassnames}>
           {message ?? ""}
