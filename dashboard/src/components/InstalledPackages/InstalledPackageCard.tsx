@@ -39,7 +39,6 @@ export default function InstalledPackageCard({
     queryFn: () => apiService.getResourceStatus({ release }),
   });
 
-  console.log(release);
   const latestVersionData: LatestChartVersion | undefined =
     latestVersionResult?.[0];
 

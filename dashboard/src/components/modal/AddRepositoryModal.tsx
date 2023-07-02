@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { callApi } from "../../API/releases";
 import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
+import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
 interface FormKeys {
   name: string;
@@ -20,6 +21,13 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const [formData, setFormData] = useState<FormKeys>({} as FormKeys);
   const [isLoading, setIsLoading] = useState(false);
   const alertError = useAlertError();
+  const { searchParamsObject } = useCustomSearchParams();
+  const { repo_url, repo_name } = searchParamsObject;
+
+  useEffect(() => {
+    if (!repo_url || !repo_name) return;
+    setFormData({ ...formData, name: repo_name, url: repo_url });
+  }, [repo_url, repo_name]);
 
   const addRepository = () => {
     const body = new FormData();
@@ -73,6 +81,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
         <label className="flex-1" htmlFor="name">
           <div className="mb-2 text-sm require">Name</div>
           <input
+            value={formData.name}
             onChange={(e) =>
               setFormData({ ...formData, [e.target.id]: e.target.value })
             }
@@ -86,6 +95,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
         <label className="flex-1" htmlFor="url">
           <div className="mb-2 text-sm require">URL</div>
           <input
+            value={formData.url}
             onChange={(e) =>
               setFormData({ ...formData, [e.target.id]: e.target.value })
             }

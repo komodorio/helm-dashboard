@@ -177,7 +177,9 @@ export default function RevisionDetails({
             {latestVerData?.[0]?.isSuggestedRepo ? (
               <span
                 onClick={() => {
-                  navigate(`/repository/${context}?add_repo=true`);
+                  navigate(
+                    `/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].name}`
+                  );
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
               >
