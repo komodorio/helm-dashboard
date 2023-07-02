@@ -1,10 +1,13 @@
 import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
-import { Diff2HtmlUI, Diff2HtmlUIConfig } from 'diff2html/lib/ui/js/diff2html-ui-slim.js';
+import {
+  Diff2HtmlUI,
+  Diff2HtmlUIConfig,
+} from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 import { useGetReleaseInfoByType } from "../../API/releases";
 import { useParams, useSearchParams } from "react-router-dom";
-import useCustomSearchParams from '../../hooks/useCustomSearchParams';
+import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
-import parse from 'html-react-parser';
+import parse from "html-react-parser";
 
 import hljs from "highlight.js";
 import Spinner from "../Spinner";
@@ -13,85 +16,120 @@ type RevisionDiffProps = {
   includeUserDefineOnly?: boolean;
 };
 
-const VIEW_MODE_VIEW_ONLY = 'view';
-const VIEW_MODE_DIFF_PREV = 'diff-with-previous';
-const VIEW_MODE_DIFF_SPECIFIC = 'diff-with-specific-revision';
+const VIEW_MODE_VIEW_ONLY = "view";
+const VIEW_MODE_DIFF_PREV = "diff-with-previous";
+const VIEW_MODE_DIFF_SPECIFIC = "diff-with-specific-revision";
 
 function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const [specificVersion, setSpecificVersion] = useState("1");
-  const {searchParamsObject: searchParams, addSearchParam, removeSearchParam} = useCustomSearchParams();
-  const {tab, mode: viewMode = VIEW_MODE_VIEW_ONLY, 'user-defined': userDefinedValue} = searchParams;
-  
+  const {
+    searchParamsObject: searchParams,
+    addSearchParam,
+    removeSearchParam,
+  } = useCustomSearchParams();
+  const {
+    tab,
+    mode: viewMode = VIEW_MODE_VIEW_ONLY,
+    "user-defined": userDefinedValue,
+  } = searchParams;
+
   const diffElement = useRef<HTMLElement>({});
 
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
-    addSearchParam('mode', e.target.value);
+    addSearchParam("mode", e.target.value);
   };
 
   const handleUserDefinedCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      addSearchParam('user-defined', `${e.target.checked}`);
+      addSearchParam("user-defined", `${e.target.checked}`);
     } else {
-      removeSearchParam('user-defined')
+      removeSearchParam("user-defined");
     }
   };
   const params = useParams();
-  const revisionInt = parseInt(params.revision || '', 10)
+  const revisionInt = parseInt(params.revision || "", 10);
   const hasMultipleRevisions = revisionInt > 1;
 
   const additionalParams = useMemo(() => {
-    let additionalParamStr = ''
-    console.log(userDefinedValue)
+    let additionalParamStr = "";
     if (!!userDefinedValue) {
-      additionalParamStr += '&userDefined=true'
+      additionalParamStr += "&userDefined=true";
     }
     if (viewMode === VIEW_MODE_DIFF_PREV && hasMultipleRevisions) {
-      additionalParamStr += `&revisionDiff=${revisionInt - 1}`
+      additionalParamStr += `&revisionDiff=${revisionInt - 1}`;
     }
-    const specificRevisionInt = parseInt(specificVersion || '', 10);
-    if (viewMode === VIEW_MODE_DIFF_SPECIFIC && hasMultipleRevisions && !Number.isNaN(specificRevisionInt)) {
-      additionalParamStr += `&revisionDiff=${specificVersion}`
+    const specificRevisionInt = parseInt(specificVersion || "", 10);
+    if (
+      viewMode === VIEW_MODE_DIFF_SPECIFIC &&
+      hasMultipleRevisions &&
+      !Number.isNaN(specificRevisionInt)
+    ) {
+      additionalParamStr += `&revisionDiff=${specificVersion}`;
     }
     return additionalParamStr;
-  }, [viewMode, userDefinedValue, specificVersion, revisionInt, hasMultipleRevisions]);
-  console.log(additionalParams)
+  }, [
+    viewMode,
+    userDefinedValue,
+    specificVersion,
+    revisionInt,
+    hasMultipleRevisions,
+  ]);
   const hasRevisionToDiff = !!additionalParams;
 
-  const {data, isLoading, isSuccess: fetchedDataSuccessfully} = useGetReleaseInfoByType({...params, tab}, additionalParams);
+  const {
+    data,
+    isLoading,
+    isSuccess: fetchedDataSuccessfully,
+  } = useGetReleaseInfoByType({ ...params, tab }, additionalParams);
 
   const content = useMemo(() => {
-    if (data && !isLoading && (viewMode === VIEW_MODE_VIEW_ONLY || !hasRevisionToDiff)) {  
+    if (
+      data &&
+      !isLoading &&
+      (viewMode === VIEW_MODE_VIEW_ONLY || !hasRevisionToDiff)
+    ) {
       return hljs.highlight(data, { language: "yaml" }).value;
     }
     if (fetchedDataSuccessfully && !data && viewMode === VIEW_MODE_VIEW_ONLY) {
       return "No value to display";
     }
-    return '';
+    return "";
   }, [data, viewMode, isLoading]);
 
   useEffect(() => {
-    if (viewMode !== VIEW_MODE_VIEW_ONLY && hasRevisionToDiff && data && !isLoading) {
-      const configuration : Diff2HtmlUIConfig = {
-        
-        matching: 'lines',
-        outputFormat: 'side-by-side',
-      
+    if (
+      viewMode !== VIEW_MODE_VIEW_ONLY &&
+      hasRevisionToDiff &&
+      data &&
+      !isLoading
+    ) {
+      const configuration: Diff2HtmlUIConfig = {
+        matching: "lines",
+        outputFormat: "side-by-side",
+
         highlight: true,
         renderNothingWhenEmpty: false,
       };
-      const diff2htmlUi = new Diff2HtmlUI(diffElement.current, data, configuration);
+      const diff2htmlUi = new Diff2HtmlUI(
+        diffElement.current,
+        data,
+        configuration
+      );
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
-      
     } else if (viewMode === VIEW_MODE_VIEW_ONLY) {
-      diffElement.current.innerHTML = '';
-      
+      diffElement.current.innerHTML = "";
     } else if (fetchedDataSuccessfully && (!hasRevisionToDiff || !data)) {
-      diffElement.current.innerHTML = 'No differences to display';
-      
+      diffElement.current.innerHTML = "No differences to display";
     }
-  }, [viewMode, hasRevisionToDiff, data, isLoading, fetchedDataSuccessfully, diffElement]);
-  console.log(userDefinedValue)
+  }, [
+    viewMode,
+    hasRevisionToDiff,
+    data,
+    isLoading,
+    fetchedDataSuccessfully,
+    diffElement,
+  ]);
   return (
     <div>
       <div className="flex mb-3 p-2 border border-[#DCDDDF] flex-row items-center justify-between w-full bg-white rounded">
@@ -149,7 +187,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
                 className="border ml-2 border-gray-500 w-10 p-1 rounded-sm"
                 type="text"
                 value={specificVersion}
-                onChange={e => setSpecificVersion(e.target.value)}
+                onChange={(e) => setSpecificVersion(e.target.value)}
               ></input>
             </div>
           </label>
@@ -172,17 +210,18 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
           </div>
         )}
       </div>
-      {isLoading ? <Spinner /> : ''}
-      {viewMode  === VIEW_MODE_VIEW_ONLY && content ? (
+      {isLoading ? <Spinner /> : ""}
+      {viewMode === VIEW_MODE_VIEW_ONLY && content ? (
         <div className="bg-white overflow-x-auto w-full p-3 relative">
-          <pre className="bg-white rounded">
-                {parse(content)}
-          </pre>  
+          <pre className="bg-white rounded">{parse(content)}</pre>
         </div>
-      ) : ''}
-      <div className="bg-white overflow-x-auto w-full relative" ref={diffElement}>
-        
-      </div>
+      ) : (
+        ""
+      )}
+      <div
+        className="bg-white overflow-x-auto w-full relative"
+        ref={diffElement}
+      ></div>
     </div>
   );
 }

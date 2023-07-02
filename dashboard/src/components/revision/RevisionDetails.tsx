@@ -820,7 +820,7 @@ const ManifestDiff = ({
       const diff = await response.text();
       setDiff(diff);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
