@@ -54,14 +54,16 @@ export default function RevisionsList({
               justifyContent: "space-between",
             }}>
               <span style={{
-                display: "flex"
+                display: "flex",
+                width: "70px",
+                justifyContent: "space-between",
               }}>
-              {prevRelease ? (
-                <>
+              {prevRelease  ? (
+                (compare(prevRelease.chart_ver, release.chart_ver, '!=') && <>
                   <span className="line-through">{prevRelease.chart_ver}</span>
                   {compare(prevRelease.chart_ver, release.chart_ver, '>') ? <BsArrowDownLeft /> : <BsArrowUpRight />}
                   <span>{release.chart_ver}</span>
-                </>
+                </>)
               ) : (
                 ""
               )}
