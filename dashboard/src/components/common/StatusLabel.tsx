@@ -8,6 +8,7 @@ type StatusLabelProps = {
 function StatusLabel({ status, isRollback }: StatusLabelProps) {
   function getColor(status: string) {
     if (status === "deployed") return "text-[#1FA470]";
+    if (status === "failed") return "text-[#DC143C]";
     else return "text-[#9195A1]";
   }
 
