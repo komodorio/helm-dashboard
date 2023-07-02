@@ -56,12 +56,12 @@ export const ManifestDiff = ({
 
   if (versionsError !== null) {
     return (
-      <div className="flex h-full">
+      <div className="flex ">
         <p className="text-red-600 text-lg">{String(versionsError)}</p>
       </div>
     );
   }
   return (
-    <div ref={diffContainerRef} className="relative overflow-y-auto"></div>
+    <div ref={diffContainerRef} className="relative overflow-y-auto "></div>
   );
 };

@@ -244,7 +244,7 @@ export const InstallChartModal = ({
           <span className="text-green-700 ">{chartName}</span>
         </div>
       }
-      containerClassNames="w-5/6 text-2xl"
+      containerClassNames="w-5/6 text-2xl h-2/3"
       actions={[
         {
           id: "1",
