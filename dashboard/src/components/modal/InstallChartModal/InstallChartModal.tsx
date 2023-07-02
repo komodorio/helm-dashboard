@@ -149,7 +149,6 @@ export const InstallChartModal = ({
       </p>
     );
 
-    console.log(versions);
     return (
       <div className="flex gap-2 text-xl">
         {versions?.length ? (
