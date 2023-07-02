@@ -2,7 +2,7 @@ import { useAppContext } from "../../../context/AppContext";
 
 export const GeneralDetails = ({
   chartName,
-  namespace,
+  namespace = "default",
   isUpgrade,
   onNamespaceInput,
   onChartNameInput,

@@ -56,7 +56,11 @@ export const InstallChartModal = ({
     isUpgrade ? latestVersion : chartVersion
   );
 
-  const { data: chartValues, refetch: refetchChartValues } = useGetChartValues(
+  const {
+    data: chartValues,
+    isLoading: loadingChartValues,
+    refetch: refetchChartValues,
+  } = useGetChartValues(
     namespace || "default",
     chartName,
     selectedRepo,
@@ -185,6 +189,7 @@ export const InstallChartModal = ({
           callback: setReleaseVersionMutation.mutate,
           variant: ModalButtonStyle.info,
           isLoading: setReleaseVersionMutation.isLoading,
+          disabled: loadingChartValues || setReleaseVersionMutation.isLoading,
         },
       ]}
     >
@@ -198,7 +203,8 @@ export const InstallChartModal = ({
       />
       <div className="flex w-full gap-6 mt-4">
         <UserDefinedValues val={userValues} setVal={setUserValues} />
-        <ChartValues chartValues={chartValues} />
+
+        <ChartValues chartValues={chartValues} loading={loadingChartValues} />
       </div>
 
       <ManifestDiff
