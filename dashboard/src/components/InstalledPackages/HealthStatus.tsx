@@ -16,9 +16,11 @@ const HealthStatus = ({ statusData }: Props) => {
       }
 
       return (
-        <Tooltip content={`${cond.status} ${item.kind} ${item.metadata.name}`}>
+        <Tooltip
+          key={crypto.randomUUID()} // this is not a good practice, we need to fetch some unique id from the backend
+          content={`${cond.status} ${item.kind} ${item.metadata.name}`}
+        >
           <span
-            key={item.metadata.name}
             className={`inline-block ${
               cond.status === "Healthy"
                 ? "bg-[#00c2ab]"
