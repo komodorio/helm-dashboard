@@ -32,6 +32,7 @@ import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
 import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
+import { isNewerVersion } from "../../utils";
 
 type RevisionTagProps = {
   caption: string;
@@ -450,24 +451,4 @@ const Uninstall = () => {
       ) : null}
     </>
   );
-};
-
-const isNewerVersion = (oldVer: string, newVer: string) => {
-  if (oldVer && oldVer[0] === "v") {
-    oldVer = oldVer.substring(1);
-  }
-
-  if (newVer && newVer[0] === "v") {
-    newVer = newVer.substring(1);
-  }
-
-  const oldParts = oldVer.split(".");
-  const newParts = newVer.split(".");
-  for (let i = 0; i < newParts.length; i++) {
-    const a = ~~newParts[i]; // parse int
-    const b = ~~oldParts[i]; // parse int
-    if (a > b) return true;
-    if (a < b) return false;
-  }
-  return false;
 };

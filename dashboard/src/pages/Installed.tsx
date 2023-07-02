@@ -16,7 +16,7 @@ function Installed() {
   const { filteredNamespace } = searchParamsObject;
   const namespaces = filteredNamespace?.split("+") ?? [];
   const navigate = useNavigate();
-  const {setSelectedCluster, selectedCluster} = useAppContext();
+  const { setSelectedCluster, selectedCluster } = useAppContext();
 
   const handleClusterChange = (
     clusterName: string,
@@ -33,7 +33,7 @@ function Installed() {
 
   useEffect(() => {
     if (selectedCluster && !context) {
-      handleClusterChange(selectedCluster, namespaces)
+      handleClusterChange(selectedCluster, namespaces);
     }
   }, [selectedCluster, context, namespaces]);
 
