@@ -82,7 +82,7 @@ const Modal = ({
           <div className="flex justify-center">
             <div
               style={{
-                maxHeight: "700px",
+                maxHeight: "95vh",
                 overflow: "hidden",
               }}
               className={`relative rounded-lg shadow  m-7 w-2/5 max-w-[1000px] ${

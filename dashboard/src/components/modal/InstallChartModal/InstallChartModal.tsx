@@ -124,12 +124,14 @@ export const InstallChartModal = ({
           },
         }
       );
+
       if (!res.ok) {
         setShowErrorModal({
           title: `Failed to ${isInstall ? "install" : "upgrade"} the chart`,
           msg: String(await res.text()),
         });
       }
+
       return res.json();
     },
     {
@@ -140,7 +142,7 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
-            `/installed/revision/minikube/default/my-release/${
+            `/installed/revision/${releaseName}/default/my-release/${
               Number(revision) + 1
             }`
           );
