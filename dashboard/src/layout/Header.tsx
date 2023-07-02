@@ -37,13 +37,13 @@ export default function Header() {
   };
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white min-w-[1000px]">
-      <div className="h-16 flex items-center gap-6 ">
+    <div className="h-16 flex items-center justify-between bg-white w-[100%] overflow-x-auto">
+      <div className="h-16 flex items-center gap-6 min-w-fit">
         <NavLink to="/">
           <img
             src={LogoHeader}
             alt="Helm-DashBoard"
-            className="ml-3 w-[140px] "
+            className="ml-3 w-[140px] min-w-[80px]"
           />
         </NavLink>
         <span className="w-[1px] h-3/4 bg-gray-200" />
@@ -108,7 +108,7 @@ export default function Header() {
               />
             </li>
             {statusData?.LatestVer ? (
-              <li>
+              <li className="min-w-[130px]">
                 <a
                   href="https://github.com/komodorio/helm-dashboard/releases"
                   className="text-upgrade-color"
@@ -123,7 +123,7 @@ export default function Header() {
         </div>
       </div>
       <div className="h-16 flex items-center gap-5 ">
-        <div className="flex p-1 gap-2 border bottom-gray-200 rounded">
+        <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-[450px]">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
             <a

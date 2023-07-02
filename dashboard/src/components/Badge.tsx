@@ -65,7 +65,11 @@ export default function Badge(props: BadgeProps): JSX.Element {
 export const getBadgeType = (status: string) => {
   if (status === "Unknown") {
     return BadgeCodes.UNKNOWN;
-  } else if (status === "Healthy") {
+  } else if (
+    status === "Healthy" ||
+    status.toLowerCase().includes("exists") ||
+    status === "available"
+  ) {
     return BadgeCodes.SUCCESS;
   } else if (status === "Progressing") {
     return BadgeCodes.WARNING;

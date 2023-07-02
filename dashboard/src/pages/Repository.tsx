@@ -11,7 +11,7 @@ function RepositoryPage() {
   const { selectedRepo: repoFromParams } = useParams();
   const navigate = useNavigate();
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/repository/${selectedRepository.name}`);
+    navigate(`/repository/${selectedRepository.name}`, { replace: true });
   };
 
   const { data: repositories = [] } = useGetRepositories({
