@@ -295,7 +295,7 @@ const Rollback = ({
     { chart, namespace, revision, tab: "manifests" },
     `&revisionDiff=${prevRevision}`
   );
-
+ 
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
