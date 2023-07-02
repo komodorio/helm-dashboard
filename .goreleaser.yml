@@ -19,7 +19,3 @@ builds:
 archives:
   - id: helm-dashboard
     format: tar.gz
-    replacements:
-      amd64: x86_64
-      darwin: Darwin
-      linux: Linux
