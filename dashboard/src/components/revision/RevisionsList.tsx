@@ -1,5 +1,6 @@
-import { BsArrowUpRight } from "react-icons/bs";
+import { BsArrowDownLeft, BsArrowUpRight } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
+import { compare } from 'compare-versions';
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
 import { ReleaseRevision } from "../../data/types";
@@ -47,16 +48,24 @@ export default function RevisionsList({
               <StatusLabel status={release.status} />
               <span className="font-semibold">#{release.revision}</span>
             </div>
-            <div className="self-end text-[#707583] text-xs flex flex-wrap gap-1">
+            <div className="self-end text-[#707583] text-xs flex flex-wrap gap-1" style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+            }}>
+              <span style={{
+                display: "flex"
+              }}>
               {prevRelease ? (
                 <>
                   <span className="line-through">{prevRelease.chart_ver}</span>
-                  <BsArrowUpRight />
+                  {compare(prevRelease.chart_ver, release.chart_ver, '>') ? <BsArrowDownLeft /> : <BsArrowUpRight />}
                   <span>{release.chart_ver}</span>
                 </>
               ) : (
                 ""
               )}
+              </span>
               <span>AGE:{getAge(release.updated)}</span>
             </div>
           </div>
