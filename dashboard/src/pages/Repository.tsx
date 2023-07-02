@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 
 import RepositoriesList from "../components/repository/RepositoriesList";
 import RepositoryViewer from "../components/repository/RepositoryViewer";
@@ -6,13 +6,25 @@ import { Repository } from "../data/types";
 import { useGetRepositories } from "../API/repositories";
 import { HelmRepositories } from "../API/interfaces";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 function RepositoryPage() {
   const { selectedRepo: repoFromParams, context } = useParams();
   const navigate = useNavigate();
+  const {setSelectedRepo, selectedRepo} = useAppContext();
+
   const handleRepositoryChanged = (selectedRepository: Repository) => {
     navigate(`/repository/${context}/${selectedRepository.name}`, { replace: true });
   };
+  useEffect(() => {
+    setSelectedRepo(repoFromParams);
+  }, [setSelectedRepo, repoFromParams])
+
+  useEffect(() => {
+    if (selectedRepo && !repoFromParams) {
+      navigate(`/repository/${context}/${selectedRepo}`, { replace: true });
+    }
+  }, [selectedRepo, repoFromParams])
 
   const { data: repositories = [] } = useGetRepositories({
     onSuccess: (data: HelmRepositories) => {
