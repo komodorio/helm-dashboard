@@ -1,19 +1,34 @@
-export function getAge(date: Date | number | string) {
-  if (typeof date === "number" || typeof date === "string") {
-    date = new Date(date);
+export const getAge = (obj1: Date | number | string): string => {
+  const date = new Date(obj1);
+  const dateNext = new Date();
+  const diff = dateNext.getTime() - date.getTime();
+
+  const units: [string, number][] = [
+    ["years", 24 * 60 * 60 * 1000 * 365],
+    ["months", 24 * 60 * 60 * 1000 * 30],
+    ["days", 24 * 60 * 60 * 1000],
+    ["hours", 60 * 60 * 1000],
+    ["minutes", 60 * 1000],
+    ["seconds", 1000],
+    ["milliseconds", 1]
+  ];
+  
+  const map: any = {
+    years: "yr",
+    months: "mo",
+    days: "d",
+    hours: "h",
+    minutes: "m",
+    seconds: "s",
+    milliseconds: "ms",
+  };
+
+  for (let [unit, value] of units) {
+    const val = diff / value;
+    if (val >= 1) {
+      return Math.round(val) + map[unit];
+    }
   }
-  const age = Date.now() - date.getTime();
-  const seconds = Math.floor(age / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-  if (hours > 24) {
-    return `${days}d`;
-  } else if (minutes > 60) {
-    return `${hours}h`;
-  } else if (seconds > 60) {
-    return `${minutes}m`;
-  } else {
-    return `${seconds}s`;
-  }
+  
+  return "n/a";
 }
