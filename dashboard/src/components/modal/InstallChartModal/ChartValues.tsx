@@ -20,7 +20,7 @@ export const ChartValues = ({
       <pre
         className="bg-gray-100 rounded p-4 font-medium text-md w-full max-h-[300px] block overflow-y-auto"
         dangerouslySetInnerHTML={
-          chartValues
+          chartValues && !loading
             ? {
                 __html: marked(
                   hljs.highlight(chartValues, { language: "yaml" }).value
