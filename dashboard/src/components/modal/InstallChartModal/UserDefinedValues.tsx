@@ -11,7 +11,7 @@ export const UserDefinedValues = ({
         className="block tracking-wide text-gray-700 text-xl font-medium mb-2"
         htmlFor="grid-user-defined-values"
       >
-        User defined values:
+        User Defined Values:
       </label>
       <textarea
         value={val}
