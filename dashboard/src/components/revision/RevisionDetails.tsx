@@ -34,6 +34,7 @@ import Button from "../Button";
 import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
 import { isNewerVersion } from "../../utils";
 import { useAppContext } from "../../context/AppContext";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 
 type RevisionTagProps = {
   caption: string;
@@ -304,7 +305,8 @@ const Rollback = ({
   release: Release;
   refetchRevisions: () => void;
 }) => {
-  const { chart, namespace, revision } = useParams();
+  const { chart, namespace, revision, context } = useParams();
+  const navigate = useNavigateWithSearchParams();
   if (!chart || !namespace || !revision) {
     return null;
   }
@@ -312,15 +314,16 @@ const Rollback = ({
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
   const revisionInt = parseInt(revision || "", 10);
   const prevRevision = revisionInt - 1;
-  const response = useGetReleaseInfoByType(
-    { chart, namespace, revision, tab: "manifests" },
-    `&revisionDiff=${prevRevision}`
-  );
 
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
-      onSettled: () => {
-        refetchRevisions();
+      onSuccess: (response) => {
+        navigate(
+          `/installed/revision/${context}/${namespace}/${chart}/${
+            revisionInt + 1
+          }`
+        );
+        window.location.reload();
       },
     });
   const handleRollback = () => {
@@ -336,14 +339,13 @@ const Rollback = ({
 
   if (release.revision <= 1) return null;
 
-  return (
-    <>
-      <div className="h-1/2">
-        <Button onClick={handleRollback} className="flex items-center gap-2">
-          <BsArrowRepeat />
-          Rollback to #{release.revision - 1}
-        </Button>
-      </div>
+  const RollbackModal = () => {
+    const response = useGetReleaseInfoByType(
+      { chart, namespace, revision: prevRevision.toString(), tab: "manifests" },
+      `&revisionDiff=${revision}`
+    );
+
+    return (
       <Modal
         title={rollbackTitle}
         isOpen={showRollbackDiff}
@@ -358,54 +360,74 @@ const Rollback = ({
                 name: String(chart),
                 revision: release.revision,
               });
-              setShowRollbackDiff(false);
             },
             variant: ModalButtonStyle.info,
             isLoading: isRollingBackRelease,
+            text: isRollingBackRelease ? "Rolling back" : "Confirm",
           },
         ]}
       >
         <RollbackModalContent dataResponse={response} />
-      </Modal>{" "}
-    </>
-  );
-};
+      </Modal>
+    );
+  };
 
-const RollbackModalContent = ({ dataResponse }: { dataResponse: any }) => {
-  const { data, isLoading, isSuccess: fetchedDataSuccessfully } = dataResponse;
-  const diffElement = useRef<HTMLDivElement | null>(null);
+  const RollbackModalContent = ({ dataResponse }: { dataResponse: any }) => {
+    const {
+      data,
+      isLoading,
+      isSuccess: fetchedDataSuccessfully,
+    } = dataResponse;
+    const diffElement = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (data && fetchedDataSuccessfully && diffElement?.current) {
-      const configuration: Diff2HtmlUIConfig = {
-        matching: "lines",
-        outputFormat: "side-by-side",
-        highlight: true,
-        renderNothingWhenEmpty: false,
-        rawTemplates: {
-          "file-summary-wrapper": '<div class="hidden"></div>', // hide this element
-          "generic-line":
-            '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
-        },
-      };
-      const diff2htmlUi = new Diff2HtmlUI(
-        diffElement.current,
-        data,
-        configuration
-      );
-      diff2htmlUi.draw();
-      diff2htmlUi.highlightCode();
-    }
-  }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
+    useEffect(() => {
+      if (data && fetchedDataSuccessfully && diffElement?.current) {
+        const configuration: Diff2HtmlUIConfig = {
+          matching: "lines",
+          outputFormat: "side-by-side",
+          highlight: true,
+          renderNothingWhenEmpty: false,
+          rawTemplates: {
+            "file-summary-wrapper": '<div class="hidden"></div>', // hide this element
+            "generic-line":
+              '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
+          },
+        };
+        const diff2htmlUi = new Diff2HtmlUI(
+          diffElement.current,
+          data,
+          configuration
+        );
+        diff2htmlUi.draw();
+        diff2htmlUi.highlightCode();
+      }
+    }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
+    return (
+      <div className="flex flex-col space-y-4">
+        {isLoading ? (
+          <div className="flex gap-2">
+            <Spinner />
+            <p>Loading changes that will happen to cluster</p>
+          </div>
+        ) : data ? (
+          <p>Following changes will happen to cluster:</p>
+        ) : (
+          <p>No changes will happen to cluster</p>
+        )}
+        <div className="relative" ref={diffElement} />
+      </div>
+    );
+  };
   return (
-    <div className="flex flex-col space-y-4">
-      {data ? (
-        <p>Following changes will happen to cluster:</p>
-      ) : (
-        <p>No changes will happen to cluster</p>
-      )}
-      <div className="relative" ref={diffElement} />
-    </div>
+    <>
+      <div className="h-1/2">
+        <Button onClick={handleRollback} className="flex items-center gap-2">
+          <BsArrowRepeat />
+          Rollback to #{release.revision - 1}
+        </Button>
+      </div>
+      {showRollbackDiff && <RollbackModal />}
+    </>
   );
 };
 
