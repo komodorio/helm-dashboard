@@ -2,7 +2,7 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,9 +13,8 @@ function Installed() {
   const { searchParamsObject } = useCustomSearchParams();
   const { context } = useParams();
   const { filteredNamespace } = searchParamsObject;
-  const namespaces = filteredNamespace?.split("+") ?? [];
+  const namespaces = filteredNamespace?.split("+") ?? ["default"];
   const navigate = useNavigate();
-
 
   const handleClusterChange = (
     clusterName: string,
@@ -47,11 +46,12 @@ function Installed() {
 
   const filteredReleases = useMemo(() => {
     return (
-      data?.filter(
-        (installedPackage: Release) =>
+      data?.filter((installedPackage: Release) => {
+        return (
           installedPackage.name.includes(filterKey) &&
           namespaces.includes(installedPackage.namespace)
-      ) ?? []
+        );
+      }) ?? []
     );
   }, [data, filterKey, namespaces]);
 
