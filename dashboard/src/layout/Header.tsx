@@ -1,4 +1,4 @@
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -16,6 +16,7 @@ import LinkWithSearchParams from "../components/LinkWithSearchParams";
 export default function Header() {
   const { data: statusData } = useGetApplicationStatus();
   const { context } = useParams();
+  const location = useLocation();
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
   };
@@ -53,8 +54,10 @@ export default function Header() {
             <li>
               <LinkWithSearchParams
                 to={`/installed/${context}`}
-                className={({ isActive }) =>
-                  isActive ? "p-2 text-[#1347FF]  bg-[#EBEFFF]" : "p-2"
+                className={
+                  location.pathname.startsWith("/installed/")
+                    ? "p-2 text-[#1347FF]  bg-[#EBEFFF]"
+                    : "p-2"
                 }
               >
                 Installed
@@ -64,8 +67,10 @@ export default function Header() {
               <LinkWithSearchParams
                 to={`/repository/${context}`}
                 end={false}
-                className={({ isActive }) =>
-                  isActive ? "p-2 text-[#1347FF] bg-[#EBEFFF]" : "p-2"
+                className={
+                  location.pathname.startsWith("/repository/")
+                    ? "p-2 text-[#1347FF]  bg-[#EBEFFF]"
+                    : "p-2"
                 }
               >
                 Repository
