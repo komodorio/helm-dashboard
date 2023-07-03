@@ -3,19 +3,20 @@ import { useAppContext } from "../../../context/AppContext";
 export const GeneralDetails = ({
   chartName,
   namespace = "default",
-  isUpgrade,
+  disabled,
   onNamespaceInput,
   onChartNameInput,
 }: {
   chartName: string;
   namespace?: string;
-  isUpgrade: boolean;
+  disabled: boolean;
+
   onNamespaceInput: (namespace: string) => void;
   onChartNameInput: (chartName: string) => void;
 }) => {
-  const { selectedCluster } = useAppContext();
+  const { selectedRepo } = useAppContext();
   const inputClassName = ` text-lg py-1 px-2 ${
-    isUpgrade ? "bg-gray-200" : "bg-white border-2 border-gray-300"
+    disabled ? "bg-gray-200" : "bg-white border-2 border-gray-300"
   } rounded`;
   return (
     <div className="flex gap-8">
@@ -24,7 +25,7 @@ export const GeneralDetails = ({
         <input
           className={inputClassName}
           value={chartName}
-          disabled={isUpgrade}
+          disabled={disabled}
           onChange={(e) => onChartNameInput(e.target.value)}
         ></input>
       </div>
@@ -33,14 +34,14 @@ export const GeneralDetails = ({
         <input
           className={inputClassName}
           value={namespace}
-          disabled={isUpgrade}
+          disabled={disabled}
           onChange={(e) => onNamespaceInput(e.target.value)}
         ></input>
       </div>
-      {selectedCluster ? (
+      {selectedRepo ? (
         <div className="flex">
           <h4 className="text-lg">Cluster:</h4>
-          <p className="text-lg">{selectedCluster}</p>
+          <p className="text-lg">{selectedRepo}</p>
         </div>
       ) : null}
     </div>

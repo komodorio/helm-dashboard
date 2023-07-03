@@ -2,13 +2,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import useAlertError from "../../../hooks/useAlertError";
 import { useCallback, useEffect, useState } from "react";
 import { useAppContext } from "../../../context/AppContext";
-import { useGetChartValues, useGetVersions } from "../../../API/releases";
+import { useChartReleaseValues, useGetVersions } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
 import { UserDefinedValues } from "./UserDefinedValues";
 import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
+import { useChartRepoValues } from "../../../API/repositories";
+import { isNewerVersion } from "../../../utils";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -61,16 +63,26 @@ export const InstallChartModal = ({
     data: chartValues,
     isLoading: loadingChartValues,
     refetch: refetchChartValues,
-  } = useGetChartValues(
+  } = useChartRepoValues(
     namespace || "default",
     chartName,
     selectedRepo,
     selectedVersion,
     {
-      enabled: false,
-      refetchOnWindowFocus: false,
+      enabled: isInstall,
     }
   );
+
+  const { data: releaseValues, isLoading: loadingReleaseValues } =
+    useChartReleaseValues({
+      namespace,
+      release: String(releaseName),
+      userDefinedValue: userValues,
+      revision: revision ? parseInt(revision) : undefined,
+      options: {
+        enabled: !isInstall,
+      },
+    });
 
   useEffect(() => {
     fetchVersion();
@@ -112,12 +124,14 @@ export const InstallChartModal = ({
           },
         }
       );
+
       if (!res.ok) {
         setShowErrorModal({
           title: `Failed to ${isInstall ? "install" : "upgrade"} the chart`,
           msg: String(await res.text()),
         });
       }
+
       return res.json();
     },
     {
@@ -157,12 +171,16 @@ export const InstallChartModal = ({
               onChange={(e) => setSelectedVersion(e.target.value)}
               value={selectedVersion}
             >
-              {versions?.map(({ repository, version }) => (
-                <option
-                  value={version}
-                  key={repository + version}
-                >{`${repository} @ ${version}`}</option>
-              ))}
+              {versions
+                ?.sort((a, b) =>
+                  isNewerVersion(a.version, b.version) ? 1 : -1
+                )
+                .map(({ repository, version }) => (
+                  <option
+                    value={version}
+                    key={repository + version}
+                  >{`${repository} @ ${version}`}</option>
+                ))}
             </select>{" "}
           </>
         ) : null}
@@ -238,8 +256,12 @@ export const InstallChartModal = ({
       }}
       title={
         <div className="font-bold">
-          {`${isUpgrade ? "Upgrade" : "Install"} `}
-          <span className="text-green-700 ">{chartName}</span>
+          {`${
+            isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
+          } `}
+          {(isUpgrade || isInstall) && (
+            <span className="text-green-700 ">{chartName}</span>
+          )}
         </div>
       }
       containerClassNames="w-5/6 text-2xl h-2/3"
@@ -251,6 +273,7 @@ export const InstallChartModal = ({
           isLoading: setReleaseVersionMutation.isLoading,
           disabled:
             loadingChartValues ||
+            loadingReleaseValues ||
             isLoadingDiff ||
             setReleaseVersionMutation.isLoading,
         },
@@ -259,7 +282,7 @@ export const InstallChartModal = ({
       <VersionToInstall />
       <GeneralDetails
         chartName={chart}
-        isUpgrade={isUpgrade}
+        disabled={isUpgrade || (!isUpgrade && !isInstall)}
         namespace={namespace}
         onChartNameInput={(chartName) => setChart(chartName)}
         onNamespaceInput={(namespace) => setNamespace(namespace)}
@@ -267,7 +290,10 @@ export const InstallChartModal = ({
       <div className="flex w-full gap-6 mt-4">
         <UserDefinedValues val={userValues} setVal={setUserValues} />
 
-        <ChartValues chartValues={chartValues} loading={loadingChartValues} />
+        <ChartValues
+          chartValues={isInstall ? chartValues : releaseValues}
+          loading={isInstall ? loadingChartValues : loadingReleaseValues}
+        />
       </div>
 
       <ManifestDiff

@@ -26,6 +26,7 @@ export default function RevisionsList({
       search: `?${tab ? `tab=${tab}` : ""}${mode ? `&mode=${mode}` : ""}`,
     });
   };
+
   return (
     <>
       {releaseRevisions?.map((release, idx) => {
@@ -45,7 +46,7 @@ export default function RevisionsList({
             }`}
           >
             <div className="flex row justify-between">
-              <StatusLabel status={release.status} />
+              <StatusLabel status={release.status} isRollback={release.description.startsWith("Rollback to ")}/>
               <span className="font-semibold">#{release.revision}</span>
             </div>
             <div className="self-end text-[#707583] text-xs flex flex-wrap gap-1" style={{

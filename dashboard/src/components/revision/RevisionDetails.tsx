@@ -33,6 +33,7 @@ import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
 import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
 import { isNewerVersion } from "../../utils";
+import { useAppContext } from "../../context/AppContext";
 
 type RevisionTagProps = {
   caption: string;
@@ -63,6 +64,7 @@ export default function RevisionDetails({
   const tab = searchParams.get("tab");
   const selectedTab =
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
+  const { selectedCluster } = useAppContext();
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
@@ -178,7 +180,7 @@ export default function RevisionDetails({
               <span
                 onClick={() => {
                   navigate(
-                    `/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].name}`
+                    `/repository/${selectedCluster}?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].name}`
                   );
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
@@ -227,10 +229,9 @@ export default function RevisionDetails({
     );
   };
 
-  const canUpgrade = isNewerVersion(
-    release.chart_ver,
-    latestVerData?.[0]?.version ?? ""
-  );
+  const canUpgrade = !latestVerData?.[0]?.version
+    ? false
+    : isNewerVersion(release.chart_ver, latestVerData?.[0]?.version);
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
@@ -295,7 +296,7 @@ const Rollback = ({
     { chart, namespace, revision, tab: "manifests" },
     `&revisionDiff=${prevRevision}`
   );
-
+ 
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
@@ -442,7 +443,10 @@ const Uninstall = () => {
           <div>
             {resources?.map((resource) => (
               <div className="flex justify-start gap-1 w-full mb-3">
-                <span className=" w-3/5  italic">{resource.kind}</span>
+                <span style={{
+                      textAlign: "end",
+                      paddingRight: "30px",
+                }} className=" w-3/5  italic">{resource.kind}</span>
                 <span className=" w-4/5 font-semibold">
                   {resource.metadata.name}
                 </span>
