@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useAlertError from "../../../hooks/useAlertError";
 import { useCallback, useEffect, useState } from "react";
-import { useAppContext } from "../../../context/AppContext";
 import { useChartReleaseValues, useGetVersions } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
@@ -11,6 +10,7 @@ import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
 import { isNewerVersion } from "../../../utils";
+import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -31,7 +31,7 @@ export const InstallChartModal = ({
   isUpgrade = false,
   isInstall = false,
 }: InstallChartModalProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
@@ -43,8 +43,8 @@ export const InstallChartModal = ({
     namespace: queryNamespace,
     chart: releaseName,
     revision,
+    context: selectedCluster,
   } = useParams();
-  const { selectedCluster } = useAppContext();
   const [namespace, setNamespace] = useState(queryNamespace);
   const [chart, setChart] = useState(chartName);
 
@@ -142,9 +142,9 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
-            `/installed/revision/${releaseName}/default/my-release/${
-              Number(revision) + 1
-            }`
+            `/installed/revision/${selectedCluster}/${
+              namespace ? namespace : "default"
+            }/${chartName}/${selectedVersion}`
           );
           window.location.reload();
         }
@@ -274,8 +274,8 @@ export const InstallChartModal = ({
           variant: ModalButtonStyle.info,
           isLoading: setReleaseVersionMutation.isLoading,
           disabled:
-            loadingChartValues ||
-            loadingReleaseValues ||
+            (isInstall && loadingChartValues) ||
+            (!isInstall && loadingReleaseValues) ||
             isLoadingDiff ||
             setReleaseVersionMutation.isLoading,
         },

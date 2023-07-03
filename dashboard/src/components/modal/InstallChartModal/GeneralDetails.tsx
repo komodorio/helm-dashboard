@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import { useAppContext } from "../../../context/AppContext";
 
 export const GeneralDetails = ({
@@ -14,7 +15,7 @@ export const GeneralDetails = ({
   onNamespaceInput: (namespace: string) => void;
   onChartNameInput: (chartName: string) => void;
 }) => {
-  const { selectedRepo } = useAppContext();
+  const { context } = useParams();
   const inputClassName = ` text-lg py-1 px-2 ${
     disabled ? "bg-gray-200" : "bg-white border-2 border-gray-300"
   } rounded`;
@@ -38,10 +39,10 @@ export const GeneralDetails = ({
           onChange={(e) => onNamespaceInput(e.target.value)}
         ></input>
       </div>
-      {selectedRepo ? (
+      {context ? (
         <div className="flex">
           <h4 className="text-lg">Cluster:</h4>
-          <p className="text-lg">{selectedRepo}</p>
+          <p className="text-lg">{context}</p>
         </div>
       ) : null}
     </div>

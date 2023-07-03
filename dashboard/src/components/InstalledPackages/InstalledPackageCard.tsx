@@ -12,6 +12,7 @@ import Spinner from "../Spinner";
 import { useGetLatestVersion } from "../../API/releases";
 import { isNewerVersion } from "../../utils";
 import { LatestChartVersion } from "../../API/interfaces";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -20,7 +21,7 @@ type InstalledPackageCardProps = {
 export default function InstalledPackageCard({
   release,
 }: InstalledPackageCardProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigateWithSearchParams();
 
   const [isMouseOver, setIsMouseOver] = useState(false);
 
@@ -76,8 +77,12 @@ export default function InstalledPackageCard({
   };
 
   const statusColor = getStatusColor(release.status);
+  console.log(statusColor)
   return (
     <div
+      style={{
+        borderLeftColor: `${statusColor}`,
+      }}
       className={`grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-5 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
         isMouseOver && "drop-shadow-lg"
       }`}

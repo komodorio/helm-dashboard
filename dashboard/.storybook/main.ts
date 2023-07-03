@@ -2,37 +2,19 @@
 
 import type { StorybookViteConfig } from '@storybook/builder-vite';
 import path from 'path';
-
 const config: StorybookViteConfig = {
-  stories: ['../stories/**/*.stories.mdx', '../stories/**/*.stories.@(js|jsx|ts|tsx)'],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
-  core: {
-    builder: '@storybook/builder-vite',
+  stories: ["../src/**/*.stories.mdx",
+    "../src/**/*.stories.@(js|jsx|ts|tsx)"],
+  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-styling', {
+    name: '@storybook/addon-styling'
+  }, "@storybook/addon-mdx-gfm"],
+  core: {},
+  framework: {
+    name: '@storybook/react-vite',
+    options: {}
   },
-  async viteFinal(config, options) {
-    // Add your configuration here
-    return config;
-  },
-  webpackFinal: async (config) => {
-    config.module?.rules.push({
-      test: /\.css$/,
-      use: [
-        {
-          loader: 'postcss-loader',
-          options: {
-            postcssOptions: {
-              plugins: [
-                require('tailwindcss'),
-                require('autoprefixer'),
-              ],
-            },
-          },
-        },
-      ],
-      include: path.resolve(__dirname, '../'),
-    })
-    return config
-  },
+  docs: {
+    autodocs: true
+  }
 };
-
 export default config;

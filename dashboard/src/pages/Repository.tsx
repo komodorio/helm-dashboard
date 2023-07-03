@@ -7,24 +7,30 @@ import { useGetRepositories } from "../API/repositories";
 import { HelmRepositories } from "../API/interfaces";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
+import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 
 function RepositoryPage() {
   const { selectedRepo: repoFromParams, context } = useParams();
-  const navigate = useNavigate();
+  const navigate = useNavigateWithSearchParams();
   const {setSelectedRepo, selectedRepo} = useAppContext();
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/repository/${context}/${selectedRepository.name}`, { replace: true });
+    navigate(`/repository/${context}/${selectedRepository.name}`, {
+      replace: true,
+    });
   };
+
   useEffect(() => {
-    setSelectedRepo(repoFromParams);
-  }, [setSelectedRepo, repoFromParams])
+    if (repoFromParams) {
+      setSelectedRepo(repoFromParams);
+    }
+  }, [setSelectedRepo, repoFromParams]);
 
   useEffect(() => {
     if (selectedRepo && !repoFromParams) {
       navigate(`/repository/${context}/${selectedRepo}`, { replace: true });
     }
-  }, [selectedRepo, repoFromParams])
+  }, [selectedRepo, repoFromParams]);
 
   const { data: repositories = [] } = useGetRepositories({
     onSuccess: (data: HelmRepositories) => {

@@ -2,32 +2,26 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams , useNavigate} from "react-router-dom";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { Release } from "../data/types";
 
 function Installed() {
-  const { searchParamsObject } = useCustomSearchParams();
+  const { searchParamsObject, addSearchParam } = useCustomSearchParams();
   const { context } = useParams();
   const { filteredNamespace } = searchParamsObject;
-  const namespaces = filteredNamespace?.split("+") ?? [];
+  const namespaces = filteredNamespace?.split("+") ?? ["default"];
   const navigate = useNavigate();
-
 
   const handleClusterChange = (
     clusterName: string,
-    namespaces: string[] = []
+    clusterNamespaces: string[] = []
   ) => {
-    navigate(
-      `/installed/${clusterName}?&filteredNamespace=${
-        namespaces.length > 0
-          ? `${namespaces.map((ns) => ns).join("+")}`
-          : "default"
-      }`
-    );
+    const newSearchParams = addSearchParam('filteredNamespace', clusterNamespaces.length > 0 ? `${clusterNamespaces.map((ns) => ns).join("+")}`: "default")
+    navigate({pathname: `/installed/${clusterName}`, search: newSearchParams.toString()});
   };
 
   const [filterKey, setFilterKey] = useState<string>("");
@@ -47,11 +41,12 @@ function Installed() {
 
   const filteredReleases = useMemo(() => {
     return (
-      data?.filter(
-        (installedPackage: Release) =>
+      data?.filter((installedPackage: Release) => {
+        return (
           installedPackage.name.includes(filterKey) &&
           namespaces.includes(installedPackage.namespace)
-      ) ?? []
+        );
+      }) ?? []
     );
   }, [data, filterKey, namespaces]);
 

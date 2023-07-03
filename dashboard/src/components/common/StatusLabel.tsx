@@ -5,6 +5,12 @@ type StatusLabelProps = {
   isRollback?: boolean;
 };
 
+export enum DeploymentStatus {
+  DEPLOYED = "deployed",
+  FAILED = "failed",
+  PENDING = "pending",
+}
+
 export function getStatusColor(status: string) {
   if (status === "deployed") return "#1FA470";
   if (status === "failed") return "#DC143C";
@@ -21,7 +27,7 @@ function StatusLabel({ status, isRollback }: StatusLabelProps) {
       <span className={`text-[${getStatusColor(status)}] font-bold text-xs`}>
         ● {status.toUpperCase()}
       </span>
-      {isRollback && <AiOutlineReload size={14}/>}
+      {isRollback && <AiOutlineReload size={14} />}
     </div>
   );
 }

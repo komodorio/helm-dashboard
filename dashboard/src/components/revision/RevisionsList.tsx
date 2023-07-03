@@ -6,6 +6,7 @@ import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { ReleaseRevision } from "../../data/types";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 
 type RevisionsListProps = {
   releaseRevisions: ReleaseRevision[];
@@ -16,15 +17,10 @@ export default function RevisionsList({
   releaseRevisions,
   selectedRevision,
 }: RevisionsListProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigateWithSearchParams();
   const { context, namespace, chart } = useParams();
-  const { searchParamsObject: searchParams } = useCustomSearchParams();
-  const { tab, mode } = searchParams;
   const changeRelease = (newRevision: number) => {
-    navigate({
-      pathname: `/installed/revision/${context}/${namespace}/${chart}/${newRevision}`,
-      search: `?${tab ? `tab=${tab}` : ""}${mode ? `&mode=${mode}` : ""}`,
-    });
+    navigate(`/installed/revision/${context}/${namespace}/${chart}/${newRevision}`);
   };
 
   return (
