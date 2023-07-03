@@ -10,6 +10,7 @@ const useCustomSearchParams = () => {
     const copySearchParams = new URLSearchParams(search);
     copySearchParams.set(k, value);
     setSearch(copySearchParams);
+    return copySearchParams;
   };
 
   const removeSearchParam = (k: string) => {

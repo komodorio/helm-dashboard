@@ -12,6 +12,7 @@ import Spinner from "../Spinner";
 import { useGetLatestVersion } from "../../API/releases";
 import { isNewerVersion } from "../../utils";
 import { LatestChartVersion } from "../../API/interfaces";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -20,7 +21,7 @@ type InstalledPackageCardProps = {
 export default function InstalledPackageCard({
   release,
 }: InstalledPackageCardProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigateWithSearchParams();
 
   const [isMouseOver, setIsMouseOver] = useState(false);
 
