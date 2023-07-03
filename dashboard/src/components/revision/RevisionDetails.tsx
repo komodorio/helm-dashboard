@@ -83,13 +83,11 @@ export default function RevisionDetails({
     isLoading: isRunningTests,
     data: testResults,
   } = useTestRelease({
-    onSuccess: () => {
-      setShowTestResults(true);
-    },
     onError: (error) => {
+      setShowTestResults(false);
       setShowErrorModal({
         title: "Failed to run tests for chart " + chart,
-        msg: error as string,
+        msg: (error as Error).message,
       });
       console.error("Failed to execute test for chart", error);
     },
