@@ -119,7 +119,7 @@ const Modal = ({
                 {children}
               </div>
               {bottomContent ? (
-                <div className="p-5 border-t text-sm">{bottomContent}</div>
+                <div className="p-5 text-sm">{bottomContent}</div>
               ) : (
                 <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b ">
                   {actions?.map((action) => (

@@ -4,6 +4,9 @@ import { callApi } from "../../API/releases";
 import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
+import { useAppContext } from "../../context/AppContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface FormKeys {
   name: string;
@@ -23,6 +26,10 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const alertError = useAlertError();
   const { searchParamsObject } = useCustomSearchParams();
   const { repo_url, repo_name } = searchParamsObject;
+  const { setSelectedRepo } = useAppContext();
+  const { context } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!repo_url || !repo_name) return;
@@ -45,7 +52,10 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
       .then(() => {
         setIsLoading(false);
         onClose();
-        window.location.reload();
+
+        queryClient.invalidateQueries({ queryKey: ["helm", "repositories"] });
+        setSelectedRepo(formData.name || "");
+        navigate(`/repository/${context}/${formData.name}`, { replace: true });
       })
       .catch((error) => {
         alertError.setShowErrorModal({

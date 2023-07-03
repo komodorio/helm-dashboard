@@ -142,7 +142,9 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
-            `/installed/revision/${selectedCluster}/${namespace ? namespace : "default"}/${chartName}/${selectedVersion}`
+            `/installed/revision/${selectedCluster}/${
+              namespace ? namespace : "default"
+            }/${chartName}/${selectedVersion}`
           );
           window.location.reload();
         }
@@ -272,8 +274,8 @@ export const InstallChartModal = ({
           variant: ModalButtonStyle.info,
           isLoading: setReleaseVersionMutation.isLoading,
           disabled:
-            loadingChartValues ||
-            loadingReleaseValues ||
+            (isInstall && loadingChartValues) ||
+            (!isInstall && loadingReleaseValues) ||
             isLoadingDiff ||
             setReleaseVersionMutation.isLoading,
         },
