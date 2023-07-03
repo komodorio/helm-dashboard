@@ -1,9 +1,9 @@
-import { NavLink, useSearchParams } from "react-router-dom"
+import { NavLink, useLocation, useSearchParams } from "react-router-dom"
 
 const LinkWithSearchParams = ({to, ...props}) => {
-    const [searchParams]  = useSearchParams();
+    const {search} = useLocation();
     return (
-        <NavLink to={`${to}?${searchParams.toString()}`} {...props} />
+        <NavLink to={`${to}${search}`} {...props} />
     )
 }
 
