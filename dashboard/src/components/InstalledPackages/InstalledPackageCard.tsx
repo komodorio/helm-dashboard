@@ -3,7 +3,7 @@ import { Cluster, Release } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
-import StatusLabel from "../common/StatusLabel";
+import StatusLabel, { getStatusColor } from "../common/StatusLabel";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import HealthStatus from "./HealthStatus";
@@ -75,9 +75,10 @@ export default function InstalledPackageCard({
     );
   };
 
+  const statusColor = getStatusColor(release.status);
   return (
     <div
-      className={`grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-5 drop-shadow border-l-4 border-l-[#1BE99A] cursor-pointer ${
+      className={`grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-5 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
         isMouseOver && "drop-shadow-lg"
       }`}
       onMouseOver={handleMouseOver}

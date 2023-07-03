@@ -5,20 +5,20 @@ type StatusLabelProps = {
   isRollback?: boolean;
 };
 
-function StatusLabel({ status, isRollback }: StatusLabelProps) {
-  function getColor(status: string) {
-    if (status === "deployed") return "text-[#1FA470]";
-    if (status === "failed") return "text-[#DC143C]";
-    else return "text-[#9195A1]";
-  }
+export function getStatusColor(status: string) {
+  if (status === "deployed") return "#1FA470";
+  if (status === "failed") return "#DC143C";
+  else return "#9195A1";
+}
 
+function StatusLabel({ status, isRollback }: StatusLabelProps) {
   return (
     <div style={{
       minWidth: "90px",
       display: "flex",
       justifyContent: "space-between",
     }}>
-      <span className={`${getColor(status)} font-bold text-xs`}>
+      <span className={`text-[${getStatusColor(status)}] font-bold text-xs`}>
         ● {status.toUpperCase()}
       </span>
       {isRollback && <AiOutlineReload size={14}/>}
