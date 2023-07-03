@@ -218,12 +218,18 @@ export default function RevisionDetails({
                 </Button>
               </div>
               <Modal
-                containerClassNames="w-3/5"
+                containerClassNames="w-4/5"
                 title="Test results"
                 isOpen={showTestsResults}
                 onClose={() => setShowTestResults(false)}
               >
-                {isRunningTests ? <Spinner /> : displayTestResults()}
+                {isRunningTests ? (
+                  <div className="flex mr-2 items-center">
+                    <Spinner /> Waiting for completion..
+                  </div>
+                ) : (
+                  displayTestResults()
+                )}
               </Modal>{" "}
             </>
           ) : null}
