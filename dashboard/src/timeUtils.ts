@@ -19,7 +19,7 @@ export function getAge(obj1: ReleaseRevision, obj2: ReleaseRevision) {
     milliseconds: "ms",
   };
 
-  for (let unit of Object.keys(map)) {
+  for (const unit of Object.keys(map)) {
     const val = diff.as(unit as keyof DurationLikeObject);
     if (val >= 1) {
       return Math.round(val) + map[unit];
