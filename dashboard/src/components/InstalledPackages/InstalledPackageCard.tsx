@@ -77,7 +77,7 @@ export default function InstalledPackageCard({
   };
 
   const statusColor = getStatusColor(release.status);
-  console.log(statusColor)
+
   return (
     <div
       style={{

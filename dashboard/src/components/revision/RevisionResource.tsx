@@ -83,7 +83,9 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         <td className={"rounded text-gray-400 " + cellClassnames}>
           <div className="flex flex-col space-y-1 justify-start items-start">
             {message && <div>{message}</div>}
-            {(badgeType === 'error' || badgeType === 'warning') && <Troubleshoot />}
+            {(badgeType === "error" || badgeType === "warning") && (
+              <Troubleshoot />
+            )}
           </div>
         </td>
         <td className={"rounded " + cellClassnames}>
