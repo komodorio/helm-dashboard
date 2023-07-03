@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useAlertError from "../../../hooks/useAlertError";
 import { useCallback, useEffect, useState } from "react";
-import { useAppContext } from "../../../context/AppContext";
 import { useChartReleaseValues, useGetVersions } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
@@ -142,7 +141,9 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
-            `/installed/revision/${selectedCluster}/${namespace ? namespace : "default"}/${chartName}/${selectedVersion}`
+            `/installed/revision/${selectedCluster}/${
+              namespace ? namespace : "default"
+            }/${chartName}/${selectedVersion}`
           );
           window.location.reload();
         }
@@ -272,8 +273,8 @@ export const InstallChartModal = ({
           variant: ModalButtonStyle.info,
           isLoading: setReleaseVersionMutation.isLoading,
           disabled:
-            loadingChartValues ||
-            loadingReleaseValues ||
+            (isInstall && loadingChartValues) ||
+            (!isInstall && loadingReleaseValues) ||
             isLoadingDiff ||
             setReleaseVersionMutation.isLoading,
         },
