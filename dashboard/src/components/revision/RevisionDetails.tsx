@@ -104,10 +104,17 @@ export default function RevisionDetails({
       return;
     }
 
-    runTests({
-      ns: namespace,
-      name: chart,
-    });
+    try {
+      runTests({
+        ns: namespace,
+        name: chart,
+      });
+    } catch (error: any) {
+      setShowErrorModal({
+        title: "Test failed to run",
+        msg: error.message,
+      });
+    }
     setShowTestResults(true);
   };
 
