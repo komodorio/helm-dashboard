@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { ErrorAlert, ErrorModalContext } from "./context/ErrorModalContext";
 import GlobalErrorModal from "./components/modal/GlobalErrorModal";
+import { AppContextProvider } from "./context/AppContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,6 +18,19 @@ const queryClient = new QueryClient({
   },
 });
 
+const PageLayout = ({children}) => {
+  return (
+    <>
+      <Header />
+      <div className="bg-body-background min-h-screen min-w-screen">
+        <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] min-h-screen max-h-full">
+          {children}
+        </div>
+      </div>
+    </>
+  )
+}
+
 export default function App() {
   const [shouldShowErrorModal, setShowErrorModal] = useState<
     ErrorAlert | undefined
@@ -25,36 +39,33 @@ export default function App() {
 
   return (
     <div>
-      <ErrorModalContext.Provider value={value}>
-        <QueryClientProvider client={queryClient}>
-          <HashRouter>
-            <Header />
-            <div className="bg-body-background min-h-screen min-w-screen">
-              <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] min-h-screen max-h-full">
+      <AppContextProvider>
+        <ErrorModalContext.Provider value={value}>
+          <QueryClientProvider client={queryClient}>
+            <HashRouter>
                 <Routes>
-                  <Route path="/installed/:context" element={<Installed />} />
+                  <Route path="/installed/:context" element={<PageLayout><Installed /></PageLayout>} />
                   <Route
                     path="/installed/revision/:context/:namespace/:chart/:revision"
-                    element={<Revision />}
+                    element={<PageLayout><Revision /></PageLayout>}
                   />
-                  <Route path="/repository" element={<RepositoryPage />} />
+                  <Route path="/repository/:context" element={<PageLayout><RepositoryPage /></PageLayout>} />
                   <Route
-                    path="/repository/:selectedRepo"
-                    element={<RepositoryPage />}
+                    path="/repository/:context/:selectedRepo"
+                    element={<PageLayout><RepositoryPage /></PageLayout>}
                   />
-                  <Route path="*" element={<Installed />} />
+                  <Route path="*" element={<PageLayout><Installed /></PageLayout>} />
                 </Routes>
-              </div>
-            </div>
-            <GlobalErrorModal
-              isOpen={!!shouldShowErrorModal}
-              onClose={() => setShowErrorModal(undefined)}
-              titleText={shouldShowErrorModal?.title || ""}
-              contentText={shouldShowErrorModal?.msg || ""}
-            />
-          </HashRouter>
-        </QueryClientProvider>
-      </ErrorModalContext.Provider>
+              <GlobalErrorModal
+                isOpen={!!shouldShowErrorModal}
+                onClose={() => setShowErrorModal(undefined)}
+                titleText={shouldShowErrorModal?.title || ""}
+                contentText={shouldShowErrorModal?.msg || ""}
+              />
+            </HashRouter>
+          </QueryClientProvider>
+        </ErrorModalContext.Provider>
+      </AppContextProvider>
     </div>
   );
 }

@@ -15,7 +15,6 @@ function RepositoriesList({
   repositories,
 }: RepositoriesListProps) {
   const [showAddRepositoryModal, setShowAddRepositoryModal] = useState(false);
-
   const { searchParamsObject } = useCustomSearchParams();
 
   useEffect(() => {

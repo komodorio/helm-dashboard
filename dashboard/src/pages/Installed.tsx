@@ -2,7 +2,7 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,6 +15,7 @@ function Installed() {
   const { filteredNamespace } = searchParamsObject;
   const namespaces = filteredNamespace?.split("+") ?? [];
   const navigate = useNavigate();
+
 
   const handleClusterChange = (
     clusterName: string,

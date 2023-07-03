@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -14,7 +14,7 @@ import { useGetApplicationStatus } from "../API/other";
 
 export default function Header() {
   const { data: statusData } = useGetApplicationStatus();
-
+  const {context} = useParams();
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
   };
@@ -39,7 +39,7 @@ export default function Header() {
   return (
     <div className="h-16 flex items-center justify-between bg-white w-[100%] overflow-x-auto">
       <div className="h-16 flex items-center gap-6 min-w-fit">
-        <NavLink to="/">
+        <NavLink to={`/installed/${context}`}>
           <img
             src={LogoHeader}
             alt="Helm-DashBoard"
@@ -51,7 +51,7 @@ export default function Header() {
           <ul className="w-full items-center flex md:flex-row space-x-2 xl:space-x-4 2xl:space-x-8 md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <NavLink
-                to="/installed"
+                to={`/installed/${context}`}
                 className={({ isActive }) =>
                   isActive ? "p-2 text-[#1347FF]  bg-[#EBEFFF]" : "p-2"
                 }
@@ -61,7 +61,7 @@ export default function Header() {
             </li>
             <li>
               <NavLink
-                to="/repository"
+                to={`/repository/${context}`}
                 end={false}
                 className={({ isActive }) =>
                   isActive ? "p-2 text-[#1347FF] bg-[#EBEFFF]" : "p-2"
