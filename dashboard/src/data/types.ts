@@ -45,31 +45,30 @@ export type Release = {
   has_tests: boolean;
 };
 
-
 export type ReleaseHealthStatus = {
   kind: string;
   apiVersion: string;
   metadata: {
-      name: string;
-      namespace: string;
-      creationTimestamp?: string;
-      labels: {
-          [key: string]: string;
-      }
-  },
-  spec: {},
+    name: string;
+    namespace: string;
+    creationTimestamp?: string;
+    labels: {
+      [key: string]: string;
+    };
+  };
+  spec: {};
   status: {
-      conditions: [
-          {
-              type: string;
-              status: string;
-              lastProbeTime: string;
-              lastTransitionTime?: string;
-              reason: string;
-          }
-      ]
-  }
-}
+    conditions: [
+      {
+        type: string;
+        status: string;
+        lastProbeTime: string;
+        lastTransitionTime?: string;
+        reason: string;
+      }
+    ];
+  };
+};
 
 export type Repository = {
   name: string;
