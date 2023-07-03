@@ -41,8 +41,8 @@ export const InstallChartModal = ({
     namespace: queryNamespace,
     chart: releaseName,
     revision,
+    context: selectedCluster,
   } = useParams();
-  const { selectedCluster } = useAppContext();
   const [namespace, setNamespace] = useState(queryNamespace);
   const [chart, setChart] = useState(chartName);
 
@@ -128,9 +128,7 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
-            `/installed/revision/minikube/default/my-release/${
-              Number(revision) + 1
-            }`
+            `/installed/revision/${selectedCluster}/${namespace ? namespace : "default"}/${chartName}/${selectedVersion}`
           );
           window.location.reload();
         }
