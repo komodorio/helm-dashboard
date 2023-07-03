@@ -5,6 +5,7 @@ import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { ReleaseRevision } from "../../data/types";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
+import { useMemo } from "react";
 
 type RevisionsListProps = {
   releaseRevisions: ReleaseRevision[];
@@ -25,6 +26,7 @@ export default function RevisionsList({
       search: `?${tab ? `tab=${tab}` : ""}${mode ? `&mode=${mode}` : ""}`,
     });
   };
+
   return (
     <>
       {releaseRevisions?.map((release, idx) => {
@@ -57,7 +59,7 @@ export default function RevisionsList({
               ) : (
                 ""
               )}
-              <span>AGE:{getAge(release.updated)}</span>
+              <span>AGE:{getAge(release, releaseRevisions[idx - 1])}</span>
             </div>
           </div>
         );
