@@ -5,7 +5,7 @@ import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import RevisionCard from './RevisionCard';
 import { RevisionCardProps } from './RevisionCard';
-import '../index.css'
+import '../../index.css'
 import {Meta, Story} from '@storybook/react/';
 //👇 This default export determines where your story goes in the story list
 /*export default {
