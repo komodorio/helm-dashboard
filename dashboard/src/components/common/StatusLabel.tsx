@@ -5,6 +5,12 @@ type StatusLabelProps = {
   isRollback?: boolean;
 };
 
+export enum DeploymentStatus {
+  DEPLOYED = "deployed",
+  FAILED = "failed",
+  PENDING = "pending",
+}
+
 function StatusLabel({ status, isRollback }: StatusLabelProps) {
   function getColor(status: string) {
     if (status === "deployed") return "text-[#1FA470]";
@@ -13,15 +19,17 @@ function StatusLabel({ status, isRollback }: StatusLabelProps) {
   }
 
   return (
-    <div style={{
-      minWidth: "90px",
-      display: "flex",
-      justifyContent: "space-between",
-    }}>
+    <div
+      style={{
+        minWidth: "90px",
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+    >
       <span className={`${getColor(status)} font-bold text-xs`}>
         ● {status.toUpperCase()}
       </span>
-      {isRollback && <AiOutlineReload size={14}/>}
+      {isRollback && <AiOutlineReload size={14} />}
     </div>
   );
 }

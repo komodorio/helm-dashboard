@@ -13,7 +13,7 @@ import {
   BsCheckCircle,
 } from "react-icons/bs";
 import { Release } from "../../data/types";
-import StatusLabel from "../common/StatusLabel";
+import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useGetReleaseInfoByType } from "../../API/releases";
 
@@ -235,7 +235,7 @@ export default function RevisionDetails({
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
-      <StatusLabel status="deployed" />
+      <StatusLabel status={DeploymentStatus.DEPLOYED} />
       <Header />
       <div className="flex flex-row gap-6">
         <span>
@@ -262,7 +262,14 @@ export default function RevisionDetails({
         <RevisionTag caption="namespace" text={namespace ?? ""} />
         <RevisionTag caption="cluster" text={context ?? ""} />
       </div>
-      <span>{release.description}</span>
+
+      <span
+        className={`text-sm ${
+          release.status === DeploymentStatus.FAILED ? "text-red-600" : ""
+        }`}
+      >
+        {release.description}
+      </span>
       <Tabs tabs={revisionTabs} selectedTab={selectedTab} />
     </div>
   );
@@ -296,7 +303,7 @@ const Rollback = ({
     { chart, namespace, revision, tab: "manifests" },
     `&revisionDiff=${prevRevision}`
   );
- 
+
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
       onSettled: () => {
@@ -443,10 +450,15 @@ const Uninstall = () => {
           <div>
             {resources?.map((resource) => (
               <div className="flex justify-start gap-1 w-full mb-3">
-                <span style={{
-                      textAlign: "end",
-                      paddingRight: "30px",
-                }} className=" w-3/5  italic">{resource.kind}</span>
+                <span
+                  style={{
+                    textAlign: "end",
+                    paddingRight: "30px",
+                  }}
+                  className=" w-3/5  italic"
+                >
+                  {resource.kind}
+                </span>
                 <span className=" w-4/5 font-semibold">
                   {resource.metadata.name}
                 </span>
