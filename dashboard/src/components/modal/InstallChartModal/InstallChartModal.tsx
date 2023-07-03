@@ -120,7 +120,7 @@ export const InstallChartModal = ({
           method: "post",
           body: formData,
           headers: {
-            "X-Kubecontext": selectedCluster,
+            "X-Kubecontext": selectedCluster as string,
           },
         }
       );
@@ -135,16 +135,18 @@ export const InstallChartModal = ({
       return res.json();
     },
     {
-      onSuccess: async () => {
+      onSuccess: async (response) => {
         onClose();
         if (isInstall) {
-          navigate(`/`);
+          navigate(
+            `/installed/revision/${selectedCluster}/${response.namespace}/${response.name}/1`
+          );
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
             `/installed/revision/${selectedCluster}/${
               namespace ? namespace : "default"
-            }/${chartName}/${selectedVersion}`
+            }/${chartName}/${response.version}`
           );
           window.location.reload();
         }
