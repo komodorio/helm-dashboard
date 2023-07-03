@@ -1,19 +1,15 @@
-export const getAge = (obj1: Date | number | string): string => {
-  const date = new Date(obj1);
-  const dateNext = new Date();
-  const diff = dateNext.getTime() - date.getTime();
+import { DateTime, DurationLikeObject } from "luxon";
+import { ReleaseRevision } from "./data/types";
 
-  const units: [string, number][] = [
-    ["years", 24 * 60 * 60 * 1000 * 365],
-    ["months", 24 * 60 * 60 * 1000 * 30],
-    ["days", 24 * 60 * 60 * 1000],
-    ["hours", 60 * 60 * 1000],
-    ["minutes", 60 * 1000],
-    ["seconds", 1000],
-    ["milliseconds", 1]
-  ];
-  
-  const map: any = {
+export function getAge(obj1: ReleaseRevision, obj2: ReleaseRevision) {
+  const date = DateTime.fromISO(obj1.updated);
+  let dateNext = DateTime.now();
+  if (obj2) {
+    dateNext = DateTime.fromISO(obj2.updated);
+  }
+  const diff = dateNext.diff(date);
+
+  const map: Record<string, string> = {
     years: "yr",
     months: "mo",
     days: "d",
@@ -23,12 +19,11 @@ export const getAge = (obj1: Date | number | string): string => {
     milliseconds: "ms",
   };
 
-  for (let [unit, value] of units) {
-    const val = diff / value;
+  for (const unit of Object.keys(map)) {
+    const val = diff.as(unit as keyof DurationLikeObject);
     if (val >= 1) {
       return Math.round(val) + map[unit];
     }
   }
-  
   return "n/a";
 }

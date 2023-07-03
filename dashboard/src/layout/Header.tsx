@@ -15,7 +15,7 @@ import LinkWithSearchParams from "../components/LinkWithSearchParams";
 
 export default function Header() {
   const { data: statusData } = useGetApplicationStatus();
-  const {context} = useParams();
+  const { context } = useParams();
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
   };

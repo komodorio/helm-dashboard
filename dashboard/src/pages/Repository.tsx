@@ -12,7 +12,7 @@ import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 function RepositoryPage() {
   const { selectedRepo: repoFromParams, context } = useParams();
   const navigate = useNavigateWithSearchParams();
-  const {setSelectedRepo, selectedRepo} = useAppContext();
+  const { setSelectedRepo, selectedRepo } = useAppContext();
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
     navigate(`/repository/${context}/${selectedRepository.name}`, {
