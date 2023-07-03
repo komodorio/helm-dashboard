@@ -7,11 +7,12 @@ import { useGetRepositories } from "../API/repositories";
 import { HelmRepositories } from "../API/interfaces";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
+import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 
 function RepositoryPage() {
   const { selectedRepo: repoFromParams, context } = useParams();
-  const navigate = useNavigate();
-  const { setSelectedRepo, selectedRepo } = useAppContext();
+  const navigate = useNavigateWithSearchParams();
+  const {setSelectedRepo, selectedRepo} = useAppContext();
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
     navigate(`/repository/${context}/${selectedRepository.name}`, {

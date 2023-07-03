@@ -10,6 +10,7 @@ import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
 import { isNewerVersion } from "../../../utils";
+import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export const InstallChartModal = ({
   isUpgrade = false,
   isInstall = false,
 }: InstallChartModalProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
   const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
