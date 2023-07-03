@@ -18,13 +18,17 @@ export function getStatusColor(status: string) {
 }
 
 function StatusLabel({ status, isRollback }: StatusLabelProps) {
-  return (
+  const statusColor = getStatusColor(status);
+
+  return ( 
     <div style={{
       minWidth: "90px",
       display: "flex",
       justifyContent: "space-between",
     }}>
-      <span className={`text-[${getStatusColor(status)}] font-bold text-xs`}>
+      <span className={`text-[${statusColor}] font-bold text-xs`} style={{
+        color: `${statusColor}`,
+      }}>
         ● {status.toUpperCase()}
       </span>
       {isRollback && <AiOutlineReload size={14} />}
