@@ -199,25 +199,6 @@ export function useGetReleaseInfoByType(
   );
 }
 
-export function useGetChartValues(
-  namespace: string,
-  chartName: string,
-  repository: string,
-  version: string,
-  options?: UseQueryOptions<any>
-) {
-  return useQuery<any>(
-    ["values", namespace, chartName, repository],
-    () =>
-      callApi<any>(
-        `/api/helm/repositories/values?chart=${repository}/${chartName}&version=${version}`,
-        {
-          headers: { "Content-Type": "text/plain; charset=utf-8" },
-        }
-      ),
-    options
-  );
-}
 export function useGetDiff(
   formData: FormData,
   options?: UseQueryOptions<string>
@@ -268,6 +249,36 @@ export function useTestRelease(
         method: "POST",
       });
     },
+    options
+  );
+}
+
+export function useChartReleaseValues({
+  namespace = "default",
+  release,
+  userDefinedValue,
+  revision,
+  options,
+}: {
+  namespace?: string;
+  release: string;
+  userDefinedValue?: string;
+  revision?: number;
+  options?: UseQueryOptions<any>;
+}) {
+  return useQuery<any>(
+    ["values", namespace, release, userDefinedValue],
+    () =>
+      callApi<any>(
+        `/api/helm/releases/${namespace}/${release}/values?${
+          userDefinedValue
+            ? `userDefined=${userDefinedValue}`
+            : "userDefined=true"
+        }${revision ? `&revision=${revision}` : ""}`,
+        {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        }
+      ),
     options
   );
 }

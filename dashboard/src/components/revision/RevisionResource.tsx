@@ -16,6 +16,7 @@ import "react-modern-drawer/dist/index.css";
 import Button from "../Button";
 import Badge, { BadgeCodes, getBadgeType } from "../Badge";
 import Spinner from "../Spinner";
+import { Troubleshoot } from "../Troubleshoot";
 
 export default function RevisionResource() {
   const { namespace = "", chart = "" } = useParams();
@@ -69,7 +70,7 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
   const { reason = "", status = "", message = "" } = conditions?.[0] || {};
   const cellClassnames = "py-2";
 
-  let badgeType = getBadgeType(status);
+  const badgeType = getBadgeType(status);
 
   return (
     <>
@@ -77,10 +78,15 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
         <td className={"pl-6 rounded " + cellClassnames}>{kind}</td>
         <td className={"font-bold" + cellClassnames}>{name}</td>
         <td className={cellClassnames}>
-          <Badge type={badgeType}>{reason}</Badge>
+          {reason ? <Badge type={badgeType}>{reason}</Badge> : null}
         </td>
         <td className={"rounded text-gray-400 " + cellClassnames}>
-          {message ?? ""}
+          <div className="flex flex-col space-y-1 justify-start items-start">
+            {message && <div>{message}</div>}
+            {(badgeType === "error" || badgeType === "warning") && (
+              <Troubleshoot />
+            )}
+          </div>
         </td>
         <td className={"rounded " + cellClassnames}>
           <div className="flex justify-end items-center pr-4">

@@ -21,7 +21,7 @@ build_go: $(BIN) ; $(info $(M) Building GO...) @ ## Build program binary
 
 .PHONY: build_ui
 build_ui: $(BIN) ; $(info $(M) Building UI...) @ ## Build program binary
-	cd dashboard && npm run build && cd ..
+	cd dashboard && npm i && npm run build && cd ..
 
 .PHONY: build
 build: build_ui build_go ; $(info $(M) Building executable...) @ ## Build program binary

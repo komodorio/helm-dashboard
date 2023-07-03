@@ -81,6 +81,10 @@ const Modal = ({
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
           <div className="flex justify-center">
             <div
+              style={{
+                maxHeight: "95vh",
+                overflow: "hidden",
+              }}
               className={`relative rounded-lg shadow  m-7 w-2/5 max-w-[1000px] ${
                 containerClassNames && !containerClassNames.includes("bg-")
                   ? "bg-white"
@@ -111,14 +115,11 @@ const Modal = ({
                   </button>
                 </div>
               )}
-              <div
-                className="p-4 space-y-6 overflow-y-auto"
-                style={{ maxHeight: "500px" }}
-              >
+              <div className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh_-_200px)]">
                 {children}
               </div>
               {bottomContent ? (
-                <div className="p-5 border-t text-sm">{bottomContent}</div>
+                <div className="p-5 text-sm">{bottomContent}</div>
               ) : (
                 <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b ">
                   {actions?.map((action) => (

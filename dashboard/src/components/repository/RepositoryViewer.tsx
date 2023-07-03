@@ -1,13 +1,14 @@
 import { BsTrash3, BsArrowRepeat } from "react-icons/bs";
 import { Chart, Repository } from "../../data/types";
 import ChartViewer from "./ChartViewer";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
 import { useUpdateRepo } from "../../API/repositories";
 import { callApi } from "../../API/releases";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppContext } from "../../context/AppContext";
 
 type RepositoryViewerProps = {
   repository: Repository | undefined;
@@ -16,19 +17,29 @@ type RepositoryViewerProps = {
 function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const [searchValue, setSearchValue] = useState("");
   const [isRemoveLoading, setIsRemove] = useState(false);
-  const { selectedRepo } = useParams();
+  const { context } = useParams();
+  const { setSelectedRepo, selectedRepo } = useAppContext();
+  const queryClient = useQueryClient();
+
+  const navigate = useNavigate();
 
   const { data: charts, isLoading } = useQuery<Chart[]>({
-    queryKey: ["charts", repository?.name ?? ""],
+    queryKey: ["charts", repository?.name || ""],
     queryFn: apiService.getRepositoryCharts,
     refetchOnWindowFocus: false,
+    enabled: !!repository?.name,
   });
 
   useEffect(() => {
     setSearchValue("");
   }, [repository, selectedRepo]);
 
-  const update = useUpdateRepo(repository?.name || "", { retry: false });
+  const update = useUpdateRepo(repository?.name || "", {
+    retry: false,
+    onSuccess: () => {
+      window.location.reload();
+    },
+  });
 
   const removeRepository = async () => {
     if (confirm("Confirm removing repository?")) {
@@ -38,7 +49,9 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         await callApi<void>(`/api/helm/repositories/${repo}`, {
           method: "DELETE",
         });
-        window.location.reload();
+        navigate(`/repository/${context}`, { replace: true });
+        setSelectedRepo("");
+        queryClient.invalidateQueries({ queryKey: ["helm", "repositories"] });
       } catch (error) {
         console.error(error);
       } finally {
@@ -77,7 +90,6 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             <button
               onClick={() => {
                 update.mutate();
-                window.location.reload();
               }}
             >
               <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
@@ -88,7 +100,6 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             <button
               onClick={() => {
                 removeRepository();
-                window.location.reload();
               }}
             >
               <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Chart } from "../../data/types";
-import { InstallVersionModal } from "../revision/RevisionDetails";
+import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
 
 type ChartViewerProps = {
   chart: Chart;
@@ -41,13 +41,15 @@ function ChartViewer({ chart }: ChartViewerProps) {
           )}
         </span>
       </div>
-      <InstallVersionModal
-        chartName={chart.name}
-        chartVersion={chart.version}
-        isOpen={showInstallModal}
-        onClose={() => setShowInstallModal(false)}
-        isInstall={true}
-      />
+      {showInstallModal && (
+        <InstallChartModal
+          chartName={chart.name}
+          chartVersion={chart.version}
+          isOpen={showInstallModal}
+          onClose={() => setShowInstallModal(false)}
+          isInstall={true}
+        />
+      )}
     </>
   );
 }

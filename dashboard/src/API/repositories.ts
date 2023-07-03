@@ -122,3 +122,23 @@ function useGetChartValues(
     options
   );
 }
+
+export function useChartRepoValues(
+  namespace: string,
+  chartName: string,
+  repository: string,
+  version: string,
+  options?: UseQueryOptions<any>
+) {
+  return useQuery<any>(
+    ["values", namespace, chartName, repository],
+    () =>
+      callApi<any>(
+        `/api/helm/repositories/values?chart=${repository}/${chartName}&version=${version}`,
+        {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        }
+      ),
+    options
+  );
+}
