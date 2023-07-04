@@ -32,7 +32,7 @@ import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
 import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
-import { isNewerVersion } from "../../utils";
+import { isNewerVersion } from "../../utils/utils";
 import { useAppContext } from "../../context/AppContext";
 
 type RevisionTagProps = {

@@ -20,7 +20,8 @@
     "react-error-boundary": "^4.0.10",
     "react-icons": "^4.8.0",
     "react-modern-drawer": "^1.2.0",
-    "react-router-dom": "^6.9.0"
+    "react-router-dom": "^6.9.0",
+    "react-select": "^5.7.3"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",

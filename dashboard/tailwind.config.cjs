@@ -25,6 +25,7 @@ module.exports = {
       colors: {
         grey: "#3d4048",
         primary: "#1347FF",
+        muted: "#707583",
         error: {
           "border-color": "#DC3545",
           background: "#F9D7DA",

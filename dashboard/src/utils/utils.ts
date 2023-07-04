@@ -1,3 +1,5 @@
+import { NonEmptyArray } from "./types";
+
 export const isNewerVersion = (oldVer: string, newVer: string) => {
   if (oldVer && oldVer[0] === "v") {
     oldVer = oldVer.substring(1);
@@ -17,3 +19,7 @@ export const isNewerVersion = (oldVer: string, newVer: string) => {
   }
   return false;
 };
+
+export function isNoneEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
+  return Array.isArray(arr) && arr.length > 0;
+}

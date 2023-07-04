@@ -10,7 +10,7 @@ import HealthStatus from "./HealthStatus";
 import HelmGrayIcon from "../../assets/helm-gray-50.svg";
 import Spinner from "../Spinner";
 import { useGetLatestVersion } from "../../API/releases";
-import { isNewerVersion } from "../../utils";
+import { isNewerVersion } from "../../utils/utils";
 import { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 

@@ -9,8 +9,12 @@ import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
-import { isNewerVersion } from "../../../utils";
+import { isNewerVersion, isNoneEmptyArray } from "../../../utils/utils";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
+import Select, { components } from 'react-select';
+import { AiOutlineCheck } from "react-icons/ai";
+import { BsCheck, BsCheck2 } from "react-icons/bs";
+import { VersionToInstall } from "./VersionToInstall";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -50,10 +54,14 @@ export const InstallChartModal = ({
 
   const {
     error: versionsError,
-    data: versions,
+    data: _versions,
     refetch: fetchVersion,
   } = useGetVersions(chartName);
 
+  const versions = _versions?.map((v) => ({
+    ...v,
+    isChartVersion: v.version === chartVersion,
+  }));
   latestVersion = latestVersion ?? chartVersion; // a guard for typescript, latestVersion is always defined
   const [selectedVersion, setSelectedVersion] = useState(
     isUpgrade ? latestVersion : chartVersion
@@ -155,42 +163,6 @@ export const InstallChartModal = ({
     }
   );
 
-  const VersionToInstall = () => {
-    const currentVersion = (
-      <p className="text-xl">
-        current version is:{" "}
-        <span className="text-green-700">{chartVersion}</span>
-      </p>
-    );
-
-    return (
-      <div className="flex gap-2 text-xl">
-        {versions?.length ? (
-          <>
-            Version to install:{" "}
-            <select
-              className=" py-1 border-2 border-gray-200 text-blue-500 rounded"
-              onChange={(e) => setSelectedVersion(e.target.value)}
-              value={selectedVersion}
-            >
-              {versions
-                ?.sort((a, b) =>
-                  isNewerVersion(a.version, b.version) ? 1 : -1
-                )
-                .map(({ repository, version }) => (
-                  <option
-                    value={version}
-                    key={repository + version}
-                  >{`${repository} @ ${version}`}</option>
-                ))}
-            </select>{" "}
-          </>
-        ) : null}
-
-        {currentVersion}
-      </div>
-    );
-  };
 
   const getVersionManifestFormData = (version: string) => {
     const formData = new FormData();
@@ -278,7 +250,7 @@ export const InstallChartModal = ({
         },
       ]}
     >
-      <VersionToInstall />
+      {versions && isNoneEmptyArray(versions) && <VersionToInstall versions={versions} onSelectVersion={setSelectedVersion} />}
       <GeneralDetails
         chartName={chart}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
