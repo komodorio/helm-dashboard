@@ -113,8 +113,7 @@ export const InstallChartModal = ({
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        `/api/helm/releases/${namespace ? namespace : "default"}${
-          !isInstall ? `/${releaseName}` : ""
+        `/api/helm/releases/${namespace ? namespace : "default"}${!isInstall ? `/${releaseName}` : ""
         }`,
         {
           method: "post",
@@ -144,8 +143,7 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
-            `/installed/revision/${selectedCluster}/${
-              namespace ? namespace : "default"
+            `/installed/revision/${selectedCluster}/${namespace ? namespace : "default"
             }/${chartName}/${response.version}`
           );
           window.location.reload();
@@ -259,13 +257,10 @@ export const InstallChartModal = ({
         onClose();
       }}
       title={
-        <div className="font-bold">
-          {`${
-            isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
-          } `}
-          {(isUpgrade || isInstall) && (
-            <span className="text-green-700 ">{chartName}</span>
-          )}
+        <div className="font-medium">
+          {`${isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
+            } `}
+          <span className="text-[#198754] font-bold">{chartName}</span>
         </div>
       }
       containerClassNames="w-5/6 text-2xl h-2/3"
