@@ -256,25 +256,21 @@ export function useTestRelease(
 export function useChartReleaseValues({
   namespace = "default",
   release,
-  userDefinedValue,
   revision,
+  userDefinedValue,
   options,
 }: {
   namespace?: string;
   release: string;
-  userDefinedValue?: string;
   revision?: number;
+  userDefinedValue?: string;
   options?: UseQueryOptions<any>;
 }) {
   return useQuery<any>(
     ["values", namespace, release, userDefinedValue],
     () =>
       callApi<any>(
-        `/api/helm/releases/${namespace}/${release}/values?${
-          userDefinedValue
-            ? `userDefined=${userDefinedValue}`
-            : "userDefined=true"
-        }${revision ? `&revision=${revision}` : ""}`,
+        `/api/helm/releases/${namespace}/${release}/values?userDefined=true${revision ? `&revision=${revision}` : ""}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }

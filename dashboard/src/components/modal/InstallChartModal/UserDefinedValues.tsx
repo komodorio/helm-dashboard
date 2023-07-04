@@ -1,23 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 
 export const UserDefinedValues = ({
-  val,
-  setVal,
+  initialVal,
+  onChange,
 }: {
-  val: string;
-  setVal: any;
+  initialVal: string;
+  onChange: (udv: string) => void;
 }) => {
-  const [localState, setLocalState] = useState(val);
+  const [localState, setLocalState] = useState(initialVal);
 
-  const prevValueRef = useRef(val);
+  const prevValueRef = useRef(localState);
   const timeoutRef = useRef<any>(null);
   useEffect(() => {
-    clearTimeout(timeoutRef.current);
     if (prevValueRef.current !== localState) {
       timeoutRef.current = setTimeout(() => {
-        setVal(localState);
+        onChange(localState);
         clearTimeout(timeoutRef.current);
       }, 400);
+    }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     }
   }, [localState]);
 

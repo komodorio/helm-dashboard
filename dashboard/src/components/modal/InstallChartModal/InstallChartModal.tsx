@@ -7,7 +7,7 @@ import { GeneralDetails } from "./GeneralDetails";
 import { UserDefinedValues } from "./UserDefinedValues";
 import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
 import { isNewerVersion, isNoneEmptyArray } from "../../../utils/utils";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
@@ -42,7 +42,7 @@ export const InstallChartModal = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoadingDiff, setIsLoadingDiff] = useState(false);
   const [diff, setDiff] = useState("");
-
+  
   const {
     namespace: queryNamespace,
     chart: releaseName,
@@ -85,7 +85,6 @@ export const InstallChartModal = ({
     useChartReleaseValues({
       namespace,
       release: String(releaseName),
-      userDefinedValue: userValues,
       revision: revision ? parseInt(revision) : undefined,
       options: {
         enabled: !isInstall,
@@ -110,14 +109,13 @@ export const InstallChartModal = ({
 
   const setReleaseVersionMutation = useMutation(
     ["setVersion", namespace, chart, selectedVersion, selectedRepo],
-    async () => {
+    async ({ preview, userValues: udv }: { preview: boolean, userValues?: string }) => {
       setErrorMessage("");
       const formData = new FormData();
-      formData.append("preview", "false");
+      formData.append("preview", `${preview ?? false}`);
       formData.append("chart", `${selectedRepo}/${chartName}`);
       formData.append("version", selectedVersion);
-      formData.append("values", userValues);
-      formData.append("name", chart);
+      formData.append("values", udv ?? userValues);
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
@@ -142,7 +140,10 @@ export const InstallChartModal = ({
       return res.json();
     },
     {
-      onSuccess: async (response) => {
+      onSuccess: async (response, { preview }) => {
+        if (preview) {
+          return
+        }
         onClose();
         if (isInstall) {
           navigate(
@@ -186,7 +187,7 @@ export const InstallChartModal = ({
     return data;
   };
 
-  const fetchDiff = useCallback(async () => {
+  const fetchDiff = useCallback(async (upgradedManifest?: string) => {
     if (!selectedRepo || versionsError) {
       return;
     }
@@ -199,10 +200,8 @@ export const InstallChartModal = ({
     setIsLoadingDiff(true);
     try {
       const [currentVerData, selectedVerData] = await Promise.all([
-        selectedVersion !== currentVersion
-          ? fetchVersionData(currentVersion)
-          : { manifest: "" },
-        fetchVersionData(selectedVersion),
+        fetchVersionData(currentVersion),
+        upgradedManifest !== undefined ? Promise.resolve({ manifest: upgradedManifest }) : fetchVersionData(selectedVersion),
       ]);
       const formData = new FormData();
       formData.append("a", currentVerData.manifest);
@@ -239,7 +238,7 @@ export const InstallChartModal = ({
       actions={[
         {
           id: "1",
-          callback: setReleaseVersionMutation.mutate,
+          callback: () => setReleaseVersionMutation.mutate({ preview: false }),
           variant: ModalButtonStyle.info,
           isLoading: setReleaseVersionMutation.isLoading,
           disabled:
@@ -252,14 +251,19 @@ export const InstallChartModal = ({
     >
       {versions && isNoneEmptyArray(versions) && <VersionToInstall versions={versions} onSelectVersion={setSelectedVersion} />}
       <GeneralDetails
-        chartName={chart}
+        releaseName={releaseName!}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
         namespace={namespace}
-        onChartNameInput={(chartName) => setChart(chartName)}
+        onReleaseNameInput={(chartName) => setChart(chartName)}
         onNamespaceInput={(namespace) => setNamespace(namespace)}
       />
       <div className="flex w-full gap-6 mt-4">
-        <UserDefinedValues val={userValues} setVal={setUserValues} />
+        <UserDefinedValues initialVal={userValues} onChange={(udv) => {
+          setReleaseVersionMutation.mutateAsync({ preview: true, userValues: udv }).then((res) => {
+            fetchDiff(res.manifest)
+          })
+          setUserValues(udv)
+        }} />
 
         <ChartValues
           chartValues={chartValues}

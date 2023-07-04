@@ -2,18 +2,18 @@ import { useParams } from "react-router-dom";
 import { useAppContext } from "../../../context/AppContext";
 
 export const GeneralDetails = ({
-  chartName,
+  releaseName,
   namespace = "default",
   disabled,
   onNamespaceInput,
-  onChartNameInput,
+  onReleaseNameInput,
 }: {
-  chartName: string;
+  releaseName: string;
   namespace?: string;
   disabled: boolean;
 
   onNamespaceInput: (namespace: string) => void;
-  onChartNameInput: (chartName: string) => void;
+  onReleaseNameInput: (releaseName: string) => void;
 }) => {
   const { context } = useParams();
   const inputClassName = ` text-lg py-1 px-2 ${
@@ -25,9 +25,9 @@ export const GeneralDetails = ({
         <h4 className="text-lg">Release name:</h4>
         <input
           className={inputClassName}
-          value={chartName}
+          value={releaseName}
           disabled={disabled}
-          onChange={(e) => onChartNameInput(e.target.value)}
+          onChange={(e) => onReleaseNameInput(e.target.value)}
         ></input>
       </div>
       <div>
