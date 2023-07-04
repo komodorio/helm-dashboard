@@ -262,8 +262,8 @@ export const InstallChartModal = ({
         <UserDefinedValues val={userValues} setVal={setUserValues} />
 
         <ChartValues
-          chartValues={isInstall ? chartValues : releaseValues}
-          loading={isInstall ? loadingChartValues : loadingReleaseValues}
+          chartValues={chartValues}
+          loading={loadingChartValues}
         />
       </div>
 
