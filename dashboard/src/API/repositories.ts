@@ -134,7 +134,9 @@ export function useChartRepoValues(
     ["values", namespace, chartName, repository],
     () =>
       callApi<any>(
-        `/api/helm/repositories/values?chart=${repository}/${chartName}&version=${version}`,
+        `/api/helm/repositories/values?chart=${
+          repository ? `${repository}/` : ""
+        }${chartName}&version=${version}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }

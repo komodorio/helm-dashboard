@@ -9,21 +9,15 @@ import Spinner from "../../Spinner";
 
 interface ManifestDiffProps {
   diff: string;
-  fetchDiff: () => void;
   versionsError: unknown;
   isLoading: boolean;
 }
 
 export const ManifestDiff = ({
   diff,
-  fetchDiff,
   versionsError,
   isLoading,
 }: ManifestDiffProps) => {
-  useEffect(() => {
-    fetchDiff();
-  }, [fetchDiff]);
-
   const diffContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
