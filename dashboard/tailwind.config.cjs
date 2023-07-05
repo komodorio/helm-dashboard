@@ -10,6 +10,7 @@ module.exports = {
   theme: {
     fontFamily: {
       roboto: ["Roboto", "serif"],
+      inter: ["Inter", "serif"],
     },
     fontWeight: {
       thin: "100",

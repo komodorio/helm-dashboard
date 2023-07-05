@@ -46,8 +46,8 @@ export default function Header() {
     }`;
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white w-[100%] ">
-      <div className="h-16 flex items-center gap-6 min-w-fit">
+    <div className="h-16 flex items-center justify-between bg-white w-[100%] shadow-md drop-shadow-sm">
+      <div className="h-16 flex items-center gap-6 min-w-fit ">
         <LinkWithSearchParams to={`/installed/${context}`}>
           <img
             src={LogoHeader}

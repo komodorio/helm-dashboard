@@ -35,16 +35,15 @@ export default function GlobalErrorModal({
   return (
     <Modal
       containerClassNames={
-        "border-2 border-error-border-color bg-error-background w-full "
+        "border-2 border-error-border-color bg-error-background w-3/5 "
       }
       title={ErrorTitle}
       isOpen={isOpen}
       onClose={onClose}
       bottomContent={
-        <div>
+        <div className="text-xs">
           Hint: Komodor has the same HELM capabilities, with enterprise features
-          and support.
-          <br />{" "}
+          and support.{" "}
           <a
             className="text-blue-500"
             href="https://komodor.com/helm-dash/?utm_campaign=Helm+Dashboard+%7C+CTA&utm_source=helm-dash&utm_medium=cta&utm_content=helm-dash"
@@ -58,7 +57,7 @@ export default function GlobalErrorModal({
     >
       <p
         style={{ minWidth: "500px" }}
-        className="text-error-color border-green-400"
+        className="text-error-color border-green-400 text-sm"
       >
         {contentText}
       </p>
