@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -38,27 +38,30 @@ export default function Header() {
     window.open("/static/api-docs.html", "_blank");
   };
 
+  const getBtnStyle = (identifier: string) =>
+    `text-md py-2.5 px-5 ${
+      location.pathname.startsWith(`/${identifier}/`)
+        ? " text-[#1347FF]  bg-[#EBEFFF]"
+        : ""
+    }`;
+
   return (
-    <div className="h-16 flex items-center justify-between bg-white w-[100%] overflow-x-auto">
+    <div className="h-16 flex items-center justify-between bg-white w-[100%] ">
       <div className="h-16 flex items-center gap-6 min-w-fit">
         <LinkWithSearchParams to={`/installed/${context}`}>
           <img
             src={LogoHeader}
-            alt="Helm-DashBoard"
-            className="ml-3 w-[140px] min-w-[80px]"
+            alt="helm dashboard logo"
+            className="ml-3 w-48 min-w-[80px]"
           />
         </LinkWithSearchParams>
-        <span className="w-[1px] h-3/4 bg-gray-200" />
+        <span className="ml-3 w-[2px] h-3/5 bg-gray-200" />
         <div className="inline-block w-full">
-          <ul className="w-full items-center flex md:flex-row space-x-2 xl:space-x-4 2xl:space-x-8 md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
+          <ul className="w-full items-center flex md:flex-row md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <LinkWithSearchParams
                 to={`/installed/${context}`}
-                className={
-                  location.pathname.startsWith("/installed/")
-                    ? "p-2 text-[#1347FF]  bg-[#EBEFFF]"
-                    : "p-2"
-                }
+                className={getBtnStyle("installed")}
               >
                 Installed
               </LinkWithSearchParams>
@@ -67,11 +70,7 @@ export default function Header() {
               <LinkWithSearchParams
                 to={`/repository/${context}`}
                 end={false}
-                className={
-                  location.pathname.startsWith("/repository/")
-                    ? "p-2 text-[#1347FF]  bg-[#EBEFFF]"
-                    : "p-2"
-                }
+                className={getBtnStyle("repository")}
               >
                 Repository
               </LinkWithSearchParams>
@@ -128,8 +127,8 @@ export default function Header() {
           </ul>
         </div>
       </div>
-      <div className="h-16 flex items-center gap-5 ">
-        <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-[450px]">
+      <div className="h-16 flex items-center text-sm">
+        <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-max">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
             <a
@@ -138,7 +137,7 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="flex items-center gap-2 min-w-[25%]">
+              <div className="flex font-bold items-center gap-2 min-w-[25%] ">
                 Upgrade your HELM experience - Free
                 <BsBoxArrowUpRight className="w-[14px] h-[14px]" />
               </div>
@@ -149,7 +148,7 @@ export default function Header() {
           </div>
         </div>
 
-        <span className="w-[1px] h-3/4 bg-gray-200" />
+        <span className="w-[5px] h-3/4 bg-gray-200 ml-3" />
         <ShutDownButton />
       </div>
     </div>
