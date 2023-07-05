@@ -153,7 +153,7 @@ export const InstallChartModal = ({
           navigate(
             `/installed/revision/${selectedCluster}/${
               namespace ? namespace : "default"
-            }/${chartName}/${response.version}`
+            }/${releaseName}/${response.version}`
           );
           window.location.reload();
         }
