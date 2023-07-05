@@ -85,7 +85,7 @@ const Modal = ({
                 maxHeight: "95vh",
                 overflow: "hidden",
               }}
-              className={`relative rounded-lg shadow  m-7 w-2/5 max-w-[1000px] ${
+              className={`relative rounded-lg shadow  m-7 w-2/5 max-w-[1300px] ${
                 containerClassNames && !containerClassNames.includes("bg-")
                   ? "bg-white"
                   : ""

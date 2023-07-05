@@ -114,3 +114,5 @@ export type ChartVersion = {
   urls: string[];
   isSuggestedRepo: boolean;
 };
+
+export type NonEmptyArray<T> = [T, ...T[]];
