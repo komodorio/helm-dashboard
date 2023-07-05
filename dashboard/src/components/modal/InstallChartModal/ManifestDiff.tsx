@@ -37,7 +37,7 @@ export const ManifestDiff = ({
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
     }
-  }, [diff]);
+  }, [diff, diffContainerRef.current]);
 
   if (isLoading) {
     return (

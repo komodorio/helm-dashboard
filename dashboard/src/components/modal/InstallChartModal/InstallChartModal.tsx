@@ -321,10 +321,10 @@ export const InstallChartModal = ({
     >
       <VersionToInstall />
       <GeneralDetails
-        chartName={chart}
+        releaseName={chart}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
         namespace={namespace}
-        onChartNameInput={(chartName) => setChart(chartName)}
+        onReleaseNameInput={(releaseName) => setChart(releaseName)}
         onNamespaceInput={(namespace) => setNamespace(namespace)}
       />
       <div className="flex w-full gap-6 mt-4">
