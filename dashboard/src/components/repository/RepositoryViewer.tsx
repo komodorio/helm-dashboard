@@ -113,7 +113,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             value={searchValue}
             type="text"
             placeholder="Filter..."
-            className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
+            className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow rounded"
           />
         </div>
       </div>
