@@ -9,8 +9,8 @@ import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
-import { isNewerVersion } from "../../../utils";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
+import { VersionToInstall } from "./VersionToInstall";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -164,45 +164,6 @@ export const InstallChartModal = ({
     }
   );
 
-  const VersionToInstall = () => {
-    const currentVersion = (
-      <p className="text-xl text-gray-500 font-medium	">
-        (current version is:{" "}
-        <span className="text-green-700">{chartVersion}</span>)
-      </p>
-    );
-
-    return (
-      <div className="flex gap-2 text-xl">
-        {versions?.length ? (
-          <>
-            Version to install:{" "}
-            <select
-              className=" py-1 border-2 border-gray-200 text-blue-500 rounded"
-              onChange={(e) => {
-                setSelectedVersion(e.target.value);
-              }}
-              value={selectedVersion}
-            >
-              {versions
-                ?.sort((a, b) =>
-                  isNewerVersion(a.version, b.version) ? 1 : -1
-                )
-                .map(({ repository, version }) => (
-                  <option
-                    value={version}
-                    key={repository + version}
-                  >{`${repository} @ ${version}`}</option>
-                ))}
-            </select>{" "}
-          </>
-        ) : null}
-
-        {!isInstall ? currentVersion : null}
-      </div>
-    );
-  };
-
   const getVersionManifestFormData = useCallback(
     ({ version, userValues }: { version: string; userValues?: string }) => {
       const formData = new FormData();
@@ -280,7 +241,7 @@ export const InstallChartModal = ({
     if (
       selectedVersion &&
       ((!isInstall && !loadingReleaseValues) ||
-        (isInstall && loadingChartValues)) &&
+        (isInstall && !loadingChartValues)) &&
       selectedRepo
     ) {
       fetchDiff({ userValues });
@@ -319,7 +280,13 @@ export const InstallChartModal = ({
         },
       ]}
     >
-      <VersionToInstall />
+      <VersionToInstall
+        chartVersion={chartVersion}
+        selectedVersion={selectedVersion}
+        setSelectedVersion={setSelectedVersion}
+        versions={versions ?? []}
+        isInstall={isInstall}
+      />
       <GeneralDetails
         releaseName={chart}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
