@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Cluster, Release } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
 import { getAge } from "../../timeUtils";
 import StatusLabel, { getStatusColor } from "../common/StatusLabel";
 import { useQuery } from "@tanstack/react-query";
@@ -83,7 +82,7 @@ export default function InstalledPackageCard({
       style={{
         borderLeftColor: `${statusColor}`,
       }}
-      className={`grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-5 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
+      className={`text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
         isMouseOver && "drop-shadow-lg"
       }`}
       onMouseOver={handleMouseOver}
@@ -93,12 +92,12 @@ export default function InstalledPackageCard({
       <img
         src={release.icon || HelmGrayIcon}
         alt="helm release icon"
-        className="w-[40px] mx-4 col-span-1"
+        className="w-[45px] mx-4 col-span-1"
       />
 
-      <div className="col-span-11 text-sm">
+      <div className="col-span-11 -mb-5">
         <div className="grid grid-cols-11">
-          <div className="col-span-3 font-bold text-xl mr-0.5">
+          <div className="col-span-3 font-bold text-xl mr-0.5 font-roboto-slab">
             {release.name}
           </div>
           <div className="col-span-3">

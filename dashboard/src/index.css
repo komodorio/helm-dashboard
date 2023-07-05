@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto&family=Inter&family=Poppins:wght@600&family=Poppins:wght@500&family=Inter:wght@500&family=Roboto+Slab:wght@400&family=Roboto+Slab:wght@700&family=Roboto:wght@700&family=Roboto:wght@500");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

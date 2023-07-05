@@ -10,6 +10,7 @@ module.exports = {
   theme: {
     fontFamily: {
       roboto: ["Roboto", "serif"],
+      "roboto-slab": ["Roboto Slab", "sans-serif"],
       inter: ["Inter", "serif"],
     },
     fontWeight: {
