@@ -23,7 +23,7 @@ export interface ModalAction {
 export interface ModalProps extends PropsWithChildren {
   title?: string | ReactNode;
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   containerClassNames?: string;
   actions?: ModalAction[];
   bottomContent?: ReactNode;
