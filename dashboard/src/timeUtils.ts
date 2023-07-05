@@ -1,7 +1,7 @@
 import { DateTime, DurationLikeObject } from "luxon";
 import { ReleaseRevision } from "./data/types";
 
-export function getAge(obj1: ReleaseRevision, obj2: ReleaseRevision) {
+export function getAge(obj1: ReleaseRevision, obj2?: ReleaseRevision) {
   const date = DateTime.fromISO(obj1.updated);
   let dateNext = DateTime.now();
   if (obj2) {
