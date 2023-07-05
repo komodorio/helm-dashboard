@@ -301,7 +301,7 @@ export const InstallChartModal = ({
         />
       )}
       <GeneralDetails
-        releaseName={isInstall ? chartName : String(releaseName)}
+        releaseName={isInstall ? chart : String(releaseName)}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
         namespace={namespace}
         onReleaseNameInput={(releaseName) => setChart(releaseName)}
