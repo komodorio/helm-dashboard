@@ -272,12 +272,9 @@ export function useChartReleaseValues({
     ["values", namespace, release, userDefinedValue, version],
     () =>
       callApi<any>(
-        `/api/helm/releases/${namespace}/${release}/values?${
-          // userDefinedValue
-          // ? `userDefined=${userDefinedValue}`
-          // :
-          "userDefined=true"
-        }${revision ? `&revision=${revision}` : ""}`,
+        `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
+          revision ? `&revision=${revision}` : ""
+        }`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
