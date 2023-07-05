@@ -149,7 +149,7 @@ export default function RevisionDetails({
         <div className="flex flex-row flex-wrap gap-3 float-right h-fit">
           <div className="flex flex-col">
             <Button
-              className="flex justify-center items-center gap-2 min-w-[150px]"
+              className="flex justify-center items-center gap-2 min-w-[150px] text-sm font-semibold"
               onClick={() => setIsReconfigureModalOpen(true)}
             >
               {isLoadingLatestVersion || isRefetchingLatestVersion ? (
@@ -207,15 +207,13 @@ export default function RevisionDetails({
           {release.has_tests ? (
             <>
               {" "}
-              <div className="h-1/2">
-                <Button
-                  onClick={handleRunTests}
-                  className="flex items-center gap-2"
-                >
-                  <BsCheckCircle />
-                  Run tests
-                </Button>
-              </div>
+              <Button
+                onClick={handleRunTests}
+                className="flex items-center gap-2 h-1/2 text-sm font-semibold"
+              >
+                <BsCheckCircle />
+                Run tests
+              </Button>
               <Modal
                 containerClassNames="w-4/5"
                 title="Test results"
@@ -233,9 +231,7 @@ export default function RevisionDetails({
             </>
           ) : null}
 
-          <div className="h-1/2">
-            <Uninstall />
-          </div>
+          <Uninstall />
         </div>
       </header>
     );
@@ -249,11 +245,11 @@ export default function RevisionDetails({
     <div className="flex flex-col px-16 pt-5 gap-3">
       <StatusLabel status={release.status} />
       <Header />
-      <div className="flex flex-row gap-6">
+      <div className="flex flex-row gap-6 text-sm -mt-4">
         <span>
           Revision <span className="font-semibold">#{release.revision}</span>
         </span>
-        <span>
+        <span className="text-sm">
           {new Intl.DateTimeFormat("en-US", {
             year: "numeric",
             month: "2-digit",
@@ -429,12 +425,13 @@ const Rollback = ({
 
   return (
     <>
-      <div className="h-1/2">
-        <Button onClick={handleRollback} className="flex items-center gap-2">
-          <BsArrowRepeat />
-          Rollback to #{rollbackRevision}
-        </Button>
-      </div>
+      <Button
+        onClick={handleRollback}
+        className="flex items-center gap-2 h-1/2 text-sm font-semibold"
+      >
+        <BsArrowRepeat />
+        Rollback to #{rollbackRevision}
+      </Button>
       {showRollbackDiff && <RollbackModal />}
     </>
   );
@@ -470,7 +467,7 @@ const Uninstall = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 hover:bg-red-200"
+        className="flex items-center gap-2 hover:bg-red-200 h-1/2 text-sm font-semibold"
       >
         <BsTrash3 />
         Uninstall
