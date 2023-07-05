@@ -62,7 +62,7 @@ function Revision() {
         ) : selectedRelease ? (
           <RevisionDetails
             release={selectedRelease}
-            refetchRevisions={refetchRevisions}
+            installedRevision={releaseRevisions?.[0] as ReleaseRevision}
           />
         ) : null}
       </div>
