@@ -208,7 +208,10 @@ export const InstallChartModal = ({
       const formData = new FormData();
       formData.append("chart", `${selectedRepo}/${chartName}`);
       formData.append("version", version);
-      formData.append("values", userValues || releaseValues);
+      formData.append(
+        "values",
+        userValues ? userValues : releaseValues ? releaseValues : ""
+      );
       formData.append("preview", "true");
       formData.append("name", chartName);
 
@@ -226,8 +229,12 @@ export const InstallChartModal = ({
     userValues?: string;
   }) => {
     const formData = getVersionManifestFormData({ version, userValues });
-    const fetchUrl = `/api/helm/releases/${namespace ? namespace : "[empty]"}${
-      !isInstall ? `/${releaseName}` : `/${releaseValues ? chartName : ""}`
+    const fetchUrl = `/api/helm/releases/${
+      namespace ? namespace : isInstall ? "" : "[empty]"
+    }${
+      !isInstall
+        ? `/${releaseName}`
+        : `/${releaseValues ? chartName : "default"}`
     }`; // if there is no release we don't provide anything, and we dont display version;
     const response = await fetch(fetchUrl, {
       method: "post",
@@ -251,7 +258,9 @@ export const InstallChartModal = ({
         fetchVersionData({ version: selectedVersion, userValues }),
       ]);
       const formData = new FormData();
-      formData.append("a", currentVerData.manifest);
+      if (currentVersion !== selectedVersion) {
+        formData.append("a", currentVerData.manifest);
+      }
       formData.append("b", selectedVerData.manifest);
 
       const response = await fetch("/diff", {
