@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Cluster, Release } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { getAge } from "../../timeUtils";
-import StatusLabel, { getStatusColor } from "../common/StatusLabel";
+import StatusLabel, {
+  DeploymentStatus,
+  getStatusColor,
+} from "../common/StatusLabel";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import HealthStatus from "./HealthStatus";
@@ -75,15 +78,18 @@ export default function InstalledPackageCard({
     );
   };
 
-  const statusColor = getStatusColor(release.status);
+  const statusColor = getStatusColor(release.status as DeploymentStatus);
+  const borderLeftColor = {
+    [DeploymentStatus.DEPLOYED]: "border-l-deployed",
+    [DeploymentStatus.FAILED]: "border-l-failed",
+    [DeploymentStatus.PENDING]: "border-l-pending",
+  };
 
-  console.log({ release });
   return (
     <div
-      style={{
-        borderLeftColor: `${statusColor}`,
-      }}
-      className={`text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
+      className={`${
+        borderLeftColor[release.status]
+      } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
         isMouseOver && "drop-shadow-lg"
       }`}
       onMouseOver={handleMouseOver}

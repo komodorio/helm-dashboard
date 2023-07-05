@@ -12,7 +12,7 @@ export enum DeploymentStatus {
   SUPERSEDED = "superseded",
 }
 
-export function getStatusColor(status: string) {
+export function getStatusColor(status: DeploymentStatus) {
   if (status === DeploymentStatus.DEPLOYED) return "text-deployed";
   if (status === DeploymentStatus.FAILED) return "text-failed";
   if (status === DeploymentStatus.PENDING) return "text-pending";
@@ -20,7 +20,7 @@ export function getStatusColor(status: string) {
 }
 
 function StatusLabel({ status, isRollback }: StatusLabelProps) {
-  const statusColor = getStatusColor(status);
+  const statusColor = getStatusColor(status as DeploymentStatus);
 
   return (
     <div
