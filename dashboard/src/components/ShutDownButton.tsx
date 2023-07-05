@@ -12,13 +12,7 @@ function ShutDownButton() {
 
   return (
     <div className="w-full">
-      <Modal
-        title="Session Ended"
-        isOpen={status === "error"}
-        onClose={() => {
-          console.log("goodbye");
-        }}
-      >
+      <Modal title="Session Ended" isOpen={status === "error"}>
         <p>
           The Helm Dashboard application has been shut down. You can now close
           the browser tab.
