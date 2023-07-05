@@ -92,7 +92,7 @@ export default function InstalledPackageCard({
       <img
         src={release.icon || HelmGrayIcon}
         alt="helm release icon"
-        className="w-[45px] mx-4 col-span-1"
+        className="w-[45px] mx-4 col-span-1 min-w-[45px]"
       />
 
       <div className="col-span-11 -mb-5">

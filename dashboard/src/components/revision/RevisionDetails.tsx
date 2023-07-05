@@ -65,7 +65,6 @@ export default function RevisionDetails({
   const tab = searchParams.get("tab");
   const selectedTab =
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
-  const { selectedCluster } = useAppContext();
 
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
@@ -145,7 +144,9 @@ export default function RevisionDetails({
     const navigate = useNavigate();
     return (
       <header className="flex flex-wrap justify-between">
-        <h1 className="text-[#3d4048] text-4xl float-left mb-1">{chart}</h1>
+        <h1 className=" text-3xl font-semibold float-left mb-1 font-roboto-slab">
+          {chart}
+        </h1>
         <div className="flex flex-row flex-wrap gap-3 float-right h-fit">
           <div className="flex flex-col">
             <Button
@@ -186,7 +187,7 @@ export default function RevisionDetails({
               <span
                 onClick={() => {
                   navigate(
-                    `/repository/${selectedCluster}?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].name}`
+                    `/repository/${context}?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
                   );
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
@@ -247,7 +248,7 @@ export default function RevisionDetails({
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
-      <StatusLabel status={DeploymentStatus.DEPLOYED} />
+      <StatusLabel status={release.status} />
       <Header />
       <div className="flex flex-row gap-6">
         <span>

@@ -84,7 +84,7 @@ function ClustersList({
   };
 
   return (
-    <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-[190px] m-5 h-fit pb-4 drop-shadow">
+    <div className="bg-white flex flex-col p-2 rounded shadow-md text-[#3d4048] w-48 m-5 h-fit pb-4 drop-shadow">
       <label className="font-bold">Clusters</label>
       {clusters
         ?.sort((a, b) =>
