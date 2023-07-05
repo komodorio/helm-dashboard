@@ -78,10 +78,10 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   }
 
   return (
-    <div className="flex flex-col p-6 gap-3 bg-white drop-shadow-lg">
+    <div className="flex flex-col p-6 gap-3 bg-white drop-shadow-lg border rounded-md">
       <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
       <div className="flex justify-between">
-        <span className="text-[#3d4048] text-4xl font-semibold">
+        <span className="text-[#3d4048] text-3xl font-semibold">
           {repository?.name}
         </span>
 
@@ -92,7 +92,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
                 update.mutate();
               }}
             >
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded">
                 {update.isLoading ? <Spinner size={4} /> : <BsArrowRepeat />}
                 Update
               </span>
@@ -102,7 +102,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
                 removeRepository();
               }}
             >
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold">
+              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded">
                 {isRemoveLoading ? <Spinner size={4} /> : <BsTrash3 />}
                 Remove
               </span>
@@ -117,13 +117,13 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
           />
         </div>
       </div>
-      <span className="text-[#3d4048] text-sm bg-[#D6EFFE] px-3 py-1 rounded-md self-start">
+      <span className="text-[#3d4048] text-sm bg-[#D6EFFE] px-3 py-1 rounded-md self-start -mt-10">
         URL: <span className="font-bold">{repository?.url}</span>
       </span>
 
-      <div className="bg-[#ECEFF2] grid grid-cols-6 text-xs font-bold p-2 px-4 mt-4 rounded-md">
-        <span className="col-span-1">CHART NAME</span>
-        <span className="col-span-3">DESCRIPTION</span>
+      <div className="bg-[#ECEFF2] grid grid-cols-10 text-xs font-bold p-2 px-4 mt-4 rounded-md">
+        <span className="col-span-2">CHART NAME</span>
+        <span className="col-span-6">DESCRIPTION</span>
         <span className="col-span-1 text-center">VERSION</span>
         <span className="col-span-1 text-center"></span>
       </div>

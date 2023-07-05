@@ -20,15 +20,15 @@ function ChartViewer({ chart }: ChartViewerProps) {
   return (
     <>
       <div
-        className="grid grid-cols-6 gap-3 hover:bg-[#f4f7fa] p-4"
+        className="grid grid-cols-10 gap-3 hover:bg-[#f4f7fa] p-4 text-sm"
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
-        <span className="col-span-1 font-semibold flex flex-row items-center gap-1">
+        <span className="col-span-2 font-semibold flex flex-row items-center gap-1 text-base">
           <img src={chart.icon} className="h-4" />
           {chart.name}
         </span>
-        <span className="col-span-3 text-sm">{chart.description}</span>
+        <span className="col-span-6 text-sm">{chart.description}</span>
         <span className="col-span-1 text-center">{chart.version}</span>
         <span className="col-span-1 text-center">
           {showInstallButton && (
