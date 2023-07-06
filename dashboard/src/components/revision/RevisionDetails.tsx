@@ -12,7 +12,7 @@ import {
   BsArrowUp,
   BsCheckCircle,
 } from "react-icons/bs";
-import { Release } from "../../data/types";
+import { Release, ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useGetReleaseInfoByType } from "../../API/releases";
@@ -33,7 +33,6 @@ import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
 import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
 import { isNewerVersion } from "../../utils";
-import { useAppContext } from "../../context/AppContext";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import apiService from "../../API/apiService";
 
@@ -44,12 +43,12 @@ type RevisionTagProps = {
 
 type RevisionDetailsProps = {
   release: Release;
-  refetchRevisions: () => void;
+  installedRevision: ReleaseRevision;
 };
 
 export default function RevisionDetails({
   release,
-  refetchRevisions,
+  installedRevision,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
   const revisionTabs = [
@@ -144,11 +143,13 @@ export default function RevisionDetails({
     const navigate = useNavigate();
     return (
       <header className="flex flex-wrap justify-between">
-        <h1 className="text-[#3d4048] text-4xl float-left mb-1">{chart}</h1>
+        <h1 className=" text-3xl font-semibold float-left mb-1 font-roboto-slab">
+          {chart}
+        </h1>
         <div className="flex flex-row flex-wrap gap-3 float-right h-fit">
           <div className="flex flex-col">
             <Button
-              className="flex justify-center items-center gap-2 min-w-[150px]"
+              className="flex justify-center items-center gap-2 min-w-[150px] text-sm font-semibold"
               onClick={() => setIsReconfigureModalOpen(true)}
             >
               {isLoadingLatestVersion || isRefetchingLatestVersion ? (
@@ -185,7 +186,7 @@ export default function RevisionDetails({
               <span
                 onClick={() => {
                   navigate(
-                    `/${context}/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].name}`
+                    `/${context}/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
                   );
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
@@ -202,19 +203,17 @@ export default function RevisionDetails({
             )}
           </div>
 
-          <Rollback release={release} refetchRevisions={refetchRevisions} />
+          <Rollback release={release} installedRevision={installedRevision} />
           {release.has_tests ? (
             <>
               {" "}
-              <div className="h-1/2">
-                <Button
-                  onClick={handleRunTests}
-                  className="flex items-center gap-2"
-                >
-                  <BsCheckCircle />
-                  Run tests
-                </Button>
-              </div>
+              <Button
+                onClick={handleRunTests}
+                className="flex items-center gap-2 h-1/2 text-sm font-semibold"
+              >
+                <BsCheckCircle />
+                Run tests
+              </Button>
               <Modal
                 containerClassNames="w-4/5"
                 title="Test results"
@@ -232,9 +231,7 @@ export default function RevisionDetails({
             </>
           ) : null}
 
-          <div className="h-1/2">
-            <Uninstall />
-          </div>
+          <Uninstall />
         </div>
       </header>
     );
@@ -246,13 +243,13 @@ export default function RevisionDetails({
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
-      <StatusLabel status={DeploymentStatus.DEPLOYED} />
+      <StatusLabel status={release.status} />
       <Header />
-      <div className="flex flex-row gap-6">
+      <div className="flex flex-row gap-6 text-sm -mt-4">
         <span>
           Revision <span className="font-semibold">#{release.revision}</span>
         </span>
-        <span>
+        <span className="text-sm">
           {new Intl.DateTimeFormat("en-US", {
             year: "numeric",
             month: "2-digit",
@@ -296,10 +293,10 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
 
 const Rollback = ({
   release,
-  refetchRevisions,
+  installedRevision,
 }: {
   release: Release;
-  refetchRevisions: () => void;
+  installedRevision: ReleaseRevision;
 }) => {
   const { chart, namespace, revision, context } = useParams();
   const navigate = useNavigateWithSearchParams();
@@ -309,11 +306,14 @@ const Rollback = ({
 
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
   const revisionInt = parseInt(revision || "", 10);
-  const prevRevision = revisionInt - 1;
+  const rollbackRevision =
+    installedRevision.revision === release.revision
+      ? installedRevision.revision - 1
+      : revisionInt;
 
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
-      onSuccess: (response) => {
+      onSuccess: () => {
         navigate(
           `/${context}/${namespace}/${chart}/installed/revision/${revisionInt + 1
           }`
@@ -321,6 +321,7 @@ const Rollback = ({
         window.location.reload();
       },
     });
+
   const handleRollback = () => {
     setShowRollbackDiff(true);
   };
@@ -328,7 +329,7 @@ const Rollback = ({
   const rollbackTitle = (
     <div className="font-semibold text-lg">
       Rollback <span className="text-red-500">{chart}</span> from revision{" "}
-      {release.revision} to {release.revision - 1}
+      {installedRevision.revision} to {rollbackRevision}
     </div>
   );
 
@@ -336,8 +337,13 @@ const Rollback = ({
 
   const RollbackModal = () => {
     const response = useGetReleaseInfoByType(
-      { chart, namespace, revision: prevRevision.toString(), tab: "manifests" },
-      `&revisionDiff=${revision}`
+      {
+        chart,
+        namespace,
+        revision: revision.toString(),
+        tab: "manifests",
+      },
+      `&revisionDiff=${installedRevision.revision}`
     );
 
     return (
@@ -345,7 +351,7 @@ const Rollback = ({
         title={rollbackTitle}
         isOpen={showRollbackDiff}
         onClose={() => setShowRollbackDiff(false)}
-        containerClassNames="w-[800px]"
+        containerClassNames="w-4/5"
         actions={[
           {
             id: "1",
@@ -397,6 +403,7 @@ const Rollback = ({
         diff2htmlUi.highlightCode();
       }
     }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
+
     return (
       <div className="flex flex-col space-y-4">
         {isLoading ? (
@@ -413,14 +420,16 @@ const Rollback = ({
       </div>
     );
   };
+
   return (
     <>
-      <div className="h-1/2">
-        <Button onClick={handleRollback} className="flex items-center gap-2">
-          <BsArrowRepeat />
-          Rollback to #{release.revision - 1}
-        </Button>
-      </div>
+      <Button
+        onClick={handleRollback}
+        className="flex items-center gap-2 h-1/2 text-sm font-semibold"
+      >
+        <BsArrowRepeat />
+        Rollback to #{rollbackRevision}
+      </Button>
       {showRollbackDiff && <RollbackModal />}
     </>
   );
@@ -456,7 +465,7 @@ const Uninstall = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 hover:bg-red-200"
+        className="flex items-center gap-2 hover:bg-red-200 h-1/2 text-sm font-semibold"
       >
         <BsTrash3 />
         Uninstall

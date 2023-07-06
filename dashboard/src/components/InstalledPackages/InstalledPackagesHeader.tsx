@@ -18,7 +18,7 @@ export default function InstalledPackagesHeader({
   );
   return (
     <div className="drop-shadow">
-      <div className="flex items-center justify-between bg-white rounded-md p-2">
+      <div className="flex items-center justify-between bg-white rounded-md p-2 font-inter">
         <div className="flex items-center">
           <img
             src={HeaderLogo}
@@ -30,9 +30,9 @@ export default function InstalledPackagesHeader({
           })`}</h2>
         </div>
 
-        <div className="w-1/4">
+        <div className="w-1/3">
           <input
-            className="border border-[#ced4da] rounded-sm p-1 text-sm w-11/12"
+            className="border border-[#ced4da] rounded p-1 text-sm w-11/12"
             placeholder="Filter..."
             type="text"
             onChange={(ev) => setFilterKey(ev.target.value)}

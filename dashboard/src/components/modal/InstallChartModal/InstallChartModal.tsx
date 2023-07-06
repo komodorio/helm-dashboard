@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import useAlertError from "../../../hooks/useAlertError";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useChartReleaseValues, useGetVersions } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
@@ -12,6 +12,7 @@ import { useChartRepoValues } from "../../../API/repositories";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
 import apiService from "../../../API/apiService";
+import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -34,7 +35,6 @@ export const InstallChartModal = ({
 }: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
-  const [selectedRepo, setSelectedRepo] = useState("");
   const [userValues, setUserValues] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoadingDiff, setIsLoadingDiff] = useState(false);
@@ -49,16 +49,39 @@ export const InstallChartModal = ({
   const [namespace, setNamespace] = useState(queryNamespace);
   const [chart, setChart] = useState(chartName);
 
-  const {
-    error: versionsError,
-    data: versions,
-    refetch: fetchVersion,
-  } = useGetVersions(chartName);
+  const { error: versionsError, data: _versions } = useGetVersions(chartName, {
+    select: (data) => {
+      return data?.sort((a, b) =>
+        isNewerVersion(a.version, b.version) ? 1 : -1
+      );
+    },
+    onSuccess: (data) => {
+      const selectedVersion = (data || []).find(
+        ({ version }) => version === (isUpgrade ? latestVersion : chartVersion)
+      ) || { version: "", repository: "" };
+
+      setSelectedVersionData(selectedVersion);
+    },
+  });
+
+  const versions = _versions?.map((v) => ({
+    ...v,
+    isChartVersion: v.version === chartVersion,
+  }));
 
   latestVersion = latestVersion ?? chartVersion; // a guard for typescript, latestVersion is always defined
-  const [selectedVersion, setSelectedVersion] = useState(
-    isUpgrade ? latestVersion : chartVersion
-  );
+  const [selectedVersionData, setSelectedVersionData] = useState<{
+    version: string;
+    repository?: string;
+  }>();
+
+  const selectedVersion = useMemo(() => {
+    return selectedVersionData?.version;
+  }, [selectedVersionData]);
+
+  const selectedRepo = useMemo(() => {
+    return selectedVersionData?.repository;
+  }, [selectedVersionData]);
 
   const {
     data: chartValues,
@@ -67,8 +90,8 @@ export const InstallChartModal = ({
   } = useChartRepoValues(
     namespace || "default",
     chartName,
-    selectedRepo,
-    selectedVersion,
+    selectedRepo || "",
+    selectedVersion || "",
     {
       enabled: isInstall && selectedRepo !== "",
     }
@@ -92,16 +115,6 @@ export const InstallChartModal = ({
     });
 
   useEffect(() => {
-    fetchVersion();
-  }, [chart, namespace]);
-
-  useEffect(() => {
-    if (versions?.length) {
-      setSelectedRepo(versions[0].repository);
-    }
-  }, [versions]);
-
-  useEffect(() => {
     if (selectedRepo) {
       refetchChartValues();
     }
@@ -115,14 +128,13 @@ export const InstallChartModal = ({
       const formData = new FormData();
       formData.append("preview", "false");
       formData.append("chart", `${selectedRepo}/${chartName}`);
-      formData.append("version", selectedVersion);
+      formData.append("version", selectedVersion || "");
       formData.append("values", userValues);
       formData.append("name", chart);
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        `/api/helm/releases/${namespace ? namespace : "default"}${
-          !isInstall ? `/${releaseName}` : `/${releaseValues ? chartName : ""}` // if there is no release we don't provide anything, and we dont display version
+        `/api/helm/releases/${namespace ? namespace : "default"}${!isInstall ? `/${releaseName}` : `/${releaseValues ? chartName : ""}` // if there is no release we don't provide anything, and we dont display version
         }`,
         {
           method: "post",
@@ -150,10 +162,9 @@ export const InstallChartModal = ({
             `/${selectedCluster}/${response.namespace}/${response.name}/installed/revision/1`
           );
         } else {
-          setSelectedVersion(""); //cleanup
+          setSelectedVersionData({ version: "" }); //cleanup
           navigate(
-            `/${selectedCluster}/${
-              namespace ? namespace : "default"
+            `/${selectedCluster}/${namespace ? namespace : "default"
             }/${releaseName}/installed/revision/${response.version}`
           );
           window.location.reload();
@@ -191,13 +202,11 @@ export const InstallChartModal = ({
     userValues?: string;
   }) => {
     const formData = getVersionManifestFormData({ version, userValues });
-    const fetchUrl = `/api/helm/releases/${
-      namespace ? namespace : isInstall ? "" : "[empty]"
-    }${
-      !isInstall
+    const fetchUrl = `/api/helm/releases/${namespace ? namespace : isInstall ? "" : "[empty]"
+      }${!isInstall
         ? `/${releaseName}`
         : `/${releaseValues ? chartName : "default"}`
-    }`; // if there is no release we don't provide anything, and we dont display version;
+      }`; // if there is no release we don't provide anything, and we dont display version;
     const response = await apiService.fetchWithDefaults(fetchUrl, {
       method: "post",
       body: formData,
@@ -217,12 +226,11 @@ export const InstallChartModal = ({
     try {
       const [currentVerData, selectedVerData] = await Promise.all([
         fetchVersionData({ version: currentVersion }),
-        fetchVersionData({ version: selectedVersion, userValues }),
+        fetchVersionData({ version: selectedVersion || "", userValues }),
       ]);
       const formData = new FormData();
-      if (currentVersion !== selectedVersion) {
-        formData.append("a", currentVerData.manifest);
-      }
+
+      formData.append("a", isInstall ? "" : currentVerData.manifest);
       formData.append("b", selectedVerData.manifest);
 
       const response = await apiService.fetchWithDefaults("/diff", {
@@ -253,20 +261,19 @@ export const InstallChartModal = ({
     <Modal
       isOpen={isOpen}
       onClose={() => {
-        setSelectedVersion("");
+        setSelectedVersionData({ version: "" });
         onClose();
       }}
       title={
         <div className="font-bold">
-          {`${
-            isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
-          } `}
+          {`${isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
+            } `}
           {(isUpgrade || releaseValues || isInstall) && (
             <span className="text-green-700 ">{chartName}</span>
           )}
         </div>
       }
-      containerClassNames="w-5/6 text-2xl h-2/3"
+      containerClassNames="w-full text-2xl h-2/3"
       actions={[
         {
           id: "1",
@@ -281,15 +288,16 @@ export const InstallChartModal = ({
         },
       ]}
     >
-      <VersionToInstall
-        chartVersion={chartVersion}
-        selectedVersion={selectedVersion}
-        setSelectedVersion={setSelectedVersion}
-        versions={versions ?? []}
-        isInstall={isInstall}
-      />
+      {versions && isNoneEmptyArray(versions) && (
+        <VersionToInstall
+          versions={versions}
+          onSelectVersion={(versionData) => {
+            setSelectedVersionData(versionData);
+          }}
+        />
+      )}
       <GeneralDetails
-        releaseName={chart}
+        releaseName={isInstall ? chart : String(releaseName)}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
         namespace={namespace}
         onReleaseNameInput={(releaseName) => setChart(releaseName)}

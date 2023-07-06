@@ -47,7 +47,7 @@ export default function RevisionsList({
                 status={release.status}
                 isRollback={release.description.startsWith("Rollback to ")}
               />
-              <span className="font-semibold">#{release.revision}</span>
+              <span className="font-bold">#{release.revision}</span>
             </div>
             <div
               className="self-end text-[#707583] text-xs flex flex-wrap gap-1"

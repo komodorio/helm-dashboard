@@ -1,52 +1,87 @@
+import { useState } from "react";
+import Select, { components } from "react-select";
+import { BsCheck2 } from "react-icons/bs";
+import { NonEmptyArray } from "../../../data/types";
 import { isNewerVersion } from "../../../utils";
 
-interface Props {
-  chartVersion: string;
-  selectedVersion: string;
-  setSelectedVersion: (version: string) => void;
-  versions: { repository: string; version: string }[];
-  isInstall: boolean;
-}
+export const VersionToInstall: React.FC<{
+  versions: NonEmptyArray<{
+    repository: string;
+    version: string;
+    isChartVersion: boolean;
+  }>;
+  onSelectVersion: (props: { version: string; repository: string }) => void;
+}> = ({ versions, onSelectVersion }) => {
+  const chartVersion = versions.find(
+    ({ isChartVersion }) => isChartVersion
+  )!.version;
 
-export const VersionToInstall = ({
-  chartVersion,
-  selectedVersion,
-  setSelectedVersion,
-  versions,
-  isInstall,
-}: Props) => {
   const currentVersion = (
-    <p className="text-xl text-muted font-medium	">
-      (current version is:{" "}
-      <span className="text-green-700">{chartVersion}</span>)
+    <p className="text-xl text-muted ml-2">
+      {`(current version is `}
+      <span className="text-green-700">{`${chartVersion}`}</span>
+      {`)`}
     </p>
   );
 
+  // Prepare your options for react-select
+  const options =
+    versions.map(({ repository, version }) => ({
+      value: { repository, version },
+      label: `${repository} @ ${version}`,
+      check: chartVersion === version,
+    })) || [];
+  const checkedOpt = options.find(({ check }) => check)!;
+  const [selectedOption, setSelectedOption] = useState(checkedOpt);
+
   return (
-    <div className="flex gap-2 text-xl">
+    <div className="flex gap-2 text-xl items-center">
       {versions?.length ? (
         <>
           Version to install:{" "}
-          <select
-            className=" py-1 border-2 border-gray-200 text-blue-500 rounded"
-            onChange={(e) => {
-              setSelectedVersion(e.target.value);
+          <Select
+            className="basic-single cursor-pointer min-w-[272px]"
+            classNamePrefix="select"
+            isClearable={false}
+            isSearchable={false}
+            name="version"
+            options={options}
+            onChange={(selectedOption) => {
+              if (selectedOption) {
+                setSelectedOption(selectedOption);
+                onSelectVersion(selectedOption.value);
+              }
             }}
-            value={selectedVersion}
-          >
-            {versions
-              ?.sort((a, b) => (isNewerVersion(a.version, b.version) ? 1 : -1))
-              .map(({ repository, version }) => (
-                <option
-                  value={version}
-                  key={repository + version}
-                >{`${repository} @ ${version}`}</option>
-              ))}
-          </select>{" "}
+            value={selectedOption}
+            components={{
+              SingleValue: ({ children, ...props }) => (
+                <components.SingleValue {...props}>
+                  <span className="text-green-700 font-bold">{children}</span>
+                  {props.data.check && (
+                    <BsCheck2 className="inline-block ml-2 text-green-700 font-bold" />
+                  )}
+                </components.SingleValue>
+              ),
+              Option: ({ children, isSelected, innerProps, data }) => (
+                <div
+                  className={`flex items-center py-2 pl-4 pr-2 text-green-700 hover:bg-blue-100`}
+                  {...innerProps}
+                >
+                  <div className="width-auto">{children}</div>
+                  {data.check && (
+                    <BsCheck2
+                      fontWeight={"bold"}
+                      className="inline-block ml-2 text-green-700 font-bold"
+                    />
+                  )}
+                </div>
+              ),
+            }} // Use the custom Option component
+          />
         </>
       ) : null}
 
-      {!isInstall ? currentVersion : null}
+      {currentVersion}
     </div>
   );
 };

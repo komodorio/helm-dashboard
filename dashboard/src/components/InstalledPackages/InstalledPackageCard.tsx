@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Cluster, Release } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
-import { useNavigate, useParams } from "react-router-dom";
 import { getAge } from "../../timeUtils";
-import StatusLabel, { getStatusColor } from "../common/StatusLabel";
+import StatusLabel, {
+  DeploymentStatus,
+  getStatusColor,
+} from "../common/StatusLabel";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import HealthStatus from "./HealthStatus";
@@ -70,14 +72,17 @@ export default function InstalledPackageCard({
     );
   };
 
-  const statusColor = getStatusColor(release.status);
+  const statusColor = getStatusColor(release.status as DeploymentStatus);
+  const borderLeftColor = {
+    [DeploymentStatus.DEPLOYED]: "border-l-deployed",
+    [DeploymentStatus.FAILED]: "border-l-failed",
+    [DeploymentStatus.PENDING]: "border-l-pending",
+  };
 
   return (
     <div
-      style={{
-        borderLeftColor: `${statusColor}`,
-      }}
-      className={`grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-5 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${isMouseOver && "drop-shadow-lg"
+      className={`${borderLeftColor[release.status]
+        } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${isMouseOver && "drop-shadow-lg"
         }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
@@ -86,12 +91,12 @@ export default function InstalledPackageCard({
       <img
         src={release.icon || HelmGrayIcon}
         alt="helm release icon"
-        className="w-[40px] mx-4 col-span-1"
+        className="w-[45px] mx-4 col-span-1 min-w-[45px]"
       />
 
-      <div className="col-span-11 text-sm">
+      <div className="col-span-11 -mb-5">
         <div className="grid grid-cols-11">
-          <div className="col-span-3 font-bold text-xl mr-0.5">
+          <div className="col-span-3 font-bold text-xl mr-0.5 font-roboto-slab">
             {release.name}
           </div>
           <div className="col-span-3">
@@ -104,9 +109,7 @@ export default function InstalledPackageCard({
           <div className="col-span-1 font-bold text-xs">
             {release.namespace}
           </div>
-          <div className="col-span-1 font-bold text-xs">
-            {getAge(release.updated)}
-          </div>
+          <div className="col-span-1 font-bold text-xs">{getAge(release)}</div>
         </div>
         <div className="grid grid-cols-11 text-xs mt-3">
           <div className="col-span-3 h-12 line-clamp-3 mr-1">

@@ -10,6 +10,8 @@ module.exports = {
   theme: {
     fontFamily: {
       roboto: ["Roboto", "serif"],
+      "roboto-slab": ["Roboto Slab", "sans-serif"],
+      inter: ["Inter", "serif"],
     },
     fontWeight: {
       thin: "100",
@@ -31,6 +33,10 @@ module.exports = {
           background: "#F9D7DA",
           color: "#842029",
         },
+        failed: "#FC1683",
+        deployed: "#1FA470",
+        superseded: "#9195A1",
+        pending: "#000",
         "link-color": "#0D6EFD",
         "body-background": "#F4F7FA",
         "upgrade-color": "#FC1683",
