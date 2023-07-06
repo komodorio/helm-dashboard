@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+[ ! -z "$HELM_DEBUG" ] && set -x
+
+
 # Function to print error message and exit
 error_exit() {
     echo "$1" >&2
@@ -60,7 +63,7 @@ echo "Tried to autodetect latest version: $version"
     echo "Defaulted to version: $version"
 }
 
-echo "Downloading andinstalling ${name} v${version} ..."
+echo "Downloading and installing ${name} v${version} ..."
 
 # Convert architecture of the target system to a compatible GOARCH value
 case $(uname -m) in
@@ -99,5 +102,5 @@ install_plugin "$version" "$url" "releases/v${version}.tar.gz" "releases/v${vers
 
 echo
 echo "Helm Dashboard is installed. To start it, run the following command:"
-echo "Helm Dashboard"
+echo "helm dashboard"
 
