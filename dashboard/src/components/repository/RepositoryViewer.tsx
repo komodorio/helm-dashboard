@@ -49,7 +49,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         await callApi<void>(`/api/helm/repositories/${repo}`, {
           method: "DELETE",
         });
-        navigate(`/repository/${context}`, { replace: true });
+        navigate(`/${context}/repository`, { replace: true });
         setSelectedRepo("");
         queryClient.invalidateQueries({ queryKey: ["helm", "repositories"] });
       } catch (error) {

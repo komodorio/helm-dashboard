@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
+import apiService from "../../../API/apiService";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -108,7 +109,7 @@ export const InstallChartModal = ({
 
   // Confirm method (install)
   const setReleaseVersionMutation = useMutation(
-    ["setVersion", namespace, chart, selectedVersion, selectedRepo],
+    ["setVersion", namespace, chart, selectedVersion, selectedRepo, selectedCluster],
     async () => {
       setErrorMessage("");
       const formData = new FormData();
@@ -146,14 +147,14 @@ export const InstallChartModal = ({
         onClose();
         if (isInstall) {
           navigate(
-            `/installed/revision/${selectedCluster}/${response.namespace}/${response.name}/1`
+            `/${selectedCluster}/${response.namespace}/${response.name}/installed/revision/1`
           );
         } else {
           setSelectedVersion(""); //cleanup
           navigate(
-            `/installed/revision/${selectedCluster}/${
+            `/${selectedCluster}/${
               namespace ? namespace : "default"
-            }/${releaseName}/${response.version}`
+            }/${releaseName}/installed/revision/${response.version}`
           );
           window.location.reload();
         }
@@ -197,7 +198,7 @@ export const InstallChartModal = ({
         ? `/${releaseName}`
         : `/${releaseValues ? chartName : "default"}`
     }`; // if there is no release we don't provide anything, and we dont display version;
-    const response = await fetch(fetchUrl, {
+    const response = await apiService.fetchWithDefaults(fetchUrl, {
       method: "post",
       body: formData,
     });
@@ -224,7 +225,7 @@ export const InstallChartModal = ({
       }
       formData.append("b", selectedVerData.manifest);
 
-      const response = await fetch("/diff", {
+      const response = await apiService.fetchWithDefaults("/diff", {
         method: "post",
         body: formData,
       });
