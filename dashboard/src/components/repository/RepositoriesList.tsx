@@ -27,7 +27,7 @@ function RepositoriesList({
     <>
       <div className="h-fit bg-white w-3/12 flex flex-col p-3 border rounded-md shadow-md text-[#3d4048] gap-3 drop-shadow-md ">
         <label className="font-bold">Repositories</label>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-2">
           {repositories?.map((repository) => (
             <span
               className="flex items-center"
@@ -45,7 +45,7 @@ function RepositoriesList({
                 checked={repository.name === selectedRepository?.name}
                 name="clusters"
               />
-              <label htmlFor={repository.name} className="ml-1">
+              <label htmlFor={repository.name} className="ml-1 text-xs">
                 {repository.name}
               </label>
             </span>
