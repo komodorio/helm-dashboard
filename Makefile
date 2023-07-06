@@ -1,5 +1,5 @@
 DATE    ?= $(shell date +%FT%T%z)
-VERSION ?= $(git describe --tags --always --dirty --match=v* 2> /dev/null || \
+VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || \
 			cat $(CURDIR)/.version 2> /dev/null || echo "v0")
 
 .PHONY: test
