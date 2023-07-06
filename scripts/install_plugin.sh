@@ -75,3 +75,4 @@ echo
 echo "Helm Dashboard is installed, to start it, run in your terminal:"
 echo "    helm dashboard"
 echo
+
