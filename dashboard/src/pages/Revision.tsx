@@ -6,6 +6,7 @@ import { ReleaseRevision } from "../data/types";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../API/apiService";
 import Spinner from "../components/Spinner";
+import { DeploymentStatus } from "../components/common/StatusLabel";
 
 const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) =>
   r1.revision - r2.revision < 0 ? 1 : -1;
@@ -23,6 +24,15 @@ function Revision() {
     queryKey: ["releasesHistory", restParams],
     queryFn: apiService.getReleasesHistory,
   });
+
+  const latestRevision = useMemo(
+    () =>
+      Array.isArray(releaseRevisions) &&
+      releaseRevisions?.find(
+        (revision) => revision.status === DeploymentStatus.DEPLOYED
+      ),
+    [releaseRevisions]
+  );
 
   const sortedReleases = useMemo(
     () => releaseRevisions?.sort(descendingSort),
@@ -63,6 +73,7 @@ function Revision() {
           <RevisionDetails
             release={selectedRelease}
             installedRevision={releaseRevisions?.[0] as ReleaseRevision}
+            isLatest={selectedRelease.revision === latestRevision?.revision}
           />
         ) : null}
       </div>

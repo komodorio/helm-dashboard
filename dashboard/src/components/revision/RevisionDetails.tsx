@@ -44,15 +44,21 @@ type RevisionTagProps = {
 type RevisionDetailsProps = {
   release: Release;
   installedRevision: ReleaseRevision;
+  isLatest: boolean;
 };
 
 export default function RevisionDetails({
   release,
   installedRevision,
+  isLatest,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
   const revisionTabs = [
-    { value: "resources", label: "Resources", content: <RevisionResource /> },
+    {
+      value: "resources",
+      label: "Resources",
+      content: <RevisionResource isLatest={isLatest} />,
+    },
     { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
     {
       value: "values",
@@ -272,8 +278,9 @@ export default function RevisionDetails({
       </div>
 
       <span
-        className={`text-sm ${release.status === DeploymentStatus.FAILED ? "text-red-600" : ""
-          }`}
+        className={`text-sm ${
+          release.status === DeploymentStatus.FAILED ? "text-red-600" : ""
+        }`}
       >
         {release.description}
       </span>
@@ -315,7 +322,8 @@ const Rollback = ({
     useRollbackRelease({
       onSuccess: () => {
         navigate(
-          `/${context}/${namespace}/${chart}/installed/revision/${revisionInt + 1
+          `/${context}/${namespace}/${chart}/installed/revision/${
+            revisionInt + 1
           }`
         );
         window.location.reload();
@@ -445,9 +453,12 @@ const Uninstall = () => {
   const uninstallMutation = useMutation(
     ["uninstall", namespace, chart],
     () =>
-      apiService.fetchWithDefaults("/api/helm/releases/" + namespace + "/" + chart, {
-        method: "delete",
-      }),
+      apiService.fetchWithDefaults(
+        "/api/helm/releases/" + namespace + "/" + chart,
+        {
+          method: "delete",
+        }
+      ),
     {
       onSuccess: () => {
         window.location.href = "/";
