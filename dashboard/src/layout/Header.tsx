@@ -13,9 +13,15 @@ import {
 import { useGetApplicationStatus } from "../API/other";
 import LinkWithSearchParams from "../components/LinkWithSearchParams";
 import apiService from "../API/apiService";
+import { useAppContext } from "../context/AppContext";
 
 export default function Header() {
-  const { data: statusData } = useGetApplicationStatus();
+  const { clusterMode, setClusterMode } = useAppContext();
+  const { data: statusData } = useGetApplicationStatus({
+    onSuccess: (data) => {
+      setClusterMode(data.ClusterMode);
+    },
+  });
   const { context } = useParams();
   const location = useLocation();
   const openSupportChat = () => {
@@ -150,7 +156,7 @@ export default function Header() {
         </div>
 
         <span className="w-[5px] h-3/4 bg-gray-200 ml-3" />
-        <ShutDownButton />
+        {!clusterMode ? <ShutDownButton /> : null}
       </div>
     </div>
   );

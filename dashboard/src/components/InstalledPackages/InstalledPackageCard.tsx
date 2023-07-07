@@ -15,6 +15,7 @@ import { useGetLatestVersion } from "../../API/releases";
 import { isNewerVersion } from "../../utils";
 import { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
+import { useParams } from "react-router-dom";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -81,9 +82,11 @@ export default function InstalledPackageCard({
 
   return (
     <div
-      className={`${borderLeftColor[release.status]
-        } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${isMouseOver && "drop-shadow-lg"
-        }`}
+      className={`${
+        borderLeftColor[release.status]
+      } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
+        isMouseOver && "drop-shadow-lg"
+      }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
       onClick={handleOnClick}

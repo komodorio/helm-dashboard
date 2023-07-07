@@ -31,8 +31,7 @@ export const VersionToInstall: React.FC<{
       label: `${repository} @ ${version}`,
       check: chartVersion === version,
     })) || [];
-  const checkedOpt = options.find(({ check }) => check)!;
-  const [selectedOption, setSelectedOption] = useState(checkedOpt);
+  const [selectedOption, setSelectedOption] = useState(options[0]);
 
   return (
     <div className="flex gap-2 text-xl items-center">

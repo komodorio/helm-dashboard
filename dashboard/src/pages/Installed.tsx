@@ -5,7 +5,7 @@ import { useGetInstalledReleases } from "../API/releases";
 import { useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
-import { useParams , useNavigate} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { Release } from "../data/types";
 
@@ -20,8 +20,16 @@ function Installed() {
     clusterName: string,
     clusterNamespaces: string[] = []
   ) => {
-    const newSearchParams = addSearchParam('filteredNamespace', clusterNamespaces.length > 0 ? `${clusterNamespaces.map((ns) => ns).join("+")}`: "default")
-    navigate({pathname: `/${clusterName}/installed`, search: newSearchParams.toString()});
+    const newSearchParams = addSearchParam(
+      "filteredNamespace",
+      clusterNamespaces.length > 0
+        ? `${clusterNamespaces.map((ns) => ns).join("+")}`
+        : "default"
+    );
+    navigate({
+      pathname: `/${clusterName}/installed`,
+      search: newSearchParams.toString(),
+    });
   };
 
   const [filterKey, setFilterKey] = useState<string>("");
@@ -58,6 +66,7 @@ function Installed() {
         onClusterChange={handleClusterChange}
         installedReleases={data}
       />
+
       <div className="p-5 w-4/5">
         <InstalledPackagesHeader
           isLoading={isLoading || isRefetching}
