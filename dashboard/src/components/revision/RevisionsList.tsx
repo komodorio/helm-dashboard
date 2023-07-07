@@ -20,7 +20,7 @@ export default function RevisionsList({
   const { context, namespace, chart } = useParams();
   const changeRelease = (newRevision: number) => {
     navigate(
-      `/installed/revision/${context}/${namespace}/${chart}/${newRevision}`
+      `/${context}/${namespace}/${chart}/installed/revision/${newRevision}`
     );
   };
 

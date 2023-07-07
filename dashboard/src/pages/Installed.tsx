@@ -21,7 +21,7 @@ function Installed() {
     clusterNamespaces: string[] = []
   ) => {
     const newSearchParams = addSearchParam('filteredNamespace', clusterNamespaces.length > 0 ? `${clusterNamespaces.map((ns) => ns).join("+")}`: "default")
-    navigate({pathname: `/installed/${clusterName}`, search: newSearchParams.toString()});
+    navigate({pathname: `/${clusterName}/installed`, search: newSearchParams.toString()});
   };
 
   const [filterKey, setFilterKey] = useState<string>("");

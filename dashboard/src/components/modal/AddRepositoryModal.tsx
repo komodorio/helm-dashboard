@@ -55,7 +55,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
 
         queryClient.invalidateQueries({ queryKey: ["helm", "repositories"] });
         setSelectedRepo(formData.name || "");
-        navigate(`/repository/${context}/${formData.name}`, { replace: true });
+        navigate(`/${context}/repository/${formData.name}`, { replace: true });
       })
       .catch((error) => {
         alertError.setShowErrorModal({

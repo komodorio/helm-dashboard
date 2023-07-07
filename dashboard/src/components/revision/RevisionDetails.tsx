@@ -34,6 +34,7 @@ import Button from "../Button";
 import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
 import { isNewerVersion } from "../../utils";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
+import apiService from "../../API/apiService";
 
 type RevisionTagProps = {
   caption: string;
@@ -64,7 +65,6 @@ export default function RevisionDetails({
   const tab = searchParams.get("tab");
   const selectedTab =
     revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
-
   const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
 
   const {
@@ -186,7 +186,7 @@ export default function RevisionDetails({
               <span
                 onClick={() => {
                   navigate(
-                    `/repository/${context}?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
+                    `/${context}/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
                   );
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
@@ -272,9 +272,8 @@ export default function RevisionDetails({
       </div>
 
       <span
-        className={`text-sm ${
-          release.status === DeploymentStatus.FAILED ? "text-red-600" : ""
-        }`}
+        className={`text-sm ${release.status === DeploymentStatus.FAILED ? "text-red-600" : ""
+          }`}
       >
         {release.description}
       </span>
@@ -316,8 +315,7 @@ const Rollback = ({
     useRollbackRelease({
       onSuccess: () => {
         navigate(
-          `/installed/revision/${context}/${namespace}/${chart}/${
-            revisionInt + 1
+          `/${context}/${namespace}/${chart}/installed/revision/${revisionInt + 1
           }`
         );
         window.location.reload();
@@ -447,7 +445,7 @@ const Uninstall = () => {
   const uninstallMutation = useMutation(
     ["uninstall", namespace, chart],
     () =>
-      fetch("/api/helm/releases/" + namespace + "/" + chart, {
+      apiService.fetchWithDefaults("/api/helm/releases/" + namespace + "/" + chart, {
         method: "delete",
       }),
     {

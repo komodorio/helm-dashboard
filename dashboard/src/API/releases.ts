@@ -6,7 +6,8 @@ import {
 } from "@tanstack/react-query";
 import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
-
+import ApiService from "./apiService";
+import apiService from "./apiService";
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
 export function useGetInstalledReleases(
@@ -350,7 +351,7 @@ export async function callApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const response = await fetch(url, options);
+  const response = await apiService.fetchWithDefaults(url, options);
 
   if (!response.ok) {
     const error = await response.text();

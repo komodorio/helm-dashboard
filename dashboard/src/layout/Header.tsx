@@ -12,6 +12,7 @@ import {
 } from "react-icons/bs";
 import { useGetApplicationStatus } from "../API/other";
 import LinkWithSearchParams from "../components/LinkWithSearchParams";
+import apiService from "../API/apiService";
 
 export default function Header() {
   const { data: statusData } = useGetApplicationStatus();
@@ -27,7 +28,7 @@ export default function Header() {
 
   const resetCache = async () => {
     try {
-      await fetch("/api/cache", { method: "DELETE" });
+      await apiService.fetchWithDefaults("/api/cache", { method: "DELETE" });
       window.location.reload();
     } catch (error) {
       console.error(error);
@@ -40,7 +41,7 @@ export default function Header() {
 
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
-      location.pathname.startsWith(`/${identifier}/`)
+      location.pathname.includes(`/${identifier}`)
         ? " text-[#1347FF]  bg-[#EBEFFF]"
         : ""
     }`;
@@ -48,7 +49,7 @@ export default function Header() {
   return (
     <div className="h-16 flex items-center justify-between bg-white w-[100%] ">
       <div className="h-16 flex items-center gap-6 min-w-fit ">
-        <LinkWithSearchParams to={`/installed/${context}`}>
+        <LinkWithSearchParams to={`/${context}/installed`}>
           <img
             src={LogoHeader}
             alt="helm dashboard logo"
@@ -60,7 +61,7 @@ export default function Header() {
           <ul className="w-full items-center flex md:flex-row md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <LinkWithSearchParams
-                to={`/installed/${context}`}
+                to={`/${context}/installed`}
                 className={getBtnStyle("installed")}
               >
                 Installed
@@ -68,7 +69,7 @@ export default function Header() {
             </li>
             <li>
               <LinkWithSearchParams
-                to={`/repository/${context}`}
+                to={`/${context}/repository`}
                 end={false}
                 className={getBtnStyle("repository")}
               >

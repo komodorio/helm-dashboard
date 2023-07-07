@@ -25,6 +25,7 @@ export default function InstalledPackageCard({
 }: InstalledPackageCardProps) {
   const navigate = useNavigateWithSearchParams();
 
+  const { context: selectedCluster } = useParams();
   const [isMouseOver, setIsMouseOver] = useState(false);
 
   const { data: clusters } = useQuery<Cluster[]>({
@@ -64,16 +65,9 @@ export default function InstalledPackageCard({
 
   const handleOnClick = () => {
     const { name, namespace } = release;
-    const selectedCluster = clusters?.find((cluster) => cluster.IsCurrent);
-
-    if (!selectedCluster) {
-      throw new Error(
-        "Couldn't find selected cluster! cannot navigate to revision page"
-      );
-    }
 
     navigate(
-      `/installed/revision/${selectedCluster?.Name}/${namespace}/${name}/${release.revision}`,
+      `/${selectedCluster}/${namespace}/${name}/installed/revision/${release.revision}`,
       { state: release }
     );
   };
@@ -87,11 +81,9 @@ export default function InstalledPackageCard({
 
   return (
     <div
-      className={`${
-        borderLeftColor[release.status]
-      } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
-        isMouseOver && "drop-shadow-lg"
-      }`}
+      className={`${borderLeftColor[release.status]
+        } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-4 drop-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${isMouseOver && "drop-shadow-lg"
+        }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
       onClick={handleOnClick}
