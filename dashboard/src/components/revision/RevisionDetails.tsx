@@ -202,7 +202,8 @@ export default function RevisionDetails({
             ) : (
               <span
                 onClick={() => refetchLatestVersion()}
-                className="underline text-xs cursor-pointer"
+                className="underline cursor-pointer"
+                style={{ fontSize: ".675em" }}
               >
                 {"check for new version".toUpperCase()}
               </span>

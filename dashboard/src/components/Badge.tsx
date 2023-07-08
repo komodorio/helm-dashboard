@@ -37,12 +37,12 @@ export interface BadgeProps {
 }
 export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
-    [BadgeCodes.ERROR]: "bg-failed text-white",
-    [BadgeCodes.WARNING]: "bg-[#ffa800] text-white",
-    [BadgeCodes.SUCCESS]: "bg-[#00c2ab] text-black-50 text-black-800",
+    [BadgeCodes.ERROR]: "bg-red-500 text-white",
+    [BadgeCodes.WARNING]: "bg-yellow-400 text-white",
+    [BadgeCodes.SUCCESS]: "bg-green-300 text-black-50 text-black-800",
     [BadgeCodes.INFO]: "bg-blue-200 text-black-800",
     [BadgeCodes.DEFAULT]: "text-black-800",
-    [BadgeCodes.UNKNOWN]: "text-failed bg-zinc-200",
+    [BadgeCodes.UNKNOWN]: "text-red-500 bg-zinc-200",
   };
 
   const badgeBase =

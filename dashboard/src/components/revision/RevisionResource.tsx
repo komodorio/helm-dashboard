@@ -90,9 +90,9 @@ const ResourceRow = ({
         <td className={cellClassnames}>
           {reason ? <Badge type={badgeType}>{reason}</Badge> : null}
         </td>
-        <td className={"rounded text-gray-400 " + cellClassnames}>
+        <td className={"rounded text-gray-100" + cellClassnames}>
           <div className="flex flex-col space-y-1 justify-start items-start">
-            {message && <div>{message}</div>}
+            {message && <div style={{ color: "grey", fontWeight: 100}}>{message}</div>}
             {(badgeType === "error" || badgeType === "warning") && (
               <Troubleshoot />
             )}

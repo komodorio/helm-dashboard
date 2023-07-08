@@ -27,6 +27,7 @@ function StatusLabel({ status, isRollback }: StatusLabelProps) {
       style={{
         minWidth: "100px",
         display: "flex",
+        fontSize: "14px",
         justifyContent: "space-between",
       }}
     >
