@@ -114,7 +114,7 @@ export default function InstalledPackageCard({
           </div>
           <div className="col-span-1 font-bold text-xs">{getAge(release)}</div>
         </div>
-        <div className="grid grid-cols-11 text-xs mt-3">
+        <div className="grid grid-cols-11 text-xs mt-3" style={{ marginBottom: "12px"}}>
           <div className="col-span-3 h-12 line-clamp-3 mr-1">
             {release.description}
           </div>
