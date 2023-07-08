@@ -11,8 +11,8 @@ function ShutDownButton() {
   };
 
   return (
-    <div>
-      <Modal title="Session Ended" isOpen={status === "error"} onClose={() => {}}>
+    <div className="w-full">
+      <Modal title="Session Ended" isOpen={status === "error"}>
         <p>
           The Helm Dashboard application has been shut down. You can now close
           the browser tab.
@@ -22,9 +22,9 @@ function ShutDownButton() {
       <button
         onClick={handleClick}
         title="Shut down the Helm Dashboard application"
-        className="mr-5 py-3 px-2 border border-transparent hover:border hover:border-gray-500 rounded"
+        className="flex justify-center w-full mr-5 py-3 border border-transparent hover:border hover:border-gray-500 rounded hover:rounded-lg"
       >
-        <BsPower />
+        <BsPower className="w-6" />
       </button>
     </div>
   );

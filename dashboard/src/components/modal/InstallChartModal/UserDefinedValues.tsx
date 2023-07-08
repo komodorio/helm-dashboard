@@ -1,10 +1,30 @@
+import { useEffect, useRef, useState } from "react";
+
 export const UserDefinedValues = ({
-  val,
-  setVal,
+  initialValue,
+  setValues,
 }: {
-  val: string;
-  setVal: any;
+  initialValue: string;
+  setValues: (val: string) => void;
 }) => {
+  const [localState, setLocalState] = useState(initialValue);
+
+  useEffect(() => {
+    setLocalState(initialValue);
+  }, [initialValue]);
+
+  const prevValueRef = useRef(initialValue);
+  const timeoutRef = useRef<any>(null);
+  useEffect(() => {
+    clearTimeout(timeoutRef.current);
+    if (prevValueRef.current !== localState) {
+      timeoutRef.current = setTimeout(() => {
+        setValues(localState);
+        clearTimeout(timeoutRef.current);
+      }, 400);
+    }
+  }, [localState]);
+
   return (
     <div className="w-1/2">
       <label
@@ -14,8 +34,9 @@ export const UserDefinedValues = ({
         User Defined Values:
       </label>
       <textarea
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
+        value={localState}
+        defaultValue={initialValue}
+        onChange={(e) => setLocalState(e.target.value)}
         rows={14}
         className="block p-2.5 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none"
       ></textarea>

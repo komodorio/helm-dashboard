@@ -14,11 +14,15 @@ import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 
 import Button from "../Button";
-import Badge, { BadgeCodes, getBadgeType } from "../Badge";
+import Badge, { getBadgeType } from "../Badge";
 import Spinner from "../Spinner";
 import { Troubleshoot } from "../Troubleshoot";
 
-export default function RevisionResource() {
+interface Props {
+  isLatest: boolean;
+}
+
+export default function RevisionResource({ isLatest }: Props) {
   const { namespace = "", chart = "" } = useParams();
   const { data: resources, isLoading } = useGetResources(namespace, chart);
 
@@ -42,7 +46,7 @@ export default function RevisionResource() {
         <tbody className="bg-white mt-4 h-8 rounded w-full">
           {resources?.length ? (
             resources.map((resource: StructuredResources) => (
-              <ResourceRow resource={resource} />
+              <ResourceRow resource={resource} isLatest={isLatest} />
             ))
           ) : (
             <tr>
@@ -57,7 +61,13 @@ export default function RevisionResource() {
   );
 }
 
-const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
+const ResourceRow = ({
+  resource,
+  isLatest,
+}: {
+  resource: StructuredResources;
+  isLatest: boolean;
+}) => {
   const {
     kind,
     metadata: { name },
@@ -89,9 +99,11 @@ const ResourceRow = ({ resource }: { resource: StructuredResources }) => {
           </div>
         </td>
         <td className={"rounded " + cellClassnames}>
-          <div className="flex justify-end items-center pr-4">
-            <Button onClick={toggleDrawer}>Describe</Button>
-          </div>
+          {isLatest ? (
+            <div className="flex justify-end items-center pr-4">
+              <Button onClick={toggleDrawer}>Describe</Button>
+            </div>
+          ) : null}
         </td>
       </tr>
       <Drawer

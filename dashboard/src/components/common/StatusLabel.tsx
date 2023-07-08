@@ -9,27 +9,28 @@ export enum DeploymentStatus {
   DEPLOYED = "deployed",
   FAILED = "failed",
   PENDING = "pending",
+  SUPERSEDED = "superseded",
 }
 
-export function getStatusColor(status: string) {
-  if (status === "deployed") return "#1FA470";
-  if (status === "failed") return "#DC143C";
-  else return "#9195A1";
+export function getStatusColor(status: DeploymentStatus) {
+  if (status === DeploymentStatus.DEPLOYED) return "text-deployed";
+  if (status === DeploymentStatus.FAILED) return "text-failed";
+  if (status === DeploymentStatus.PENDING) return "text-pending";
+  else return "text-superseded";
 }
 
 function StatusLabel({ status, isRollback }: StatusLabelProps) {
-  const statusColor = getStatusColor(status);
+  const statusColor = getStatusColor(status as DeploymentStatus);
 
-  return ( 
-    <div style={{
-      minWidth: "100px",
-      display: "flex",
-      justifyContent: "space-between",
-    }}>
-      <span className={`text-[${statusColor}] font-bold text-xs`} style={{
-        color: `${statusColor}`,
-        fontSize: "0.75rem",
-      }}>
+  return (
+    <div
+      style={{
+        minWidth: "100px",
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+    >
+      <span className={`${statusColor} font-bold text-sm`}>
         ● {status.toUpperCase()}
       </span>
       {isRollback && <AiOutlineReload size={14} />}

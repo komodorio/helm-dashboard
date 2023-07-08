@@ -15,7 +15,7 @@ function RepositoryPage() {
   const { setSelectedRepo, selectedRepo } = useAppContext();
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/repository/${context}/${selectedRepository.name}`, {
+    navigate(`/${context}/repository/${selectedRepository.name}`, {
       replace: true,
     });
   };
@@ -28,9 +28,9 @@ function RepositoryPage() {
 
   useEffect(() => {
     if (selectedRepo && !repoFromParams) {
-      navigate(`/repository/${context}/${selectedRepo}`, { replace: true });
+      navigate(`/${context}/repository/${selectedRepo}`, { replace: true });
     }
-  }, [selectedRepo, repoFromParams]);
+  }, [selectedRepo, repoFromParams, context]);
 
   const { data: repositories = [] } = useGetRepositories({
     onSuccess: (data: HelmRepositories) => {

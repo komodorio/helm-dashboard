@@ -6,7 +6,8 @@ import {
 } from "@tanstack/react-query";
 import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
-
+import ApiService from "./apiService";
+import apiService from "./apiService";
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
 export function useGetInstalledReleases(
@@ -259,22 +260,22 @@ export function useChartReleaseValues({
   userDefinedValue,
   revision,
   options,
+  version,
 }: {
   namespace?: string;
   release: string;
   userDefinedValue?: string;
   revision?: number;
+  version?: string;
   options?: UseQueryOptions<any>;
 }) {
   return useQuery<any>(
-    ["values", namespace, release, userDefinedValue],
+    ["values", namespace, release, userDefinedValue, version],
     () =>
       callApi<any>(
-        `/api/helm/releases/${namespace}/${release}/values?${
-          userDefinedValue
-            ? `userDefined=${userDefinedValue}`
-            : "userDefined=true"
-        }${revision ? `&revision=${revision}` : ""}`,
+        `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
+          revision ? `&revision=${revision}` : ""
+        }`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
@@ -350,7 +351,7 @@ export async function callApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const response = await fetch(url, options);
+  const response = await apiService.fetchWithDefaults(url, options);
 
   if (!response.ok) {
     const error = await response.text();

@@ -1,4 +1,4 @@
-import { BsArrowDownLeft, BsArrowUpRight } from "react-icons/bs";
+import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
 import { useParams } from "react-router-dom";
 import { compare } from "compare-versions";
 
@@ -20,7 +20,7 @@ export default function RevisionsList({
   const { context, namespace, chart } = useParams();
   const changeRelease = (newRevision: number) => {
     navigate(
-      `/installed/revision/${context}/${namespace}/${chart}/${newRevision}`
+      `/${context}/${namespace}/${chart}/installed/revision/${newRevision}`
     );
   };
 
@@ -47,7 +47,7 @@ export default function RevisionsList({
                 status={release.status}
                 isRollback={release.description.startsWith("Rollback to ")}
               />
-              <span className="font-semibold">#{release.revision}</span>
+              <span className="font-bold">#{release.revision}</span>
             </div>
             <div
               className="self-end text-[#707583] text-xs flex flex-wrap gap-1"
@@ -57,10 +57,10 @@ export default function RevisionsList({
                 justifyContent: "space-between",
               }}
             >
-              <span
+              <div
                 style={{
                   display: "flex",
-                  width: "70px",
+                  width: "80px",
                   justifyContent: "space-between",
                 }}
               >
@@ -75,7 +75,7 @@ export default function RevisionsList({
                           release.chart_ver,
                           ">"
                         ) ? (
-                          <BsArrowDownLeft />
+                          <BsArrowDownRight />
                         ) : (
                           <BsArrowUpRight />
                         )}
@@ -83,7 +83,7 @@ export default function RevisionsList({
                       </>
                     )
                   : ""}
-              </span>
+              </div>
               <span>AGE:{getAge(release, releaseRevisions[idx - 1])}</span>
             </div>
           </div>

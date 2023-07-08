@@ -25,9 +25,9 @@ const HealthStatus = ({ statusData }: Props) => {
               cond.status === "Healthy"
                 ? "bg-[#00c2ab]"
                 : cond.status === "Progressing"
-                ? "bg-[#ffff00]"
-                : "bg-[#DC3545]"
-            } w-2 h-2 rounded-sm`}
+                ? "bg-[#ffa800]"
+                : "bg-[#ff0072]"
+            } w-2.5 h-2.5 rounded-sm`}
           ></span>
         </Tooltip>
       );
