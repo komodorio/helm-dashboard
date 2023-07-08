@@ -17,6 +17,8 @@ export default {
 const Template: ComponentStory<typeof RepositoriesList> = () => (
   <RepositoriesList 
     selectedRepository={undefined}
+    // in this case we allow Unexpected empty method
+    //eslint-disable-next-line @typescript-eslint/no-empty-function
     onRepositoryChanged={() => {}}
     repositories={[]}
   />
