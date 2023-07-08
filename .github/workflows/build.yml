@@ -8,6 +8,10 @@ on:
     branches:
     - "*"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,7 +37,7 @@ jobs:
       - name: Dry Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          version: latest
+          version: "1.18.2"
           args: release --snapshot --rm-dist
       - name: Test if the Binary is Runnable
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
