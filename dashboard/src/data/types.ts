@@ -56,7 +56,7 @@ export type ReleaseHealthStatus = {
       [key: string]: string;
     };
   };
-  spec: {};
+  spec: unknown;
   status: {
     conditions: [
       {

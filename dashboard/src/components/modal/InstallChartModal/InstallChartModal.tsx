@@ -120,7 +120,7 @@ export const InstallChartModal = ({
           method: "post",
           body: formData,
           headers: {
-            "X-Kubecontext": selectedCluster,
+            "X-Kubecontext": selectedCluster!,
           },
         }
       );

@@ -14,6 +14,6 @@ export default {
 } as ComponentMeta<typeof ClustersList>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof ClustersList> = () => <ClustersList installedReleases={[]} />;
+const Template: ComponentStory<typeof ClustersList> = () => <ClustersList filteredNamespaces={[""]} installedReleases={[]} onClusterChange={() => {}} selectedCluster={""} />;
 
 export const Default = Template.bind({});

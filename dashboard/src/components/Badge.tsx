@@ -19,7 +19,7 @@
  */
 
 import React from "react";
-import { BadgeCode } from "../global";
+export type BadgeCode  = "default" | "info" | "success" | "warning" | "error" | "unknown";
 
 export const BadgeCodes = Object.freeze({
   ERROR: "error",

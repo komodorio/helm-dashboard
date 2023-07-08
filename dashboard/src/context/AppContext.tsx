@@ -3,6 +3,8 @@ import { createContext, useState, useContext } from "react";
 export interface AppContextData {
   selectedRepo: string;
   setSelectedRepo: (newValue: string) => void;
+  selectedCluster: string;
+  setSelectedCluster: (newValue: string) => void;
 }
 
 const AppContext = createContext<AppContextData | undefined>(undefined);
@@ -21,10 +23,13 @@ export const AppContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [selectedRepo, setSelectedRepo] = useState("");
+  const [selectedCluster, setSelectedCluster] = useState("");
 
   const contextValue: AppContextData = {
     selectedRepo,
     setSelectedRepo,
+    selectedCluster,
+    setSelectedCluster
   };
 
   return (

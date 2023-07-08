@@ -53,9 +53,7 @@ export default function Header() {
             <li>
               <LinkWithSearchParams
                 to={`/installed/${context}`}
-                className={({ isActive }) =>
-                  isActive ? "p-2 text-[#1347FF]  bg-[#EBEFFF]" : "p-2"
-                }
+                className={({ isActive }) => isActive ? "p-2 text-[#1347FF]  bg-[#EBEFFF]" : "p-2"}
               >
                 Installed
               </LinkWithSearchParams>

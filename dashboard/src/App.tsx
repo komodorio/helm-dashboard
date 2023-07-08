@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const PageLayout = ({ children }) => {
+const PageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Header />

@@ -199,7 +199,7 @@ export default function RevisionDetails({
                 onClick={() => refetchLatestVersion()}
                 className="underline text-sm cursor-pointer"
               >
-                check for new version
+                {"check for new version".toUpperCase()}
               </span>
             )}
           </div>

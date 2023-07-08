@@ -52,7 +52,8 @@ function RepositoriesList({
         </div>
         <button
           type="button"
-          className="h-8 w-fit flex items-center gap-2 bg-white border border-gray-300 px-3 py-1 text-sm font-semibold"
+          style={{ marginTop: "10px", backgroundColor: "#1347FF"}}
+          className="h-8 w-fit flex items-center gap-2 border border-gray-300 px-3 py-1 text-sm font-semibold"
           onClick={() => setShowAddRepositoryModal(true)}
         >
           + Add Repository

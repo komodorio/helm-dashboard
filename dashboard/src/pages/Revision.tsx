@@ -17,17 +17,20 @@ function Revision() {
   const { data: releaseRevisions, refetch: refetchRevisions } = useQuery<
     ReleaseRevision[]
   >({
+    //@ts-ignore
     queryKey: ["releasesHistory", restParams],
     queryFn: apiService.getReleasesHistory,
   });
+  const releaseRevisionsCasted = releaseRevisions as ReleaseRevision[];
+
   const sortedReleases = useMemo(
-    () => releaseRevisions?.sort(descendingSort),
+    () => releaseRevisionsCasted?.sort(descendingSort),
     [releaseRevisions]
   );
 
   const selectedRelease = useMemo(() => {
     if (selectedRevision && releaseRevisions) {
-      return releaseRevisions.find(
+      return releaseRevisionsCasted.find(
         (r: ReleaseRevision) => r.revision === selectedRevision
       );
     }
@@ -51,6 +54,7 @@ function Revision() {
       <div className="w-5/6 min-h-screen bg-[#F4F7FA] pb-4">
         {selectedRelease ? (
           <RevisionDetails
+            //@ts-ignore
             release={selectedRelease}
             refetchRevisions={refetchRevisions}
           />

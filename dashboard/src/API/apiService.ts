@@ -1,4 +1,4 @@
-import { Chart, ChartVersion, Release, ReleaseHealthStatus, Repository } from "../data/types";
+import { Chart, ChartVersion, Release, ReleaseHealthStatus, ReleaseRevision, Repository } from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 
 class ApiService {
@@ -77,10 +77,10 @@ class ApiService {
 
   getReleasesHistory = async ({
     queryKey,
-  }: QueryFunctionContext<Release[], Release>) => {
+  }: QueryFunctionContext<Release[], Release>): Promise<ReleaseRevision[]> => {
     const [_, params] = queryKey;
 
-    if (!params.namespace || !params.chart) return null;
+    if (!params.namespace || !params.chart) return [];
 
     const response = await fetch(
       `/api/helm/releases/${params.namespace}/${params.chart}/history`

@@ -30,8 +30,8 @@ export default function InstalledPackageCard({
     queryFn: () => apiService.getClusters(),
   });
 
-  const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
-    queryKey: ["chartName", release.chartName],
+  const { data: latestVersionResult } = useGetLatestVersion(release.chart_name, {
+    queryKey: ["chartName", release.chart_name],
     cacheTime: 0,
   });
 
@@ -44,9 +44,9 @@ export default function InstalledPackageCard({
     latestVersionResult?.[0];
 
   const canUpgrade =
-    !latestVersionData?.version || !release.chartVersion
+    !latestVersionData?.version || !release.chart_ver
       ? false
-      : isNewerVersion(release.chartVersion, latestVersionData?.version);
+      : isNewerVersion(release.chart_ver, latestVersionData?.version);
 
   const installRepoSuggestion = latestVersionData?.isSuggestedRepo
     ? latestVersionData.repository
@@ -112,7 +112,7 @@ export default function InstalledPackageCard({
             {release.namespace}
           </div>
           <div className="col-span-1 font-bold text-xs">
-            {getAge(release.updated)}
+            {getAge(release)}
           </div>
         </div>
         <div className="grid grid-cols-11 text-xs mt-3">
