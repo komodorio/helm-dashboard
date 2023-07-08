@@ -55,7 +55,7 @@ function RepositoryPage() {
         onRepositoryChanged={handleRepositoryChanged}
         selectedRepository={selectedRepository}
       />
-      <div style={{ width: "80%" }}>
+      <div style={{ width: "72%" }}>
         <RepositoryViewer repository={selectedRepository} />
       </div>
     </div>
