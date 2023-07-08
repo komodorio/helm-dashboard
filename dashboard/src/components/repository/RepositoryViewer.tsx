@@ -43,6 +43,8 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   });
 
   const removeRepository = async () => {
+    //this is expected
+    //eslint-disable-next-line no-alert
     if (confirm("Confirm removing repository?")) {
       try {
         setIsRemove(true);

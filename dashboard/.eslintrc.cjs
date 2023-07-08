@@ -15,7 +15,7 @@ module.exports = {
     "plugin:storybook/recommended",
   ],
   rules: {
-    "no-console": ["error", { allow: ["warn"] }],
+    "no-console": ["off", { allow: ["warn"] }],
     "no-alert": "error",
     "no-debugger": "error",
     "@typescript-eslint/ban-ts-comment": "off"

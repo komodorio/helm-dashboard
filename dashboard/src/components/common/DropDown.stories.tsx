@@ -21,9 +21,7 @@ const Template: ComponentStory<typeof DropDown> = (args) => (
 
 export const Default = Template.bind({});
 
-const onClick = () => {
-  alert("menu item 1 clicked");
-};
+const onClick = () => { console.log("drop down clicked") };
 
 Default.args = {
   items: [
