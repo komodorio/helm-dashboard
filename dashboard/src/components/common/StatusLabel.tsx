@@ -22,12 +22,13 @@ function StatusLabel({ status, isRollback }: StatusLabelProps) {
 
   return ( 
     <div style={{
-      minWidth: "90px",
+      minWidth: "100px",
       display: "flex",
       justifyContent: "space-between",
     }}>
       <span className={`text-[${statusColor}] font-bold text-xs`} style={{
         color: `${statusColor}`,
+        fontSize: "0.75rem",
       }}>
         ● {status.toUpperCase()}
       </span>

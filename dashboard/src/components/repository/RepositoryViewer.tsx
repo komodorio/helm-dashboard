@@ -79,7 +79,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   }
 
   return (
-    <div className="flex flex-col p-6 gap-3 bg-white drop-shadow-lg">
+    <div className="flex flex-col p-6 gap-3 bg-white drop-shadow-lg rounded-md">
       <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
       <div className="flex justify-between">
         <span className="text-[#3d4048] text-4xl font-semibold">

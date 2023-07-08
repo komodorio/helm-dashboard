@@ -17,7 +17,7 @@ export default function InstalledPackagesHeader({
     !isLoading && (numOfPackages == undefined || numOfPackages == 0)
   );
   return (
-    <div className="drop-shadow">
+    <div className="drop-shadow" style={{ width: "980px"}}>
       <div className="flex items-center justify-between bg-white rounded-md p-2">
         <div className="flex items-center">
           <img
