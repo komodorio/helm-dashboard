@@ -9,7 +9,7 @@ If you want to switch to a different cluster, simply click on the corresponding 
 
 # Reset Cache
 The "Reset Cache" feature in Helm Dashboard clears the cached data and fetches the latest information from the backend or data source. It ensures that the dashboard displays up-to-date data and reflects any recent changes or updates.
-![Detail1](images/screenshot_release_detail1.png)
+![Detail1](images/screenshot_reset_cache.png)
 
 # Repository
 Essentially, a repository is a location where charts are gathered and can be shared. If you want to learn more about repositories, [click here](https://helm.sh/docs/topics/chart_repository/). You can find the repository in the home section, as depicted in the figure.
