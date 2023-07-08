@@ -15,7 +15,11 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof RepositoriesList> = () => (
-  <RepositoriesList />
+  <RepositoriesList 
+    selectedRepository={undefined}
+    onRepositoryChanged={() => {}}
+    repositories={[]}
+  />
 );
 
 export const Default = Template.bind({});

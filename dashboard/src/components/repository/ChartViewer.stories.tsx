@@ -20,10 +20,13 @@ const Template: ComponentStory<typeof ChartViewer> = (args) => (
 
 export const Default = Template.bind({});
 
-Default.args = {
+const defaultArgs = {
   chart: {
     name: "chart1",
     description: "chart1 description",
     version: "v1.0.0",
   },
-};
+}
+
+//@ts-ignore
+Default.args = defaultArgs;

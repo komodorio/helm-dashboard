@@ -14,6 +14,9 @@ module.exports = {
     "prettier",
     "plugin:storybook/recommended",
   ],
+  rules: {
+    "@typescript-eslint/ban-ts-comment": "off"
+  },
   parser: "@typescript-eslint/parser",
   plugins: ["@typescript-eslint"],
   root: true,

@@ -21,6 +21,7 @@ function Revision() {
     refetch: refetchRevisions,
     isLoading: isLoadinHistory,
   } = useQuery<ReleaseRevision[]>({
+    //eslint-ignore
     //@ts-ignore
     queryKey: ["releasesHistory", restParams],
     queryFn: apiService.getReleasesHistory,

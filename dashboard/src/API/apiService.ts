@@ -8,7 +8,7 @@ interface ClustersResponse {
   Namespace: string
 }
 class ApiService {
-  currentCluster: string = "";
+  currentCluster = "";
   constructor(protected readonly isMockMode: boolean = false) { }
 
   setCluster = (cluster: string) => {
