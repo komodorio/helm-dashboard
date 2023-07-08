@@ -273,9 +273,21 @@ $(".bi-power").click(function () {
     }).done(function () {
         // TODO: display explanation overlay here
         $("#PowerOffModal").modal('show');
-        window.close();
+        var dialogMessage = "Session ended.";
+        showDialogBox(dialogMessage);
     })
 })
+
+function showDialogBox(message) {
+    // Create the dialog box element
+    var $dialogBox = $("<div>", {
+      class: "dialog-box",
+      text: message
+    });
+  
+    $("body").append($dialogBox);
+    $dialogBox.modal("show");
+  }
 
 function isNewerVersion(oldVer, newVer) {
     if (oldVer && oldVer[0] === 'v') {
