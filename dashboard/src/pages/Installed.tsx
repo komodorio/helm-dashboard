@@ -51,7 +51,7 @@ function Installed() {
     return (
       data?.filter((installedPackage: Release) => {
         return (
-          installedPackage.name.includes(filterKey) && 
+          installedPackage.name.includes(filterKey) ||
           installedPackage.namespace.includes(filterKey) &&
           namespaces.includes(installedPackage.namespace)
         );

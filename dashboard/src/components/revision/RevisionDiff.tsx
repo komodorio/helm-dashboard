@@ -117,10 +117,10 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       );
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
-    } else if (viewMode === VIEW_MODE_VIEW_ONLY) {
-      diffElement!.current!.innerHTML = "";
-    } else if (fetchedDataSuccessfully && (!hasRevisionToDiff || !data)) {
-      diffElement!.current!.innerHTML = "No differences to display";
+    } else if (viewMode === VIEW_MODE_VIEW_ONLY && diffElement.current) {
+      diffElement.current.innerHTML = "";
+    } else if (fetchedDataSuccessfully && (!hasRevisionToDiff || !data) && diffElement.current) {
+      diffElement.current.innerHTML = "No differences to display";
     }
   }, [
     viewMode,
