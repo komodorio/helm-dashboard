@@ -101,7 +101,7 @@ Text: The Values tab displays the textual representation of the values file asso
 Diff: The "Diff" feature allows you to compare the current values with the previous values used in a previous deployment. It highlights any differences between the two versions, making it easier to identify changes made to the configuration.
 ![Detail12](images/screenshot_values_diff_prev.png)
 
-### text Tab
+### Text Tab
 
 Text: The Notes tab displays any accompanying notes or documentation related to the Helm chart.
 ![Detail14](images/screenshot_notes_view.png)
