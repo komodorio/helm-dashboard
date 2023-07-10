@@ -33,7 +33,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
     "user-defined": userDefinedValue,
   } = searchParams;
 
-  const diffElement = useRef<HTMLElement>({});
+  const diffElement = useRef<HTMLElement>(new HTMLElement());
 
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
     addSearchParam("mode", e.target.value);
@@ -52,7 +52,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
 
   const additionalParams = useMemo(() => {
     let additionalParamStr = "";
-    if (!!userDefinedValue) {
+    if (userDefinedValue) {
       additionalParamStr += "&userDefined=true";
     }
     if (viewMode === VIEW_MODE_DIFF_PREV && hasMultipleRevisions) {
@@ -111,15 +111,15 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
         renderNothingWhenEmpty: false,
       };
       const diff2htmlUi = new Diff2HtmlUI(
-        diffElement.current,
+        diffElement!.current!,
         data,
         configuration
       );
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
-    } else if (viewMode === VIEW_MODE_VIEW_ONLY) {
+    } else if (viewMode === VIEW_MODE_VIEW_ONLY && diffElement.current) {
       diffElement.current.innerHTML = "";
-    } else if (fetchedDataSuccessfully && (!hasRevisionToDiff || !data)) {
+    } else if (fetchedDataSuccessfully && (!hasRevisionToDiff || !data) && diffElement.current) {
       diffElement.current.innerHTML = "No differences to display";
     }
   }, [
@@ -220,6 +220,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       )}
       <div
         className="bg-white overflow-x-auto w-full relative"
+        //@ts-ignore
         ref={diffElement}
       ></div>
     </div>

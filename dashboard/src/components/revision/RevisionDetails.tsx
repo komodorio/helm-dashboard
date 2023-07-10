@@ -202,9 +202,10 @@ export default function RevisionDetails({
             ) : (
               <span
                 onClick={() => refetchLatestVersion()}
-                className="underline text-sm cursor-pointer"
+                className="underline cursor-pointer"
+                style={{ fontSize: ".575em" }}
               >
-                check for new version
+                {"check for new version".toUpperCase()}
               </span>
             )}
           </div>
@@ -291,7 +292,7 @@ export default function RevisionDetails({
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
   return (
-    <span className="bg-[#d6effe] px-2 text-sm">
+    <span className="bg-[#d6effe] p-1 rounded px-2 text-sm">
       <span>{caption}:</span>
       <span className="font-bold"> {text}</span>
     </span>

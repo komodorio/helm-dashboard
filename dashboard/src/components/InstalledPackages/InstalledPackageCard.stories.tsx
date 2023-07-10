@@ -21,13 +21,19 @@ const Template: ComponentStory<typeof InstalledPackageCard> = (args) => (
 export const Default = Template.bind({});
 
 Default.args = {
-  installedPackage: {
-    id: "package1",
-    image: "img",
-    version: "1.0.0",
-    name: "package1",
-    revision: 1,
-    lastUpdated: "2021-01-01",
-    description: "package1 description",
+  release: {
+    id: "",
+    name: "",
+    namespace: "",
+    revision: 3,
+    updated: "",
+    status: "",
+    chart: "",
+    chart_name: "",
+    chart_ver: "",
+    app_version: "",
+    icon: "",
+    description: "",
+    has_tests: false,
   },
 };

@@ -49,10 +49,6 @@ export interface KubectlContexts {
   contexts: string[];
 }
 
-export interface K8sResource {
-  // Implementation depends on the specific kubernetes resource structure
-}
-
 export interface K8sResourceList {
   items: K8sResource[];
 }

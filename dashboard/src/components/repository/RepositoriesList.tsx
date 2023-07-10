@@ -22,12 +22,11 @@ function RepositoriesList({
       setShowAddRepositoryModal(true);
     }
   }, []);
-
   return (
     <>
-      <div className="h-fit bg-white w-3/12 flex flex-col p-3 border rounded-md shadow-md text-[#3d4048] gap-3 drop-shadow-md ">
+      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded shadow-md text-[#3d4048] gap-3">
         <label className="font-bold">Repositories</label>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           {repositories?.map((repository) => (
             <span
               className="flex items-center"
@@ -45,7 +44,7 @@ function RepositoriesList({
                 checked={repository.name === selectedRepository?.name}
                 name="clusters"
               />
-              <label htmlFor={repository.name} className="ml-1 text-xs">
+              <label htmlFor={repository.name} className="ml-1">
                 {repository.name}
               </label>
             </span>
@@ -53,7 +52,8 @@ function RepositoriesList({
         </div>
         <button
           type="button"
-          className="h-8 w-fit flex items-center gap-2 bg-white border border-gray-300 px-3 py-1 text-sm font-semibold rounded"
+          style={{ marginTop: "10px" }}
+          className="h-8 w-fit flex items-center gap-2 border border-gray-300 px-3 py-1 text-sm font-semibold"
           onClick={() => setShowAddRepositoryModal(true)}
         >
           + Add Repository

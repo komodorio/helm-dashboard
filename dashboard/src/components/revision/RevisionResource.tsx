@@ -29,7 +29,7 @@ export default function RevisionResource({ isLatest }: Props) {
   return (
     <table
       cellPadding={6}
-      className="border-spacing-y-4  font-semibold border-separate w-full text-xs "
+      className="border-spacing-y-2 font-semibold border-separate w-full text-xs "
     >
       <thead className="bg-zinc-200 font-bold h-8 rounded">
         <tr>
@@ -85,14 +85,14 @@ const ResourceRow = ({
   return (
     <>
       <tr className="min-w-[100%] min-h[70px]">
-        <td className={"pl-6 rounded " + cellClassnames}>{kind}</td>
-        <td className={"font-bold" + cellClassnames}>{name}</td>
+        <td className={"pl-6 rounded text-sm font-normal " + cellClassnames}>{kind}</td>
+        <td className={"font-bold" + cellClassnames + " text-sm	"}>{name}</td>
         <td className={cellClassnames}>
           {reason ? <Badge type={badgeType}>{reason}</Badge> : null}
         </td>
-        <td className={"rounded text-gray-400 " + cellClassnames}>
+        <td className={"rounded text-gray-100" + cellClassnames}>
           <div className="flex flex-col space-y-1 justify-start items-start">
-            {message && <div>{message}</div>}
+            {message && <div className="text-gray-500 font-thin">{message}</div>}
             {(badgeType === "error" || badgeType === "warning") && (
               <Troubleshoot />
             )}

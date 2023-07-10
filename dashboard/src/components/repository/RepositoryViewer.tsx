@@ -24,6 +24,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const navigate = useNavigate();
 
   const { data: charts, isLoading } = useQuery<Chart[]>({
+    //@ts-ignore
     queryKey: ["charts", repository?.name || ""],
     queryFn: apiService.getRepositoryCharts,
     refetchOnWindowFocus: false,
@@ -42,6 +43,8 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   });
 
   const removeRepository = async () => {
+    //this is expected
+    //eslint-disable-next-line no-alert
     if (confirm("Confirm removing repository?")) {
       try {
         setIsRemove(true);
@@ -60,10 +63,10 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     }
   };
 
-  const numOfCharts = charts?.length;
+  const numOfCharts = (charts as Chart[])?.length;
   const showNoChartsAlert = Boolean(!numOfCharts && numOfCharts == 0);
   const filteredCharts = useMemo(() => {
-    return charts?.filter((ch: Chart) =>
+    return (charts as Chart[])?.filter((ch: Chart) =>
       ch.name.toLowerCase().includes(searchValue.toLowerCase())
     );
   }, [searchValue]);
