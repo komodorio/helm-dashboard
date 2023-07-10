@@ -62,7 +62,7 @@ export default function Header() {
             className="ml-3 w-48 min-w-[80px]"
           />
         </LinkWithSearchParams>
-        <span className="ml-3 w-[2px] h-3/5 bg-gray-200" />
+        <span className="ml-3 w-px h-3/5 bg-gray-200"/>
         <div className="inline-block w-full">
           <ul className="w-full items-center flex md:flex-row md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
