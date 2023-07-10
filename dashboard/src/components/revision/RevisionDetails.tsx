@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  Diff2HtmlUI,
-  Diff2HtmlUIConfig,
-} from "diff2html/lib/ui/js/diff2html-ui-slim.js";
+import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 
 import {
   BsPencil,
@@ -32,7 +29,7 @@ import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
 import Button from "../Button";
 import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
-import { isNewerVersion } from "../../utils";
+import { diffConfiguration, isNewerVersion } from "../../utils";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import apiService from "../../API/apiService";
 
@@ -392,21 +389,10 @@ const Rollback = ({
 
     useEffect(() => {
       if (data && fetchedDataSuccessfully && diffElement?.current) {
-        const configuration: Diff2HtmlUIConfig = {
-          matching: "lines",
-          outputFormat: "side-by-side",
-          highlight: true,
-          renderNothingWhenEmpty: false,
-          rawTemplates: {
-            "file-summary-wrapper": '<div class="hidden"></div>', // hide this element
-            "generic-line":
-              '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
-          },
-        };
         const diff2htmlUi = new Diff2HtmlUI(
           diffElement.current,
           data,
-          configuration
+          diffConfiguration
         );
         diff2htmlUi.draw();
         diff2htmlUi.highlightCode();
@@ -425,7 +411,7 @@ const Rollback = ({
         ) : (
           <p>No changes will happen to cluster</p>
         )}
-        <div className="relative" ref={diffElement} />
+        <div className="relative leading-5" ref={diffElement} />
       </div>
     );
   };

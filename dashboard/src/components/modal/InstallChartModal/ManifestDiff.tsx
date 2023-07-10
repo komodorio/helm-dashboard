@@ -1,11 +1,9 @@
-import {
-  Diff2HtmlUI,
-  Diff2HtmlUIConfig,
-} from "diff2html/lib/ui/js/diff2html-ui-base";
+import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-base";
 import hljs from "highlight.js";
 
 import { useEffect, useRef } from "react";
 import Spinner from "../../Spinner";
+import { diffConfiguration } from "../../../utils";
 
 interface ManifestDiffProps {
   diff: string;
@@ -22,16 +20,10 @@ export const ManifestDiff = ({
 
   useEffect(() => {
     if (diff && diffContainerRef.current) {
-      const configuration: Diff2HtmlUIConfig = {
-        matching: "lines",
-        outputFormat: "side-by-side",
-        highlight: true,
-        renderNothingWhenEmpty: false,
-      };
       const diff2htmlUi = new Diff2HtmlUI(
         diffContainerRef.current,
         diff,
-        configuration,
+        diffConfiguration,
         hljs
       );
       diff2htmlUi.draw();
@@ -58,9 +50,12 @@ export const ManifestDiff = ({
 
   return (
     <div>
-      <h4 className="text-lg">Manifest changes:</h4>
+      <h4 className="text-xl">Manifest changes:</h4>
       {diff ? (
-        <div ref={diffContainerRef} className="relative overflow-y-auto "></div>
+        <div
+          ref={diffContainerRef}
+          className="relative overflow-y-auto leading-5"
+        ></div>
       ) : (
         <pre className="font-roboto text-lg">
           No changes will happen to the cluster

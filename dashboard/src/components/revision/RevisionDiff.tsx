@@ -1,16 +1,14 @@
 import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
-import {
-  Diff2HtmlUI,
-  Diff2HtmlUIConfig,
-} from "diff2html/lib/ui/js/diff2html-ui-slim.js";
+import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 import { useGetReleaseInfoByType } from "../../API/releases";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
 import parse from "html-react-parser";
 
 import hljs from "highlight.js";
 import Spinner from "../Spinner";
+import { diffConfiguration } from "../../utils";
 
 type RevisionDiffProps = {
   includeUserDefineOnly?: boolean;
@@ -104,17 +102,10 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       data &&
       !isLoading
     ) {
-      const configuration: Diff2HtmlUIConfig = {
-        matching: "lines",
-        outputFormat: "side-by-side",
-
-        highlight: true,
-        renderNothingWhenEmpty: false,
-      };
       const diff2htmlUi = new Diff2HtmlUI(
         diffElement!.current!,
         data,
-        configuration
+        diffConfiguration
       );
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
@@ -135,6 +126,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
     fetchedDataSuccessfully,
     diffElement,
   ]);
+
   return (
     <div>
       <div className="flex mb-3 p-2 border border-[#DCDDDF] flex-row items-center justify-between w-full bg-white rounded">
@@ -224,7 +216,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
         ""
       )}
       <div
-        className="bg-white overflow-x-auto w-full relative"
+        className="bg-white w-full relative leading-5"
         //@ts-ignore
         ref={diffElement}
       ></div>

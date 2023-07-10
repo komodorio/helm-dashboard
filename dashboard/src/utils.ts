@@ -1,3 +1,4 @@
+import { Diff2HtmlUIConfig } from "diff2html/lib/ui/js/diff2html-ui-base";
 import { NonEmptyArray } from "./data/types";
 
 export const isNewerVersion = (oldVer: string, newVer: string) => {
@@ -23,3 +24,18 @@ export const isNewerVersion = (oldVer: string, newVer: string) => {
 export function isNoneEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
   return Array.isArray(arr) && arr.length > 0;
 }
+
+export const diffConfiguration: Diff2HtmlUIConfig = {
+  drawFileList: false,
+  outputFormat: "side-by-side",
+  matching: "lines",
+  renderNothingWhenEmpty: false,
+  highlight: true,
+  fileContentToggle: false,
+  stickyFileHeaders: false,
+  rawTemplates: {
+    "file-summary-wrapper": '<div class="hidden"></div>', // hide this element
+    "generic-line":
+      '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
+  },
+};
