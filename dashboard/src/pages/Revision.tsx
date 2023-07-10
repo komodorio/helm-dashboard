@@ -28,11 +28,7 @@ function Revision() {
   });
 
   const latestRevision = useMemo(
-    () =>
-      Array.isArray(releaseRevisions) &&
-      releaseRevisions?.find(
-        (revision) => revision.status === DeploymentStatus.DEPLOYED
-      ),
+    () => Array.isArray(releaseRevisions) && releaseRevisions?.[0],
     [releaseRevisions]
   );
 

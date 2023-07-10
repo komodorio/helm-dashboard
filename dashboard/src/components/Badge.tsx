@@ -19,14 +19,12 @@
  */
 
 import React from "react";
-export type BadgeCode  = "default" | "info" | "success" | "warning" | "error" | "unknown";
+export type BadgeCode = "success" | "warning" | "error";
 
 export const BadgeCodes = Object.freeze({
   ERROR: "error",
   WARNING: "warning",
   SUCCESS: "success",
-  INFO: "info",
-  DEFAULT: "default",
   UNKNOWN: "unknown",
 });
 
@@ -37,19 +35,15 @@ export interface BadgeProps {
 }
 export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
-    [BadgeCodes.ERROR]: "bg-red-500 text-white",
-    [BadgeCodes.WARNING]: "bg-yellow-400 text-white",
-    [BadgeCodes.SUCCESS]: "bg-green-300 text-black-50 text-black-800",
-    [BadgeCodes.INFO]: "bg-blue-200 text-black-800",
-    [BadgeCodes.DEFAULT]: "text-black-800",
-    [BadgeCodes.UNKNOWN]: "text-red-500 bg-zinc-200",
+    [BadgeCodes.SUCCESS]: "bg-success text-black-800",
+    [BadgeCodes.WARNING]: "bg-warning text-white",
+    [BadgeCodes.ERROR]: "bg-danger text-white",
+    [BadgeCodes.UNKNOWN]: "bg-secondary text-danger",
   };
 
   const badgeBase =
-    "inline-flex items-center px-2.5 py-0.5 rounded text-sm font-light h-[30px]";
-  // the type of the badge is indicated by "type" prop.
-  // the default type is "default".
-  // the resulting span element is stored in badge_elem.
+    "inline-flex items-center px-2.5 rounded text-sm font-light";
+
   const badgeElem = (
     <span
       className={`${badgeBase} ${colorVariants[props.type]} ${

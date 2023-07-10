@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import hljs from "highlight.js";
 import { marked } from "marked";
+import { RiExternalLinkLine } from "react-icons/ri";
 
 import {
   StructuredResources,
@@ -51,7 +52,8 @@ export default function RevisionResource({ isLatest }: Props) {
           ) : (
             <tr>
               <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
-                Looks like you don't have any resources.
+                Looks like you don't have any resources.{" "}
+                <RiExternalLinkLine className="ml-2 text-lg" />
               </div>
             </tr>
           )}
@@ -84,15 +86,19 @@ const ResourceRow = ({
 
   return (
     <>
-      <tr className="min-w-[100%] min-h[70px]">
-        <td className={"pl-6 rounded text-sm font-normal " + cellClassnames}>{kind}</td>
+      <tr className="min-w-[100%] min-h[70px] text-sm">
+        <td className={"pl-6 rounded text-sm font-normal" + cellClassnames}>
+          {kind}
+        </td>
         <td className={"font-bold" + cellClassnames + " text-sm	"}>{name}</td>
         <td className={cellClassnames}>
           {reason ? <Badge type={badgeType}>{reason}</Badge> : null}
         </td>
         <td className={"rounded text-gray-100" + cellClassnames}>
-          <div className="flex flex-col space-y-1 justify-start items-start">
-            {message && <div className="text-gray-500 font-thin">{message}</div>}
+          <div className="flex flex-col space-y-1 justify-start items-start ">
+            {message && (
+              <div className="text-gray-500 font-thin">{message}</div>
+            )}
             {(badgeType === "error" || badgeType === "warning") && (
               <Troubleshoot />
             )}
@@ -110,7 +116,7 @@ const ResourceRow = ({
         open={isOpen}
         onClose={toggleDrawer}
         direction="right"
-        className="min-w-[60%] max-w-[80%]"
+        className="min-w-[85%] "
       >
         {isOpen ? (
           <DescribeResource
@@ -157,22 +163,23 @@ const DescribeResource = ({
   const badgeType = getBadgeType(status);
   return (
     <>
-      <div className="flex justify-between px-3 py-4 border-b">
+      <div className="flex justify-between px-3 py-4 border-b ">
         <div>
           <div className="flex gap-3">
-            <h3 className="font-medium text-xl">{name}</h3>
+            <h3 className="font-medium text-xl font-poppins">{name}</h3>
             <Badge type={badgeType}>{reason}</Badge>
           </div>
-          <p className="m-0 mt-4">{kind}</p>
+          <p className="m-0 mt-4 font-inter text-sm font-normal">{kind}</p>
         </div>
 
         <div className="flex  items-center gap-4 pr-4">
           <a
             href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&amp;utm_source=helm-dash&amp;utm_medium=cta&amp;utm_content=helm-dash"
-            className="bg-blue-600 text-white p-3 text-md flex items-center rounded"
+            className="bg-primary text-white p-1.5 text-sm flex items-center rounded"
             target="_blank"
           >
             See more details in Komodor
+            <RiExternalLinkLine className="ml-2 text-lg" />
           </a>
           <button
             type="button"
@@ -189,9 +196,9 @@ const DescribeResource = ({
       {isLoading ? (
         <Spinner />
       ) : (
-        <div className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-auto ">
           <pre
-            className="bg-white rounded p-4 font-medium text-md w-full"
+            className="bg-white rounded p-4 font-medium text-base font-sf-mono"
             style={{ overflow: "unset" }}
             dangerouslySetInnerHTML={{
               __html: marked(yamlFormattedData),

@@ -22,6 +22,7 @@ module.exports = {
         "monospace",
       ],
       monospace: ["monospace"],
+      poppins: ["Poppins", "sans-serif"],
     },
     fontWeight: {
       thin: "100",
@@ -37,6 +38,7 @@ module.exports = {
       colors: {
         grey: "#3d4048",
         primary: "#1347FF",
+        secondary: "#ECEFF2",
         muted: "#707583",
         error: {
           "border-color": "#DC3545",
@@ -47,12 +49,17 @@ module.exports = {
         deployed: "#1FA470",
         superseded: "#9195A1",
         pending: "#000",
+        danger: "#ff0072",
+        "text-danger": "#FC1683",
+        warning: "#ffa800",
+        success: "#00c2ab",
         "link-color": "#0D6EFD",
         "body-background": "#F4F7FA",
         "upgrade-color": "#FC1683",
       },
     },
   },
+  // eslint-disable-next-line no-undef
   plugins: [require("@tailwindcss/line-clamp"), require("flowbite/plugin")],
 
   fontFamily: {
