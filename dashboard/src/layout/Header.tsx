@@ -53,7 +53,7 @@ export default function Header() {
     }`;
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white ">
+    <div className="h-16 flex items-center justify-between bg-white custom-shadow">
       <div className="h-16 flex items-center gap-6 min-w-fit ">
         <LinkWithSearchParams to={`/${context}/installed`}>
           <img
@@ -134,7 +134,7 @@ export default function Header() {
           </ul>
         </div>
       </div>
-      <div className="h-16 flex items-center text-sm">
+      <div className="h-16 flex items-center text-sm ">
         <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-max">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
