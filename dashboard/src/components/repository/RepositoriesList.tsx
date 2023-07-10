@@ -60,8 +60,9 @@ function RepositoriesList({
         </button>
         <p className="text-xs">
           Charts developers: you can also add local directories as chart source.
-          Use <span className="text-green-600">--local-chart</span> CLI switch
-          to specify it.
+          Use{" "}
+          <span className="text-green-600 font-monospace">--local-chart</span>{" "}
+          CLI switch to specify it.
         </p>
       </div>
       <AddRepositoryModal

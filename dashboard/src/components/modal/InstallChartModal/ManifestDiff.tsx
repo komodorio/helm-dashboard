@@ -62,7 +62,9 @@ export const ManifestDiff = ({
       {diff ? (
         <div ref={diffContainerRef} className="relative overflow-y-auto "></div>
       ) : (
-        <pre>No changes will happen to the cluster</pre>
+        <pre className="font-roboto text-lg">
+          No changes will happen to the cluster
+        </pre>
       )}
     </div>
   );

@@ -26,7 +26,7 @@ export const UserDefinedValues = ({
   }, [localState]);
 
   return (
-    <div className="w-1/2">
+    <div className="w-1/2 font-monospace">
       <label
         className="block tracking-wide text-gray-700 text-xl font-medium mb-2"
         htmlFor="grid-user-defined-values"
@@ -38,7 +38,7 @@ export const UserDefinedValues = ({
         defaultValue={initialValue}
         onChange={(e) => setLocalState(e.target.value)}
         rows={14}
-        className="block p-2.5 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none"
+        className="block p-2.5 w-full text-md text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none"
       ></textarea>
     </div>
   );

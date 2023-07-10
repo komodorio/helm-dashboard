@@ -15,8 +15,8 @@ export const GeneralDetails = ({
   onReleaseNameInput: (chartName: string) => void;
 }) => {
   const { context } = useParams();
-  const inputClassName = ` text-lg py-1 px-2 ${
-    disabled ? "bg-gray-200" : "bg-white border-2 border-gray-300"
+  const inputClassName = ` text-lg py-1 px-2 border border-1 border-gray-300 ${
+    disabled ? "bg-gray-200" : "bg-white "
   } rounded`;
   return (
     <div className="flex gap-8">

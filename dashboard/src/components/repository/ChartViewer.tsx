@@ -31,14 +31,14 @@ function ChartViewer({ chart }: ChartViewerProps) {
         <span className="col-span-6 text-sm">{chart.description}</span>
         <span className="col-span-1 text-center">{chart.version}</span>
         <span className="col-span-1 text-center">
-          {showInstallButton && (
-            <button
-              className="bg-white border border-gray-300 p-1 px-2 rounded-md font-semibold"
-              onClick={() => setShowInstallModal(true)}
-            >
-              Install
-            </button>
-          )}
+          <button
+            className={`bg-white border border-gray-300 px-2 p-1 rounded-md font-semibold ${
+              showInstallButton ? "visible" : "invisible"
+            }`}
+            onClick={() => setShowInstallModal(true)}
+          >
+            Install
+          </button>
         </span>
       </div>
       {showInstallModal && (

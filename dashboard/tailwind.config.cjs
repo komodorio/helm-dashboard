@@ -12,6 +12,16 @@ module.exports = {
       roboto: ["Roboto", "serif"],
       "roboto-slab": ["Roboto Slab", "sans-serif"],
       inter: ["Inter", "serif"],
+      "sf-mono": [
+        "SFMono-Regular",
+        "Menlo",
+        "Monaco",
+        "Consolas",
+        "Liberation Mono",
+        "Courier New",
+        "monospace",
+      ],
+      monospace: ["monospace"],
     },
     fontWeight: {
       thin: "100",
