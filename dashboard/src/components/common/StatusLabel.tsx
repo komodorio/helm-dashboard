@@ -8,7 +8,7 @@ type StatusLabelProps = {
 export enum DeploymentStatus {
   DEPLOYED = "deployed",
   FAILED = "failed",
-  PENDING = "pending",
+  PENDING = "pending-install",
   SUPERSEDED = "superseded",
 }
 

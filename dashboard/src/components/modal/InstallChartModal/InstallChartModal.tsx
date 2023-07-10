@@ -225,7 +225,7 @@ export const InstallChartModal = ({
     }${
       !isInstall
         ? `/${releaseName}`
-        : `/${releaseValues ? chartName : !namespace ? "default" : ""}`
+        : `${releaseValues ? chartName : !namespace ? "default" : ""}`
     }`; // if there is no release we don't provide anything, and we dont display version;
     try {
       setErrorMessage("");

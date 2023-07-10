@@ -48,7 +48,7 @@ module.exports = {
         failed: "#FC1683",
         deployed: "#1FA470",
         superseded: "#9195A1",
-        pending: "#000",
+        pending: "#5AB0FF",
         danger: "#ff0072",
         "text-danger": "#FC1683",
         warning: "#ffa800",
