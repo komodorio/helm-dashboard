@@ -19,7 +19,9 @@ const VIEW_MODE_DIFF_PREV = "diff-with-previous";
 const VIEW_MODE_DIFF_SPECIFIC = "diff-with-specific-revision";
 
 function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
-  const [specificVersion, setSpecificVersion] = useState("1");
+  const params = useParams();
+
+  const [specificVersion, setSpecificVersion] = useState(params.revision);
   const {
     searchParamsObject: searchParams,
     addSearchParam,
@@ -45,7 +47,6 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       removeSearchParam("user-defined");
     }
   };
-  const params = useParams();
   const revisionInt = parseInt(params.revision || "", 10);
   const hasMultipleRevisions = revisionInt > 1;
 
