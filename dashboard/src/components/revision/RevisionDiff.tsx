@@ -33,7 +33,8 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
     "user-defined": userDefinedValue,
   } = searchParams;
 
-  const diffElement = useRef<HTMLElement>(new HTMLElement());
+  //@ts-ignore
+  const diffElement = useRef<HTMLElement>({});
 
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
     addSearchParam("mode", e.target.value);
@@ -119,7 +120,11 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
       diff2htmlUi.highlightCode();
     } else if (viewMode === VIEW_MODE_VIEW_ONLY && diffElement.current) {
       diffElement.current.innerHTML = "";
-    } else if (fetchedDataSuccessfully && (!hasRevisionToDiff || !data) && diffElement.current) {
+    } else if (
+      fetchedDataSuccessfully &&
+      (!hasRevisionToDiff || !data) &&
+      diffElement.current
+    ) {
       diffElement.current.innerHTML = "No differences to display";
     }
   }, [
