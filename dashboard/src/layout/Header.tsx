@@ -53,7 +53,7 @@ export default function Header() {
     }`;
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white w-[100%] ">
+    <div className="h-16 flex items-center justify-between bg-white ">
       <div className="h-16 flex items-center gap-6 min-w-fit ">
         <LinkWithSearchParams to={`/${context}/installed`}>
           <img
