@@ -7,15 +7,11 @@ import { diffConfiguration } from "../../../utils";
 
 interface ManifestDiffProps {
   diff: string;
-  versionsError: unknown;
   isLoading: boolean;
+  error: string;
 }
 
-export const ManifestDiff = ({
-  diff,
-  versionsError,
-  isLoading,
-}: ManifestDiffProps) => {
+export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
   const diffContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -31,19 +27,11 @@ export const ManifestDiff = ({
     }
   }, [diff, diffContainerRef.current]);
 
-  if (isLoading) {
+  if (!isLoading) {
     return (
-      <div>
+      <div className="flex text-lg items-end">
         <Spinner />
-        Loading diff...
-      </div>
-    );
-  }
-
-  if (versionsError !== null) {
-    return (
-      <div className="flex ">
-        <p className="text-red-600 text-lg">{String(versionsError)}</p>
+        Calculating diff...
       </div>
     );
   }
@@ -51,13 +39,18 @@ export const ManifestDiff = ({
   return (
     <div>
       <h4 className="text-xl">Manifest changes:</h4>
-      {diff ? (
+
+      {error ? (
+        <p className="text-red-600 text-lg">
+          Failed to get upgrade info: {error}
+        </p>
+      ) : diff ? (
         <div
           ref={diffContainerRef}
           className="relative overflow-y-auto leading-5"
         ></div>
       ) : (
-        <pre className="font-roboto text-lg">
+        <pre className="font-roboto text-base">
           No changes will happen to the cluster
         </pre>
       )}

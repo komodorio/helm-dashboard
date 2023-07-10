@@ -199,10 +199,9 @@ export default function RevisionDetails({
             ) : (
               <span
                 onClick={() => refetchLatestVersion()}
-                className="underline cursor-pointer"
-                style={{ fontSize: ".575em" }}
+                className="underline cursor-pointer text-xs"
               >
-                {"check for new version".toUpperCase()}
+                Check for new version
               </span>
             )}
           </div>
@@ -346,7 +345,7 @@ const Rollback = ({
       {
         chart,
         namespace,
-        revision: revision.toString(),
+        revision: rollbackRevision.toString(),
         tab: "manifests",
       },
       `&revisionDiff=${installedRevision.revision}`
@@ -402,14 +401,14 @@ const Rollback = ({
     return (
       <div className="flex flex-col space-y-4">
         {isLoading ? (
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-sm">
             <Spinner />
             <p>Loading changes that will happen to cluster</p>
           </div>
         ) : data ? (
-          <p>Following changes will happen to cluster:</p>
+          <p className="text-sm">Following changes will happen to cluster:</p>
         ) : (
-          <p>No changes will happen to cluster</p>
+          <p className="text-base">No changes will happen to cluster</p>
         )}
         <div className="relative leading-5" ref={diffElement} />
       </div>

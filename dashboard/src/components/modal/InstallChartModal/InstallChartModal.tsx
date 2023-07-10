@@ -1,7 +1,11 @@
 import { useParams } from "react-router-dom";
 import useAlertError from "../../../hooks/useAlertError";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useChartReleaseValues, useGetVersions } from "../../../API/releases";
+import {
+  callApi,
+  useChartReleaseValues,
+  useGetVersions,
+} from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
 import { UserDefinedValues } from "./UserDefinedValues";
@@ -223,12 +227,16 @@ export const InstallChartModal = ({
         ? `/${releaseName}`
         : `/${releaseValues ? chartName : "default"}`
     }`; // if there is no release we don't provide anything, and we dont display version;
-    const response = await apiService.fetchWithDefaults(fetchUrl, {
-      method: "post",
-      body: formData,
-    });
-    const data = await response.json();
-    return data;
+    try {
+      setErrorMessage("");
+      const data = await callApi(fetchUrl, {
+        method: "post",
+        body: formData,
+      });
+      return data;
+    } catch (e) {
+      setErrorMessage((e as Error).message as string);
+    }
   };
 
   const fetchDiff = async ({ userValues }: { userValues: string }) => {
@@ -337,16 +345,12 @@ export const InstallChartModal = ({
 
       <ManifestDiff
         diff={diff}
-        isLoading={isLoadingDiff}
-        versionsError={versionsError}
+        isLoading={
+          isLoadingDiff ||
+          (isInstall ? loadingChartValues : loadingReleaseValues)
+        }
+        error={errorMessage || (versionsError as string)}
       />
-      {errorMessage && (
-        <div>
-          <p className="text-red-600 text-lg">
-            Failed to get upgrade info: {errorMessage}
-          </p>
-        </div>
-      )}
     </Modal>
   );
 };
