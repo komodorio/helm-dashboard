@@ -43,6 +43,8 @@ export type Release = {
   icon: string;
   description: string;
   has_tests: boolean;
+  chartName: string; // duplicated in some cases in the backend, we need to resolve this
+  chartVersion: string; // duplicated in some cases in the backend, we need to resolve this
 };
 
 export type ReleaseHealthStatus = {
