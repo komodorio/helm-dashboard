@@ -242,7 +242,7 @@ export default function RevisionDetails({
 
   const canUpgrade = !latestVerData?.[0]?.version
     ? false
-    : isNewerVersion(release.chart_ver, latestVerData?.[0]?.version);
+    : isNewerVersion(installedRevision.chart_ver, latestVerData?.[0]?.version);
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
