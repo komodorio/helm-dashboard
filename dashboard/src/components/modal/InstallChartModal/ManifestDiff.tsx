@@ -27,7 +27,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
     }
   }, [diff, diffContainerRef.current]);
 
-  if (!isLoading) {
+  if (isLoading) {
     return (
       <div className="flex text-lg items-end">
         <Spinner />
