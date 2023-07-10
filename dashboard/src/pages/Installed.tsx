@@ -51,15 +51,16 @@ function Installed() {
     return (
       data?.filter((installedPackage: Release) => {
         return (
-          installedPackage.name.includes(filterKey) &&
-          namespaces.includes(installedPackage.namespace)
+          installedPackage.name.includes(filterKey) ||
+          (installedPackage.namespace.includes(filterKey) &&
+            namespaces.includes(installedPackage.namespace))
         );
       }) ?? []
     );
   }, [data, filterKey, namespaces]);
 
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row w-full">
       <ClustersList
         selectedCluster={context ?? ""}
         filteredNamespaces={namespaces}
@@ -67,7 +68,7 @@ function Installed() {
         installedReleases={data}
       />
 
-      <div className="p-5 w-4/5">
+      <div className="p-5 w-[calc(100%-17rem)]">
         <InstalledPackagesHeader
           isLoading={isLoading || isRefetching}
           filteredReleases={filteredReleases}

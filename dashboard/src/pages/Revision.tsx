@@ -21,6 +21,8 @@ function Revision() {
     refetch: refetchRevisions,
     isLoading: isLoadinHistory,
   } = useQuery<ReleaseRevision[]>({
+    //eslint-ignore
+    //@ts-ignore
     queryKey: ["releasesHistory", restParams],
     queryFn: apiService.getReleasesHistory,
   });
@@ -35,13 +37,13 @@ function Revision() {
   );
 
   const sortedReleases = useMemo(
-    () => releaseRevisions?.sort(descendingSort),
+    () => (releaseRevisions as ReleaseRevision[])?.sort(descendingSort),
     [releaseRevisions]
   );
 
   const selectedRelease = useMemo(() => {
     if (selectedRevision && releaseRevisions) {
-      return releaseRevisions.find(
+      return (releaseRevisions as ReleaseRevision[]).find(
         (r: ReleaseRevision) => r.revision === selectedRevision
       );
     }
@@ -71,7 +73,9 @@ function Revision() {
           </div>
         ) : selectedRelease ? (
           <RevisionDetails
+            //@ts-ignore
             release={selectedRelease}
+            //@ts-ignore
             installedRevision={releaseRevisions?.[0] as ReleaseRevision}
             isLatest={selectedRelease.revision === latestRevision?.revision}
           />

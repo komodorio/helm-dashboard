@@ -48,12 +48,12 @@ export default function Header() {
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
       location.pathname.includes(`/${identifier}`)
-        ? " text-[#1347FF]  bg-[#EBEFFF]"
+        ? " text-[#1347FF] rounded-sm bg-[#EBEFFF]"
         : ""
     }`;
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white w-[100%] ">
+    <div className="h-16 flex items-center justify-between bg-white custom-shadow">
       <div className="h-16 flex items-center gap-6 min-w-fit ">
         <LinkWithSearchParams to={`/${context}/installed`}>
           <img
@@ -62,7 +62,7 @@ export default function Header() {
             className="ml-3 w-48 min-w-[80px]"
           />
         </LinkWithSearchParams>
-        <span className="ml-3 w-[2px] h-3/5 bg-gray-200" />
+        <span className="ml-3 w-px h-3/5 bg-gray-200" />
         <div className="inline-block w-full">
           <ul className="w-full items-center flex md:flex-row md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
@@ -134,7 +134,7 @@ export default function Header() {
           </ul>
         </div>
       </div>
-      <div className="h-16 flex items-center text-sm">
+      <div className="h-16 flex items-center text-sm ">
         <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-max">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
@@ -155,7 +155,7 @@ export default function Header() {
           </div>
         </div>
 
-        <span className="w-[5px] h-3/4 bg-gray-200 ml-3" />
+        <span className="w-px h-3/5 bg-gray-200 ml-3" />
         {!clusterMode ? <ShutDownButton /> : null}
       </div>
     </div>

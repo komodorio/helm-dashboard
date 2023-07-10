@@ -1,4 +1,4 @@
-import { Chart, ChartVersion, Release, ReleaseHealthStatus, Repository } from "../data/types";
+import { Chart, ChartVersion, Release, ReleaseHealthStatus, ReleaseRevision, Repository } from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 interface ClustersResponse {
   AuthInfo: string
@@ -8,7 +8,7 @@ interface ClustersResponse {
   Namespace: string
 }
 class ApiService {
-  currentCluster: string = "";
+  currentCluster = "";
   constructor(protected readonly isMockMode: boolean = false) { }
 
   setCluster = (cluster: string) => {
@@ -98,10 +98,10 @@ class ApiService {
 
   getReleasesHistory = async ({
     queryKey,
-  }: QueryFunctionContext<Release[], Release>) => {
+  }: QueryFunctionContext<Release[], Release>): Promise<ReleaseRevision[]> => {
     const [_, params] = queryKey;
 
-    if (!params.namespace || !params.chart) return null;
+    if (!params.namespace || !params.chart) return [];
 
     const response = await this.fetchWithDefaults(
       `/api/helm/releases/${params.namespace}/${params.chart}/history`

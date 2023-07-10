@@ -73,7 +73,7 @@ export const CustomModal: ComponentStory<typeof Modal> = (args) => (
       <button
         className="bg-cyan-500 p-2"
         type="button"
-        onClick={() => alert("just a button")}
+        onClick={() => console.log("just a button")}
       >
         Just a button
       </button>

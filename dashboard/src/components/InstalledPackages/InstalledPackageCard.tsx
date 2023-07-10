@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Cluster, Release } from "../../data/types";
+import { Release } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { getAge } from "../../timeUtils";
 import StatusLabel, {
@@ -28,11 +28,6 @@ export default function InstalledPackageCard({
 
   const { context: selectedCluster } = useParams();
   const [isMouseOver, setIsMouseOver] = useState(false);
-
-  const { data: clusters } = useQuery<Cluster[]>({
-    queryKey: ["clusters"],
-    queryFn: () => apiService.getClusters(),
-  });
 
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
     queryKey: ["chartName", release.chartName],
@@ -74,7 +69,7 @@ export default function InstalledPackageCard({
   };
 
   const statusColor = getStatusColor(release.status as DeploymentStatus);
-  const borderLeftColor = {
+  const borderLeftColor: { [key: string]: string } = {
     [DeploymentStatus.DEPLOYED]: "border-l-deployed",
     [DeploymentStatus.FAILED]: "border-l-failed",
     [DeploymentStatus.PENDING]: "border-l-pending",
@@ -114,7 +109,10 @@ export default function InstalledPackageCard({
           </div>
           <div className="col-span-1 font-bold text-xs">{getAge(release)}</div>
         </div>
-        <div className="grid grid-cols-11 text-xs mt-3">
+        <div
+          className="grid grid-cols-11 text-xs mt-3"
+          style={{ marginBottom: "12px" }}
+        >
           <div className="col-span-3 h-12 line-clamp-3 mr-1">
             {release.description}
           </div>
@@ -132,7 +130,7 @@ export default function InstalledPackageCard({
                 className="text-[#0d6efd] flex flex-row items-center gap-1 font-bold"
                 title={`upgrade available: ${latestVersionData?.version} from ${latestVersionData?.repository}`}
               >
-                {canUpgrade ? (
+                {canUpgrade && !installRepoSuggestion ? (
                   <>
                     <BsArrowUpCircleFill />
                     UPGRADE

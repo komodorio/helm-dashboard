@@ -25,12 +25,13 @@ function StatusLabel({ status, isRollback }: StatusLabelProps) {
   return (
     <div
       style={{
-        minWidth: "90px",
+        minWidth: "100px",
         display: "flex",
+        fontSize: "14px",
         justifyContent: "space-between",
       }}
     >
-      <span className={`${statusColor} font-bold text-sm`}>
+      <span className={`${statusColor} font-bold text-xs`}>
         ● {status.toUpperCase()}
       </span>
       {isRollback && <AiOutlineReload size={14} />}

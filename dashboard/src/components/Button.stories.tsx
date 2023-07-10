@@ -24,5 +24,5 @@ const Template: ComponentStory<typeof Button> = (args: ButtonProps) => <Button {
 export const Default = Template.bind({});
 Default.args = {
   children: <><span>&uarr;</span><span>Update</span></>,
-  onClick: () => {},
+  onClick: () => { console.log("click") },
 };

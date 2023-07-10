@@ -41,6 +41,11 @@ input::placeholder {
     padding: theme("spacing.6");
     box-shadow: theme("boxShadow.xl");
   }
+  .custom-shadow {
+    position: relative;
+    box-sizing: border-box;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+  }
 }
 
 pre,

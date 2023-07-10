@@ -286,10 +286,10 @@ export function useChartReleaseValues({
 
 // Request objects
 interface ReleaseInfoParams {
-  chart: string;
+  chart?: string;
   tab: string;
-  namespace: string;
-  revision: string;
+  namespace?: string;
+  revision?: string;
 }
 interface InstallReleaseRequest {
   name: string;
