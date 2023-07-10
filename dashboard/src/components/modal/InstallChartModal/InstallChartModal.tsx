@@ -94,6 +94,11 @@ export const InstallChartModal = ({
     selectedVersion || "",
     {
       enabled: isInstall && selectedRepo !== "",
+      onSuccess: (data) => {
+        if (data) {
+          fetchDiff({ userValues: data });
+        }
+      },
     }
   );
 
@@ -101,7 +106,7 @@ export const InstallChartModal = ({
     useChartReleaseValues({
       namespace,
       release: String(releaseName),
-      // userDefinedValue: userValues, // for key only
+      userDefinedValue: userValues, // for key only
       revision: revision ? parseInt(revision) : undefined,
       options: {
         enabled: !isInstall,
@@ -122,7 +127,14 @@ export const InstallChartModal = ({
 
   // Confirm method (install)
   const setReleaseVersionMutation = useMutation(
-    ["setVersion", namespace, chart, selectedVersion, selectedRepo, selectedCluster],
+    [
+      "setVersion",
+      namespace,
+      chart,
+      selectedVersion,
+      selectedRepo,
+      selectedCluster,
+    ],
     async () => {
       setErrorMessage("");
       const formData = new FormData();
@@ -134,7 +146,8 @@ export const InstallChartModal = ({
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        `/api/helm/releases/${namespace ? namespace : "default"}${!isInstall ? `/${releaseName}` : `/${releaseValues ? chartName : ""}` // if there is no release we don't provide anything, and we dont display version
+        `/api/helm/releases/${namespace ? namespace : "default"}${
+          !isInstall ? `/${releaseName}` : `/${releaseValues ? chartName : ""}` // if there is no release we don't provide anything, and we dont display version
         }`,
         {
           method: "post",
@@ -164,7 +177,8 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersionData({ version: "" }); //cleanup
           navigate(
-            `/${selectedCluster}/${namespace ? namespace : "default"
+            `/${selectedCluster}/${
+              namespace ? namespace : "default"
             }/${releaseName}/installed/revision/${response.version}`
           );
           window.location.reload();
@@ -202,11 +216,13 @@ export const InstallChartModal = ({
     userValues?: string;
   }) => {
     const formData = getVersionManifestFormData({ version, userValues });
-    const fetchUrl = `/api/helm/releases/${namespace ? namespace : isInstall ? "" : "[empty]"
-      }${!isInstall
+    const fetchUrl = `/api/helm/releases/${
+      namespace ? namespace : isInstall ? "" : "[empty]"
+    }${
+      !isInstall
         ? `/${releaseName}`
         : `/${releaseValues ? chartName : "default"}`
-      }`; // if there is no release we don't provide anything, and we dont display version;
+    }`; // if there is no release we don't provide anything, and we dont display version;
     const response = await apiService.fetchWithDefaults(fetchUrl, {
       method: "post",
       body: formData,
@@ -266,8 +282,9 @@ export const InstallChartModal = ({
       }}
       title={
         <div className="font-bold">
-          {`${isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
-            } `}
+          {`${
+            isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
+          } `}
           {(isUpgrade || releaseValues || isInstall) && (
             <span className="text-green-700 ">{chartName}</span>
           )}
