@@ -17,8 +17,8 @@ export default function InstalledPackagesHeader({
     !isLoading && (numOfPackages == undefined || numOfPackages == 0)
   );
   return (
-    <div className="custom-shadow">
-      <div className="flex items-center justify-between bg-white rounded-md p-2 font-inter">
+    <div className="custom-shadow rounded-t-md  ">
+      <div className="flex items-center justify-between bg-white px-2 py-0.5 font-inter rounded-t-md ">
         <div className="flex items-center">
           <img
             src={HeaderLogo}
