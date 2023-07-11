@@ -40,7 +40,7 @@ function ClustersList({
   filteredNamespaces,
   onClusterChange,
 }: ClustersListProps) {
-  const { addSearchParam, removeSearchParam } = useCustomSearchParams();
+  const { upsertSearchParams, removeSearchParam } = useCustomSearchParams();
   const { clusterMode } = useAppContext();
 
   const { data: clusters } = useQuery<Cluster[]>({
@@ -78,7 +78,7 @@ function ClustersList({
       : [...(filteredNamespaces ?? []), namespace];
     removeSearchParam("filteredNamespace");
     if (newSelectedNamespaces.length > 0) {
-      addSearchParam(
+      upsertSearchParams(
         "filteredNamespace",
         newSelectedNamespaces.map((ns) => ns).join("+")
       );

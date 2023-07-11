@@ -13,10 +13,10 @@ interface TabsProps {
 }
 
 export default function Tabs({ tabs, selectedTab }: TabsProps) {
-  const { addSearchParam } = useCustomSearchParams();
+  const { upsertSearchParams } = useCustomSearchParams();
 
   const moveTab = (tab: Tab) => {
-    addSearchParam("tab", tab.value);
+    upsertSearchParams("tab", tab.value);
   };
 
   return (

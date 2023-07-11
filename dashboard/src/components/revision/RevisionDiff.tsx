@@ -24,7 +24,7 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const [specificVersion, setSpecificVersion] = useState(params.revision);
   const {
     searchParamsObject: searchParams,
-    addSearchParam,
+    upsertSearchParams,
     removeSearchParam,
   } = useCustomSearchParams();
   const {
@@ -37,12 +37,12 @@ function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
   const diffElement = useRef<HTMLElement>({});
 
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
-    addSearchParam("mode", e.target.value);
+    upsertSearchParams("mode", e.target.value);
   };
 
   const handleUserDefinedCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      addSearchParam("user-defined", `${e.target.checked}`);
+      upsertSearchParams("user-defined", `${e.target.checked}`);
     } else {
       removeSearchParam("user-defined");
     }
