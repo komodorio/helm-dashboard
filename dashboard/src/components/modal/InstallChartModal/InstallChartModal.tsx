@@ -61,7 +61,9 @@ export const InstallChartModal = ({
     },
     onSuccess: (data) => {
       const selectedVersion = (data || []).find(
-        ({ version }) => version === (isUpgrade ? latestVersion : currentlyInstalledChartVersion)
+        ({ version }) =>
+          version ===
+          (isUpgrade ? latestVersion : currentlyInstalledChartVersion)
       ) || { version: "", repository: "" };
 
       setSelectedVersionData(selectedVersion);
@@ -249,7 +251,9 @@ export const InstallChartModal = ({
     setIsLoadingDiff(true);
     try {
       const [currentVerData, selectedVerData] = await Promise.all([
-        currentVersion ? fetchVersionData({ version: currentVersion }) : Promise.resolve({manifest: ''}),
+        currentVersion
+          ? fetchVersionData({ version: currentVersion })
+          : Promise.resolve({ manifest: "" }),
         fetchVersionData({ version: selectedVersion || "", userValues }),
       ]);
       const formData = new FormData();
@@ -324,7 +328,7 @@ export const InstallChartModal = ({
       <GeneralDetails
         releaseName={isInstall ? chart : String(releaseName)}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
-        namespace={namespace}
+        namespace={namespace ? namespace : isInstall ? "default" : ""}
         onReleaseNameInput={(releaseName) => setChart(releaseName)}
         onNamespaceInput={(namespace) => setNamespace(namespace)}
       />

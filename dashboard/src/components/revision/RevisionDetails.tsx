@@ -177,7 +177,7 @@ export default function RevisionDetails({
               <InstallChartModal
                 isOpen={isReconfigureModalOpen}
                 chartName={release.chart_name}
-                chartVersion={release.chart_ver}
+                currentlyInstalledChartVersion={release.chart_ver}
                 latestVersion={latestVerData?.[0]?.version}
                 isUpgrade={canUpgrade}
                 onClose={() => {
