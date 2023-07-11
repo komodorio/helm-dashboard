@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import hljs from "highlight.js";
-import { marked } from "marked";
 import { RiExternalLinkLine } from "react-icons/ri";
 
 import {
@@ -201,7 +200,7 @@ const DescribeResource = ({
             className="bg-white rounded p-4 font-medium text-base font-sf-mono"
             style={{ overflow: "unset" }}
             dangerouslySetInnerHTML={{
-              __html: marked(yamlFormattedData),
+              __html: yamlFormattedData,
             }}
           />
         </div>

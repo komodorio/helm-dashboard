@@ -1,4 +1,3 @@
-import { marked } from "marked";
 import hljs from "highlight.js";
 import Spinner from "../../Spinner";
 
@@ -22,9 +21,7 @@ export const ChartValues = ({
         dangerouslySetInnerHTML={
           chartValues && !loading
             ? {
-                __html: marked(
-                  hljs.highlight(chartValues, { language: "yaml" }).value
-                ),
+                __html: hljs.highlight(chartValues, { language: "yaml" }).value,
               }
             : undefined
         }
