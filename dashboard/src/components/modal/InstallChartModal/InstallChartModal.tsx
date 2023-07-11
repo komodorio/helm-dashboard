@@ -99,7 +99,7 @@ export const InstallChartModal = ({
     selectedRepo || "",
     selectedVersion || "",
     {
-      enabled: isInstall && selectedRepo !== "",
+      enabled: isInstall && Boolean(selectedRepo) && selectedRepo !== "",
       onSuccess: (data) => {
         if (data) {
           fetchDiff({ userValues: data });
