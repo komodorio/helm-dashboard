@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const useCustomSearchParams = () => {
@@ -6,12 +7,12 @@ const useCustomSearchParams = () => {
     new URLSearchParams(search)
   );
 
-  const addSearchParam = (k: string, value: string) => {
+  const upsertSearchParams = useCallback((k: string, value: string) => {
     const copySearchParams = new URLSearchParams(search);
     copySearchParams.set(k, value);
     setSearch(copySearchParams);
     return copySearchParams;
-  };
+  }, []);
 
   const removeSearchParam = (k: string) => {
     const copySearchParams = new URLSearchParams(search);
@@ -22,7 +23,7 @@ const useCustomSearchParams = () => {
   return {
     searchParamsObject: searchAsObject,
     setSearchParams: setSearch,
-    addSearchParam,
+    upsertSearchParams,
     removeSearchParam,
   };
 };

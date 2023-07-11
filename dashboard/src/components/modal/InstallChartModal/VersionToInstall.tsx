@@ -14,15 +14,15 @@ export const VersionToInstall: React.FC<{
 }> = ({ versions, onSelectVersion }) => {
   const chartVersion = versions.find(
     ({ isChartVersion }) => isChartVersion
-  )!.version;
+  )?.version;
 
-  const currentVersion = (
+  const currentVersion = chartVersion ? (
     <p className="text-xl text-muted ml-2">
       {`(current version is `}
       <span className="text-green-700">{`${chartVersion}`}</span>
       {`)`}
     </p>
-  );
+  ) : null;
 
   // Prepare your options for react-select
   const options =

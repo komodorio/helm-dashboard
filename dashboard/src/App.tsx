@@ -21,14 +21,12 @@ const queryClient = new QueryClient({
 
 const PageLayout = () => {
   return (
-    <>
+    <div className="flex flex-col h-screen">
       <Header />
-      <div className="bg-body-background min-h-screen min-w-screen">
-        <div className="bg-no-repeat bg-[url('./assets/body-background.svg')] min-h-screen max-h-full">
-          <Outlet />
-        </div>
+      <div className="bg-body-background bg-no-repeat bg-[url('./assets/body-background.svg')] flex-1">
+        <Outlet />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -48,39 +46,37 @@ export default function App() {
   const value = { shouldShowErrorModal, setShowErrorModal };
 
   return (
-    <div>
-      <AppContextProvider>
-        <ErrorModalContext.Provider value={value}>
-          <QueryClientProvider client={queryClient}>
-            <HashRouter>
-              <Routes>
-                <Route path="*" element={<PageLayout />}>
-                  <Route path=":context/*" element={<SyncContext />}>
-                    <Route path="installed/?" element={<Installed />} />
-                    <Route
-                      path=":namespace/:chart/installed/revision/:revision"
-                      element={<Revision />}
-                    />
-                    <Route path="repository/" element={<RepositoryPage />} />
-                    <Route
-                      path="repository/:selectedRepo?"
-                      element={<RepositoryPage />}
-                    />
-                    <Route path="*" element={<Installed />} />
-                  </Route>
+    <AppContextProvider>
+      <ErrorModalContext.Provider value={value}>
+        <QueryClientProvider client={queryClient}>
+          <HashRouter>
+            <Routes>
+              <Route path="*" element={<PageLayout />}>
+                <Route path=":context/*" element={<SyncContext />}>
+                  <Route path="installed/?" element={<Installed />} />
+                  <Route
+                    path=":namespace/:chart/installed/revision/:revision"
+                    element={<Revision />}
+                  />
+                  <Route path="repository/" element={<RepositoryPage />} />
+                  <Route
+                    path="repository/:selectedRepo?"
+                    element={<RepositoryPage />}
+                  />
                   <Route path="*" element={<Installed />} />
                 </Route>
-              </Routes>
-              <GlobalErrorModal
-                isOpen={!!shouldShowErrorModal}
-                onClose={() => setShowErrorModal(undefined)}
-                titleText={shouldShowErrorModal?.title || ""}
-                contentText={shouldShowErrorModal?.msg || ""}
-              />
-            </HashRouter>
-          </QueryClientProvider>
-        </ErrorModalContext.Provider>
-      </AppContextProvider>
-    </div>
+                <Route path="*" element={<Installed />} />
+              </Route>
+            </Routes>
+            <GlobalErrorModal
+              isOpen={!!shouldShowErrorModal}
+              onClose={() => setShowErrorModal(undefined)}
+              titleText={shouldShowErrorModal?.title || ""}
+              contentText={shouldShowErrorModal?.msg || ""}
+            />
+          </HashRouter>
+        </QueryClientProvider>
+      </ErrorModalContext.Provider>
+    </AppContextProvider>
   );
 }

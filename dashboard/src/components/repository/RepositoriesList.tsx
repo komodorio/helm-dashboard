@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import { Repository } from "../../data/types";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
+import { useParams } from "react-router";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
@@ -14,14 +15,13 @@ function RepositoriesList({
   selectedRepository,
   repositories,
 }: RepositoriesListProps) {
-  const [showAddRepositoryModal, setShowAddRepositoryModal] = useState(false);
-  const { searchParamsObject } = useCustomSearchParams();
+  const { searchParamsObject, upsertSearchParams, removeSearchParam } = useCustomSearchParams();
+  const showAddRepositoryModal = useMemo(
+    () => searchParamsObject['add_repo'] === "true",
+    [searchParamsObject]
+  );
+  const setShowAddRepositoryModal = useCallback((value: boolean) => value ? upsertSearchParams('add_repo', 'true') : removeSearchParam('add_repo'), [upsertSearchParams, removeSearchParam]);
 
-  useEffect(() => {
-    if (searchParamsObject.add_repo) {
-      setShowAddRepositoryModal(true);
-    }
-  }, []);
   return (
     <>
       <div className="h-fit bg-white w-72 flex flex-col p-3 rounded shadow-md text-[#3d4048] gap-3">
@@ -44,7 +44,7 @@ function RepositoriesList({
                 checked={repository.name === selectedRepository?.name}
                 name="clusters"
               />
-              <label htmlFor={repository.name} className="ml-1">
+              <label htmlFor={repository.name} className="ml-1 text-sm"> 
                 {repository.name}
               </label>
             </span>

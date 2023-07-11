@@ -10,7 +10,7 @@ import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { Release } from "../data/types";
 
 function Installed() {
-  const { searchParamsObject, addSearchParam } = useCustomSearchParams();
+  const { searchParamsObject, upsertSearchParams } = useCustomSearchParams();
   const { context } = useParams();
   const { filteredNamespace } = searchParamsObject;
   const namespaces = filteredNamespace?.split("+") ?? ["default"];
@@ -20,7 +20,7 @@ function Installed() {
     clusterName: string,
     clusterNamespaces: string[] = []
   ) => {
-    const newSearchParams = addSearchParam(
+    const newSearchParams = upsertSearchParams(
       "filteredNamespace",
       clusterNamespaces.length > 0
         ? `${clusterNamespaces.map((ns) => ns).join("+")}`

@@ -22,7 +22,7 @@ interface InstallChartModalProps {
   isOpen: boolean;
   onClose: () => void;
   chartName: string;
-  chartVersion: string;
+  currentlyInstalledChartVersion?: string;
   latestVersion?: string;
   isUpgrade?: boolean;
   isInstall?: boolean;
@@ -32,7 +32,7 @@ export const InstallChartModal = ({
   isOpen,
   onClose,
   chartName,
-  chartVersion,
+  currentlyInstalledChartVersion,
   latestVersion,
   isUpgrade = false,
   isInstall = false,
@@ -61,7 +61,7 @@ export const InstallChartModal = ({
     },
     onSuccess: (data) => {
       const selectedVersion = (data || []).find(
-        ({ version }) => version === (isUpgrade ? latestVersion : chartVersion)
+        ({ version }) => version === (isUpgrade ? latestVersion : currentlyInstalledChartVersion)
       ) || { version: "", repository: "" };
 
       setSelectedVersionData(selectedVersion);
@@ -70,10 +70,10 @@ export const InstallChartModal = ({
 
   const versions = _versions?.map((v) => ({
     ...v,
-    isChartVersion: v.version === chartVersion,
+    isChartVersion: v.version === currentlyInstalledChartVersion,
   }));
 
-  latestVersion = latestVersion ?? chartVersion; // a guard for typescript, latestVersion is always defined
+  latestVersion = latestVersion ?? currentlyInstalledChartVersion; // a guard for typescript, latestVersion is always defined
   const [selectedVersionData, setSelectedVersionData] = useState<{
     version: string;
     repository?: string;
@@ -244,12 +244,12 @@ export const InstallChartModal = ({
       return;
     }
 
-    const currentVersion = chartVersion;
+    const currentVersion = currentlyInstalledChartVersion;
 
     setIsLoadingDiff(true);
     try {
       const [currentVerData, selectedVerData] = await Promise.all([
-        fetchVersionData({ version: currentVersion }),
+        currentVersion ? fetchVersionData({ version: currentVersion }) : Promise.resolve({manifest: ''}),
         fetchVersionData({ version: selectedVersion || "", userValues }),
       ]);
       const formData = new FormData();
