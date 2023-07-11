@@ -2,8 +2,8 @@ package objects
 
 import (
 	"bytes"
-	"fmt"
 	"gopkg.in/yaml.v3"
+	"helm.sh/helm/v3/pkg/registry"
 	"io"
 	"os"
 	"path"
@@ -51,25 +51,26 @@ func (a *Releases) List() ([]*Release, error) {
 			return nil, errorx.Decorate(err, "failed to get list of releases")
 		}
 		for _, r := range rels {
-			releases = append(releases, &Release{HelmConfig: a.HelmConfig, Orig: r, Settings: a.Settings})
+			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings))
 		}
 	}
 	return releases, nil
 }
 
 func (a *Releases) ByName(namespace string, name string) (*Release, error) {
-	rels, err := a.List()
+	log.Debugf("Getting release by ns+name: %s/%s", namespace, name)
+	hc, err := a.HelmConfig(namespace)
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get list of releases")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 	}
 
-	for _, r := range rels {
-		if r.Orig.Namespace == namespace && r.Orig.Name == name {
-			return r, nil
-		}
+	client := action.NewGet(hc)
+	rel, err := client.Run(name)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to get helm release")
 	}
 
-	return nil, errorx.DataUnavailable.New(fmt.Sprintf("release '%s' is not found in namespace '%s'", name, namespace))
+	return NewRelease(a.HelmConfig, rel, a.Settings), nil
 }
 
 func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
@@ -132,6 +133,16 @@ func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.E
 		return nil, err
 	}
 
+	registryClient, err := registry.NewClient(
+		registry.ClientOptDebug(false),
+		registry.ClientOptEnableCache(true),
+		//registry.ClientOptWriter(out),
+		registry.ClientOptCredentialsFile(settings.RegistryConfig),
+	)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to crete helm config object")
+	}
+
 	if req := chartRequested.Metadata.Dependencies; req != nil {
 		// If CheckDependencies returns an error, we have unfulfilled dependencies.
 		// As of Helm 2.4.0, this is treated as a stopping condition:
@@ -148,6 +159,7 @@ func locateChart(pathOpts action.ChartPathOptions, chart string, settings *cli.E
 					RepositoryConfig: settings.RepositoryConfig,
 					RepositoryCache:  settings.RepositoryCache,
 					Debug:            settings.Debug,
+					RegistryClient:   registryClient, // added on top of Helm code
 				}
 				if err := man.Update(); err != nil {
 					return nil, err
@@ -191,7 +203,7 @@ func (r *Release) History() ([]*Release, error) {
 
 	r.revisions = []*Release{}
 	for _, rev := range revs {
-		r.revisions = append(r.revisions, &Release{HelmConfig: r.HelmConfig, Orig: rev, Settings: r.Settings})
+		r.revisions = append(r.revisions, NewRelease(r.HelmConfig, rev, r.Settings))
 	}
 
 	return r.revisions, nil
@@ -398,4 +410,12 @@ func checkIfInstallable(ch *chart.Chart) error {
 		return nil
 	}
 	return errors.Errorf("%s charts are not installable", ch.Metadata.Type)
+}
+
+func NewRelease(hc HelmNSConfigGetter, orig *release.Release, settings *cli.EnvSettings) *Release {
+	return &Release{
+		HelmConfig: hc,
+		Orig:       orig,
+		Settings:   settings,
+	}
 }
