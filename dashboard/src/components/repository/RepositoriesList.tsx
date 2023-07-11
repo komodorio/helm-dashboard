@@ -15,16 +15,23 @@ function RepositoriesList({
   selectedRepository,
   repositories,
 }: RepositoriesListProps) {
-  const { searchParamsObject, upsertSearchParams, removeSearchParam } = useCustomSearchParams();
+  const { searchParamsObject, upsertSearchParams, removeSearchParam } =
+    useCustomSearchParams();
   const showAddRepositoryModal = useMemo(
-    () => searchParamsObject['add_repo'] === "true",
+    () => searchParamsObject["add_repo"] === "true",
     [searchParamsObject]
   );
-  const setShowAddRepositoryModal = useCallback((value: boolean) => value ? upsertSearchParams('add_repo', 'true') : removeSearchParam('add_repo'), [upsertSearchParams, removeSearchParam]);
+  const setShowAddRepositoryModal = useCallback(
+    (value: boolean) =>
+      value
+        ? upsertSearchParams("add_repo", "true")
+        : removeSearchParam("add_repo"),
+    [upsertSearchParams, removeSearchParam]
+  );
 
   return (
     <>
-      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded shadow-md text-[#3d4048] gap-3">
+      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded custom-shadow text-[#3d4048] gap-3">
         <label className="font-bold">Repositories</label>
         <div className="flex flex-col gap-1">
           {repositories?.map((repository) => (
@@ -44,7 +51,7 @@ function RepositoriesList({
                 checked={repository.name === selectedRepository?.name}
                 name="clusters"
               />
-              <label htmlFor={repository.name} className="ml-1 text-sm"> 
+              <label htmlFor={repository.name} className="ml-1 text-sm">
                 {repository.name}
               </label>
             </span>

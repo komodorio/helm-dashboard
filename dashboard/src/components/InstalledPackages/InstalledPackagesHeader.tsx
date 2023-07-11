@@ -17,7 +17,7 @@ export default function InstalledPackagesHeader({
     !isLoading && (numOfPackages == undefined || numOfPackages == 0)
   );
   return (
-    <div className="drop-shadow">
+    <div className="custom-shadow">
       <div className="flex items-center justify-between bg-white rounded-md p-2 font-inter">
         <div className="flex items-center">
           <img
