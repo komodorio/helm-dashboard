@@ -44,7 +44,7 @@ function RepositoriesList({
                 checked={repository.name === selectedRepository?.name}
                 name="clusters"
               />
-              <label htmlFor={repository.name} className="ml-1">
+              <label htmlFor={repository.name} className="ml-1 text-sm"> 
                 {repository.name}
               </label>
             </span>
