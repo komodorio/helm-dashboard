@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 
 export const GeneralDetails = ({
   releaseName,
-  namespace = "default",
+  namespace = "",
   disabled,
   onNamespaceInput,
   onReleaseNameInput,
