@@ -79,21 +79,16 @@ const ResourceRow = ({
     setIsOpen((prevState) => !prevState);
   };
   const { reason = "", status = "", message = "" } = conditions?.[0] || {};
-  const cellClassnames = "py-2";
 
   const badgeType = getBadgeType(status);
 
   return (
     <>
-      <tr className="min-w-[100%] min-h[70px] text-sm">
-        <td className={"pl-6 rounded text-sm font-normal" + cellClassnames}>
-          {kind}
-        </td>
-        <td className={"font-bold" + cellClassnames + " text-sm	"}>{name}</td>
-        <td className={cellClassnames}>
-          {reason ? <Badge type={badgeType}>{reason}</Badge> : null}
-        </td>
-        <td className={"rounded text-gray-100" + cellClassnames}>
+      <tr className="min-w-[100%] min-h[70px] text-sm py-2">
+        <td className="pl-6 rounded text-sm font-normal w-48">{kind}</td>
+        <td className="font-bold text-sm w-56">{name}</td>
+        <td>{reason ? <Badge type={badgeType}>{reason}</Badge> : null}</td>
+        <td className="rounded text-gray-100">
           <div className="flex flex-col space-y-1 justify-start items-start ">
             {message && (
               <div className="text-gray-500 font-thin">{message}</div>
@@ -103,7 +98,7 @@ const ResourceRow = ({
             )}
           </div>
         </td>
-        <td className={"rounded " + cellClassnames}>
+        <td className="rounded">
           {isLatest && reason !== "NotFound" ? (
             <div className="flex justify-end items-center mr-36">
               <Button className="px-1 text-xs" onClick={toggleDrawer}>
