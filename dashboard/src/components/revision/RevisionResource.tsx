@@ -104,7 +104,7 @@ const ResourceRow = ({
           </div>
         </td>
         <td className={"rounded " + cellClassnames}>
-          {isLatest ? (
+          {isLatest && reason !== "NotFound" ? (
             <div className="flex justify-end items-center pr-4">
               <Button onClick={toggleDrawer}>Describe</Button>
             </div>
