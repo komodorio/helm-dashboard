@@ -215,13 +215,13 @@ function RevisionDiff({
       {isLoading ? <Spinner /> : ""}
       {viewMode === VIEW_MODE_VIEW_ONLY && content ? (
         <div className="bg-white overflow-x-auto w-full p-3 relative">
-          <pre className="bg-white rounded">{parse(content)}</pre>
+          <pre className="bg-white rounded font-sf-mono">{parse(content)}</pre>
         </div>
       ) : (
         ""
       )}
       <div
-        className="bg-white w-full relative leading-5"
+        className="bg-white w-full relative leading-5 font-sf-mono"
         //@ts-ignore
         ref={diffElement}
       ></div>

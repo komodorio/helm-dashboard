@@ -6,7 +6,6 @@ import { ReleaseRevision } from "../data/types";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../API/apiService";
 import Spinner from "../components/Spinner";
-import { DeploymentStatus } from "../components/common/StatusLabel";
 
 const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) =>
   r1.revision - r2.revision < 0 ? 1 : -1;
@@ -16,11 +15,9 @@ function Revision() {
 
   const selectedRevision = revision ? parseInt(revision, 10) : 0;
 
-  const {
-    data: releaseRevisions,
-    refetch: refetchRevisions,
-    isLoading: isLoadinHistory,
-  } = useQuery<ReleaseRevision[]>({
+  const { data: releaseRevisions, isLoading: isLoadingHistory } = useQuery<
+    ReleaseRevision[]
+  >({
     //eslint-ignore
     //@ts-ignore
     queryKey: ["releasesHistory", restParams],
@@ -52,7 +49,7 @@ function Revision() {
         <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">
           Revisions
         </label>
-        {isLoadinHistory ? (
+        {isLoadingHistory ? (
           <RevisionSidebarSkeleton />
         ) : (
           <RevisionsList
@@ -63,7 +60,7 @@ function Revision() {
       </div>
 
       <div className="w-5/6 min-h-screen bg-[#F4F7FA] pb-4">
-        {isLoadinHistory ? (
+        {isLoadingHistory ? (
           <div className=" p-4">
             <Spinner />
           </div>
