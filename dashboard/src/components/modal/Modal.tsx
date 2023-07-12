@@ -41,23 +41,23 @@ const Modal = ({
   const colorVariants = new Map<ModalButtonStyle, string>([
     [
       ModalButtonStyle.default,
-      "text-lg font-bold text-gray-500 bg-white hover:bg-gray-100 disabled:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 font-medium px-5 py-1 hover:text-gray-900 focus:z-10 ",
+      "text-base font-semibold text-gray-500 bg-white hover:bg-gray-100 disabled:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 font-medium px-5 py-1 hover:text-gray-900 focus:z-10 ",
     ],
     [
       ModalButtonStyle.info,
-      "font-bold text-white bg-blue-700 hover:bg-blue-800 disabled:bg-blue-700/80 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-lg px-3 py-1.5 text-center ",
+      "font-semibold text-white bg-blue-700 hover:bg-blue-800 disabled:bg-blue-700/80 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-base px-3 py-1.5 text-center ",
     ],
     [
       ModalButtonStyle.success,
-      "font-bold text-white bg-green-700 hover:bg-green-800 disabled:bg-green-700/80 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-lg px-3 py-1.5 text-center ",
+      "font-semibold text-white bg-green-700 hover:bg-green-800 disabled:bg-green-700/80 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-base px-3 py-1.5 text-center ",
     ],
     [
       ModalButtonStyle.error,
-      "font-bold text-white bg-red-700 hover:bg-red-800 disabled:bg-red-700/80 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-lg px-3 py-1.5 text-center ",
+      "font-semibold text-white bg-red-700 hover:bg-red-800 disabled:bg-red-700/80 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-base px-3 py-1.5 text-center ",
     ],
     [
       ModalButtonStyle.disabled,
-      "font-bold text-gray-500 bg-gray-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-lg font-medium px-3 py-1.5 hover:text-gray-900 focus:z-10 ",
+      "font-semibold text-gray-500 bg-gray-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-base font-medium px-3 py-1.5 hover:text-gray-900 focus:z-10 ",
     ],
   ]);
 
@@ -134,7 +134,7 @@ const Modal = ({
                           ? `flex items-center font-bold justify-around space-x-1 ${getClassName(
                               action
                             )}`
-                          : getClassName(action)
+                          : `${getClassName(action)} `
                       }
                       onClick={action.callback}
                       disabled={action.disabled || action.isLoading}
