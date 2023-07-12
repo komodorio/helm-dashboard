@@ -70,9 +70,9 @@ export default function InstalledPackageCard({
 
   const statusColor = getStatusColor(release.status as DeploymentStatus);
   const borderLeftColor: { [key: string]: string } = {
-    [DeploymentStatus.DEPLOYED]: "border-l-deployed",
-    [DeploymentStatus.FAILED]: "border-l-failed",
-    [DeploymentStatus.PENDING]: "border-l-pending",
+    [DeploymentStatus.DEPLOYED]: "border-l-[#1BE99A]",
+    [DeploymentStatus.FAILED]: "border-l-text-danger",
+    [DeploymentStatus.PENDING]: "border-l-[#5AB0FF]",
   };
 
   return (

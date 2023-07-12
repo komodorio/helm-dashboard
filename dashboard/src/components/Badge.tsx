@@ -35,14 +35,14 @@ export interface BadgeProps {
 }
 export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
-    [BadgeCodes.SUCCESS]: "bg-success text-black-800",
-    [BadgeCodes.WARNING]: "bg-warning text-white",
-    [BadgeCodes.ERROR]: "bg-danger text-white",
+    [BadgeCodes.SUCCESS]: "bg-text-success text-black-800",
+    [BadgeCodes.WARNING]: "bg-text-warning text-white",
+    [BadgeCodes.ERROR]: "bg-text-danger text-white",
     [BadgeCodes.UNKNOWN]: "bg-secondary text-danger",
   };
 
   const badgeBase =
-    "inline-flex items-center px-2.5 rounded text-sm font-light";
+    "inline-flex items-center px-1 py-1 rounded text-xs font-light";
 
   const badgeElem = (
     <span

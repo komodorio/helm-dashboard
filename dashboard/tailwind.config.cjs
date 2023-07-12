@@ -37,6 +37,7 @@ module.exports = {
     extend: {
       colors: {
         grey: "#3d4048",
+        "light-grey": "#DCDDDF",
         primary: "#1347FF",
         secondary: "#ECEFF2",
         muted: "#707583",
@@ -51,6 +52,8 @@ module.exports = {
         pending: "#5AB0FF",
         danger: "#ff0072",
         "text-danger": "#FC1683",
+        "text-warning": "#ffc107",
+        "text-success": "#A4F8D7",
         warning: "#ffa800",
         success: "#00c2ab",
         "link-color": "#0D6EFD",
