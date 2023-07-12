@@ -42,12 +42,14 @@ type RevisionDetailsProps = {
   release: Release;
   installedRevision: ReleaseRevision;
   isLatest: boolean;
+  latestRevision: number;
 };
 
 export default function RevisionDetails({
   release,
   installedRevision,
   isLatest,
+  latestRevision,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
   const revisionTabs = [
@@ -56,13 +58,26 @@ export default function RevisionDetails({
       label: "Resources",
       content: <RevisionResource isLatest={isLatest} />,
     },
-    { value: "manifests", label: "Manifests", content: <RevisionDiff /> },
+    {
+      value: "manifests",
+      label: "Manifests",
+      content: <RevisionDiff latestRevision={latestRevision} />,
+    },
     {
       value: "values",
       label: "Values",
-      content: <RevisionDiff includeUserDefineOnly={true} />,
+      content: (
+        <RevisionDiff
+          latestRevision={latestRevision}
+          includeUserDefineOnly={true}
+        />
+      ),
     },
-    { value: "notes", label: "Notes", content: <RevisionDiff /> },
+    {
+      value: "notes",
+      label: "Notes",
+      content: <RevisionDiff latestRevision={latestRevision} />,
+    },
   ];
   const { context, namespace, chart } = useParams();
   const tab = searchParams.get("tab");

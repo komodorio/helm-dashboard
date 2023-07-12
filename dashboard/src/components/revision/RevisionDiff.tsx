@@ -12,16 +12,20 @@ import { diffConfiguration } from "../../utils";
 
 type RevisionDiffProps = {
   includeUserDefineOnly?: boolean;
+  latestRevision: number;
 };
 
 const VIEW_MODE_VIEW_ONLY = "view";
 const VIEW_MODE_DIFF_PREV = "diff-with-previous";
 const VIEW_MODE_DIFF_SPECIFIC = "diff-with-specific-revision";
 
-function RevisionDiff({ includeUserDefineOnly }: RevisionDiffProps) {
+function RevisionDiff({
+  includeUserDefineOnly,
+  latestRevision,
+}: RevisionDiffProps) {
   const params = useParams();
 
-  const [specificVersion, setSpecificVersion] = useState(params.revision);
+  const [specificVersion, setSpecificVersion] = useState(latestRevision);
   const {
     searchParamsObject: searchParams,
     upsertSearchParams,

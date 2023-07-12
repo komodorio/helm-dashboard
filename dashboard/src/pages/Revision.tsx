@@ -74,6 +74,7 @@ function Revision() {
             //@ts-ignore
             installedRevision={releaseRevisions?.[0] as ReleaseRevision}
             isLatest={selectedRelease.revision === latestRevision?.revision}
+            latestRevision={latestRevision.revision}
           />
         ) : null}
       </div>
