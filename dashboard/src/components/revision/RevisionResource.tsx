@@ -105,8 +105,10 @@ const ResourceRow = ({
         </td>
         <td className={"rounded " + cellClassnames}>
           {isLatest && reason !== "NotFound" ? (
-            <div className="flex justify-end items-center pr-4">
-              <Button onClick={toggleDrawer}>Describe</Button>
+            <div className="flex justify-end items-center mr-36">
+              <Button className="px-1 text-xs" onClick={toggleDrawer}>
+                Describe
+              </Button>
             </div>
           ) : null}
         </td>
