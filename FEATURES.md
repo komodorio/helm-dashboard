@@ -109,7 +109,7 @@ Text: The Notes tab displays any accompanying notes or documentation related to 
 Diff with previous: The "Diff" feature is not typically available in the Notes tab. This tab is primarily meant for viewing the static text-based notes associated with the chart and doesn't involve comparisons or tracking changes like in the Manifests or Values tabs.
 ![Detail15](images/screenshot_notes_diff_prev.png)
 
-Diff with Specific Version: Similar to the previous point, the ability to view a diff with a specific version of the notes is not a standard feature in the Notes section of the Helm Dashboard. The Notes section usually presents the information for the specific version of the Helm chart that is currently deployed.
+Diff with Specific Version: Similar to the previous point, the ability to view a diff with a specific version of the notes is not a standard feature in the Notes section of the Helm Dashboard. The Notes section usually presents the information for the specific version of the Helm chart that is currently.
 ![Detail16](images/screenshot_notes_diff_specific_version.png)
 
 
