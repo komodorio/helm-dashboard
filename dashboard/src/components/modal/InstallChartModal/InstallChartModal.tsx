@@ -323,6 +323,7 @@ export const InstallChartModal = ({
           onSelectVersion={(versionData) => {
             setSelectedVersionData(versionData);
           }}
+          isInstall={isInstall}
         />
       )}
       <GeneralDetails

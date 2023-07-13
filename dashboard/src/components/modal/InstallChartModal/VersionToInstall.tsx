@@ -2,7 +2,6 @@ import { useState } from "react";
 import Select, { components } from "react-select";
 import { BsCheck2 } from "react-icons/bs";
 import { NonEmptyArray } from "../../../data/types";
-import { isNewerVersion } from "../../../utils";
 
 export const VersionToInstall: React.FC<{
   versions: NonEmptyArray<{
@@ -11,18 +10,20 @@ export const VersionToInstall: React.FC<{
     isChartVersion: boolean;
   }>;
   onSelectVersion: (props: { version: string; repository: string }) => void;
-}> = ({ versions, onSelectVersion }) => {
+  isInstall?: boolean;
+}> = ({ versions, onSelectVersion, isInstall }) => {
   const chartVersion = versions.find(
     ({ isChartVersion }) => isChartVersion
   )?.version;
 
-  const currentVersion = chartVersion ? (
-    <p className="text-xl text-muted ml-2">
-      {`(current version is `}
-      <span className="text-green-700">{`${chartVersion}`}</span>
-      {`)`}
-    </p>
-  ) : null;
+  const currentVersion =
+    chartVersion && !isInstall ? (
+      <p className="text-xl text-muted ml-2">
+        {`(current version is `}
+        <span className="text-green-700">{`${chartVersion}`}</span>
+        {`)`}
+      </p>
+    ) : null;
 
   // Prepare your options for react-select
   const options =
@@ -56,7 +57,7 @@ export const VersionToInstall: React.FC<{
               SingleValue: ({ children, ...props }) => (
                 <components.SingleValue {...props}>
                   <span className="text-green-700 font-bold">{children}</span>
-                  {props.data.check && (
+                  {props.data.check && !isInstall && (
                     <BsCheck2 className="inline-block ml-2 text-green-700 font-bold" />
                   )}
                 </components.SingleValue>
