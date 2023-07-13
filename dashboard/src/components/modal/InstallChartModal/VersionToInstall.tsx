@@ -68,7 +68,7 @@ export const VersionToInstall: React.FC<{
                   {...innerProps}
                 >
                   <div className="width-auto">{children}</div>
-                  {data.check && (
+                  {data.check && !isInstall && (
                     <BsCheck2
                       fontWeight={"bold"}
                       className="inline-block ml-2 text-green-700 font-bold"
