@@ -328,7 +328,7 @@ export const InstallChartModal = ({
       <GeneralDetails
         releaseName={isInstall ? chart : String(releaseName)}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
-        namespace={namespace ? namespace : isInstall ? "default" : ""}
+        namespace={namespace ? namespace : ""}
         onReleaseNameInput={(releaseName) => setChart(releaseName)}
         onNamespaceInput={(namespace) => setNamespace(namespace)}
       />
