@@ -112,7 +112,7 @@ export const InstallChartModal = ({
     useChartReleaseValues({
       namespace,
       release: String(releaseName),
-      userDefinedValue: userValues, // for key only
+      // userDefinedValue: userValues, // for key only
       revision: revision ? parseInt(revision) : undefined,
       options: {
         enabled: !isInstall,
@@ -290,6 +290,10 @@ export const InstallChartModal = ({
       isOpen={isOpen}
       onClose={() => {
         setSelectedVersionData({ version: "" });
+        if (!isInstall) {
+          setUserValues(releaseValues);
+          fetchDiff({ userValues: releaseValues });
+        }
         onClose();
       }}
       title={
