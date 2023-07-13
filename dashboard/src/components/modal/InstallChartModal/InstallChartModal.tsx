@@ -72,7 +72,7 @@ export const InstallChartModal = ({
 
   const versions = _versions?.map((v) => ({
     ...v,
-    isChartVersion: v.version === currentlyInstalledChartVersion,
+    isInstalledVersion: v.version === currentlyInstalledChartVersion,
   }));
 
   latestVersion = latestVersion ?? currentlyInstalledChartVersion; // a guard for typescript, latestVersion is always defined
@@ -326,6 +326,7 @@ export const InstallChartModal = ({
         />
       )}
       <GeneralDetails
+        clusterName=""
         releaseName={isInstall ? chart : String(releaseName)}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
         namespace={namespace ? namespace : isInstall ? "default" : ""}

@@ -4,16 +4,18 @@ import { BsCheck2 } from "react-icons/bs";
 import { NonEmptyArray } from "../../../data/types";
 import { isNewerVersion } from "../../../utils";
 
+export interface Version {
+  repository: string;
+  version: string;
+  isInstalledVersion: boolean;
+}
+
 export const VersionToInstall: React.FC<{
-  versions: NonEmptyArray<{
-    repository: string;
-    version: string;
-    isChartVersion: boolean;
-  }>;
-  onSelectVersion: (props: { version: string; repository: string }) => void;
+  versions: NonEmptyArray<Version>;
+  onSelectVersion: (props: Version) => void;
 }> = ({ versions, onSelectVersion }) => {
   const chartVersion = versions.find(
-    ({ isChartVersion }) => isChartVersion
+    ({ isInstalledVersion }) => isInstalledVersion
   )?.version;
 
   const currentVersion = chartVersion ? (
@@ -26,8 +28,8 @@ export const VersionToInstall: React.FC<{
 
   // Prepare your options for react-select
   const options =
-    versions.map(({ repository, version }) => ({
-      value: { repository, version },
+    versions.map(({ repository, version, ...rest }) => ({
+      value: { repository, version, ...rest },
       label: `${repository} @ ${version}`,
       check: chartVersion === version,
     })) || [];

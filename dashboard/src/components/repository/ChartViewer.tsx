@@ -41,7 +41,7 @@ function ChartViewer({ chart }: ChartViewerProps) {
           </button>
         </span>
       </div>
-      {showInstallModal && (
+      {/* {showInstallModal && (
         <InstallChartModal
           chartName={chart.name}
           currentlyInstalledChartVersion={chart.version}
@@ -49,7 +49,7 @@ function ChartViewer({ chart }: ChartViewerProps) {
           onClose={() => setShowInstallModal(false)}
           isInstall={true}
         />
-      )}
+      )} */}
     </>
   );
 }

@@ -4,24 +4,21 @@ export const UserDefinedValues = ({
   initialValue,
   setValues,
 }: {
-  initialValue: string;
+  initialValue?: string;
   setValues: (val: string) => void;
 }) => {
-  const [localState, setLocalState] = useState(initialValue);
-
-  useEffect(() => {
-    setLocalState(initialValue);
-  }, [initialValue]);
-
+  const [localState, setLocalState] = useState(initialValue ?? '');
   const prevValueRef = useRef(initialValue);
   const timeoutRef = useRef<any>(null);
   useEffect(() => {
-    clearTimeout(timeoutRef.current);
     if (prevValueRef.current !== localState) {
       timeoutRef.current = setTimeout(() => {
         setValues(localState);
         clearTimeout(timeoutRef.current);
       }, 400);
+    }
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     }
   }, [localState]);
 

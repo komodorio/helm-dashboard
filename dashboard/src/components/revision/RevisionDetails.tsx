@@ -32,6 +32,7 @@ import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal"
 import { diffConfiguration, isNewerVersion } from "../../utils";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import apiService from "../../API/apiService";
+import { InstallChartModal2 } from "../modal/InstallChartModal/InstallChartModal2";
 
 type RevisionTagProps = {
   caption: string;
@@ -174,12 +175,12 @@ export default function RevisionDetails({
             </Button>
 
             {isReconfigureModalOpen && (
-              <InstallChartModal
+              <InstallChartModal2
                 isOpen={isReconfigureModalOpen}
                 chartName={release.chart_name}
                 currentlyInstalledChartVersion={release.chart_ver}
                 latestVersion={latestVerData?.[0]?.version}
-                isUpgrade={canUpgrade}
+                isUpgrade={canUpgrade ? 'upgrade' : 'install'}
                 onClose={() => {
                   setIsReconfigureModalOpen(false);
                 }}

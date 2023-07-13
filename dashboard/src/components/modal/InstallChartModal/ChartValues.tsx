@@ -1,13 +1,15 @@
 import hljs from "highlight.js";
 import Spinner from "../../Spinner";
+import { Loadable } from "../../../types";
 
 export const ChartValues = ({
   chartValues,
-  loading,
 }: {
-  chartValues: string;
-  loading: boolean;
+  chartValues: Loadable<string>;
 }) => {
+  if (chartValues.state === 'error') {
+    throw chartValues.error;
+  }
   return (
     <div className="w-1/2">
       <label
@@ -19,16 +21,16 @@ export const ChartValues = ({
       <pre
         className="text-base bg-[#ECEFF2] p-2 rounded font-medium w-full max-h-[330px] block overflow-y-auto font-sf-mono"
         dangerouslySetInnerHTML={
-          chartValues && !loading
+          chartValues.state === 'hasValue'
             ? {
-                __html: hljs.highlight(chartValues, { language: "yaml" }).value,
-              }
+              __html: hljs.highlight(chartValues.value, { language: "yaml" }).value,
+            }
             : undefined
         }
       >
-        {loading ? (
+        {chartValues.state === 'loading' ? (
           <Spinner />
-        ) : !chartValues && !loading ? (
+        ) : !chartValues.value ? (
           "No original values information found"
         ) : null}
       </pre>

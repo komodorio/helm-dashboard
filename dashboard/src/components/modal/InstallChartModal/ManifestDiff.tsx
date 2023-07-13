@@ -4,30 +4,29 @@ import hljs from "highlight.js";
 import { useEffect, useRef } from "react";
 import Spinner from "../../Spinner";
 import { diffConfiguration } from "../../../utils";
+import { Loadable } from "../../../types";
 
 interface ManifestDiffProps {
-  diff: string;
-  isLoading: boolean;
-  error: string;
+  diff: Loadable<string>;
 }
 
-export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
+export const ManifestDiff = ({ diff }: ManifestDiffProps) => {
   const diffContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (diff && diffContainerRef.current) {
+    if (diff.state === 'hasValue' && diffContainerRef.current) {
       const diff2htmlUi = new Diff2HtmlUI(
         diffContainerRef.current,
-        diff,
+        diff.value,
         diffConfiguration,
         hljs
       );
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
     }
-  }, [diff, diffContainerRef.current]);
+  }, [diff.state, diff, diffContainerRef.current]);
 
-  if (isLoading) {
+  if (diff.state === 'loading') {
     return (
       <div className="flex text-lg items-end">
         <Spinner />
@@ -40,9 +39,9 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
     <div>
       <h4 className="text-xl">Manifest changes:</h4>
 
-      {error ? (
+      {diff.state === 'error' ? (
         <p className="text-red-600 text-lg">
-          Failed to get upgrade info: {error}
+          Failed to get upgrade info: {diff.error}
         </p>
       ) : diff ? (
         <div

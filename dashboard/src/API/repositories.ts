@@ -12,6 +12,7 @@ import {
   LatestChartVersion,
   ValuesYamlText,
 } from "./interfaces";
+import { Loadable } from "../types";
 
 // Get list of Helm repositories
 export function useGetRepositories(
@@ -123,19 +124,44 @@ function useGetChartValues(
   );
 }
 
+const useLoadableQuery = <T>(
+  queryKey: any,
+  queryFn: () => Promise<T>,
+  options?: UseQueryOptions<T>
+) => {
+  const query = useQuery<T>(queryKey, queryFn, options);
+  return {
+    ...query,
+    loadable: {
+      state: query.error ? "error" as const : query.isLoading ? "loading" as const : "hasValue" as const,
+      value: query.data,
+      error: query?.error,
+    } as Loadable<T>,
+  };
+};
+
+
+
 export function useChartRepoValues(
-  namespace: string,
-  chartName: string,
-  repository: string,
-  version: string,
-  options?: UseQueryOptions<any>
+  {
+    chartName,
+    namespace,
+    repository,
+    version,
+    options,
+  }: {
+    chartName: string,
+    namespace?: string,
+    repository?: string,
+    version?: string,
+    options?: UseQueryOptions<any>
+  }
 ) {
-  return useQuery<any>(
+  return useLoadableQuery<any>(
     ["values", namespace, chartName, repository],
     () =>
       callApi<any>(
-        `/api/helm/repositories/values?chart=${
-          repository ? `${repository}/` : ""
+        `/api/helm/repositories/values?chart=${repository ? `${repository}/` : ""
         }${chartName}&version=${version}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
