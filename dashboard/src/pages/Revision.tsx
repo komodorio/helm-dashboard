@@ -25,7 +25,11 @@ function Revision() {
   });
 
   const latestRevision = useMemo(
-    () => Array.isArray(releaseRevisions) && releaseRevisions?.[0],
+    () =>
+      Array.isArray(releaseRevisions) &&
+      releaseRevisions?.find((revisionData) => {
+        return revisionData.revision === releaseRevisions.length;
+      }),
     [releaseRevisions]
   );
 
