@@ -125,18 +125,15 @@ function useGetChartValues(
 
 export function useChartRepoValues(
   namespace: string,
-  chartName: string,
-  repository: string,
   version: string,
+  chart: string,
   options?: UseQueryOptions<any>
 ) {
   return useQuery<any>(
-    ["values", namespace, chartName, repository],
+    ["values", namespace, chart],
     () =>
       callApi<any>(
-        `/api/helm/repositories/values?chart=${
-          repository ? `${repository}/` : ""
-        }${chartName}&version=${version}`,
+        `/api/helm/repositories/values?chart=${chart}&version=${version}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }

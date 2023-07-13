@@ -8,8 +8,9 @@ export const VersionToInstall: React.FC<{
     repository: string;
     version: string;
     isChartVersion: boolean;
+    urls: string[];
   }>;
-  onSelectVersion: (props: { version: string; repository: string }) => void;
+  onSelectVersion: (props: { version: string; repository: string; urls: string[] }) => void;
   isInstall?: boolean;
 }> = ({ versions, onSelectVersion, isInstall }) => {
   const chartVersion = versions.find(
@@ -27,8 +28,8 @@ export const VersionToInstall: React.FC<{
 
   // Prepare your options for react-select
   const options =
-    versions.map(({ repository, version }) => ({
-      value: { repository, version },
+    versions.map(({ repository, version, urls }) => ({
+      value: { repository, version, urls },
       label: `${repository} @ ${version}`,
       check: chartVersion === version,
     })) || [];
