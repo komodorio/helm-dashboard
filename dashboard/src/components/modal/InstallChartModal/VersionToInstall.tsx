@@ -40,7 +40,6 @@ export const VersionToInstall: React.FC<{
     })) || [];
   const [selectedOption, setSelectedOption] = useState<typeof options[number]>();
   const initOpt = useMemo(() => options.find(({ value }) => value.version === initialVersion?.version && value.repository === initialVersion?.repository), [options, initialVersion]);
-  console.log({selectedOption, initialVersion})
   return (
     <div className="flex gap-2 text-xl items-center">
       {(versions?.length && (selectedOption || initOpt)) ? (
