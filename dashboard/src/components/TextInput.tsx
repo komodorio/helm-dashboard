@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * @file TextInput.tsx
  * @description This is a single-lined text field.
  *              You can choose a placeholder, label,
@@ -9,7 +9,7 @@
  * - placeholder: placeholder text
  * - isMandatory: adds a red star if is.
  *
- * @return JSX.Element 
+ * @return JSX.Element
  *
  */
 
@@ -28,7 +28,7 @@ export default function TextInput(props: TextInputProps): JSX.Element {
       <label className="block ml-1 mb-1 text-sm font-medium text-gray-900dark:text-white">
         {props.label}
         {/* if prop.isMandatory is true, add a whitespace and a red star to signify it*/}
-        {props.isMandatory ? <span className='text-red-500'> *</span> : ""}
+        {props.isMandatory ? <span className="text-red-500"> *</span> : ""}
       </label>
       <input
         type="text"

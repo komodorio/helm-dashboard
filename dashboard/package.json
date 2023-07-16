@@ -44,6 +44,8 @@
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-storybook": "^0.6.12",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
     "postcss": "^8.4.24",
     "prettier": "2.8.4",
     "react-icons": "^4.8.0",
@@ -52,6 +54,9 @@
     "typescript": "^4.9.5",
     "vite": "^4.1.0",
     "vite-plugin-html-config": "^1.0.11"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   },
   "scripts": {
     "dev": "vite",
@@ -63,7 +68,8 @@
     "lint": "npx eslint src/",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier src/ --check",
-    "prettier:fix": "npm run prettier -- --write"
+    "prettier:fix": "npm run prettier -- --write",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",

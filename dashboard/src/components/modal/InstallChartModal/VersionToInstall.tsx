@@ -15,12 +15,17 @@ export const VersionToInstall: React.FC<{
     repository?: string;
     version?: string;
   };
-  onSelectVersion: (props: { version: string; repository: string; urls: string[] }) => void;
+  onSelectVersion: (props: {
+    version: string;
+    repository: string;
+    urls: string[];
+  }) => void;
   isInstall?: boolean;
 }> = ({ versions, onSelectVersion, isInstall, initialVersion }) => {
-  const chartVersion = useMemo(() => versions.find(
-    ({ isChartVersion }) => isChartVersion
-  )?.version, [versions]);
+  const chartVersion = useMemo(
+    () => versions.find(({ isChartVersion }) => isChartVersion)?.version,
+    [versions]
+  );
 
   const currentVersion =
     chartVersion && !isInstall ? (
@@ -38,11 +43,20 @@ export const VersionToInstall: React.FC<{
       label: `${repository} @ ${version}`,
       check: chartVersion === version,
     })) || [];
-  const [selectedOption, setSelectedOption] = useState<typeof options[number]>();
-  const initOpt = useMemo(() => options.find(({ value }) => value.version === initialVersion?.version && value.repository === initialVersion?.repository), [options, initialVersion]);
+  const [selectedOption, setSelectedOption] =
+    useState<(typeof options)[number]>();
+  const initOpt = useMemo(
+    () =>
+      options.find(
+        ({ value }) =>
+          value.version === initialVersion?.version &&
+          value.repository === initialVersion?.repository
+      ),
+    [options, initialVersion]
+  );
   return (
     <div className="flex gap-2 text-xl items-center">
-      {(versions?.length && (selectedOption || initOpt)) ? (
+      {versions?.length && (selectedOption || initOpt) ? (
         <>
           Version to install:{" "}
           <Select

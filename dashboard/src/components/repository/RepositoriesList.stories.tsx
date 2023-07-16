@@ -15,7 +15,7 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof RepositoriesList> = () => (
-  <RepositoriesList 
+  <RepositoriesList
     selectedRepository={undefined}
     // in this case we allow Unexpected empty method
     //eslint-disable-next-line @typescript-eslint/no-empty-function

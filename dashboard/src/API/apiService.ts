@@ -1,19 +1,26 @@
-import { Chart, ChartVersion, Release, ReleaseHealthStatus, ReleaseRevision, Repository } from "../data/types";
+import {
+  Chart,
+  ChartVersion,
+  Release,
+  ReleaseHealthStatus,
+  ReleaseRevision,
+  Repository,
+} from "../data/types";
 import { QueryFunctionContext } from "@tanstack/react-query";
 interface ClustersResponse {
-  AuthInfo: string
-  Cluster: string
-  IsCurrent: boolean
-  Name: string
-  Namespace: string
+  AuthInfo: string;
+  Cluster: string;
+  IsCurrent: boolean;
+  Name: string;
+  Namespace: string;
 }
 class ApiService {
   currentCluster = "";
-  constructor(protected readonly isMockMode: boolean = false) { }
+  constructor(protected readonly isMockMode: boolean = false) {}
 
   setCluster = (cluster: string) => {
     this.currentCluster = cluster;
-  }
+  };
 
   public fetchWithDefaults = async (url: string, options?: RequestInit) => {
     if (this.currentCluster) {
@@ -24,7 +31,7 @@ class ApiService {
       return fetch(url, { ...options, headers });
     }
     return fetch(url, options);
-  }
+  };
   getToolVersion = async () => {
     const response = await fetch(`/status`);
     const data = await response.json();
@@ -67,7 +74,9 @@ class ApiService {
     queryKey,
   }: QueryFunctionContext<Chart[], Repository>) => {
     const [_, repository] = queryKey;
-    const response = await this.fetchWithDefaults(`/api/helm/repositories/${repository}`);
+    const response = await this.fetchWithDefaults(
+      `/api/helm/repositories/${repository}`
+    );
     const data = await response.json();
     return data;
   };
@@ -86,13 +95,15 @@ class ApiService {
 
   getResourceStatus = async ({
     release,
-  }: { release: Release }): Promise<ReleaseHealthStatus[] | null> => {
+  }: {
+    release: Release;
+  }): Promise<ReleaseHealthStatus[] | null> => {
     if (!release) return null;
 
     const response = await this.fetchWithDefaults(
       `/api/helm/releases/${release.namespace}/${release.name}/resources?health=true`
     );
-    const data = await response.json()
+    const data = await response.json();
     return data;
   };
 

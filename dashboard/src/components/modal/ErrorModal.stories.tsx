@@ -15,14 +15,16 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof ErrorModal> = (args) => (
-  <ErrorModal {...args}/>
+  <ErrorModal {...args} />
 );
 
 export const Default = Template.bind({});
 
 Default.args = {
-    onClose: ()=>{ console.log('on Close clicked')},
-    titleText: 'Failed to get list of charts',
-    contentText: 'failed to get list of releases, cause: Kubernetes cluster unreachable: Get &#34;https://kubernetes.docker.internal:6443/version&#34;: dial tcp 127.0.0.1:6443: connectex: No connection could be made because the target machine actively refused it.'
-
+  onClose: () => {
+    console.log("on Close clicked");
+  },
+  titleText: "Failed to get list of charts",
+  contentText:
+    "failed to get list of releases, cause: Kubernetes cluster unreachable: Get &#34;https://kubernetes.docker.internal:6443/version&#34;: dial tcp 127.0.0.1:6443: connectex: No connection could be made because the target machine actively refused it.",
 };

@@ -15,10 +15,7 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof AddRepositoryModal> = (args) => (
-  <AddRepositoryModal
-    {...args}
-    isOpen={true}
-  />
+  <AddRepositoryModal {...args} isOpen={true} />
 );
 
 export const Default = Template.bind({});
