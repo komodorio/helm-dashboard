@@ -10,6 +10,7 @@ import { ErrorAlert, ErrorModalContext } from "./context/ErrorModalContext";
 import GlobalErrorModal from "./components/modal/GlobalErrorModal";
 import { AppContextProvider } from "./context/AppContext";
 import apiService from "./API/apiService";
+import DocsPage from "./pages/DocsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +67,7 @@ export default function App() {
                   <Route path="*" element={<Installed />} />
                 </Route>
                 <Route path="*" element={<Installed />} />
+                <Route path="docs/" element={<DocsPage/>} />
               </Route>
             </Routes>
             <GlobalErrorModal

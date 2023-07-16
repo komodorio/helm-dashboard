@@ -42,7 +42,7 @@ export default function Header() {
   };
 
   const openAPI = () => {
-    window.open("/static/api-docs.html", "_blank");
+    window.open("/docs", "_blank");
   };
 
   const getBtnStyle = (identifier: string) =>
