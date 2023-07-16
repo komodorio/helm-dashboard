@@ -49,6 +49,7 @@ export const InstallChartModal = ({
     chart: _releaseName,
     revision,
     context: selectedCluster,
+    selectedRepo: currentRepoCtx,
   } = useParams();
   const [namespace, setNamespace] = useState(queryNamespace);
   const [releaseName, setReleaseName] = useState(isInstall ? chartName : _releaseName);
@@ -60,13 +61,12 @@ export const InstallChartModal = ({
       );
     },
     onSuccess: (data) => {
-      const selectedVersion = (data || []).find(
-        ({ version }) =>
-          version ===
-          (isUpgrade ? latestVersion : currentlyInstalledChartVersion)
-      ) || { version: "", repository: "", urls: [] };
-
-      setSelectedVersionData(selectedVersion);
+      const empty = { version: "", repository: "", urls: [] }
+      if (!isInstall) {
+        return setSelectedVersionData(data[0] ?? empty);
+      }
+      const versionsToRepo = data.filter(v => v.repository === currentRepoCtx)
+      return setSelectedVersionData(versionsToRepo[0] ?? empty);
     },
   });
 
@@ -82,9 +82,6 @@ export const InstallChartModal = ({
     urls: string[];
   }>();
 
-  const chart = useMemo(() => {
-    return selectedVersionData?.urls[0].startsWith('file://') ? selectedVersionData?.urls[0] : `${selectedVersionData?.repository}/${chartName}`;
-  }, [selectedVersionData, chartName])
 
   const selectedVersion = useMemo(() => {
     return selectedVersionData?.version;
@@ -93,6 +90,10 @@ export const InstallChartModal = ({
   const selectedRepo = useMemo(() => {
     return selectedVersionData?.repository;
   }, [selectedVersionData]);
+
+  const chart = useMemo(() => {
+    return selectedVersionData?.urls?.[0]?.startsWith('file://') ? selectedVersionData?.urls[0] : `${selectedVersionData?.repository}/${chartName}`;
+  }, [selectedVersionData, chartName])
 
   const {
     data: chartValues,
@@ -324,9 +325,8 @@ export const InstallChartModal = ({
       {versions && isNoneEmptyArray(versions) && (
         <VersionToInstall
           versions={versions}
-          onSelectVersion={(versionData) => {
-            setSelectedVersionData(versionData);
-          }}
+          initialVersion={selectedVersionData}
+          onSelectVersion={setSelectedVersionData}
           isInstall={isInstall}
         />
       )}
