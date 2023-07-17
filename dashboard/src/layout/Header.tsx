@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -17,6 +17,7 @@ import { useAppContext } from "../context/AppContext";
 
 export default function Header() {
   const { clusterMode, setClusterMode } = useAppContext();
+  const navigate = useNavigate();
   const { data: statusData } = useGetApplicationStatus({
     onSuccess: (data) => {
       setClusterMode(data.ClusterMode);
@@ -42,7 +43,7 @@ export default function Header() {
   };
 
   const openAPI = () => {
-    window.open("/docs", "_blank");
+    window.open("/#/docs", "_blank");
   };
 
   const getBtnStyle = (identifier: string) =>
