@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     build: {
-      assetsDir: "./assets",
+      assetsDir: "./assets/",
       outDir: "../pkg/frontend/dist",
       emptyOutDir: true,
     },
