@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "public/static",   ".storybook/**/*.ts"],
+  "include": ["src", "public/static",   ".storybook/**/*.ts", "public/analytics.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
