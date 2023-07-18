@@ -4702,7 +4702,7 @@
   "resolved" "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz"
   "version" "3.1.3"
 
-"fast-glob@^3.2.12", "fast-glob@^3.2.9":
+"fast-glob@^3.2.11", "fast-glob@^3.2.12", "fast-glob@^3.2.9":
   "integrity" "sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w=="
   "resolved" "https://registry.npmjs.org/fast-glob/-/fast-glob-3.2.12.tgz"
   "version" "3.2.12"
@@ -9152,6 +9152,16 @@
   "integrity" "sha512-hUybhgI+/LQQ5q6xoMMsTvI4PBuQD/Wv6Z1vtDPVWjanS8weCIexXuLLYNGD/93f0v8W2hpNfXpmxgpZMahJ0g=="
   "resolved" "https://registry.npmjs.org/vite-plugin-html-config/-/vite-plugin-html-config-1.0.11.tgz"
   "version" "1.0.11"
+
+"vite-plugin-static-copy@^0.17.0":
+  "integrity" "sha512-2HpNbHfDt8SDy393AGXh9llHkc8FJMQkI8s3T5WsH3SWLMO+f5cFIyPErl4yGKU9Uh3Vaqsd4lHZYTf042fQ2A=="
+  "resolved" "https://registry.npmjs.org/vite-plugin-static-copy/-/vite-plugin-static-copy-0.17.0.tgz"
+  "version" "0.17.0"
+  dependencies:
+    "chokidar" "^3.5.3"
+    "fast-glob" "^3.2.11"
+    "fs-extra" "^11.1.0"
+    "picocolors" "^1.0.0"
 
 "vite@^4.1.0":
   "integrity" "sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg=="

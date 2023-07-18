@@ -22,7 +22,8 @@
     "react-modern-drawer": "^1.2.0",
     "react-router-dom": "^6.9.0",
     "react-select": "^5.7.3",
-    "swagger-ui-react": "^5.1.1"
+    "swagger-ui-react": "^5.1.1",
+    "vite-plugin-static-copy": "^0.17.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",
