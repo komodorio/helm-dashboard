@@ -2,765 +2,711 @@ import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 
 const DocsPage = () => {
-  
-  return (
-    <SwaggerUI spec={obj}/>
-  );
+  return <SwaggerUI spec={obj} />;
 };
 
 export default DocsPage;
 
 const obj = {
-  "openapi": "3.0.3",
-  "info": {
-    "title": "Helm Dashboard API",
-    "version": ""
+  openapi: "3.0.3",
+  info: {
+    title: "Helm Dashboard API",
+    version: "",
   },
-  "tags": [
+  tags: [
     {
-      "name": "Releases"
+      name: "Releases",
     },
     {
-      "name": "Repositories"
+      name: "Repositories",
     },
     {
-      "name": "K8s"
+      name: "K8s",
     },
     {
-      "name": "Scanners"
+      name: "Scanners",
     },
     {
-      "name": "Miscellaneous"
-    }
+      name: "Miscellaneous",
+    },
   ],
-  "paths": {
+  paths: {
     "/api/helm/releases": {
-      "get": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Get list of installed releases",
-        "responses": {
+      get: {
+        tags: ["Releases"],
+        description: "Get list of installed releases",
+        responses: {
           "200": {
-            "description": "Returns list of installed releases"
-          }
-        }
-      }
+            description: "Returns list of installed releases",
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace, use '[emtpy]' if you want to use k8s context default"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Install new release",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "required": true
-                  },
-                  "chart": {
-                    "type": "string",
-                    "required": true
-                  },
-                  "version": {
-                    "type": "string"
-                  },
-                  "values": {
-                    "type": "string",
-                    "description": "Text of values.yaml to use"
-                  },
-                  "preview": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
+          name: "ns",
+          in: "path",
+          description:
+            "Name of kubernetes namespace, use '[emtpy]' if you want to use k8s context default",
         },
-        "responses": {
+      ],
+      post: {
+        tags: ["Releases"],
+        description: "Install new release",
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                    required: true,
+                  },
+                  chart: {
+                    type: "string",
+                    required: true,
+                  },
+                  version: {
+                    type: "string",
+                  },
+                  values: {
+                    type: "string",
+                    description: "Text of values.yaml to use",
+                  },
+                  preview: {
+                    type: "boolean",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
           "200": {
-            "description": "In case preview=true, the preview diff is generated",
-            "content": {
-              "text/plain": {}
-            }
+            description: "In case preview=true, the preview diff is generated",
+            content: {
+              "text/plain": {},
+            },
           },
           "202": {
-            "description": "In case preview=false, the actial install is performed and resulting release object is returned",
-            "content": {
-              "application/json": {}
-            }
-          }
-        }
-      }
+            description:
+              "In case preview=false, the actial install is performed and resulting release object is returned",
+            content: {
+              "application/json": {},
+            },
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
+        },
       ],
-      "post": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Upgrade/reconfigure existing release",
-        "requestBody": {
-          "content": {
+      post: {
+        tags: ["Releases"],
+        description: "Upgrade/reconfigure existing release",
+        requestBody: {
+          content: {
             "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "required": true
+              schema: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                    required: true,
                   },
-                  "chart": {
-                    "type": "string",
-                    "required": true
+                  chart: {
+                    type: "string",
+                    required: true,
                   },
-                  "version": {
-                    "type": "string"
+                  version: {
+                    type: "string",
                   },
-                  "values": {
-                    "type": "string",
-                    "description": "Text of values.yaml to use"
+                  values: {
+                    type: "string",
+                    description: "Text of values.yaml to use",
                   },
-                  "preview": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
+                  preview: {
+                    type: "boolean",
+                  },
+                },
+              },
+            },
+          },
         },
-        "responses": {
+        responses: {
           "200": {
-            "description": "In case preview=true, the preview diff is generated",
-            "content": {
-              "text/plain": {}
-            }
+            description: "In case preview=true, the preview diff is generated",
+            content: {
+              "text/plain": {},
+            },
           },
           "202": {
-            "description": "In case preview=false, the actial install is performed and resulting release object is returned",
-            "content": {
-              "application/json": {}
-            }
-          }
-        }
-      }
+            description:
+              "In case preview=false, the actial install is performed and resulting release object is returned",
+            content: {
+              "application/json": {},
+            },
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}/history": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
+        },
       ],
-      "get": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Get revision history for release",
-        "responses": {
+      get: {
+        tags: ["Releases"],
+        description: "Get revision history for release",
+        responses: {
           "200": {
-            "description": "List of release revisions"
-          }
-        }
-      }
+            description: "List of release revisions",
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}/manifest": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
         },
         {
-          "name": "revision",
-          "in": "query",
-          "description": "Revision to get data from"
+          name: "revision",
+          in: "query",
+          description: "Revision to get data from",
         },
         {
-          "name": "revisionDiff",
-          "in": "query",
-          "description": "Revision to diff against"
-        }
+          name: "revisionDiff",
+          in: "query",
+          description: "Revision to diff against",
+        },
       ],
-      "get": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Get manifest for release",
-        "responses": {
+      get: {
+        tags: ["Releases"],
+        description: "Get manifest for release",
+        responses: {
           "200": {
-            "description": "Manifest text, or diff if revisionDiff is specified"
-          }
-        }
-      }
+            description: "Manifest text, or diff if revisionDiff is specified",
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}/values": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
         },
         {
-          "name": "revision",
-          "in": "query",
-          "description": "Revision to get data from"
+          name: "revision",
+          in: "query",
+          description: "Revision to get data from",
         },
         {
-          "name": "revisionDiff",
-          "in": "query",
-          "description": "Revision to diff against"
+          name: "revisionDiff",
+          in: "query",
+          description: "Revision to diff against",
         },
         {
-          "name": "userDefined",
-          "in": "query",
-          "description": "If set, only user-defined values will be listed"
-        }
+          name: "userDefined",
+          in: "query",
+          description: "If set, only user-defined values will be listed",
+        },
       ],
-      "get": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Get values for release",
-        "responses": {
+      get: {
+        tags: ["Releases"],
+        description: "Get values for release",
+        responses: {
           "200": {
-            "description": "Values YAML text, or diff if revisionDiff is specified"
-          }
-        }
-      }
+            description:
+              "Values YAML text, or diff if revisionDiff is specified",
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}/notes": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
         },
         {
-          "name": "revision",
-          "in": "query",
-          "description": "Revision to get data from"
+          name: "revision",
+          in: "query",
+          description: "Revision to get data from",
         },
         {
-          "name": "revisionDiff",
-          "in": "query",
-          "description": "Revision to diff against"
-        }
+          name: "revisionDiff",
+          in: "query",
+          description: "Revision to diff against",
+        },
       ],
-      "get": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Get textual notes for release",
-        "responses": {
+      get: {
+        tags: ["Releases"],
+        description: "Get textual notes for release",
+        responses: {
           "200": {
-            "description": "Notes text, or diff if revisionDiff is specified"
-          }
-        }
-      }
+            description: "Notes text, or diff if revisionDiff is specified",
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}/resources": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
         },
         {
-          "name": "health",
-          "in": "query",
-          "description": "Flag to query k8s health status of resources"
-        }
+          name: "health",
+          in: "query",
+          description: "Flag to query k8s health status of resources",
+        },
       ],
-      "get": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "List of installed k8s resources for this release",
-        "responses": {
+      get: {
+        tags: ["Releases"],
+        description: "List of installed k8s resources for this release",
+        responses: {
           "200": {
-            "description": "Structured list of resources",
-            "content": {
-              "application/json": {}
-            }
-          }
-        }
-      }
+            description: "Structured list of resources",
+            content: {
+              "application/json": {},
+            },
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}/rollback": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
+        },
       ],
-      "post": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Rollback the release to a previous revision",
-        "requestBody": {
-          "content": {
+      post: {
+        tags: ["Releases"],
+        description: "Rollback the release to a previous revision",
+        requestBody: {
+          content: {
             "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "revision": {
-                    "type": "integer"
-                  }
-                }
-              }
-            }
-          }
+              schema: {
+                type: "object",
+                properties: {
+                  revision: {
+                    type: "integer",
+                  },
+                },
+              },
+            },
+          },
         },
-        "responses": {
+        responses: {
           "202": {
-            "description": "Rolled back successfully"
-          }
-        }
-      }
+            description: "Rolled back successfully",
+          },
+        },
+      },
     },
     "/api/helm/releases/{ns}/{name}/test": {
-      "parameters": [
+      parameters: [
         {
-          "name": "ns",
-          "in": "path",
-          "description": "Name of kubernetes namespace"
+          name: "ns",
+          in: "path",
+          description: "Name of kubernetes namespace",
         },
         {
-          "name": "name",
-          "in": "path",
-          "description": "Name of Helm release"
-        }
+          name: "name",
+          in: "path",
+          description: "Name of Helm release",
+        },
       ],
-      "post": {
-        "tags": [
-          "Releases"
-        ],
-        "description": "Run the tests on a release",
-        "responses": {
+      post: {
+        tags: ["Releases"],
+        description: "Run the tests on a release",
+        responses: {
           "200": {
-            "description": "Logs of a test run"
-          }
-        }
-      }
+            description: "Logs of a test run",
+          },
+        },
+      },
     },
     "/api/helm/repositories": {
-      "get": {
-        "tags": [
-          "Repositories"
-        ],
-        "description": "Get list of Helm repositories",
-        "responses": {
+      get: {
+        tags: ["Repositories"],
+        description: "Get list of Helm repositories",
+        responses: {
           "200": {
-            "description": "Returns list of Helm repositories"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Repositories"
-        ],
-        "description": "Adds new repository",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "url": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "name",
-                  "url"
-                ]
-              }
-            }
-          }
+            description: "Returns list of Helm repositories",
+          },
         },
-        "responses": {
+      },
+      post: {
+        tags: ["Repositories"],
+        description: "Adds new repository",
+        requestBody: {
+          content: {
+            "application/x-www-form-urlencoded": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                  },
+                  url: {
+                    type: "string",
+                  },
+                },
+                required: ["name", "url"],
+              },
+            },
+          },
+        },
+        responses: {
           "204": {
-            "description": "Empty response in case repository were added"
-          }
-        }
-      }
+            description: "Empty response in case repository were added",
+          },
+        },
+      },
     },
     "/api/helm/repositories/{repo}": {
-      "parameters": [
+      parameters: [
         {
-          "name": "repo",
-          "in": "path",
-          "description": "Name of Helm repository"
-        }
+          name: "repo",
+          in: "path",
+          description: "Name of Helm repository",
+        },
       ],
-      "get": {
-        "tags": [
-          "Repositories"
-        ],
-        "description": "Get list of charts in repository",
-        "responses": {
+      get: {
+        tags: ["Repositories"],
+        description: "Get list of charts in repository",
+        responses: {
           "200": {
-            "description": "Returns list of charts"
-          }
-        }
+            description: "Returns list of charts",
+          },
+        },
       },
-      "post": {
-        "tags": [
-          "Repositories"
-        ],
-        "description": "Update repository from remote",
-        "responses": {
+      post: {
+        tags: ["Repositories"],
+        description: "Update repository from remote",
+        responses: {
           "204": {
-            "description": "Empty response"
-          }
-        }
+            description: "Empty response",
+          },
+        },
       },
-      "delete": {
-        "tags": [
-          "Repositories"
-        ],
-        "description": "Remove repository",
-        "responses": {
+      delete: {
+        tags: ["Repositories"],
+        description: "Remove repository",
+        responses: {
           "204": {
-            "description": "Empty response"
-          }
-        }
-      }
+            description: "Empty response",
+          },
+        },
+      },
     },
     "/api/helm/repositories/latestver": {
-      "parameters": [
+      parameters: [
         {
-          "name": "name",
-          "in": "query",
-          "description": "Name of Helm chart to search for",
-          "required": true
-        }
+          name: "name",
+          in: "query",
+          description: "Name of Helm chart to search for",
+          required: true,
+        },
       ],
-      "description": "Find the latest available version of specified chart through all the repositories",
-      "get": {
-        "tags": [
-          "Repositories"
-        ],
-        "responses": {
+      description:
+        "Find the latest available version of specified chart through all the repositories",
+      get: {
+        tags: ["Repositories"],
+        responses: {
           "200": {
-            "description": "The object with latest available version is returned"
+            description: "The object with latest available version is returned",
           },
           "204": {
-            "description": "In case no matching repository found, the response is empty with status 204"
-          }
-        }
-      }
+            description:
+              "In case no matching repository found, the response is empty with status 204",
+          },
+        },
+      },
     },
     "/api/helm/repositories/versions": {
-      "parameters": [
+      parameters: [
         {
-          "name": "name",
-          "in": "query",
-          "description": "Name of Helm chart to search for",
-          "required": true
-        }
+          name: "name",
+          in: "query",
+          description: "Name of Helm chart to search for",
+          required: true,
+        },
       ],
-      "get": {
-        "description": "Get the list of versions for specified chart across the repositories",
-        "tags": [
-          "Repositories"
-        ],
-        "responses": {
+      get: {
+        description:
+          "Get the list of versions for specified chart across the repositories",
+        tags: ["Repositories"],
+        responses: {
           "200": {
-            "description": "The list if chart versions is returned"
-          }
-        }
-      }
+            description: "The list if chart versions is returned",
+          },
+        },
+      },
     },
     "/api/helm/repositories/values": {
-      "parameters": [
+      parameters: [
         {
-          "name": "chart",
-          "in": "query",
-          "description": "Name of Helm chart to search for, in format of <repository>/<chart-name>",
-          "required": true
+          name: "chart",
+          in: "query",
+          description:
+            "Name of Helm chart to search for, in format of <repository>/<chart-name>",
+          required: true,
         },
         {
-          "name": "version",
-          "in": "query",
-          "description": "Version of Helm chart to get values from",
-          "required": true
-        }
+          name: "version",
+          in: "query",
+          description: "Version of Helm chart to get values from",
+          required: true,
+        },
       ],
-      "get": {
-        "description": "Get the original values.yaml file for the chart",
-        "tags": [
-          "Repositories"
-        ],
-        "responses": {
+      get: {
+        description: "Get the original values.yaml file for the chart",
+        tags: ["Repositories"],
+        responses: {
           "200": {
-            "description": "The content of values.yaml"
-          }
-        }
-      }
+            description: "The content of values.yaml",
+          },
+        },
+      },
     },
     "/api/k8s/contexts": {
-      "get": {
-        "tags": [
-          "K8s"
-        ],
-        "description": "Get list of kubectl contexts configured locally",
-        "responses": {
+      get: {
+        tags: ["K8s"],
+        description: "Get list of kubectl contexts configured locally",
+        responses: {
           "200": {
-            "description": "Returns list of contexts"
-          }
-        }
-      }
+            description: "Returns list of contexts",
+          },
+        },
+      },
     },
     "/api/k8s/{kind}/get": {
-      "parameters": [
+      parameters: [
         {
-          "name": "kind",
-          "in": "path",
-          "description": "Kind of kubernetes resource"
+          name: "kind",
+          in: "path",
+          description: "Kind of kubernetes resource",
         },
         {
-          "name": "name",
-          "in": "query",
-          "description": "Name of kubernetes resource",
-          "required": true
+          name: "name",
+          in: "query",
+          description: "Name of kubernetes resource",
+          required: true,
         },
         {
-          "name": "namespace",
-          "in": "query",
-          "description": "Namespace of kubernetes resource",
-          "required": true
-        }
+          name: "namespace",
+          in: "query",
+          description: "Namespace of kubernetes resource",
+          required: true,
+        },
       ],
-      "get": {
-        "tags": [
-          "K8s"
-        ],
-        "responses": {
+      get: {
+        tags: ["K8s"],
+        responses: {
           "200": {
-            "description": "Returns resources information"
-          }
-        }
-      }
+            description: "Returns resources information",
+          },
+        },
+      },
     },
     "/api/k8s/{kind}/list": {
-      "parameters": [
+      parameters: [
         {
-          "name": "kind",
-          "in": "path",
-          "description": "Kind of kubernetes resource",
-          "schema": {
-            "enum": [
-              "namespaces"
-            ]
-          }
-        }
+          name: "kind",
+          in: "path",
+          description: "Kind of kubernetes resource",
+          schema: {
+            enum: ["namespaces"],
+          },
+        },
       ],
-      "get": {
-        "tags": [
-          "K8s"
-        ],
-        "responses": {
+      get: {
+        tags: ["K8s"],
+        responses: {
           "200": {
-            "description": "Returns list of resources"
-          }
-        }
-      }
+            description: "Returns list of resources",
+          },
+        },
+      },
     },
     "/api/k8s/{kind}/describe": {
-      "parameters": [
+      parameters: [
         {
-          "name": "kind",
-          "in": "path",
-          "description": "Kind of kubernetes resource"
+          name: "kind",
+          in: "path",
+          description: "Kind of kubernetes resource",
         },
         {
-          "name": "name",
-          "in": "query",
-          "description": "Name of kubernetes resource",
-          "required": true
+          name: "name",
+          in: "query",
+          description: "Name of kubernetes resource",
+          required: true,
         },
         {
-          "name": "namespace",
-          "in": "query",
-          "description": "Namespace of kubernetes resource",
-          "required": true
-        }
+          name: "namespace",
+          in: "query",
+          description: "Namespace of kubernetes resource",
+          required: true,
+        },
       ],
-      "get": {
-        "tags": [
-          "K8s"
-        ],
-        "responses": {
+      get: {
+        tags: ["K8s"],
+        responses: {
           "200": {
-            "content": {
-              "text/plain": {}
+            content: {
+              "text/plain": {},
             },
-            "description": "Returns describe text"
-          }
-        }
-      }
+            description: "Returns describe text",
+          },
+        },
+      },
     },
     "/api/scanners": {
-      "get": {
-        "tags": [
-          "Scanners"
-        ],
-        "description": "Get list of discovered scanners",
-        "responses": {
+      get: {
+        tags: ["Scanners"],
+        description: "Get list of discovered scanners",
+        responses: {
           "200": {
-            "description": "List of scanners"
-          }
-        }
-      }
+            description: "List of scanners",
+          },
+        },
+      },
     },
     "/api/scanners/manifests": {
-      "post": {
-        "tags": [
-          "Scanners"
-        ],
-        "description": "Scan manifests using all applicable scanners",
-        "requestBody": {
-          "content": {
+      post: {
+        tags: ["Scanners"],
+        description: "Scan manifests using all applicable scanners",
+        requestBody: {
+          content: {
             "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "manifest": {
-                    "type": "string",
-                    "description": "Text of manifest to scan"
-                  }
-                }
-              }
-            }
-          }
+              schema: {
+                type: "object",
+                properties: {
+                  manifest: {
+                    type: "string",
+                    description: "Text of manifest to scan",
+                  },
+                },
+              },
+            },
+          },
         },
-        "responses": {
+        responses: {
           "200": {
-            "description": "Map of scan results per scanner type"
-          }
-        }
-      }
+            description: "Map of scan results per scanner type",
+          },
+        },
+      },
     },
     "/api/scanners/resource/{kind}": {
-      "parameters": [
+      parameters: [
         {
-          "in": "path",
-          "name": "kind"
+          in: "path",
+          name: "kind",
         },
         {
-          "in": "query",
-          "name": "namespace",
-          "required": true
+          in: "query",
+          name: "namespace",
+          required: true,
         },
         {
-          "in": "query",
-          "name": "name",
-          "required": true
-        }
+          in: "query",
+          name: "name",
+          required: true,
+        },
       ],
-      "get": {
-        "tags": [
-          "Scanners"
-        ],
-        "description": "Scan specified k8s resource in cluster",
-        "responses": {
+      get: {
+        tags: ["Scanners"],
+        description: "Scan specified k8s resource in cluster",
+        responses: {
           "200": {
-            "description": "Information with scan results per scanner type"
-          }
-        }
-      }
+            description: "Information with scan results per scanner type",
+          },
+        },
+      },
     },
     "/": {
-      "delete": {
-        "tags": [
-          "Miscellaneous"
-        ],
-        "description": "Shuts down the Helm Dashboard application",
-        "responses": {
+      delete: {
+        tags: ["Miscellaneous"],
+        description: "Shuts down the Helm Dashboard application",
+        responses: {
           "202": {
-            "description": "Shutdown command has been accepted"
-          }
-        }
-      }
+            description: "Shutdown command has been accepted",
+          },
+        },
+      },
     },
     "/status": {
-      "get": {
-        "tags": [
-          "Miscellaneous"
-        ],
-        "description": "Gets application status",
-        "responses": {
+      get: {
+        tags: ["Miscellaneous"],
+        description: "Gets application status",
+        responses: {
           "200": {
-            "description": "Returns JSON with some options",
-            "headers": {
+            description: "Returns JSON with some options",
+            headers: {
               "X-Application-Name": {
-                "description": "A string to self-identify the application"
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+                description: "A string to self-identify the application",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};

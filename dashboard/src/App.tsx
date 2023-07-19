@@ -52,7 +52,7 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <HashRouter>
             <Routes>
-              <Route path="docs/" element={<DocsPage/>} />
+              <Route path="docs/" element={<DocsPage />} />
               <Route path="*" element={<PageLayout />}>
                 <Route path=":context/*" element={<SyncContext />}>
                   <Route path="installed/?" element={<Installed />} />
