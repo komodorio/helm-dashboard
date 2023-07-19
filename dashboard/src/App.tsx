@@ -10,6 +10,7 @@ import { ErrorAlert, ErrorModalContext } from "./context/ErrorModalContext";
 import GlobalErrorModal from "./components/modal/GlobalErrorModal";
 import { AppContextProvider } from "./context/AppContext";
 import apiService from "./API/apiService";
+import DocsPage from "./pages/DocsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +52,7 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <HashRouter>
             <Routes>
+              <Route path="docs/" element={<DocsPage/>} />
               <Route path="*" element={<PageLayout />}>
                 <Route path=":context/*" element={<SyncContext />}>
                   <Route path="installed/?" element={<Installed />} />
