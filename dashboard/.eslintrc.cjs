@@ -19,7 +19,7 @@ module.exports = {
     "no-console": ["warn", { allow: ["warn"] }],
     "no-alert": "error",
     "no-debugger": "error",
-    "@typescript-eslint/ban-ts-comment": "off"
+    "@typescript-eslint/ban-ts-comment": "off",
   },
   parser: "@typescript-eslint/parser",
   plugins: ["@typescript-eslint"],

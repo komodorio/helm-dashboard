@@ -28,7 +28,7 @@ export default function TabsBar({
   tabs,
   activeTab,
   setActiveTab,
-  setTabContent
+  setTabContent,
 }: TabsBarProps): JSX.Element {
   return (
     <div className="relative">

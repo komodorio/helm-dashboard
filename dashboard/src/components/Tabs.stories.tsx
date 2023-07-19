@@ -18,7 +18,6 @@ const Template: ComponentStory<typeof Tabs> = (args) => <Tabs {...args} />;
 
 export const Default = Template.bind({});
 
-
 const defaultArgs = {
   tabs: [
     {
@@ -34,7 +33,7 @@ const defaultArgs = {
       content: <div>tab3</div>,
     },
   ],
-}
+};
 
 //@ts-ignore
 Default.args = defaultArgs;

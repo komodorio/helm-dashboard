@@ -26,7 +26,7 @@ const defaultArgs = {
     description: "chart1 description",
     version: "v1.0.0",
   },
-}
+};
 
 //@ts-ignore
 Default.args = defaultArgs;

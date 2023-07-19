@@ -1,17 +1,17 @@
 // Status.stories.ts|tsx
 
-import React from 'react';
+import React from "react";
 
-import { ComponentStory, ComponentMeta, Story } from '@storybook/react';
-import Button from './Button';
-import {ButtonProps} from './Button';
+import { ComponentStory, ComponentMeta, Story } from "@storybook/react";
+import Button from "./Button";
+import { ButtonProps } from "./Button";
 //👇 This default export determines where your story goes in the story list
 export default {
   /* 👇 The title prop is optional.
-  * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
-  * to learn how to generate automatic titles
-  */
-  title: 'Button',
+   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
+   * to learn how to generate automatic titles
+   */
+  title: "Button",
   component: Button,
 } as ComponentMeta<typeof Button>;
 
@@ -20,9 +20,18 @@ export default {
 // create a template for it.
 // We want to declare default values for the props, so we create a
 // default args object.
-const Template: ComponentStory<typeof Button> = (args: ButtonProps) => <Button {...args} />;
+const Template: ComponentStory<typeof Button> = (args: ButtonProps) => (
+  <Button {...args} />
+);
 export const Default = Template.bind({});
 Default.args = {
-  children: <><span>&uarr;</span><span>Update</span></>,
-  onClick: () => { console.log("click") },
+  children: (
+    <>
+      <span>&uarr;</span>
+      <span>Update</span>
+    </>
+  ),
+  onClick: () => {
+    console.log("click");
+  },
 };
