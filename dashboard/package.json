@@ -47,7 +47,6 @@
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-storybook": "^0.6.12",
-    "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "postcss": "^8.4.24",
     "prettier": "2.8.4",
@@ -71,8 +70,7 @@
     "lint": "npx eslint src/",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier src/ --check",
-    "prettier:fix": "npm run prettier -- --write",
-    "prepare": "husky install"
+    "prettier:fix": "npm run prettier -- --write"
   },
   "keywords": [],
   "author": "",
