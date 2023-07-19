@@ -106,11 +106,6 @@ export const InstallChartModal = ({
     refetch: refetchChartValues,
   } = useChartRepoValues(namespace || "default", selectedVersion || "", chart, {
     enabled: isInstall && Boolean(selectedRepo) && selectedRepo !== "",
-    onSuccess: (data) => {
-      if (data) {
-        fetchDiff({ userValues: data });
-      }
-    },
   });
 
   const { data: releaseValues, isLoading: loadingReleaseValues } =
@@ -154,12 +149,12 @@ export const InstallChartModal = ({
       formData.append("chart", chart);
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues);
-      formData.append("name", releaseName || "");
-
+      if (isInstall) {
+        formData.append("name", releaseName || "");
+      }
       const res = await fetch(
         // Todo: Change to BASE_URL from env
-        `/api/helm/releases/${namespace ? namespace : "default"}${
-          !isInstall ? `/${releaseName}` : `/${releaseValues ? chartName : ""}` // if there is no release we don't provide anything, and we dont display version
+        `/api/helm/releases/${namespace ? namespace : "default"}${!isInstall ? `/${releaseName}` : `/${releaseValues ? chartName : ""}` // if there is no release we don't provide anything, and we dont display version
         }`,
         {
           method: "post",
@@ -189,8 +184,7 @@ export const InstallChartModal = ({
         } else {
           setSelectedVersionData({ version: "", urls: [] }); //cleanup
           navigate(
-            `/${selectedCluster}/${
-              namespace ? namespace : "default"
+            `/${selectedCluster}/${namespace ? namespace : "default"
             }/${releaseName}/installed/revision/${response.version}`
           );
           window.location.reload();
@@ -205,18 +199,20 @@ export const InstallChartModal = ({
   const getVersionManifestFormData = useCallback(
     ({ version, userValues }: { version: string; userValues?: string }) => {
       const formData = new FormData();
+      // preview needs to come first, for some reason it has a meaning at the backend
+      formData.append("preview", "true");
       formData.append("chart", chart);
       formData.append("version", version);
       formData.append(
         "values",
         userValues ? userValues : releaseValues ? releaseValues : ""
       );
-      formData.append("preview", "true");
-      formData.append("name", chartName);
-
+      if (isInstall) {
+        formData.append("name", chartName);
+      }
       return formData;
     },
-    [userValues, chart, chartName]
+    [userValues, chart, chartName, isInstall]
   );
 
   // It actually fetches the manifest for the diffs
@@ -228,13 +224,11 @@ export const InstallChartModal = ({
     userValues?: string;
   }) => {
     const formData = getVersionManifestFormData({ version, userValues });
-    const fetchUrl = `/api/helm/releases/${
-      namespace ? namespace : isInstall ? "" : "[empty]"
-    }${
-      !isInstall
+    const fetchUrl = `/api/helm/releases/${namespace ? namespace : isInstall ? "" : "[empty]"
+      }${!isInstall
         ? `/${releaseName}`
         : `${releaseValues ? chartName : !namespace ? "default" : ""}`
-    }`; // if there is no release we don't provide anything, and we dont display version;
+      }`; // if there is no release we don't provide anything, and we dont display version;
     try {
       setErrorMessage("");
       const data = await callApi(fetchUrl, {
@@ -304,9 +298,8 @@ export const InstallChartModal = ({
       }}
       title={
         <div className="font-bold">
-          {`${
-            isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
-          } `}
+          {`${isUpgrade || (!isUpgrade && !isInstall) ? "Upgrade" : "Install"
+            } `}
           {(isUpgrade || releaseValues || isInstall) && (
             <span className="text-green-700 ">{chartName}</span>
           )}
