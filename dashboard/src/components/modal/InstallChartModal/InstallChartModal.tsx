@@ -106,11 +106,6 @@ export const InstallChartModal = ({
     refetch: refetchChartValues,
   } = useChartRepoValues(namespace || "default", selectedVersion || "", chart, {
     enabled: isInstall && Boolean(selectedRepo) && selectedRepo !== "",
-    onSuccess: (data) => {
-      if (data) {
-        fetchDiff({ userValues: data });
-      }
-    },
   });
 
   const { data: releaseValues, isLoading: loadingReleaseValues } =
