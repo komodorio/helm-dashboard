@@ -500,7 +500,7 @@ const Uninstall = () => {
           <div>Following resources will be deleted from the cluster:</div>
           <div>
             {resources?.map((resource) => (
-              <div className="flex justify-start gap-1 w-full mb-3">
+              <div key={resource.apiVersion + resource.kind + resource.metadata.name} className="flex justify-start gap-1 w-full mb-3">
                 <span
                   style={{
                     textAlign: "end",

@@ -34,8 +34,7 @@ export const UserDefinedValues = ({
         User-Defined Values:
       </label>
       <textarea
-        value={localState}
-        defaultValue={initialValue}
+        value={localState || initialValue}
         onChange={(e) => setLocalState(e.target.value)}
         rows={14}
         className="block p-2.5 w-full text-md text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none font-monospace"
