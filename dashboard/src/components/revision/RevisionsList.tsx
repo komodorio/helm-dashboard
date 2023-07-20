@@ -60,7 +60,6 @@ export default function RevisionsList({
               <div
                 style={{
                   display: "flex",
-                  width: "80px",
                   justifyContent: "space-between",
                 }}
               >
