@@ -15,6 +15,11 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
   const diffContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (isLoading) {
+      // we're listening to isLoading to draw new diffs which are not
+      // always rerender, probably because of the use of ref
+      return;
+    }
     if (diff && diffContainerRef.current) {
       const diff2htmlUi = new Diff2HtmlUI(
         diffContainerRef.current,
@@ -25,7 +30,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
       diff2htmlUi.draw();
       diff2htmlUi.highlightCode();
     }
-  }, [diff, diffContainerRef.current]);
+  }, [diff, diffContainerRef.current, isLoading]);
 
   if (isLoading) {
     return (
