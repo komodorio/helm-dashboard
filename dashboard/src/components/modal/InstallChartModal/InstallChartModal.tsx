@@ -27,6 +27,7 @@ interface InstallChartModalProps {
   latestVersion?: string;
   isUpgrade?: boolean;
   isInstall?: boolean;
+  latestRevision?: number;
 }
 
 export const InstallChartModal = ({
@@ -37,6 +38,7 @@ export const InstallChartModal = ({
   latestVersion,
   isUpgrade = false,
   isInstall = false,
+  latestRevision,
 }: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
@@ -48,7 +50,6 @@ export const InstallChartModal = ({
   const {
     namespace: queryNamespace,
     chart: _releaseName,
-    revision,
     context: selectedCluster,
     selectedRepo: currentRepoCtx,
   } = useParams();
@@ -119,7 +120,7 @@ export const InstallChartModal = ({
       namespace,
       release: String(releaseName),
       // userDefinedValue: userValues, // for key only
-      revision: revision ? parseInt(revision) : undefined,
+      revision: latestRevision ? latestRevision : undefined,
       options: {
         onSuccess: (data: string) => {
           if (data) {
@@ -233,11 +234,7 @@ export const InstallChartModal = ({
     const formData = getVersionManifestFormData({ version, userValues });
     const fetchUrl = `/api/helm/releases/${
       namespace ? namespace : isInstall ? "" : "[empty]"
-    }${
-      !isInstall
-        ? `/${releaseName}`
-        : `${releaseValues ? chartName : !namespace ? "default" : ""}`
-    }`; // if there is no release we don't provide anything, and we dont display version;
+    }${!isInstall ? `/${releaseName}` : `${!namespace ? "default" : ""}`}`; // if there is no release we don't provide anything, and we dont display version;
     try {
       setErrorMessage("");
       const data = await callApi(fetchUrl, {
@@ -348,7 +345,7 @@ export const InstallChartModal = ({
       />
       <div className="flex w-full gap-6 mt-4">
         <UserDefinedValues
-          initialValue={releaseValues}
+          initialValue={!isInstall ? releaseValues : ""}
           setValues={(val) => {
             setUserValues(val);
             fetchDiff({ userValues: val });

@@ -9,6 +9,7 @@ interface Version {
   isChartVersion: boolean;
   urls: string[];
 }
+
 export const VersionToInstall: React.FC<{
   versions: NonEmptyArray<Version>;
   initialVersion?: {

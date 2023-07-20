@@ -192,12 +192,13 @@ export default function RevisionDetails({
               <InstallChartModal
                 isOpen={isReconfigureModalOpen}
                 chartName={release.chart_name}
-                currentlyInstalledChartVersion={release.chart_ver}
+                currentlyInstalledChartVersion={installedRevision.chart_ver}
                 latestVersion={latestVerData?.[0]?.version}
                 isUpgrade={canUpgrade}
                 onClose={() => {
                   setIsReconfigureModalOpen(false);
                 }}
+                latestRevision={latestRevision}
               />
             )}
             {latestVerData?.[0]?.isSuggestedRepo ? (
@@ -500,7 +501,12 @@ const Uninstall = () => {
           <div>Following resources will be deleted from the cluster:</div>
           <div>
             {resources?.map((resource) => (
-              <div key={resource.apiVersion + resource.kind + resource.metadata.name} className="flex justify-start gap-1 w-full mb-3">
+              <div
+                key={
+                  resource.apiVersion + resource.kind + resource.metadata.name
+                }
+                className="flex justify-start gap-1 w-full mb-3"
+              >
                 <span
                   style={{
                     textAlign: "end",
