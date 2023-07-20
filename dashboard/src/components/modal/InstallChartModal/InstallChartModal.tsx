@@ -121,7 +121,6 @@ export const InstallChartModal = ({
       // userDefinedValue: userValues, // for key only
       revision: revision ? parseInt(revision) : undefined,
       options: {
-        enabled: !isInstall,
         onSuccess: (data: string) => {
           if (data) {
             fetchDiff({ userValues: "" });
@@ -262,7 +261,7 @@ export const InstallChartModal = ({
     try {
       const [currentVerData, selectedVerData] = await Promise.all([
         currentVersion
-          ? fetchVersionData({ version: currentVersion })
+          ? fetchVersionData({ version: currentVersion, userValues })
           : Promise.resolve({ manifest: "" }),
         fetchVersionData({ version: selectedVersion || "", userValues }),
       ]);

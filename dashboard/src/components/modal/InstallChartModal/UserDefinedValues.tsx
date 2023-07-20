@@ -21,7 +21,7 @@ export const UserDefinedValues = ({
       timeoutRef.current = setTimeout(() => {
         setValues(localState);
         clearTimeout(timeoutRef.current);
-      }, 400);
+      }, 800);
     }
   }, [localState]);
 
