@@ -17,6 +17,7 @@ import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchPar
 import { VersionToInstall } from "./VersionToInstall";
 import apiService from "../../../API/apiService";
 import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
+import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 
 interface InstallChartModalProps {
   isOpen: boolean;
@@ -51,6 +52,8 @@ export const InstallChartModal = ({
     context: selectedCluster,
     selectedRepo: currentRepoCtx,
   } = useParams();
+  const { searchParamsObject } = useCustomSearchParams();
+  const { filteredNamespace } = searchParamsObject;
   const [namespace, setNamespace] = useState(queryNamespace);
   const [releaseName, setReleaseName] = useState(
     isInstall ? chartName : _releaseName
@@ -336,10 +339,11 @@ export const InstallChartModal = ({
           isInstall={isInstall}
         />
       )}
+
       <GeneralDetails
         releaseName={releaseName ?? ""}
         disabled={isUpgrade || (!isUpgrade && !isInstall)}
-        namespace={namespace ? namespace : ""}
+        namespace={namespace ? namespace : filteredNamespace}
         onReleaseNameInput={setReleaseName}
         onNamespaceInput={setNamespace}
       />
