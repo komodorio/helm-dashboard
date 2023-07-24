@@ -70,9 +70,9 @@ export default function InstalledPackageCard({
 
   const statusColor = getStatusColor(release.status as DeploymentStatus);
   const borderLeftColor: { [key: string]: string } = {
-    [DeploymentStatus.DEPLOYED]: "border-l-[#1BE99A]",
+    [DeploymentStatus.DEPLOYED]: "border-l-border-green",
     [DeploymentStatus.FAILED]: "border-l-text-danger",
-    [DeploymentStatus.PENDING]: "border-l-[#5AB0FF]",
+    [DeploymentStatus.PENDING]: "border-l-border",
   };
 
   return (
@@ -123,11 +123,11 @@ export default function InstalledPackageCard({
               <Spinner size={4} />
             )}
           </div>
-          <div className="col-span-2 text-[#707583] flex flex-col items">
+          <div className="col-span-2 text-muted flex flex-col items">
             <span>CHART VERSION</span>
             {(canUpgrade || installRepoSuggestion) && (
               <div
-                className="text-[#0d6efd] flex flex-row items-center gap-1 font-bold"
+                className="text-upgradable flex flex-row items-center gap-1 font-bold"
                 title={`upgrade available: ${latestVersionData?.version} from ${latestVersionData?.repository}`}
               >
                 {canUpgrade && !installRepoSuggestion ? (
@@ -144,9 +144,9 @@ export default function InstalledPackageCard({
               </div>
             )}
           </div>
-          <div className="col-span-1 text-[#707583]">REVISION</div>
-          <div className="col-span-1 text-[#707583]">NAMESPACE</div>
-          <div className="col-span-1 text-[#707583]">UPDATED</div>
+          <div className="col-span-1 text-muted">REVISION</div>
+          <div className="col-span-1 text-muted">NAMESPACE</div>
+          <div className="col-span-1 text-muted">UPDATED</div>
         </div>
       </div>
     </div>
