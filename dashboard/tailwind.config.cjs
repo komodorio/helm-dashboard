@@ -38,6 +38,7 @@ module.exports = {
             colors: {
                 grey: "#3d4048",
                 "light-grey": "#DCDDDF",
+
                 primary: "#1347FF",
                 secondary: "#ECEFF2",
                 muted: "#707583",
@@ -59,8 +60,11 @@ module.exports = {
                 success: "#00c2ab",
                 "border-green": "#1BE99A",
                 "border-blue": "#5AB0FF",
-                'border-gray': '#dad8ce',
-                "link-color": "# 0 D6EFD ",
+                "border-gray": '#dad8ce',
+                "gray-hover": "#E9ECEF",
+                "light-white": "#ECEFF2",
+                "blue-hover": "#0b5ed7",
+                "link-color": "#0D6EFD ",
                 "body-background": "#F4F7FA",
                 "upgrade-color": "#FC1683",
             },
