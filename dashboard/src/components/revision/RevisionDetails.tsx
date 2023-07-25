@@ -304,7 +304,7 @@ export default function RevisionDetails({
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
   return (
-    <span className="bg-[#d6effe] p-1 rounded px-2 text-sm">
+    <span className="bg-light-blue-background p-1 rounded px-2 text-sm">
       <span>{caption}:</span>
       <span className="font-bold"> {text}</span>
     </span>

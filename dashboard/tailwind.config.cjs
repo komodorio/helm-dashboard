@@ -60,6 +60,7 @@ module.exports = {
                 success: "#00c2ab",
                 "border-green": "#1BE99A",
                 "border-blue": "#5AB0FF",
+                "border-dark-blue": "#007bff",
                 "border-gray": '#dad8ce',
                 "gray-hover": "#E9ECEF",
                 "light-white": "#ECEFF2",
