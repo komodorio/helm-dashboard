@@ -50,7 +50,7 @@ function Revision() {
   return (
     <div className="flex">
       <div className="flex flex-col gap-2 w-1/6 min-h-screen bg-[#E8EDF2] pb-4">
-        <label className="mt-5 mx-5 text-sm text-[#3D4048] font-semibold">
+        <label className="mt-5 mx-5 text-sm text-grey font-semibold">
           Revisions
         </label>
         {isLoadingHistory ? (
@@ -63,7 +63,7 @@ function Revision() {
         )}
       </div>
 
-      <div className="w-5/6 min-h-screen bg-[#F4F7FA] pb-4">
+      <div className="w-5/6 min-h-screen bg-body-background pb-4">
         {isLoadingHistory ? (
           <div className=" p-4">
             <Spinner />
