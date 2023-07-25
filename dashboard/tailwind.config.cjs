@@ -66,6 +66,7 @@ module.exports = {
                 "blue-hover": "#0b5ed7",
                 "link-color": "#0D6EFD ",
                 "body-background": "#F4F7FA",
+                "light-blue-background": "#D6EFFE",
                 "upgrade-color": "#FC1683",
             },
         },

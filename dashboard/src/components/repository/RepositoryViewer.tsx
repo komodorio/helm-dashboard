@@ -82,9 +82,9 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
   return (
     <div className="flex flex-col p-6 gap-3 bg-white custom-shadow border rounded-md">
-      <span className="text-[#707583] font-bold text-xs">REPOSITORY</span>
+      <span className="text-muted font-bold text-xs">REPOSITORY</span>
       <div className="flex justify-between">
-        <span className="text-[#3d4048] text-3xl font-semibold">
+        <span className="text-gray text-3xl font-semibold">
           {repository?.name}
         </span>
 
@@ -120,11 +120,11 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
           />
         </div>
       </div>
-      <span className="text-[#3d4048] text-sm bg-[#D6EFFE] px-3 py-1 rounded-md self-start -mt-10">
+      <span className="text-gray text-sm bg-light-blue-background px-3 py-1 rounded-md self-start -mt-10">
         URL: <span className="font-bold">{repository?.url}</span>
       </span>
 
-      <div className="bg-[#ECEFF2] grid grid-cols-10 text-xs font-bold p-2 px-4 mt-4 rounded-md">
+      <div className="bg-secondary grid grid-cols-10 text-xs font-bold p-2 px-4 mt-4 rounded-md">
         <span className="col-span-2">CHART NAME</span>
         <span className="col-span-6">DESCRIPTION</span>
         <span className="col-span-1 text-center">VERSION</span>
