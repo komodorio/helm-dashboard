@@ -69,6 +69,7 @@ module.exports = {
                 "link-color": "#0D6EFD ",
                 "body-background": "#F4F7FA",
                 "light-blue-background": "#D6EFFE",
+                "white-background": "#EBEFFF",
                 "upgrade-color": "#FC1683",
             },
         },
