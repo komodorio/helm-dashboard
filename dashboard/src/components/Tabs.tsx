@@ -25,10 +25,10 @@ export default function Tabs({ tabs, selectedTab }: TabsProps) {
         {tabs.map((tab) => (
           <button
             key={tab.label}
-            className={`cursor-pointer px-4 py-2 text-sm font-normal text-[#3B3D45] focus:outline-none"
+            className={`cursor-pointer px-4 py-2 text-sm font-normal text-dark-gray focus:outline-none"
               ${
                 selectedTab.value === tab.value &&
-                "border-b-[3px] border-[#3B3D45]"
+                "border-b-[3px] border-dark-gray"
               }
             `}
             onClick={() => moveTab(tab)}

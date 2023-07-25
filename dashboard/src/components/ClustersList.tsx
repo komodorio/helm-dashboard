@@ -86,7 +86,7 @@ function ClustersList({
   };
 
   return (
-    <div className="bg-white flex flex-col p-2 rounded custom-shadow text-[#3d4048] w-48 m-5 h-fit pb-4 custom-">
+    <div className="bg-white flex flex-col p-2 rounded custom-shadow text-grey w-48 m-5 h-fit pb-4 custom-">
       {!clusterMode ? (
         <>
           <label className="font-bold">Clusters</label>
