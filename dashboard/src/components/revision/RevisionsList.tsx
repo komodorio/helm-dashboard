@@ -32,60 +32,62 @@ export default function RevisionsList({
         const prevRelease = hasMultipleReleases
           ? releaseRevisions[idx + 1]
           : null;
+        const isRollback = release.description.startsWith("Rollback to ")
         return (
-          <div
-            onClick={() => changeRelease(release.revision)}
-            key={release.revision}
-            className={`flex flex-col border rounded-md mx-5 p-2 gap-4 cursor-pointer ${
-              release.revision === selectedRevision
-                ? "border-[#007bff] bg-white"
-                : "border-[#DCDDDF] bg-[#F4F7FA]"
-            }`}
-          >
-            <div className="flex row justify-between">
-              <StatusLabel
-                status={release.status}
-                isRollback={release.description.startsWith("Rollback to ")}
-              />
-              <span className="font-bold">#{release.revision}</span>
-            </div>
             <div
-              className="self-end text-[#707583] text-xs flex flex-wrap gap-1"
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
+              title={isRollback ? `Rollback to ${Number(release.revision) - 1}` : ""}
+              onClick={() => changeRelease(release.revision)}
+              key={release.revision}
+              className={`flex flex-col border rounded-md mx-5 p-2 gap-4 cursor-pointer ${
+                release.revision === selectedRevision
+                  ? "border-[#007bff] bg-white"
+                  : "border-[#DCDDDF] bg-[#F4F7FA]"
+              }`}
             >
+              <div className="flex row justify-between">
+                <StatusLabel
+                  status={release.status}
+                  isRollback={isRollback}
+                />
+                <span className="font-bold">#{release.revision}</span>
+              </div>
               <div
+                className="self-end text-[#707583] text-xs flex flex-wrap gap-1"
                 style={{
+                  width: "100%",
                   display: "flex",
                   justifyContent: "space-between",
                 }}
               >
-                {prevRelease
-                  ? compare(prevRelease.chart_ver, release.chart_ver, "!=") && (
-                      <>
-                        <span className="line-through">
-                          {prevRelease.chart_ver}
-                        </span>
-                        {compare(
-                          prevRelease.chart_ver,
-                          release.chart_ver,
-                          ">"
-                        ) ? (
-                          <BsArrowDownRight />
-                        ) : (
-                          <BsArrowUpRight />
-                        )}
-                        <span>{release.chart_ver}</span>
-                      </>
-                    )
-                  : ""}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  {prevRelease
+                    ? compare(prevRelease.chart_ver, release.chart_ver, "!=") && (
+                        <>
+                          <span className="line-through">
+                            {prevRelease.chart_ver}
+                          </span>
+                          {compare(
+                            prevRelease.chart_ver,
+                            release.chart_ver,
+                            ">"
+                          ) ? (
+                            <BsArrowDownRight />
+                          ) : (
+                            <BsArrowUpRight />
+                          )}
+                          <span>{release.chart_ver}</span>
+                        </>
+                      )
+                    : ""}
+                </div>
+                <span>AGE:{getAge(release, releaseRevisions[idx - 1])}</span>
               </div>
-              <span>AGE:{getAge(release, releaseRevisions[idx - 1])}</span>
             </div>
-          </div>
         );
       })}
     </>
