@@ -1,16 +1,16 @@
-import { createContext } from "react";
+import { createContext } from 'react'
 
 export interface ErrorAlert {
-  title?: string;
-  msg: string;
+    title?: string
+    msg: string
 }
 
 export const ErrorModalContext = createContext<{
-  shouldShowErrorModal?: ErrorAlert;
-  setShowErrorModal: (toggle?: ErrorAlert) => void;
+    shouldShowErrorModal?: ErrorAlert
+    setShowErrorModal: (toggle?: ErrorAlert) => void
 }>({
-  shouldShowErrorModal: undefined,
-  // in this case we allow Unexpected empty method
-  //eslint-disable-next-line @typescript-eslint/no-empty-function
-  setShowErrorModal: (toggle?: ErrorAlert) => {},
-});
+    shouldShowErrorModal: undefined,
+    // in this case we allow Unexpected empty method
+    //eslint-disable-next-line @typescript-eslint/no-empty-function
+    setShowErrorModal: (toggle?: ErrorAlert) => {},
+})

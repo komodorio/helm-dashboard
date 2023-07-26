@@ -14,33 +14,33 @@
  * @see https://storybook.js.org/docs/react/writing-stories/introduction
  */
 
-import React from "react";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
-import Badge from "./Badge";
-import { BadgeProps } from "./Badge";
+import React from 'react'
+import { ComponentStory, ComponentMeta } from '@storybook/react'
+import Badge from './Badge'
+import { BadgeProps } from './Badge'
 
 // We create a generic template for the component.
 
 const Template: ComponentStory<typeof Badge> = (args: BadgeProps) => (
-  <Badge {...args} />
-);
+    <Badge {...args} />
+)
 // We export the story, and we pass the template to it. For now,
 // we are only going to use the default story.
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 // We set the props for the story. Recall that the props are the same as the
 // ones in BadgeProps, which we impoted.
 Default.args = {
-  type: "success",
-  children: "Success",
-};
+    type: 'success',
+    children: 'Success',
+}
 // We set the metadata for the story.
 // Refer to https://storybook.js.org/docs/react/writing-stories/introduction
 // for more information.
 export default {
-  title: "Badge",
-  component: Badge,
-  args: {
-    type: "success",
-    children: "Success",
-  },
-};
+    title: 'Badge',
+    component: Badge,
+    args: {
+        type: 'success',
+        children: 'Success',
+    },
+}
