@@ -27,9 +27,9 @@ function Revision() {
   const latestRevision = useMemo(
     () =>
       Array.isArray(releaseRevisions) &&
-      releaseRevisions?.find((revisionData) => {
-        return revisionData.revision === releaseRevisions.length;
-      }),
+      releaseRevisions.reduce((max, revisionData) => {
+        return Math.max(max, revisionData.revision);
+      }, Number.MIN_SAFE_INTEGER),
     [releaseRevisions]
   );
 
