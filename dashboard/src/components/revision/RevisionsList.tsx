@@ -6,6 +6,7 @@ import { ReleaseRevision } from '../../data/types'
 import { getAge } from '../../timeUtils'
 import StatusLabel from '../common/StatusLabel'
 import useNavigateWithSearchParams from '../../hooks/useNavigateWithSearchParams'
+import { DateTime } from 'luxon'
 
 type RevisionsListProps = {
     releaseRevisions: ReleaseRevision[]
@@ -97,7 +98,11 @@ export default function RevisionsList({
                                       )
                                     : ''}
                             </div>
-                            <span>
+                            <span
+                                title={DateTime.fromISO(
+                                    release.updated
+                                ).toString()}
+                            >
                                 AGE:{getAge(release, releaseRevisions[idx - 1])}
                             </span>
                         </div>
