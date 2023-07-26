@@ -61,7 +61,6 @@ export default function InstalledPackageCard({
 
   const handleOnClick = () => {
     const { name, namespace } = release;
-
     navigate(
       `/${selectedCluster}/${namespace}/${name}/installed/revision/${release.revision}`,
       { state: release }
