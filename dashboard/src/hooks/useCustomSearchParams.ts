@@ -1,11 +1,11 @@
-import { useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 const useCustomSearchParams = () => {
-  const [search, setSearch] = useSearchParams();
-  const searchAsObject: { [key: string]: string } = Object.fromEntries(
-    new URLSearchParams(search)
-  );
+    const [search, setSearch] = useSearchParams()
+    const searchAsObject: { [key: string]: string } = Object.fromEntries(
+        new URLSearchParams(search)
+    )
 
   const upsertSearchParams = (k: string, value: string) => {
     const copySearchParams = new URLSearchParams(search);
@@ -14,18 +14,18 @@ const useCustomSearchParams = () => {
     return copySearchParams;
   };
 
-  const removeSearchParam = (k: string) => {
-    const copySearchParams = new URLSearchParams(search);
-    copySearchParams.delete(k);
-    setSearch(copySearchParams);
-  };
+    const removeSearchParam = (k: string) => {
+        const copySearchParams = new URLSearchParams(search)
+        copySearchParams.delete(k)
+        setSearch(copySearchParams)
+    }
 
-  return {
-    searchParamsObject: searchAsObject,
-    setSearchParams: setSearch,
-    upsertSearchParams,
-    removeSearchParam,
-  };
-};
+    return {
+        searchParamsObject: searchAsObject,
+        setSearchParams: setSearch,
+        upsertSearchParams,
+        removeSearchParam,
+    }
+}
 
-export default useCustomSearchParams;
+export default useCustomSearchParams
