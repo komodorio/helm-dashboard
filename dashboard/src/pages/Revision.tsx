@@ -74,7 +74,7 @@ function Revision() {
             release={selectedRelease}
             //@ts-ignore
             installedRevision={releaseRevisions?.[0] as ReleaseRevision}
-            isLatest={selectedRelease.revision === latestRevision?.revision}
+            isLatest={selectedRelease.revision === latestRevision}
             latestRevision={latestRevision.revision}
           />
         ) : null}

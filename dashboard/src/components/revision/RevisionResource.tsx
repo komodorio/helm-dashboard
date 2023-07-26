@@ -55,7 +55,13 @@ export default function RevisionResource({ isLatest }: Props) {
               })
               .reverse()
               .map((resource: StructuredResources) => (
-                <ResourceRow key={resource.apiVersion + resource.kind + resource.metadata.name} resource={resource} isLatest={isLatest} />
+                <ResourceRow
+                  key={
+                    resource.apiVersion + resource.kind + resource.metadata.name
+                  }
+                  resource={resource}
+                  isLatest={isLatest}
+                />
               ))
           ) : (
             <tr>
