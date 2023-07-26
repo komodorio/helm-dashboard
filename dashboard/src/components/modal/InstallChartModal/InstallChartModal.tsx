@@ -279,8 +279,8 @@ export const InstallChartModal = ({
             ])
             const formData = new FormData()
 
-            formData.append('a', isInstall ? '' : currentVerData.manifest)
-            formData.append('b', selectedVerData.manifest)
+            formData.append('a', isInstall ? '' : (currentVerData as any).manifest)
+            formData.append('b', (currentVerData as any).manifest)
 
             const response = await apiService.fetchWithDefaults('/diff', {
                 method: 'post',

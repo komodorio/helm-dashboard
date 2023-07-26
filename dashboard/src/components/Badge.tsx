@@ -19,7 +19,7 @@
  */
 
 import React from 'react'
-export type BadgeCode = 'success' | 'warning' | 'error'
+export type BadgeCode = 'success' | 'warning' | 'error' | "unknown"
 
 export const BadgeCodes = Object.freeze({
     ERROR: 'error',
@@ -56,7 +56,7 @@ export default function Badge(props: BadgeProps): JSX.Element {
     return badgeElem
 }
 
-export const getBadgeType = (status: string) => {
+export const getBadgeType = (status: string): BadgeCode => {
     if (status === 'Unknown') {
         return BadgeCodes.UNKNOWN
     } else if (

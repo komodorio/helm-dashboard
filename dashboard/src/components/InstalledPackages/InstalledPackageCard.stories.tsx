@@ -22,18 +22,20 @@ export const Default = Template.bind({})
 
 Default.args = {
     release: {
-        id: '',
-        name: '',
-        namespace: '',
-        revision: 3,
-        updated: '',
-        status: '',
-        chart: '',
-        chart_name: '',
-        chart_ver: '',
-        app_version: '',
-        icon: '',
-        description: '',
+        id: "",
+        name: "",
+        namespace: "",
+        revision: 1,
+        updated: "",
+        status: "",
+        chart: "",
+        chart_name: "",
+        chart_ver: "",
+        app_version: "",
+        icon: "",
+        description: "",
         has_tests: false,
+        chartName: "", // duplicated in some cases in the backend, we need to resolve this
+        chartVersion: "", // duplicated in some cases in the backend, we need to resolve this
     },
 }

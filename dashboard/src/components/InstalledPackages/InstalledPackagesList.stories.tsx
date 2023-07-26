@@ -23,22 +23,38 @@ export const Default = Template.bind({})
 Default.args = {
     installedReleases: [
         {
-            id: 'package1',
-            image: 'img',
-            version: '1.0.0',
-            name: 'package1',
-            revision: 1,
-            lastUpdated: '2021-01-01',
-            description: 'package1 description',
+            id: "",
+        name: "",
+        namespace: "",
+        revision: 1,
+        updated: "",
+        status: "",
+        chart: "",
+        chart_name: "",
+        chart_ver: "",
+        app_version: "",
+        icon: "",
+        description: "",
+        has_tests: false,
+        chartName: "", // duplicated in some cases in the backend, we need to resolve this
+        chartVersion: "", // duplicated in some cases in the 
         },
         {
-            id: 'package2',
-            image: 'img',
-            version: '1.0.0',
-            name: 'package2',
-            revision: 1,
-            lastUpdated: '2022-01-01',
-            description: 'package2 description',
+            id: "",
+        name: "",
+        namespace: "",
+        revision: 1,
+        updated: "",
+        status: "",
+        chart: "",
+        chart_name: "",
+        chart_ver: "",
+        app_version: "",
+        icon: "",
+        description: "",
+        has_tests: false,
+        chartName: "", // duplicated in some cases in the backend, we need to resolve this
+        chartVersion: "", // duplicated in some cases in the 
         },
     ],
 }

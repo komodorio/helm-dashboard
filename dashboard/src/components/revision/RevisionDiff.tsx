@@ -62,7 +62,7 @@ function RevisionDiff({
         if (viewMode === VIEW_MODE_DIFF_PREV && hasMultipleRevisions) {
             additionalParamStr += `&revisionDiff=${revisionInt - 1}`
         }
-        const specificRevisionInt = parseInt(specificVersion || '', 10)
+        const specificRevisionInt = parseInt(specificVersion.toString() || '', 10)
         if (
             viewMode === VIEW_MODE_DIFF_SPECIFIC &&
             hasMultipleRevisions &&
@@ -194,7 +194,7 @@ function RevisionDiff({
                                 type="text"
                                 value={specificVersion}
                                 onChange={(e) =>
-                                    setSpecificVersion(e.target.value)
+                                    setSpecificVersion(Number(e.target.value))
                                 }
                             ></input>
                         </div>

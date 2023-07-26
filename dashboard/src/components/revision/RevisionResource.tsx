@@ -14,7 +14,7 @@ import Drawer from 'react-modern-drawer'
 import 'react-modern-drawer/dist/index.css'
 
 import Button from '../Button'
-import Badge, { getBadgeType } from '../Badge'
+import Badge, { BadgeCode, getBadgeType } from '../Badge'
 import Spinner from '../Spinner'
 import { Troubleshoot } from '../Troubleshoot'
 

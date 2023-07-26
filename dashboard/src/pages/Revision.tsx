@@ -72,8 +72,8 @@ function Revision() {
                     <RevisionDetails
                         //@ts-ignore
                         release={selectedRelease}
-                        //@ts-ignore
                         installedRevision={
+                            //@ts-ignore
                             releaseRevisions?.[0] as ReleaseRevision
                         }
                         isLatest={selectedRelease.revision === latestRevision}
