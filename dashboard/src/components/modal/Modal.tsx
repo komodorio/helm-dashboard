@@ -1,6 +1,6 @@
-import { PropsWithChildren, ReactNode } from "react";
-import ReactDom from "react-dom";
-import Spinner from "../Spinner";
+import { PropsWithChildren, ReactNode } from "react"
+import ReactDom from "react-dom"
+import Spinner from "../Spinner"
 
 export enum ModalButtonStyle {
   default,
@@ -11,22 +11,22 @@ export enum ModalButtonStyle {
 }
 
 export interface ModalAction {
-  id: string;
-  callback: () => void;
-  text?: string;
-  variant?: ModalButtonStyle;
-  className?: string;
-  disabled?: boolean;
-  isLoading?: boolean;
+  id: string
+  callback: () => void
+  text?: string
+  variant?: ModalButtonStyle
+  className?: string
+  disabled?: boolean
+  isLoading?: boolean
 }
 
 export interface ModalProps extends PropsWithChildren {
-  title?: string | ReactNode;
-  isOpen: boolean;
-  onClose?: () => void;
-  containerClassNames?: string;
-  actions?: ModalAction[];
-  bottomContent?: ReactNode;
+  title?: string | ReactNode
+  isOpen: boolean
+  onClose?: () => void
+  containerClassNames?: string
+  actions?: ModalAction[]
+  bottomContent?: ReactNode
 }
 
 const Modal = ({
@@ -59,21 +59,21 @@ const Modal = ({
       ModalButtonStyle.disabled,
       "font-semibold text-gray-500 bg-gray-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-base font-medium px-3 py-1.5 hover:text-gray-900 focus:z-10 ",
     ],
-  ]);
+  ])
 
   const getClassName = (action: ModalAction) => {
-    if (action.className) return action.className;
+    if (action.className) return action.className
 
     return action.variant
       ? colorVariants.get(action.variant)
-      : colorVariants.get(ModalButtonStyle.default);
-  };
+      : colorVariants.get(ModalButtonStyle.default)
+  }
 
   const getTitle = (title: string | ReactNode) => {
     if (typeof title === "string")
-      return <h3 className="text-xl font-medium text-gray">{title}</h3>;
-    else return title;
-  };
+      return <h3 className="text-xl font-medium text-grey">{title}</h3>
+    else return title
+  }
 
   return ReactDom.createPortal(
     <>
@@ -152,7 +152,7 @@ const Modal = ({
     </>,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     document.getElementById("portal")!
-  );
-};
+  )
+}
 
-export default Modal;
+export default Modal

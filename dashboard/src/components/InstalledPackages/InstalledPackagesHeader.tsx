@@ -1,21 +1,21 @@
-import HeaderLogo from "../../assets/packges-header.svg";
-import { Release } from "../../data/types";
+import HeaderLogo from "../../assets/packges-header.svg"
+import { Release } from "../../data/types"
 
 type InstalledPackagesHeaderProps = {
-  filteredReleases?: Release[];
-  setFilterKey: React.Dispatch<React.SetStateAction<string>>;
-  isLoading: boolean;
-};
+  filteredReleases?: Release[]
+  setFilterKey: React.Dispatch<React.SetStateAction<string>>
+  isLoading: boolean
+}
 
 export default function InstalledPackagesHeader({
   filteredReleases,
   setFilterKey,
   isLoading,
 }: InstalledPackagesHeaderProps) {
-  const numOfPackages = filteredReleases?.length;
+  const numOfPackages = filteredReleases?.length
   const showNoPackageAlert = Boolean(
     !isLoading && (numOfPackages == undefined || numOfPackages == 0)
-  );
+  )
   return (
     <div className="custom-shadow rounded-t-md  ">
       <div className="flex items-center justify-between bg-white px-2 py-0.5 font-inter rounded-t-md ">
@@ -47,5 +47,5 @@ export default function InstalledPackagesHeader({
         </div>
       )}
     </div>
-  );
+  )
 }

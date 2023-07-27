@@ -1,18 +1,18 @@
-import { HD_RESOURCE_CONDITION_TYPE } from "../../API/releases";
-import { Tooltip } from "flowbite-react";
-import { ReleaseHealthStatus } from "../../data/types";
+import { HD_RESOURCE_CONDITION_TYPE } from "../../API/releases"
+import { Tooltip } from "flowbite-react"
+import { ReleaseHealthStatus } from "../../data/types"
 
 interface Props {
-  statusData: ReleaseHealthStatus[];
+  statusData: ReleaseHealthStatus[]
 }
 
 const HealthStatus = ({ statusData }: Props) => {
   const statuses = statusData.map((item) => {
     for (let i = 0; i < item.status.conditions.length; i++) {
-      const cond = item.status.conditions[i];
+      const cond = item.status.conditions[i]
 
       if (cond.type !== HD_RESOURCE_CONDITION_TYPE) {
-        continue;
+        continue
       }
 
       return (
@@ -30,11 +30,11 @@ const HealthStatus = ({ statusData }: Props) => {
             } w-2.5 h-2.5 rounded-sm`}
           ></span>
         </Tooltip>
-      );
+      )
     }
-  });
+  })
 
-  return <div className="flex flex-wrap gap-1">{statuses}</div>;
-};
+  return <div className="flex flex-wrap gap-1">{statuses}</div>
+}
 
-export default HealthStatus;
+export default HealthStatus

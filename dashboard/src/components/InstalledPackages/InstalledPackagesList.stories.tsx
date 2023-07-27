@@ -1,7 +1,7 @@
 // InstalledPackagesList.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react";
-import InstalledPackagesList from "./InstalledPackagesList";
+import { ComponentStory, ComponentMeta } from "@storybook/react"
+import InstalledPackagesList from "./InstalledPackagesList"
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,34 +11,50 @@ export default {
    */
   title: "InstalledPackagesList",
   component: InstalledPackagesList,
-} as ComponentMeta<typeof InstalledPackagesList>;
+} as ComponentMeta<typeof InstalledPackagesList>
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof InstalledPackagesList> = (args) => (
   <InstalledPackagesList {...args} />
-);
+)
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 
 Default.args = {
   installedReleases: [
     {
-      id: "package1",
-      image: "img",
-      version: "1.0.0",
-      name: "package1",
+      id: "",
+      name: "",
+      namespace: "",
       revision: 1,
-      lastUpdated: "2021-01-01",
-      description: "package1 description",
+      updated: "",
+      status: "",
+      chart: "",
+      chart_name: "",
+      chart_ver: "",
+      app_version: "",
+      icon: "",
+      description: "",
+      has_tests: false,
+      chartName: "", // duplicated in some cases in the backend, we need to resolve this
+      chartVersion: "", // duplicated in some cases in the
     },
     {
-      id: "package2",
-      image: "img",
-      version: "1.0.0",
-      name: "package2",
+      id: "",
+      name: "",
+      namespace: "",
       revision: 1,
-      lastUpdated: "2022-01-01",
-      description: "package2 description",
+      updated: "",
+      status: "",
+      chart: "",
+      chart_name: "",
+      chart_ver: "",
+      app_version: "",
+      icon: "",
+      description: "",
+      has_tests: false,
+      chartName: "", // duplicated in some cases in the backend, we need to resolve this
+      chartVersion: "", // duplicated in some cases in the
     },
   ],
-};
+}

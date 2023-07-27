@@ -3,15 +3,15 @@ import {
   UseQueryOptions,
   useMutation,
   useQuery,
-} from "@tanstack/react-query";
-import { callApi } from "./releases";
+} from "@tanstack/react-query"
+import { callApi } from "./releases"
 import {
   ChartList,
   ChartVersions,
   HelmRepositories,
   LatestChartVersion,
   ValuesYamlText,
-} from "./interfaces";
+} from "./interfaces"
 
 // Get list of Helm repositories
 export function useGetRepositories(
@@ -21,7 +21,7 @@ export function useGetRepositories(
     ["helm", "repositories"],
     () => callApi<HelmRepositories>("/api/helm/repositories"),
     options
-  );
+  )
 }
 
 // Add new repository
@@ -30,17 +30,17 @@ function useAddRepository(
 ) {
   return useMutation<void, unknown, { name: string; url: string }>(
     ({ name, url }) => {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("url", url);
+      const formData = new FormData()
+      formData.append("name", name)
+      formData.append("url", url)
 
       return callApi<void>("/api/helm/repositories", {
         method: "POST",
         body: formData,
-      });
+      })
     },
     options
-  );
+  )
 }
 
 // Get list of charts in repository
@@ -52,7 +52,7 @@ function useGetChartsInRepo(
     ["helm", "repositories", repo],
     () => callApi<ChartList>(`/api/helm/repositories/${repo}`),
     options
-  );
+  )
 }
 
 // Update repository from remote
@@ -63,8 +63,8 @@ export function useUpdateRepo(
   return useMutation<void, unknown, void>(() => {
     return callApi<void>(`/api/helm/repositories/${repo}`, {
       method: "POST",
-    });
-  }, options);
+    })
+  }, options)
 }
 
 // Remove repository
@@ -75,8 +75,8 @@ export function useDeleteRepo(
   return useMutation<void, unknown, void>(() => {
     return callApi<void>(`/api/helm/repositories/${repo}`, {
       method: "DELETE",
-    });
-  }, options);
+    })
+  }, options)
 }
 
 // Find the latest available version of specified chart through all the repositories
@@ -91,7 +91,7 @@ function useGetLatestChartVersion(
         `/api/helm/repositories/latestver?name=${name}`
       ),
     options
-  );
+  )
 }
 
 // Get the list of versions for specified chart across the repositories
@@ -104,7 +104,7 @@ function useGetChartVersions(
     () =>
       callApi<ChartVersions>(`/api/helm/repositories/versions?name=${name}`),
     options
-  );
+  )
 }
 
 // Get the original values.yaml file for the chart
@@ -120,7 +120,7 @@ function useGetChartValues(
         `/api/helm/repositories/values?chart=${chart}&version=${version}`
       ),
     options
-  );
+  )
 }
 
 export function useChartRepoValues(
@@ -139,5 +139,5 @@ export function useChartRepoValues(
         }
       ),
     options
-  );
+  )
 }

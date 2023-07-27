@@ -18,20 +18,20 @@
  *
  */
 
-import React from "react";
-export type BadgeCode = "success" | "warning" | "error";
+import React from "react"
+export type BadgeCode = "success" | "warning" | "error" | "unknown"
 
 export const BadgeCodes = Object.freeze({
   ERROR: "error",
   WARNING: "warning",
   SUCCESS: "success",
   UNKNOWN: "unknown",
-});
+})
 
 export interface BadgeProps {
-  type: BadgeCode;
-  children: React.ReactNode;
-  additionalClassNames?: string;
+  type: BadgeCode
+  children: React.ReactNode
+  additionalClassNames?: string
 }
 export default function Badge(props: BadgeProps): JSX.Element {
   const colorVariants = {
@@ -39,10 +39,10 @@ export default function Badge(props: BadgeProps): JSX.Element {
     [BadgeCodes.WARNING]: "bg-text-warning text-white",
     [BadgeCodes.ERROR]: "bg-text-danger text-white",
     [BadgeCodes.UNKNOWN]: "bg-secondary text-danger",
-  };
+  }
 
   const badgeBase =
-    "inline-flex items-center px-1 py-1 rounded text-xs font-light";
+    "inline-flex items-center px-1 py-1 rounded text-xs font-light"
 
   const badgeElem = (
     <span
@@ -52,22 +52,22 @@ export default function Badge(props: BadgeProps): JSX.Element {
     >
       {props.children}
     </span>
-  );
-  return badgeElem;
+  )
+  return badgeElem
 }
 
-export const getBadgeType = (status: string) => {
+export const getBadgeType = (status: string): BadgeCode => {
   if (status === "Unknown") {
-    return BadgeCodes.UNKNOWN;
+    return BadgeCodes.UNKNOWN
   } else if (
     status === "Healthy" ||
     status.toLowerCase().includes("exists") ||
     status === "available"
   ) {
-    return BadgeCodes.SUCCESS;
+    return BadgeCodes.SUCCESS
   } else if (status === "Progressing") {
-    return BadgeCodes.WARNING;
+    return BadgeCodes.WARNING
   } else {
-    return BadgeCodes.ERROR;
+    return BadgeCodes.ERROR
   }
-};
+}

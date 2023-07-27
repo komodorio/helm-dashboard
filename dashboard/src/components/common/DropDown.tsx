@@ -81,7 +81,10 @@ function DropDown({ items }: DropDownProps) {
                 <div
                   onClick={() => {
                     item.onClick?.()
-                    setPopupState((prev) => ({ ...prev, isOpen: false }))
+                    setPopupState((prev) => ({
+                      ...prev,
+                      isOpen: false,
+                    }))
                   }}
                   className={`cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-dropdown ${
                     item.isDisabled

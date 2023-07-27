@@ -35,7 +35,9 @@ export default function Header() {
 
   const resetCache = async () => {
     try {
-      await apiService.fetchWithDefaults("/api/cache", { method: "DELETE" })
+      await apiService.fetchWithDefaults("/api/cache", {
+        method: "DELETE",
+      })
       window.location.reload()
     } catch (error) {
       console.error(error)

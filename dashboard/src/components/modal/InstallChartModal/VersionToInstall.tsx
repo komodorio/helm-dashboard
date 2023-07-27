@@ -1,32 +1,32 @@
-import { useMemo, useState } from "react";
-import Select, { components } from "react-select";
-import { BsCheck2 } from "react-icons/bs";
-import { NonEmptyArray } from "../../../data/types";
+import { useMemo, useState } from "react"
+import Select, { components } from "react-select"
+import { BsCheck2 } from "react-icons/bs"
+import { NonEmptyArray } from "../../../data/types"
 
 interface Version {
-  repository: string;
-  version: string;
-  isChartVersion: boolean;
-  urls: string[];
+  repository: string
+  version: string
+  isChartVersion: boolean
+  urls: string[]
 }
 
 export const VersionToInstall: React.FC<{
-  versions: NonEmptyArray<Version>;
+  versions: NonEmptyArray<Version>
   initialVersion?: {
-    repository?: string;
-    version?: string;
-  };
+    repository?: string
+    version?: string
+  }
   onSelectVersion: (props: {
-    version: string;
-    repository: string;
-    urls: string[];
-  }) => void;
-  isInstall?: boolean;
+    version: string
+    repository: string
+    urls: string[]
+  }) => void
+  isInstall?: boolean
 }> = ({ versions, onSelectVersion, isInstall, initialVersion }) => {
   const chartVersion = useMemo(
     () => versions.find(({ isChartVersion }) => isChartVersion)?.version,
     [versions]
-  );
+  )
 
   const currentVersion =
     chartVersion && !isInstall ? (
@@ -35,7 +35,7 @@ export const VersionToInstall: React.FC<{
         <span className="text-green-700">{`${chartVersion}`}</span>
         {`)`}
       </p>
-    ) : null;
+    ) : null
 
   // Prepare your options for react-select
   const options =
@@ -43,9 +43,9 @@ export const VersionToInstall: React.FC<{
       value: { repository, version, urls },
       label: `${repository} @ ${version}`,
       check: chartVersion === version,
-    })) || [];
+    })) || []
   const [selectedOption, setSelectedOption] =
-    useState<(typeof options)[number]>();
+    useState<(typeof options)[number]>()
   const initOpt = useMemo(
     () =>
       options.find(
@@ -54,7 +54,7 @@ export const VersionToInstall: React.FC<{
           value.repository === initialVersion?.repository
       ),
     [options, initialVersion]
-  );
+  )
   return (
     <div className="flex gap-2 text-xl items-center">
       {versions?.length && (selectedOption || initOpt) ? (
@@ -69,8 +69,8 @@ export const VersionToInstall: React.FC<{
             options={options}
             onChange={(selectedOption) => {
               if (selectedOption) {
-                setSelectedOption(selectedOption);
-                onSelectVersion(selectedOption.value);
+                setSelectedOption(selectedOption)
+                onSelectVersion(selectedOption.value)
               }
             }}
             value={selectedOption ?? initOpt}
@@ -104,5 +104,5 @@ export const VersionToInstall: React.FC<{
 
       {currentVersion}
     </div>
-  );
-};
+  )
+}
