@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
+import { useEffect, useRef, useState } from "react"
+import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js"
 
 import {
   BsPencil,
@@ -8,42 +8,42 @@ import {
   BsArrowRepeat,
   BsArrowUp,
   BsCheckCircle,
-} from "react-icons/bs";
-import { Release, ReleaseRevision } from "../../data/types";
-import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useGetReleaseInfoByType } from "../../API/releases";
+} from "react-icons/bs"
+import { Release, ReleaseRevision } from "../../data/types"
+import StatusLabel, { DeploymentStatus } from "../common/StatusLabel"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
+import { useGetReleaseInfoByType } from "../../API/releases"
 
-import RevisionDiff from "./RevisionDiff";
-import RevisionResource from "./RevisionResource";
-import Tabs from "../Tabs";
+import RevisionDiff from "./RevisionDiff"
+import RevisionResource from "./RevisionResource"
+import Tabs from "../Tabs"
 import {
   useGetLatestVersion,
   useGetResources,
   useRollbackRelease,
   useTestRelease,
-} from "../../API/releases";
-import { useMutation } from "@tanstack/react-query";
-import Modal, { ModalButtonStyle } from "../modal/Modal";
-import Spinner from "../Spinner";
-import useAlertError from "../../hooks/useAlertError";
-import Button from "../Button";
-import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
-import { diffConfiguration, isNewerVersion } from "../../utils";
-import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
-import apiService from "../../API/apiService";
+} from "../../API/releases"
+import { useMutation } from "@tanstack/react-query"
+import Modal, { ModalButtonStyle } from "../modal/Modal"
+import Spinner from "../Spinner"
+import useAlertError from "../../hooks/useAlertError"
+import Button from "../Button"
+import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal"
+import { diffConfiguration, isNewerVersion } from "../../utils"
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams"
+import apiService from "../../API/apiService"
 
 type RevisionTagProps = {
-  caption: string;
-  text: string;
-};
+  caption: string
+  text: string
+}
 
 type RevisionDetailsProps = {
-  release: Release;
-  installedRevision: ReleaseRevision;
-  isLatest: boolean;
-  latestRevision: number;
-};
+  release: Release
+  installedRevision: ReleaseRevision
+  isLatest: boolean
+  latestRevision: number
+}
 
 export default function RevisionDetails({
   release,
@@ -51,7 +51,7 @@ export default function RevisionDetails({
   isLatest,
   latestRevision,
 }: RevisionDetailsProps) {
-  const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams()
   const revisionTabs = [
     {
       value: "resources",
@@ -78,60 +78,60 @@ export default function RevisionDetails({
       label: "Notes",
       content: <RevisionDiff latestRevision={latestRevision} />,
     },
-  ];
-  const { context, namespace, chart } = useParams();
-  const tab = searchParams.get("tab");
+  ]
+  const { context, namespace, chart } = useParams()
+  const tab = searchParams.get("tab")
   const selectedTab =
-    revisionTabs.find((t) => t.value === tab) || revisionTabs[0];
-  const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false);
+    revisionTabs.find((t) => t.value === tab) || revisionTabs[0]
+  const [isReconfigureModalOpen, setIsReconfigureModalOpen] = useState(false)
 
   const {
     data: latestVerData,
     refetch: refetchLatestVersion,
     isLoading: isLoadingLatestVersion,
     isRefetching: isRefetchingLatestVersion,
-  } = useGetLatestVersion(release.chart_name, { cacheTime: 0 });
+  } = useGetLatestVersion(release.chart_name, { cacheTime: 0 })
 
-  const [showTestsResults, setShowTestResults] = useState(false);
+  const [showTestsResults, setShowTestResults] = useState(false)
 
-  const { setShowErrorModal } = useAlertError();
+  const { setShowErrorModal } = useAlertError()
   const {
     mutate: runTests,
     isLoading: isRunningTests,
     data: testResults,
   } = useTestRelease({
     onError: (error) => {
-      setShowTestResults(false);
+      setShowTestResults(false)
       setShowErrorModal({
         title: "Failed to run tests for chart " + chart,
         msg: (error as Error).message,
-      });
-      console.error("Failed to execute test for chart", error);
+      })
+      console.error("Failed to execute test for chart", error)
     },
-  });
+  })
 
   const handleRunTests = () => {
     if (!namespace || !chart) {
       setShowErrorModal({
         title: "Missing data to run test",
         msg: "Missing chart and/or namespace",
-      });
-      return;
+      })
+      return
     }
 
     try {
       runTests({
         ns: namespace,
         name: chart,
-      });
+      })
     } catch (error: any) {
       setShowErrorModal({
         title: "Test failed to run",
         msg: error.message,
-      });
+      })
     }
-    setShowTestResults(true);
-  };
+    setShowTestResults(true)
+  }
 
   const displayTestResults = () => {
     if (!testResults || (testResults as []).length === 0) {
@@ -142,7 +142,7 @@ export default function RevisionDetails({
           <br />
           <pre>Empty response from API</pre>
         </div>
-      );
+      )
     } else {
       return (
         <div>
@@ -153,12 +153,12 @@ export default function RevisionDetails({
             </div>
           ))}
         </div>
-      );
+      )
     }
-  };
+  }
 
   const Header = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     return (
       <header className="flex flex-wrap justify-between">
         <h1 className=" text-3xl font-semibold float-left mb-1 font-roboto-slab">
@@ -196,7 +196,7 @@ export default function RevisionDetails({
                 latestVersion={latestVerData?.[0]?.version}
                 isUpgrade={canUpgrade}
                 onClose={() => {
-                  setIsReconfigureModalOpen(false);
+                  setIsReconfigureModalOpen(false)
                 }}
                 latestRevision={latestRevision}
               />
@@ -206,7 +206,7 @@ export default function RevisionDetails({
                 onClick={() => {
                   navigate(
                     `/${context}/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
-                  );
+                  )
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
               >
@@ -253,12 +253,12 @@ export default function RevisionDetails({
           <Uninstall />
         </div>
       </header>
-    );
-  };
+    )
+  }
 
   const canUpgrade = !latestVerData?.[0]?.version
     ? false
-    : isNewerVersion(installedRevision.chart_ver, latestVerData?.[0]?.version);
+    : isNewerVersion(installedRevision.chart_ver, latestVerData?.[0]?.version)
 
   return (
     <div className="flex flex-col px-16 pt-5 gap-3">
@@ -299,7 +299,7 @@ export default function RevisionDetails({
       </span>
       <Tabs tabs={revisionTabs} selectedTab={selectedTab} />
     </div>
-  );
+  )
 }
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
@@ -308,28 +308,28 @@ function RevisionTag({ caption, text }: RevisionTagProps) {
       <span>{caption}:</span>
       <span className="font-bold"> {text}</span>
     </span>
-  );
+  )
 }
 
 const Rollback = ({
   release,
   installedRevision,
 }: {
-  release: Release;
-  installedRevision: ReleaseRevision;
+  release: Release
+  installedRevision: ReleaseRevision
 }) => {
-  const { chart, namespace, revision, context } = useParams();
-  const navigate = useNavigateWithSearchParams();
+  const { chart, namespace, revision, context } = useParams()
+  const navigate = useNavigateWithSearchParams()
   if (!chart || !namespace || !revision) {
-    return null;
+    return null
   }
 
-  const [showRollbackDiff, setShowRollbackDiff] = useState(false);
-  const revisionInt = parseInt(revision || "", 10);
+  const [showRollbackDiff, setShowRollbackDiff] = useState(false)
+  const revisionInt = parseInt(revision || "", 10)
   const rollbackRevision =
     installedRevision.revision === release.revision
       ? installedRevision.revision - 1
-      : revisionInt;
+      : revisionInt
 
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
@@ -338,23 +338,23 @@ const Rollback = ({
           `/${context}/${namespace}/${chart}/installed/revision/${
             revisionInt + 1
           }`
-        );
-        window.location.reload();
+        )
+        window.location.reload()
       },
-    });
+    })
 
   const handleRollback = () => {
-    setShowRollbackDiff(true);
-  };
+    setShowRollbackDiff(true)
+  }
 
   const rollbackTitle = (
     <div className="font-semibold text-lg">
       Rollback <span className="text-red-500">{chart}</span> from revision{" "}
       {installedRevision.revision} to {rollbackRevision}
     </div>
-  );
+  )
 
-  if (release.revision <= 1) return null;
+  if (release.revision <= 1) return null
 
   const RollbackModal = () => {
     const response = useGetReleaseInfoByType(
@@ -365,7 +365,7 @@ const Rollback = ({
         tab: "manifests",
       },
       `&revisionDiff=${installedRevision.revision}`
-    );
+    )
 
     return (
       <Modal
@@ -381,7 +381,7 @@ const Rollback = ({
                 ns: namespace as string,
                 name: String(chart),
                 revision: release.revision,
-              });
+              })
             },
             variant: ModalButtonStyle.info,
             isLoading: isRollingBackRelease,
@@ -391,16 +391,12 @@ const Rollback = ({
       >
         <RollbackModalContent dataResponse={response} />
       </Modal>
-    );
-  };
+    )
+  }
 
   const RollbackModalContent = ({ dataResponse }: { dataResponse: any }) => {
-    const {
-      data,
-      isLoading,
-      isSuccess: fetchedDataSuccessfully,
-    } = dataResponse;
-    const diffElement = useRef<HTMLDivElement | null>(null);
+    const { data, isLoading, isSuccess: fetchedDataSuccessfully } = dataResponse
+    const diffElement = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
       if (data && fetchedDataSuccessfully && diffElement?.current) {
@@ -408,11 +404,11 @@ const Rollback = ({
           diffElement.current,
           data,
           diffConfiguration
-        );
-        diff2htmlUi.draw();
-        diff2htmlUi.highlightCode();
+        )
+        diff2htmlUi.draw()
+        diff2htmlUi.highlightCode()
       }
-    }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current]);
+    }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current])
 
     return (
       <div className="flex flex-col space-y-4">
@@ -428,8 +424,8 @@ const Rollback = ({
         )}
         <div className="relative leading-5" ref={diffElement} />
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -442,15 +438,15 @@ const Rollback = ({
       </Button>
       {showRollbackDiff && <RollbackModal />}
     </>
-  );
-};
+  )
+}
 
 const Uninstall = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { namespace = "", chart = "" } = useParams();
+  const [isOpen, setIsOpen] = useState(false)
+  const { namespace = "", chart = "" } = useParams()
   const { data: resources } = useGetResources(namespace, chart, {
     enabled: isOpen,
-  });
+  })
 
   const uninstallMutation = useMutation(
     ["uninstall", namespace, chart],
@@ -463,16 +459,16 @@ const Uninstall = () => {
       ),
     {
       onSuccess: () => {
-        window.location.href = "/";
+        window.location.href = "/"
       },
     }
-  );
+  )
   const uninstallTitle = (
     <div className="font-semibold text-lg">
       Uninstall <span className="text-red-500">{chart}</span> from namespace{" "}
       <span className="text-red-500">{namespace}</span>
     </div>
-  );
+  )
 
   return (
     <>
@@ -525,5 +521,5 @@ const Uninstall = () => {
         </Modal>
       ) : null}
     </>
-  );
-};
+  )
+}

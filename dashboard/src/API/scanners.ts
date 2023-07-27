@@ -3,9 +3,9 @@ import {
   UseQueryOptions,
   useMutation,
   useQuery,
-} from "@tanstack/react-query";
-import { callApi } from "./releases";
-import { ScanResult, ScanResults, ScannersList } from "./interfaces";
+} from "@tanstack/react-query"
+import { callApi } from "./releases"
+import { ScanResult, ScanResults, ScannersList } from "./interfaces"
 
 // Get list of discovered scanners
 function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
@@ -13,7 +13,7 @@ function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
     ["scanners"],
     () => callApi<ScannersList>("/api/scanners"),
     options
-  );
+  )
 }
 
 // Scan manifests using all applicable scanners
@@ -21,8 +21,8 @@ function useScanManifests(
   manifest: string,
   options?: UseMutationOptions<ScanResults, Error, string>
 ) {
-  const formData = new FormData();
-  formData.append("manifest", manifest);
+  const formData = new FormData()
+  formData.append("manifest", manifest)
   return useMutation<ScanResults, Error, string>(
     () =>
       callApi<ScanResults>("/api/scanners/manifests", {
@@ -30,7 +30,7 @@ function useScanManifests(
         body: formData,
       }),
     options
-  );
+  )
 }
 
 // Scan specified k8s resource in cluster
@@ -47,5 +47,5 @@ function useScanK8sResource(
         `/api/scanners/resource/${kind}?namespace=${namespace}&name=${name}`
       ),
     options
-  );
+  )
 }

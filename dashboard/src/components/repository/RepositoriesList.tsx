@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import AddRepositoryModal from "../modal/AddRepositoryModal";
-import { Repository } from "../../data/types";
-import useCustomSearchParams from "../../hooks/useCustomSearchParams";
-import { useParams } from "react-router";
+import { useCallback, useEffect, useMemo, useState } from "react"
+import AddRepositoryModal from "../modal/AddRepositoryModal"
+import { Repository } from "../../data/types"
+import useCustomSearchParams from "../../hooks/useCustomSearchParams"
+import { useParams } from "react-router"
 
 type RepositoriesListProps = {
-  selectedRepository: Repository | undefined;
-  onRepositoryChanged: (selectedRepository: Repository) => void;
-  repositories: Repository[];
-};
+  selectedRepository: Repository | undefined
+  onRepositoryChanged: (selectedRepository: Repository) => void
+  repositories: Repository[]
+}
 
 function RepositoriesList({
   onRepositoryChanged,
@@ -16,18 +16,18 @@ function RepositoriesList({
   repositories,
 }: RepositoriesListProps) {
   const { searchParamsObject, upsertSearchParams, removeSearchParam } =
-    useCustomSearchParams();
+    useCustomSearchParams()
   const showAddRepositoryModal = useMemo(
     () => searchParamsObject["add_repo"] === "true",
     [searchParamsObject]
-  );
+  )
   const setShowAddRepositoryModal = useCallback(
     (value: boolean) =>
       value
         ? upsertSearchParams("add_repo", "true")
         : removeSearchParam("add_repo"),
     [upsertSearchParams, removeSearchParam]
-  );
+  )
 
   return (
     <>
@@ -42,7 +42,7 @@ function RepositoriesList({
             >
               <input
                 onChange={() => {
-                  onRepositoryChanged(repository);
+                  onRepositoryChanged(repository)
                 }}
                 className="cursor-pointer"
                 type="radio"
@@ -77,7 +77,7 @@ function RepositoriesList({
         onClose={() => setShowAddRepositoryModal(false)}
       />
     </>
-  );
+  )
 }
 
-export default RepositoriesList;
+export default RepositoriesList

@@ -1,16 +1,16 @@
-import Header from "./layout/Header";
-import { HashRouter, Outlet, Route, Routes, useParams } from "react-router-dom";
-import "./index.css";
-import Installed from "./pages/Installed";
-import RepositoryPage from "./pages/Repository";
-import Revision from "./pages/Revision";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
-import { ErrorAlert, ErrorModalContext } from "./context/ErrorModalContext";
-import GlobalErrorModal from "./components/modal/GlobalErrorModal";
-import { AppContextProvider } from "./context/AppContext";
-import apiService from "./API/apiService";
-import DocsPage from "./pages/DocsPage";
+import Header from "./layout/Header"
+import { HashRouter, Outlet, Route, Routes, useParams } from "react-router-dom"
+import "./index.css"
+import Installed from "./pages/Installed"
+import RepositoryPage from "./pages/Repository"
+import Revision from "./pages/Revision"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useState } from "react"
+import { ErrorAlert, ErrorModalContext } from "./context/ErrorModalContext"
+import GlobalErrorModal from "./components/modal/GlobalErrorModal"
+import { AppContextProvider } from "./context/AppContext"
+import apiService from "./API/apiService"
+import DocsPage from "./pages/DocsPage"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
       retry: false,
     },
   },
-});
+})
 
 const PageLayout = () => {
   return (
@@ -29,23 +29,23 @@ const PageLayout = () => {
         <Outlet />
       </div>
     </div>
-  );
-};
+  )
+}
 
 const SyncContext: React.FC = () => {
-  const { context } = useParams();
+  const { context } = useParams()
   if (context) {
-    apiService.setCluster(context);
+    apiService.setCluster(context)
   }
 
-  return <Outlet />;
-};
+  return <Outlet />
+}
 
 export default function App() {
   const [shouldShowErrorModal, setShowErrorModal] = useState<
     ErrorAlert | undefined
-  >(undefined);
-  const value = { shouldShowErrorModal, setShowErrorModal };
+  >(undefined)
+  const value = { shouldShowErrorModal, setShowErrorModal }
 
   return (
     <AppContextProvider>
@@ -81,5 +81,5 @@ export default function App() {
         </QueryClientProvider>
       </ErrorModalContext.Provider>
     </AppContextProvider>
-  );
+  )
 }

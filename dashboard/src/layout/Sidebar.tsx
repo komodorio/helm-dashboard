@@ -1,4 +1,4 @@
-import "../App.css";
+import "../App.css"
 
 function Sidebar(): JSX.Element {
   return (
@@ -21,7 +21,7 @@ function Sidebar(): JSX.Element {
       <button className="btn">Add Repository</button>
       <p>Some text that describes chart</p>
     </div>
-  );
+  )
 }
 
-export default Sidebar;
+export default Sidebar

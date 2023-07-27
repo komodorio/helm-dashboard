@@ -1,6 +1,6 @@
-import { UseQueryOptions, useQuery } from "@tanstack/react-query";
-import { callApi } from "./releases";
-import { K8sResource, K8sResourceList, KubectlContexts } from "./interfaces";
+import { UseQueryOptions, useQuery } from "@tanstack/react-query"
+import { callApi } from "./releases"
+import { K8sResource, K8sResourceList, KubectlContexts } from "./interfaces"
 
 // Get list of kubectl contexts configured locally
 function useGetKubectlContexts(options?: UseQueryOptions<KubectlContexts>) {
@@ -8,7 +8,7 @@ function useGetKubectlContexts(options?: UseQueryOptions<KubectlContexts>) {
     ["k8s", "contexts"],
     () => callApi<KubectlContexts>("/api/k8s/contexts"),
     options
-  );
+  )
 }
 
 // Get resources information
@@ -25,7 +25,7 @@ function useGetK8sResource(
         `/api/k8s/${kind}/get?name=${name}&namespace=${namespace}`
       ),
     options
-  );
+  )
 }
 
 // Get list of resources
@@ -37,7 +37,7 @@ function useGetK8sResourceList(
     ["k8s", kind, "list"],
     () => callApi<K8sResourceList>(`/api/k8s/${kind}/list`),
     options
-  );
+  )
 }
 
 // Get describe text for kubernetes resource
@@ -59,5 +59,5 @@ function useGetK8sResourceDescribe(
         }
       ),
     options
-  );
+  )
 }

@@ -1,7 +1,7 @@
 // RepositoriesList.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react";
-import RepositoriesList from "./RepositoriesList";
+import { ComponentStory, ComponentMeta } from "@storybook/react"
+import RepositoriesList from "./RepositoriesList"
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,7 +11,7 @@ export default {
    */
   title: "RepositoriesList",
   component: RepositoriesList,
-} as ComponentMeta<typeof RepositoriesList>;
+} as ComponentMeta<typeof RepositoriesList>
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof RepositoriesList> = () => (
@@ -22,6 +22,6 @@ const Template: ComponentStory<typeof RepositoriesList> = () => (
     onRepositoryChanged={() => {}}
     repositories={[]}
   />
-);
+)
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})

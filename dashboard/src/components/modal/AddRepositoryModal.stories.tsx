@@ -1,7 +1,7 @@
 // Modal.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react";
-import AddRepositoryModal from "./AddRepositoryModal";
+import { ComponentStory, ComponentMeta } from "@storybook/react"
+import AddRepositoryModal from "./AddRepositoryModal"
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,15 +11,15 @@ export default {
    */
   title: "AddRepositoryModal",
   component: AddRepositoryModal,
-} as ComponentMeta<typeof AddRepositoryModal>;
+} as ComponentMeta<typeof AddRepositoryModal>
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof AddRepositoryModal> = (args) => (
   <AddRepositoryModal {...args} isOpen={true} />
-);
+)
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 
 Default.args = {
   isOpen: true,
-};
+}

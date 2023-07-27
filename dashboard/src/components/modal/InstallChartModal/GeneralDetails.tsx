@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom"
 
 export const GeneralDetails = ({
   releaseName,
@@ -7,17 +7,17 @@ export const GeneralDetails = ({
   onNamespaceInput,
   onReleaseNameInput,
 }: {
-  releaseName: string;
-  namespace?: string;
-  disabled: boolean;
+  releaseName: string
+  namespace?: string
+  disabled: boolean
 
-  onNamespaceInput: (namespace: string) => void;
-  onReleaseNameInput: (chartName: string) => void;
+  onNamespaceInput: (namespace: string) => void
+  onReleaseNameInput: (chartName: string) => void
 }) => {
-  const { context } = useParams();
+  const { context } = useParams()
   const inputClassName = ` text-lg py-1 px-2 border border-1 border-gray-300 ${
     disabled ? "bg-gray-200" : "bg-white "
-  } rounded`;
+  } rounded`
   return (
     <div className="flex gap-8">
       <div>
@@ -45,5 +45,5 @@ export const GeneralDetails = ({
         </div>
       ) : null}
     </div>
-  );
-};
+  )
+}

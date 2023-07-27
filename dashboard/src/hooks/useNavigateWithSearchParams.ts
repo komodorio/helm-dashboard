@@ -1,13 +1,13 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"
 
 const useNavigateWithSearchParams = () => {
-  const navigate = useNavigate();
-  const { search } = useLocation();
+  const navigate = useNavigate()
+  const { search } = useLocation()
   const navigateWithSearchParams = (url: string, ...restArgs: any[]) => {
-    navigate(url + search, ...restArgs);
-  };
+    navigate(url + search, ...restArgs)
+  }
 
-  return navigateWithSearchParams;
-};
+  return navigateWithSearchParams
+}
 
-export default useNavigateWithSearchParams;
+export default useNavigateWithSearchParams

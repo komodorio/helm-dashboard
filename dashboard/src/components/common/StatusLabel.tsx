@@ -1,9 +1,9 @@
-import { AiOutlineReload } from "react-icons/ai";
+import { AiOutlineReload } from "react-icons/ai"
 
 type StatusLabelProps = {
-  status: string;
-  isRollback?: boolean;
-};
+  status: string
+  isRollback?: boolean
+}
 
 export enum DeploymentStatus {
   DEPLOYED = "deployed",
@@ -13,14 +13,14 @@ export enum DeploymentStatus {
 }
 
 export function getStatusColor(status: DeploymentStatus) {
-  if (status === DeploymentStatus.DEPLOYED) return "text-deployed";
-  if (status === DeploymentStatus.FAILED) return "text-failed";
-  if (status === DeploymentStatus.PENDING) return "text-pending";
-  else return "text-superseded";
+  if (status === DeploymentStatus.DEPLOYED) return "text-deployed"
+  if (status === DeploymentStatus.FAILED) return "text-failed"
+  if (status === DeploymentStatus.PENDING) return "text-pending"
+  else return "text-superseded"
 }
 
 function StatusLabel({ status, isRollback }: StatusLabelProps) {
-  const statusColor = getStatusColor(status as DeploymentStatus);
+  const statusColor = getStatusColor(status as DeploymentStatus)
 
   return (
     <div
@@ -36,7 +36,7 @@ function StatusLabel({ status, isRollback }: StatusLabelProps) {
       </span>
       {isRollback && <AiOutlineReload size={14} />}
     </div>
-  );
+  )
 }
 
-export default StatusLabel;
+export default StatusLabel

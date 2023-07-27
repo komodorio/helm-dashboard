@@ -1,31 +1,31 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import hljs from "highlight.js";
-import { RiExternalLinkLine } from "react-icons/ri";
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import hljs from "highlight.js"
+import { RiExternalLinkLine } from "react-icons/ri"
 
 import {
   StructuredResources,
   useGetResourceDescription,
   useGetResources,
-} from "../../API/releases";
-import closeIcon from "../../assets/close.png";
+} from "../../API/releases"
+import closeIcon from "../../assets/close.png"
 
-import Drawer from "react-modern-drawer";
-import "react-modern-drawer/dist/index.css";
+import Drawer from "react-modern-drawer"
+import "react-modern-drawer/dist/index.css"
 
-import Button from "../Button";
-import Badge, { getBadgeType } from "../Badge";
-import Spinner from "../Spinner";
-import { Troubleshoot } from "../Troubleshoot";
+import Button from "../Button"
+import Badge, { BadgeCode, getBadgeType } from "../Badge"
+import Spinner from "../Spinner"
+import { Troubleshoot } from "../Troubleshoot"
 
 interface Props {
-  isLatest: boolean;
+  isLatest: boolean
 }
 
 export default function RevisionResource({ isLatest }: Props) {
-  const { namespace = "", chart = "" } = useParams();
-  const { data: resources, isLoading } = useGetResources(namespace, chart);
-  const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
+  const { namespace = "", chart = "" } = useParams()
+  const { data: resources, isLoading } = useGetResources(namespace, chart)
+  const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"]
 
   return (
     <table
@@ -51,11 +51,17 @@ export default function RevisionResource({ isLatest }: Props) {
                 return (
                   interestingResources.indexOf(a.kind.toUpperCase()) -
                   interestingResources.indexOf(b.kind.toUpperCase())
-                );
+                )
               })
               .reverse()
               .map((resource: StructuredResources) => (
-                <ResourceRow key={resource.apiVersion + resource.kind + resource.metadata.name} resource={resource} isLatest={isLatest} />
+                <ResourceRow
+                  key={
+                    resource.apiVersion + resource.kind + resource.metadata.name
+                  }
+                  resource={resource}
+                  isLatest={isLatest}
+                />
               ))
           ) : (
             <tr>
@@ -68,28 +74,28 @@ export default function RevisionResource({ isLatest }: Props) {
         </tbody>
       )}
     </table>
-  );
+  )
 }
 
 const ResourceRow = ({
   resource,
   isLatest,
 }: {
-  resource: StructuredResources;
-  isLatest: boolean;
+  resource: StructuredResources
+  isLatest: boolean
 }) => {
   const {
     kind,
     metadata: { name },
     status: { conditions },
-  } = resource;
-  const [isOpen, setIsOpen] = useState(false);
+  } = resource
+  const [isOpen, setIsOpen] = useState(false)
   const toggleDrawer = () => {
-    setIsOpen((prevState) => !prevState);
-  };
-  const { reason = "", status = "", message = "" } = conditions?.[0] || {};
+    setIsOpen((prevState) => !prevState)
+  }
+  const { reason = "", status = "", message = "" } = conditions?.[0] || {}
 
-  const badgeType = getBadgeType(status);
+  const badgeType = getBadgeType(status)
 
   return (
     <>
@@ -127,45 +133,45 @@ const ResourceRow = ({
           <DescribeResource
             resource={resource}
             closeDrawer={() => {
-              setIsOpen(false);
+              setIsOpen(false)
             }}
           />
         ) : null}
       </Drawer>
     </>
-  );
-};
+  )
+}
 
 const DescribeResource = ({
   resource,
   closeDrawer,
 }: {
-  resource: StructuredResources;
-  closeDrawer: () => void;
+  resource: StructuredResources
+  closeDrawer: () => void
 }) => {
   const {
     kind,
     metadata: { name },
     status: { conditions },
-  } = resource;
+  } = resource
 
-  const { status, reason = "" } = conditions?.[0] || {};
-  const { namespace = "", chart = "" } = useParams();
+  const { status, reason = "" } = conditions?.[0] || {}
+  const { namespace = "", chart = "" } = useParams()
   const { data, isLoading } = useGetResourceDescription(
     resource.kind,
     namespace,
     chart
-  );
-  const [yamlFormattedData, setYamlFormattedData] = useState("");
+  )
+  const [yamlFormattedData, setYamlFormattedData] = useState("")
 
   useEffect(() => {
     if (data) {
-      const val = hljs.highlight(data, { language: "yaml" }).value;
-      setYamlFormattedData(val);
+      const val = hljs.highlight(data, { language: "yaml" }).value
+      setYamlFormattedData(val)
     }
-  }, [data]);
+  }, [data])
 
-  const badgeType = getBadgeType(status);
+  const badgeType = getBadgeType(status)
   return (
     <>
       <div className="flex justify-between px-3 py-4 border-b ">
@@ -212,5 +218,5 @@ const DescribeResource = ({
         </div>
       )}
     </>
-  );
-};
+  )
+}

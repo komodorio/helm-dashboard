@@ -1,23 +1,23 @@
-import { ReactNode } from "react";
-import useCustomSearchParams from "../hooks/useCustomSearchParams";
+import { ReactNode } from "react"
+import useCustomSearchParams from "../hooks/useCustomSearchParams"
 
 export interface Tab {
-  value: string;
-  label: string;
-  content: ReactNode;
+  value: string
+  label: string
+  content: ReactNode
 }
 
 interface TabsProps {
-  tabs: Tab[];
-  selectedTab: Tab;
+  tabs: Tab[]
+  selectedTab: Tab
 }
 
 export default function Tabs({ tabs, selectedTab }: TabsProps) {
-  const { upsertSearchParams } = useCustomSearchParams();
+  const { upsertSearchParams } = useCustomSearchParams()
 
   const moveTab = (tab: Tab) => {
-    upsertSearchParams("tab", tab.value);
-  };
+    upsertSearchParams("tab", tab.value)
+  }
 
   return (
     <div className="flex flex-col">
@@ -39,5 +39,5 @@ export default function Tabs({ tabs, selectedTab }: TabsProps) {
       </div>
       <div>{selectedTab.content}</div>
     </div>
-  );
+  )
 }

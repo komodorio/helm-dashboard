@@ -1,14 +1,14 @@
-import { BsPower } from "react-icons/bs";
+import { BsPower } from "react-icons/bs"
 
-import Modal from "./modal/Modal";
-import { useShutdownHelmDashboard } from "../API/other";
+import Modal from "./modal/Modal"
+import { useShutdownHelmDashboard } from "../API/other"
 
 function ShutDownButton() {
-  const { mutate: signOut, status } = useShutdownHelmDashboard();
+  const { mutate: signOut, status } = useShutdownHelmDashboard()
 
   const handleClick = async () => {
-    signOut();
-  };
+    signOut()
+  }
 
   return (
     <div className="w-full">
@@ -27,7 +27,7 @@ function ShutDownButton() {
         <BsPower className="w-6" />
       </button>
     </div>
-  );
+  )
 }
 
-export default ShutDownButton;
+export default ShutDownButton

@@ -3,12 +3,12 @@ import {
   UseQueryOptions,
   useMutation,
   UseMutationOptions,
-} from "@tanstack/react-query";
-import { ChartVersion, Release } from "../data/types";
-import { LatestChartVersion } from "./interfaces";
-import ApiService from "./apiService";
-import apiService from "./apiService";
-export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
+} from "@tanstack/react-query"
+import { ChartVersion, Release } from "../data/types"
+import { LatestChartVersion } from "./interfaces"
+import ApiService from "./apiService"
+import apiService from "./apiService"
+export const HD_RESOURCE_CONDITION_TYPE = "hdHealth" // it's our custom condition type, only one exists
 
 export function useGetInstalledReleases(
   context: string,
@@ -23,7 +23,7 @@ export function useGetInstalledReleases(
         },
       }),
     options
-  );
+  )
 }
 
 // Install new release
@@ -31,18 +31,18 @@ function useInstallRelease(
   options?: UseMutationOptions<void, unknown, InstallReleaseRequest>
 ) {
   return useMutation<void, unknown, InstallReleaseRequest>((request) => {
-    const formData = new FormData();
+    const formData = new FormData()
     Object.entries(request).forEach(([key, value]) => {
       if (value !== undefined) {
-        formData.append(key, value.toString());
+        formData.append(key, value.toString())
       }
-    });
+    })
 
     return callApi<void>("/api/helm/releases/{ns}", {
       method: "POST",
       body: formData,
-    });
-  }, options);
+    })
+  }, options)
 }
 
 // Upgrade/reconfigure existing release
@@ -50,18 +50,18 @@ function useUpgradeRelease(
   options?: UseMutationOptions<void, unknown, UpgradeReleaseRequest>
 ) {
   return useMutation<void, unknown, UpgradeReleaseRequest>((request) => {
-    const formData = new FormData();
+    const formData = new FormData()
     Object.entries(request).forEach(([key, value]) => {
       if (value !== undefined) {
-        formData.append(key, value.toString());
+        formData.append(key, value.toString())
       }
-    });
+    })
 
     return callApi<void>("/api/helm/releases/{ns}/{name}", {
       method: "POST",
       body: formData,
-    });
-  }, options);
+    })
+  }, options)
 }
 
 export function useGetReleaseManifest(
@@ -78,7 +78,7 @@ export function useGetReleaseManifest(
         body: formData,
       }),
     options
-  );
+  )
 }
 
 /**
@@ -112,7 +112,7 @@ export function useGetResources(
         `/api/helm/releases/${ns}/${name}/resources?health=true`
       ),
     options
-  );
+  )
 
   return {
     data: data
@@ -126,14 +126,14 @@ export function useGetResources(
         },
       }))
       .sort((a, b) => {
-        const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
+        const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"]
         return (
           interestingResources.indexOf(b.kind.toUpperCase()) -
           interestingResources.indexOf(a.kind.toUpperCase())
-        );
+        )
       }),
     ...rest,
-  };
+  }
 }
 
 export function useGetResourceDescription(
@@ -152,7 +152,7 @@ export function useGetResourceDescription(
         }
       ),
     options
-  );
+  )
 }
 export function useGetLatestVersion(
   chartName: string,
@@ -165,7 +165,7 @@ export function useGetLatestVersion(
         `/api/helm/repositories/latestver?name=${chartName}`
       ),
     options
-  );
+  )
 }
 export function useGetVersions(
   chartName: string,
@@ -178,7 +178,7 @@ export function useGetVersions(
         `/api/helm/repositories/versions?name=${chartName}`
       ),
     options
-  );
+  )
 }
 
 export function useGetReleaseInfoByType(
@@ -186,7 +186,7 @@ export function useGetReleaseInfoByType(
   additionalParams = "",
   options?: UseQueryOptions<string>
 ) {
-  const { chart, namespace, tab, revision } = params;
+  const { chart, namespace, tab, revision } = params
   return useQuery<string>(
     [tab, namespace, chart, revision, additionalParams],
     () =>
@@ -197,7 +197,7 @@ export function useGetReleaseInfoByType(
         }
       ),
     options
-  );
+  )
 }
 
 export function useGetDiff(
@@ -211,10 +211,10 @@ export function useGetDiff(
         body: formData,
 
         method: "POST",
-      });
+      })
     },
     options
-  );
+  )
 }
 
 // Rollback the release to a previous revision
@@ -230,14 +230,14 @@ export function useRollbackRelease(
     unknown,
     { ns: string; name: string; revision: number }
   >(({ ns, name, revision }) => {
-    const formData = new FormData();
-    formData.append("revision", revision.toString());
+    const formData = new FormData()
+    formData.append("revision", revision.toString())
 
     return callApi<void>(`/api/helm/releases/${ns}/${name}/rollback`, {
       method: "POST",
       body: formData,
-    });
-  }, options);
+    })
+  }, options)
 }
 
 // Run the tests on a release
@@ -248,10 +248,10 @@ export function useTestRelease(
     ({ ns, name }) => {
       return callApi<void>(`/api/helm/releases/${ns}/${name}/test`, {
         method: "POST",
-      });
+      })
     },
     options
-  );
+  )
 }
 
 export function useChartReleaseValues({
@@ -262,12 +262,12 @@ export function useChartReleaseValues({
   options,
   version,
 }: {
-  namespace?: string;
-  release: string;
-  userDefinedValue?: string;
-  revision?: number;
-  version?: string;
-  options?: UseQueryOptions<any>;
+  namespace?: string
+  release: string
+  userDefinedValue?: string
+  revision?: number
+  version?: string
+  options?: UseQueryOptions<any>
 }) {
   return useQuery<any>(
     ["values", namespace, release, userDefinedValue, version],
@@ -281,90 +281,90 @@ export function useChartReleaseValues({
         }
       ),
     options
-  );
+  )
 }
 
 // Request objects
 interface ReleaseInfoParams {
-  chart?: string;
-  tab: string;
-  namespace?: string;
-  revision?: string;
+  chart?: string
+  tab: string
+  namespace?: string
+  revision?: string
 }
 interface InstallReleaseRequest {
-  name: string;
-  chart: string;
-  version?: string;
-  values?: string;
-  preview?: boolean;
+  name: string
+  chart: string
+  version?: string
+  values?: string
+  preview?: boolean
 }
 
 interface InstallReleaseRequest {
-  name: string;
-  chart: string;
-  version?: string;
-  values?: string;
-  preview?: boolean;
+  name: string
+  chart: string
+  version?: string
+  values?: string
+  preview?: boolean
 }
 
 interface UpgradeReleaseRequest {
-  name: string;
-  chart: string;
-  version?: string;
-  values?: string;
-  preview?: boolean;
+  name: string
+  chart: string
+  version?: string
+  values?: string
+  preview?: boolean
 }
 
 export interface StructuredResources {
-  kind: string;
-  apiVersion: string;
-  metadata: Metadata;
-  spec: Spec;
-  status: Status;
+  kind: string
+  apiVersion: string
+  metadata: Metadata
+  spec: Spec
+  status: Status
 }
 
 export interface Metadata {
-  name: string;
-  namespace: string;
-  creationTimestamp: any;
-  labels: any;
+  name: string
+  namespace: string
+  creationTimestamp: any
+  labels: any
 }
 
 export interface Spec {
-  [key: string]: any;
+  [key: string]: any
 }
 
 export interface Status {
-  conditions: Condition[];
+  conditions: Condition[]
 }
 
 export interface Condition {
-  type: string;
-  status: string;
-  lastProbeTime: any;
-  lastTransitionTime: any;
-  reason: string;
-  message: string;
+  type: string
+  status: string
+  lastProbeTime: any
+  lastTransitionTime: any
+  reason: string
+  message: string
 }
 
 export async function callApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const response = await apiService.fetchWithDefaults(url, options);
+  const response = await apiService.fetchWithDefaults(url, options)
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error);
+    const error = await response.text()
+    throw new Error(error)
   }
 
-  let data;
+  let data
   if (!response.headers.get("Content-Type")) {
-    return {} as T;
+    return {} as T
   } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
-    data = await response.text();
+    data = await response.text()
   } else {
-    data = await response.json();
+    data = await response.json()
   }
-  return data;
+  return data
 }

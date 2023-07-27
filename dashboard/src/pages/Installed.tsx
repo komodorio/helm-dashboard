@@ -1,20 +1,20 @@
-import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader";
-import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
-import ClustersList from "../components/ClustersList";
-import { useGetInstalledReleases } from "../API/releases";
-import { useMemo, useState } from "react";
-import Spinner from "../components/Spinner";
-import useAlertError from "../hooks/useAlertError";
-import { useParams, useNavigate } from "react-router-dom";
-import useCustomSearchParams from "../hooks/useCustomSearchParams";
-import { Release } from "../data/types";
+import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader"
+import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList"
+import ClustersList from "../components/ClustersList"
+import { useGetInstalledReleases } from "../API/releases"
+import { useMemo, useState } from "react"
+import Spinner from "../components/Spinner"
+import useAlertError from "../hooks/useAlertError"
+import { useParams, useNavigate } from "react-router-dom"
+import useCustomSearchParams from "../hooks/useCustomSearchParams"
+import { Release } from "../data/types"
 
 function Installed() {
-  const { searchParamsObject, upsertSearchParams } = useCustomSearchParams();
-  const { context } = useParams();
-  const { filteredNamespace } = searchParamsObject;
-  const namespaces = filteredNamespace?.split("+") ?? ["default"];
-  const navigate = useNavigate();
+  const { searchParamsObject, upsertSearchParams } = useCustomSearchParams()
+  const { context } = useParams()
+  const { filteredNamespace } = searchParamsObject
+  const namespaces = filteredNamespace?.split("+") ?? ["default"]
+  const navigate = useNavigate()
 
   const handleClusterChange = (
     clusterName: string,
@@ -25,15 +25,15 @@ function Installed() {
       clusterNamespaces.length > 0
         ? `${clusterNamespaces.map((ns) => ns).join("+")}`
         : "default"
-    );
+    )
     navigate({
       pathname: `/${clusterName}/installed`,
       search: newSearchParams.toString(),
-    });
-  };
+    })
+  }
 
-  const [filterKey, setFilterKey] = useState<string>("");
-  const alertError = useAlertError();
+  const [filterKey, setFilterKey] = useState<string>("")
+  const alertError = useAlertError()
   const { data, isLoading, isRefetching } = useGetInstalledReleases(
     context ?? "",
     {
@@ -42,10 +42,10 @@ function Installed() {
         alertError.setShowErrorModal({
           title: "Failed to get list of charts",
           msg: (e as Error).message,
-        });
+        })
       },
     }
-  );
+  )
 
   const filteredReleases = useMemo(() => {
     return (
@@ -54,10 +54,10 @@ function Installed() {
           installedPackage.name.includes(filterKey) ||
           (installedPackage.namespace.includes(filterKey) &&
             namespaces.includes(installedPackage.namespace))
-        );
+        )
       }) ?? []
-    );
-  }, [data, filterKey, namespaces]);
+    )
+  }, [data, filterKey, namespaces])
 
   return (
     <div className="flex flex-row w-full">
@@ -84,7 +84,7 @@ function Installed() {
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export default Installed;
+export default Installed

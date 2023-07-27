@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { Chart } from "../../data/types";
-import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal";
+import { useState } from "react"
+import { Chart } from "../../data/types"
+import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal"
 
 type ChartViewerProps = {
-  chart: Chart;
-};
+  chart: Chart
+}
 
 function ChartViewer({ chart }: ChartViewerProps) {
-  const [showInstallButton, setShowInstallButton] = useState(false);
-  const [showInstallModal, setShowInstallModal] = useState(false);
+  const [showInstallButton, setShowInstallButton] = useState(false)
+  const [showInstallModal, setShowInstallModal] = useState(false)
 
   const handleMouseOver = () => {
-    setShowInstallButton(true);
-  };
+    setShowInstallButton(true)
+  }
   const handleMouseOut = () => {
-    setShowInstallButton(false);
-  };
+    setShowInstallButton(false)
+  }
 
   return (
     <>
@@ -51,7 +51,7 @@ function ChartViewer({ chart }: ChartViewerProps) {
         />
       )}
     </>
-  );
+  )
 }
 
-export default ChartViewer;
+export default ChartViewer

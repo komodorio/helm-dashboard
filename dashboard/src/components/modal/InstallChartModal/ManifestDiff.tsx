@@ -1,24 +1,24 @@
-import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-base";
-import hljs from "highlight.js";
+import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-base"
+import hljs from "highlight.js"
 
-import { useEffect, useRef } from "react";
-import Spinner from "../../Spinner";
-import { diffConfiguration } from "../../../utils";
+import { useEffect, useRef } from "react"
+import Spinner from "../../Spinner"
+import { diffConfiguration } from "../../../utils"
 
 interface ManifestDiffProps {
-  diff: string;
-  isLoading: boolean;
-  error: string;
+  diff: string
+  isLoading: boolean
+  error: string
 }
 
 export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
-  const diffContainerRef = useRef<HTMLDivElement | null>(null);
+  const diffContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (isLoading) {
       // we're listening to isLoading to draw new diffs which are not
       // always rerender, probably because of the use of ref
-      return;
+      return
     }
     if (diff && diffContainerRef.current) {
       const diff2htmlUi = new Diff2HtmlUI(
@@ -26,11 +26,11 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
         diff,
         diffConfiguration,
         hljs
-      );
-      diff2htmlUi.draw();
-      diff2htmlUi.highlightCode();
+      )
+      diff2htmlUi.draw()
+      diff2htmlUi.highlightCode()
     }
-  }, [diff, diffContainerRef.current, isLoading]);
+  }, [diff, diffContainerRef.current, isLoading])
 
   if (isLoading) {
     return (
@@ -38,7 +38,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
         <Spinner />
         Calculating diff...
       </div>
-    );
+    )
   }
 
   return (
@@ -60,5 +60,5 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
         </pre>
       )}
     </div>
-  );
-};
+  )
+}

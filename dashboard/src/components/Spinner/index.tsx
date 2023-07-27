@@ -18,5 +18,5 @@ export default function Spinner({ size = 8 }: { size?: number }) {
         />
       </svg>
     </div>
-  );
+  )
 }
