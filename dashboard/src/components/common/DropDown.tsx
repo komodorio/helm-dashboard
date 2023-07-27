@@ -1,54 +1,54 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
-import ArrowDownIcon from "../../assets/arrow-down-icon.svg";
+import { ReactNode, useEffect, useRef, useState } from "react"
+import ArrowDownIcon from "../../assets/arrow-down-icon.svg"
 
 export type DropDownItem = {
-  id: string;
-  text?: string;
-  icon?: ReactNode;
-  onClick?: () => void;
-  isSeparator?: boolean;
-  isDisabled?: boolean;
-};
+  id: string
+  text?: string
+  icon?: ReactNode
+  onClick?: () => void
+  isSeparator?: boolean
+  isDisabled?: boolean
+}
 
 export type DropDownProps = {
-  items: DropDownItem[];
-};
+  items: DropDownItem[]
+}
 
 type PopupState = {
-  isOpen: boolean;
-  X: number;
-  Y: number;
-};
+  isOpen: boolean
+  X: number
+  Y: number
+}
 
 function DropDown({ items }: DropDownProps) {
   const [popupState, setPopupState] = useState<PopupState>({
     isOpen: false,
     X: 0,
     Y: 0,
-  });
+  })
 
-  const modalRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (popupState.isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside)
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside)
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [popupState.isOpen]);
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [popupState.isOpen])
 
   const handleClickOutside = (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       setPopupState((prev) => ({
         ...prev,
         isOpen: false,
-      }));
+      }))
     }
-  };
+  }
 
   return (
     <>
@@ -60,7 +60,7 @@ function DropDown({ items }: DropDownProps) {
               isOpen: !prev.isOpen,
               X: e.pageX,
               Y: e.pageY,
-            }));
+            }))
           }}
           className="flex items-center justify-between"
         >
@@ -80,10 +80,10 @@ function DropDown({ items }: DropDownProps) {
               ) : (
                 <div
                   onClick={() => {
-                    item.onClick?.();
-                    setPopupState((prev) => ({ ...prev, isOpen: false }));
+                    item.onClick?.()
+                    setPopupState((prev) => ({ ...prev, isOpen: false }))
                   }}
-                  className={`cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-gray-hover ${
+                  className={`cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-dropdown ${
                     item.isDisabled
                       ? "cursor-default hover:bg-transparent text-gray-400"
                       : ""
@@ -98,7 +98,7 @@ function DropDown({ items }: DropDownProps) {
         </div>
       )}
     </>
-  );
+  )
 }
 
-export default DropDown;
+export default DropDown

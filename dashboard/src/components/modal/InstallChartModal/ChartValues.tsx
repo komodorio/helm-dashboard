@@ -17,7 +17,7 @@ export const ChartValues = ({
         Chart Value Reference:
       </label>
       <pre
-        className="text-base bg-light-white p-2 rounded font-medium w-full max-h-[330px] block overflow-y-auto font-sf-mono"
+        className="text-base bg-chart-values p-2 rounded font-medium w-full max-h-[330px] block overflow-y-auto font-sf-mono"
         dangerouslySetInnerHTML={
           chartValues && !loading
             ? {

@@ -31,7 +31,7 @@ function RepositoriesList({
 
   return (
     <>
-      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded custom-shadow text-grey gap-3">
+      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded custom-shadow text-gray gap-3">
         <label className="font-bold">Repositories</label>
         <div className="flex flex-col gap-1">
           {repositories?.map((repository) => (

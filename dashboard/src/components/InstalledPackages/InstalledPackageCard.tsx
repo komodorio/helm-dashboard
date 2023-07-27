@@ -1,79 +1,79 @@
-import { useState } from "react";
-import { Release } from "../../data/types";
-import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
-import { getAge } from "../../timeUtils";
+import { useState } from "react"
+import { Release } from "../../data/types"
+import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs"
+import { getAge } from "../../timeUtils"
 import StatusLabel, {
   DeploymentStatus,
   getStatusColor,
-} from "../common/StatusLabel";
-import { useQuery } from "@tanstack/react-query";
-import apiService from "../../API/apiService";
-import HealthStatus from "./HealthStatus";
-import HelmGrayIcon from "../../assets/helm-gray-50.svg";
-import Spinner from "../Spinner";
-import { useGetLatestVersion } from "../../API/releases";
-import { isNewerVersion } from "../../utils";
-import { LatestChartVersion } from "../../API/interfaces";
-import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
-import { useParams } from "react-router-dom";
+} from "../common/StatusLabel"
+import { useQuery } from "@tanstack/react-query"
+import apiService from "../../API/apiService"
+import HealthStatus from "./HealthStatus"
+import HelmGrayIcon from "../../assets/helm-gray-50.svg"
+import Spinner from "../Spinner"
+import { useGetLatestVersion } from "../../API/releases"
+import { isNewerVersion } from "../../utils"
+import { LatestChartVersion } from "../../API/interfaces"
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams"
+import { useParams } from "react-router-dom"
 
 type InstalledPackageCardProps = {
-  release: Release;
-};
+  release: Release
+}
 
 export default function InstalledPackageCard({
   release,
 }: InstalledPackageCardProps) {
-  const navigate = useNavigateWithSearchParams();
+  const navigate = useNavigateWithSearchParams()
 
-  const { context: selectedCluster } = useParams();
-  const [isMouseOver, setIsMouseOver] = useState(false);
+  const { context: selectedCluster } = useParams()
+  const [isMouseOver, setIsMouseOver] = useState(false)
 
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
     queryKey: ["chartName", release.chartName],
     cacheTime: 0,
-  });
+  })
 
   const { data: statusData } = useQuery<any>({
     queryKey: ["resourceStatus", release],
     queryFn: () => apiService.getResourceStatus({ release }),
-  });
+  })
 
   const latestVersionData: LatestChartVersion | undefined =
-    latestVersionResult?.[0];
+    latestVersionResult?.[0]
 
   const canUpgrade =
     !latestVersionData?.version || !release.chartVersion
       ? false
-      : isNewerVersion(release.chartVersion, latestVersionData?.version);
+      : isNewerVersion(release.chartVersion, latestVersionData?.version)
 
   const installRepoSuggestion = latestVersionData?.isSuggestedRepo
     ? latestVersionData.repository
-    : null;
+    : null
 
   const handleMouseOver = () => {
-    setIsMouseOver(true);
-  };
+    setIsMouseOver(true)
+  }
 
   const handleMouseOut = () => {
-    setIsMouseOver(false);
-  };
+    setIsMouseOver(false)
+  }
 
   const handleOnClick = () => {
-    const { name, namespace } = release;
+    const { name, namespace } = release
 
     navigate(
       `/${selectedCluster}/${namespace}/${name}/installed/revision/${release.revision}`,
       { state: release }
-    );
-  };
+    )
+  }
 
-  const statusColor = getStatusColor(release.status as DeploymentStatus);
+  const statusColor = getStatusColor(release.status as DeploymentStatus)
   const borderLeftColor: { [key: string]: string } = {
-    [DeploymentStatus.DEPLOYED]: "border-l-border-green",
+    [DeploymentStatus.DEPLOYED]: "border-l-border-deployed",
     [DeploymentStatus.FAILED]: "border-l-text-danger",
     [DeploymentStatus.PENDING]: "border-l-border",
-  };
+  }
 
   return (
     <div
@@ -150,5 +150,5 @@ export default function InstalledPackageCard({
         </div>
       </div>
     </div>
-  );
+  )
 }

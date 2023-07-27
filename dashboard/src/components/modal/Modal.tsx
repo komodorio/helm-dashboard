@@ -71,7 +71,7 @@ const Modal = ({
 
   const getTitle = (title: string | ReactNode) => {
     if (typeof title === "string")
-      return <h3 className="text-xl font-medium text-grey">{title}</h3>;
+      return <h3 className="text-xl font-medium text-gray">{title}</h3>;
     else return title;
   };
 
