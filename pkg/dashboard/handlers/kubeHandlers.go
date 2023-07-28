@@ -82,6 +82,7 @@ func EnhanceStatus(res *v12.Carp, err error) *v12.CarpStatus {
 		c.Status = Unhealthy
 	} else if slices.Contains([]string{"Available", "Active", "Established", "Bound", "Ready"}, string(s.Phase)) {
 		c.Status = Healthy
+		c.Reason = "Exists" //since there is no condition to check here, we can set reason as exists.
 	} else if s.Phase == "" && len(s.Conditions) > 0 {
 		for _, cond := range s.Conditions {
 			if cond.Type == "Progressing" { // https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
@@ -95,6 +96,22 @@ func EnhanceStatus(res *v12.Carp, err error) *v12.CarpStatus {
 					c.Message = cond.Message
 				}
 			} else if cond.Type == "Available" && c.Status == Unknown {
+				if cond.Status == "False" {
+					c.Status = Unhealthy
+				} else {
+					c.Status = Healthy
+				}
+				c.Reason = cond.Reason
+				c.Message = cond.Message
+			} else if cond.Type == "DisruptionAllowed" && c.Status == Unknown { //condition for PodDisruptionBudget
+				if cond.Status == "False" {
+					c.Status = Unhealthy
+				} else {
+					c.Status = Healthy
+				}
+				c.Reason = cond.Reason
+				c.Message = cond.Message
+			} else if (cond.Type == "Established" || cond.Type == "NamesAccepted") && (c.Status == Unknown || c.Status == Healthy) { //condition for CRD
 				if cond.Status == "False" {
 					c.Status = Unhealthy
 				} else {
