@@ -71,7 +71,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         return (charts as Chart[])?.filter((ch: Chart) =>
             ch.name.toLowerCase().includes(searchValue.toLowerCase())
         )
-    }, [searchValue])
+    }, [charts, searchValue])
 
     if (repository == undefined) {
         return (

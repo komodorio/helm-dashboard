@@ -407,7 +407,7 @@ const Rollback = ({
         )
     }
 
-    const RollbackModalContent = ({ dataResponse }: { dataResponse: any }) => {
+    const RollbackModalContent = ({ dataResponse }) => {
         const {
             data,
             isLoading,
@@ -425,7 +425,7 @@ const Rollback = ({
                 diff2htmlUi.draw()
                 diff2htmlUi.highlightCode()
             }
-        }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current])
+        }, [data, isLoading, fetchedDataSuccessfully])
 
         return (
             <div className="flex flex-col space-y-4">

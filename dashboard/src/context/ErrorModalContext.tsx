@@ -11,6 +11,6 @@ export const ErrorModalContext = createContext<{
 }>({
     shouldShowErrorModal: undefined,
     // in this case we allow Unexpected empty method
-    //eslint-disable-next-line @typescript-eslint/no-empty-function
+    //eslint-disable-next-line
     setShowErrorModal: (toggle?: ErrorAlert) => {},
 })

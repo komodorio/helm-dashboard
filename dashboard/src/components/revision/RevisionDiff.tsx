@@ -102,7 +102,7 @@ function RevisionDiff({
             return 'No value to display'
         }
         return ''
-    }, [data, viewMode, isLoading])
+    }, [data, isLoading, viewMode, hasRevisionToDiff, fetchedDataSuccessfully])
 
     useEffect(() => {
         if (
@@ -110,9 +110,10 @@ function RevisionDiff({
             hasRevisionToDiff &&
             data &&
             !isLoading
+            && diffElement.current
         ) {
             const diff2htmlUi = new Diff2HtmlUI(
-                diffElement!.current!,
+                diffElement.current,
                 data,
                 diffConfiguration
             )

@@ -30,7 +30,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
             diff2htmlUi.draw()
             diff2htmlUi.highlightCode()
         }
-    }, [diff, diffContainerRef.current, isLoading])
+    }, [diff, isLoading])
 
     if (isLoading) {
         return (

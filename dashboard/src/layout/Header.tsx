@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import LogoHeader from '../assets/logo-header.svg'
 import DropDown from '../components/common/DropDown'
 import WatcherIcon from '../assets/k8s-watcher.svg'
@@ -17,7 +17,6 @@ import { useAppContext } from '../context/AppContext'
 
 export default function Header() {
     const { clusterMode, setClusterMode } = useAppContext()
-    const navigate = useNavigate()
     const { data: statusData } = useGetApplicationStatus({
         onSuccess: (data) => {
             setClusterMode(data.ClusterMode)

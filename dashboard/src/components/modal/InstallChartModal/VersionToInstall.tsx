@@ -39,11 +39,11 @@ export const VersionToInstall: React.FC<{
 
     // Prepare your options for react-select
     const options =
-        versions.map(({ repository, version, urls }) => ({
+        useMemo(() => versions.map(({ repository, version, urls }) => ({
             value: { repository, version, urls },
             label: `${repository} @ ${version}`,
             check: chartVersion === version,
-        })) || []
+        })) || [], [chartVersion, versions]);
     const [selectedOption, setSelectedOption] =
         useState<(typeof options)[number]>()
     const initOpt = useMemo(
@@ -87,7 +87,6 @@ export const VersionToInstall: React.FC<{
                             ),
                             Option: ({
                                 children,
-                                isSelected,
                                 innerProps,
                                 data,
                             }) => (

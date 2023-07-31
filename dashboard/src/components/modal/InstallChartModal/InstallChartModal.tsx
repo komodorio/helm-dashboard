@@ -86,7 +86,6 @@ export const InstallChartModal = ({
         isChartVersion: v.version === currentlyInstalledChartVersion,
     }))
 
-    latestVersion = latestVersion ?? currentlyInstalledChartVersion // a guard for typescript, latestVersion is always defined
     const [selectedVersionData, setSelectedVersionData] = useState<{
         version: string
         repository?: string
@@ -117,7 +116,7 @@ export const InstallChartModal = ({
         chart,
         {
             enabled: isInstall && Boolean(selectedRepo) && selectedRepo !== '',
-            onSuccess: (data) => {
+            onSuccess: () => {
                 fetchDiff({ userValues: '' })
             },
         }
@@ -143,7 +142,7 @@ export const InstallChartModal = ({
         if (selectedRepo) {
             refetchChartValues()
         }
-    }, [selectedRepo, selectedVersion, namespace, chart])
+    }, [selectedRepo, selectedVersion, namespace, chart, refetchChartValues])
 
     // Confirm method (install)
     const setReleaseVersionMutation = useMutation(
@@ -232,11 +231,11 @@ export const InstallChartModal = ({
             }
             return formData
         },
-        [userValues, chart, chartName, isInstall]
+        [chart, releaseValues, isInstall, chartName]
     )
 
     // It actually fetches the manifest for the diffs
-    const fetchVersionData = async ({
+    const fetchVersionData = useCallback(async ({
         version,
         userValues,
     }: {
@@ -257,9 +256,9 @@ export const InstallChartModal = ({
         } catch (e) {
             setErrorMessage((e as Error).message as string)
         }
-    }
+    }, [getVersionManifestFormData, isInstall, namespace, releaseName]);
 
-    const fetchDiff = async ({ userValues }: { userValues: string }) => {
+    const fetchDiff = useCallback(async ({ userValues }: { userValues: string }) => {
         if (!selectedRepo || versionsError) {
             return
         }
@@ -293,7 +292,7 @@ export const InstallChartModal = ({
         } finally {
             setIsLoadingDiff(false)
         }
-    }
+    }, [currentlyInstalledChartVersion, fetchVersionData, isInstall, selectedRepo, selectedVersion, versionsError]);
 
     useEffect(() => {
         if (
@@ -304,7 +303,7 @@ export const InstallChartModal = ({
         ) {
             fetchDiff({ userValues })
         }
-    }, [selectedVersion, userValues, loadingReleaseValues, selectedRepo])
+    }, [selectedVersion, userValues, loadingReleaseValues, selectedRepo, isInstall, loadingChartValues, fetchDiff])
 
     return (
         <Modal
