@@ -9,6 +9,7 @@
     "@types/marked": "^5.0.0",
     "compare-versions": "^6.0.0-rc.2",
     "diff2html": "^3.4.35",
+    "eslint-config-enpitech": "github:enpitech/eslint-config-enpitech",
     "flowbite": "^1.6.6",
     "flowbite-react": "^0.4.9",
     "highlight.js": "^11.8.0",
