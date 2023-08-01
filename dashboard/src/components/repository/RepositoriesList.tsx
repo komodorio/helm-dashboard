@@ -15,18 +15,18 @@ function RepositoriesList({
   repositories,
 }: RepositoriesListProps) {
   const { searchParamsObject, upsertSearchParams, removeSearchParam } =
-    useCustomSearchParams()
+      useCustomSearchParams()
   const showAddRepositoryModal = useMemo(
-    () => searchParamsObject["add_repo"] === "true",
-    [searchParamsObject]
+      () => searchParamsObject['add_repo'] === 'true',
+      [searchParamsObject]
   )
-  const setShowAddRepositoryModal = useCallback(
-    (value: boolean) =>
-      value
-        ? upsertSearchParams("add_repo", "true")
-        : removeSearchParam("add_repo"),
-    [upsertSearchParams, removeSearchParam]
-  )
+  const setShowAddRepositoryModal = (value: boolean) => {
+      if (value) {
+        upsertSearchParams('add_repo', 'true')
+      } else {
+        removeSearchParam('add_repo')
+      }
+  }
 
   return (
     <>

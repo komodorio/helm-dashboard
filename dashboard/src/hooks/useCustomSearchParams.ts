@@ -7,15 +7,12 @@ const useCustomSearchParams = () => {
     new URLSearchParams(search)
   )
 
-  const upsertSearchParams = useCallback(
-    (k: string, value: string) => {
-      const copySearchParams = new URLSearchParams(search)
-      copySearchParams.set(k, value)
-      setSearch(copySearchParams)
-      return copySearchParams
-    },
-    [search, setSearch]
-  )
+  const upsertSearchParams = useCallback((k: string, value: string) => {
+    const copySearchParams = new URLSearchParams(search);
+    copySearchParams.set(k, value);
+    setSearch(copySearchParams);
+    return copySearchParams;
+  }, [search, setSearch]);
 
   const removeSearchParam = (k: string) => {
     const copySearchParams = new URLSearchParams(search)
