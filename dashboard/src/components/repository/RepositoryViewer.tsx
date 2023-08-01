@@ -122,7 +122,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
           />
         </div>
       </div>
-      <span className="text-gray text-sm bg-repository px-3 py-1 rounded-md self-start -mt-10">
+      <span className="text-dark text-sm bg-repository px-3 py-1 rounded-md self-start -mt-10">
         URL: <span className="font-bold">{repository?.url}</span>
       </span>
 
