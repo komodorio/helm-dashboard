@@ -13,7 +13,7 @@ function Installed() {
   const { searchParamsObject, upsertSearchParams } = useCustomSearchParams()
   const { context } = useParams()
   const { filteredNamespace } = searchParamsObject
-  const namespaces = filteredNamespace?.split("+") ?? ["default"]
+  const namespaces = useMemo(() => filteredNamespace?.split("+") ?? ["default"], [filteredNamespace])
   const navigate = useNavigate()
 
   const handleClusterChange = (

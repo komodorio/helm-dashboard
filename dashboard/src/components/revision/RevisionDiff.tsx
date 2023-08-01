@@ -98,7 +98,7 @@ function RevisionDiff({
       return "No value to display"
     }
     return ""
-  }, [data, viewMode, isLoading])
+  }, [data, isLoading, viewMode, hasRevisionToDiff, fetchedDataSuccessfully])
 
   useEffect(() => {
     if (

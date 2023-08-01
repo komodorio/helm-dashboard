@@ -81,6 +81,7 @@ export const InstallChartModal = ({
     isChartVersion: v.version === currentlyInstalledChartVersion,
   }))
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   latestVersion = latestVersion ?? currentlyInstalledChartVersion // a guard for typescript, latestVersion is always defined
   const [selectedVersionData, setSelectedVersionData] = useState<{
     version: string
@@ -108,7 +109,7 @@ export const InstallChartModal = ({
     refetch: refetchChartValues,
   } = useChartRepoValues(namespace || "default", selectedVersion || "", chart, {
     enabled: isInstall && Boolean(selectedRepo) && selectedRepo !== "",
-    onSuccess: (data) => {
+    onSuccess: () => {
       fetchDiff({ userValues: "" })
     },
   })
@@ -133,7 +134,7 @@ export const InstallChartModal = ({
     if (selectedRepo) {
       refetchChartValues()
     }
-  }, [selectedRepo, selectedVersion, namespace, chart])
+  }, [selectedRepo, selectedVersion, namespace, chart, refetchChartValues])
 
   // Confirm method (install)
   const setReleaseVersionMutation = useMutation(
@@ -218,7 +219,7 @@ export const InstallChartModal = ({
       }
       return formData
     },
-    [userValues, chart, chartName, isInstall]
+    [chart, releaseValues, isInstall, chartName]
   )
 
   // It actually fetches the manifest for the diffs
@@ -254,7 +255,7 @@ export const InstallChartModal = ({
 
     setIsLoadingDiff(true)
     try {
-      const [currentVerData, selectedVerData] = await Promise.all([
+      const [currentVerData] = await Promise.all([
         currentVersion
           ? fetchVersionData({ version: currentVersion, userValues })
           : Promise.resolve({ manifest: "" }),
@@ -290,7 +291,7 @@ export const InstallChartModal = ({
     ) {
       fetchDiff({ userValues })
     }
-  }, [selectedVersion, userValues, loadingReleaseValues, selectedRepo])
+  }, [selectedVersion, userValues, loadingReleaseValues, selectedRepo, isInstall, loadingChartValues, fetchDiff])
 
   return (
     <Modal

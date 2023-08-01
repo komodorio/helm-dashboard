@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import AddRepositoryModal from "../modal/AddRepositoryModal"
 import { Repository } from "../../data/types"
 import useCustomSearchParams from "../../hooks/useCustomSearchParams"
-import { useParams } from "react-router"
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined

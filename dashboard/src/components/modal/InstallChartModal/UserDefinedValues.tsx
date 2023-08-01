@@ -23,7 +23,7 @@ export const UserDefinedValues = ({
         clearTimeout(timeoutRef.current)
       }, 800)
     }
-  }, [localState])
+  }, [localState, setValues])
 
   return (
     <div className="w-1/2 ">

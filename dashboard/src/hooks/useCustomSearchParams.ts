@@ -14,7 +14,7 @@ const useCustomSearchParams = () => {
       setSearch(copySearchParams)
       return copySearchParams
     },
-    [search]
+    [search, setSearch]
   )
 
   const removeSearchParam = (k: string) => {

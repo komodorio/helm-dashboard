@@ -320,16 +320,9 @@ const Rollback = ({
 }) => {
   const { chart, namespace, revision, context } = useParams()
   const navigate = useNavigateWithSearchParams()
-  if (!chart || !namespace || !revision) {
-    return null
-  }
 
   const [showRollbackDiff, setShowRollbackDiff] = useState(false)
   const revisionInt = parseInt(revision || "", 10)
-  const rollbackRevision =
-    installedRevision.revision === release.revision
-      ? installedRevision.revision - 1
-      : revisionInt
 
   const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
     useRollbackRelease({
@@ -347,14 +340,24 @@ const Rollback = ({
     setShowRollbackDiff(true)
   }
 
+
+  if (!chart || !namespace || !revision) {
+    return null
+  }
+
+  if (release.revision <= 1) return null
+
+  const rollbackRevision =
+  installedRevision.revision === release.revision
+    ? installedRevision.revision - 1
+    : revisionInt
+
   const rollbackTitle = (
     <div className="font-semibold text-lg">
       Rollback <span className="text-red-500">{chart}</span> from revision{" "}
       {installedRevision.revision} to {rollbackRevision}
     </div>
   )
-
-  if (release.revision <= 1) return null
 
   const RollbackModal = () => {
     const response = useGetReleaseInfoByType(
@@ -408,7 +411,7 @@ const Rollback = ({
         diff2htmlUi.draw()
         diff2htmlUi.highlightCode()
       }
-    }, [data, isLoading, fetchedDataSuccessfully, diffElement?.current])
+    }, [data, isLoading, fetchedDataSuccessfully])
 
     return (
       <div className="flex flex-col space-y-4">
