@@ -50,7 +50,7 @@ export default function Header() {
 
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
-      true && location.pathname.includes(`/${identifier}`)
+      location.pathname.includes(`/${identifier}`)
         ? " text-primary rounded-sm bg-header-install"
         : ""
     }`
