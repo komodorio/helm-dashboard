@@ -25,24 +25,24 @@
  *
  */
 
-import React from 'react'
+import React from "react"
 
 // define the SelectMenuItem type:
 // This is an object with a label and id.
 // The label is a string, and the id is a number.
 // The id is used to identify the selected menu item.
 export interface SelectMenuItemProps {
-    label: string
-    id: number
+  label: string
+  id: number
 }
 
 // define the SelectMenuProps interface:
 
 export interface SelectMenuProps {
-    header: string
-    children: React.ReactNode
-    selected: number
-    onSelect: (id: number) => void
+  header: string
+  children: React.ReactNode
+  selected: number
+  onSelect: (id: number) => void
 }
 
 // define the SelectMenu component:
@@ -53,32 +53,32 @@ export interface SelectMenuProps {
 // the onSelect function is passed the id of the selected menu item
 
 export function SelectMenuItem({
-    label,
-    id,
+  label,
+  id,
 }: SelectMenuItemProps): JSX.Element {
-    return (
-        <div className="flex flex-row">
-            <input
-                type="radio"
-                name="menu"
-                id={id.toString()} // id must be a string
-                value={id}
-                checked={false}
-                onChange={() => {
-                    return
-                }}
-            />
-            <label htmlFor={id.toString()}>{label}</label>
-        </div>
-    )
+  return (
+    <div className="flex flex-row">
+      <input
+        type="radio"
+        name="menu"
+        id={id.toString()} // id must be a string
+        value={id}
+        checked={false}
+        onChange={() => {
+          return
+        }}
+      />
+      <label htmlFor={id.toString()}>{label}</label>
+    </div>
+  )
 }
 
 export default function SelectMenu(props: SelectMenuProps): JSX.Element {
-    const { header, children } = props
-    return (
-        <div className="card flex flex-col">
-            <h2 className="text-xl font-bold">{header}</h2>
-            <div className="flex flex-col">{children}</div>
-        </div>
-    )
+  const { header, children, selected, onSelect } = props
+  return (
+    <div className="card flex flex-col">
+      <h2 className="text-xl font-bold">{header}</h2>
+      <div className="flex flex-col">{children}</div>
+    </div>
+  )
 }
