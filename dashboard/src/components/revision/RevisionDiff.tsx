@@ -62,7 +62,7 @@ function RevisionDiff({
     if (viewMode === VIEW_MODE_DIFF_PREV && hasMultipleRevisions) {
       additionalParamStr += `&revisionDiff=${revisionInt - 1}`
     }
-    const specificRevisionInt = parseInt(specificVersion.toString() || "", 10)
+    const specificRevisionInt = parseInt(specificVersion?.toString() || "", 10)
     if (
       viewMode === VIEW_MODE_DIFF_SPECIFIC &&
       hasMultipleRevisions &&
@@ -98,7 +98,7 @@ function RevisionDiff({
       return "No value to display"
     }
     return ""
-  }, [data, viewMode, isLoading])
+  }, [data, isLoading, viewMode, hasRevisionToDiff, fetchedDataSuccessfully])
 
   useEffect(() => {
     if (

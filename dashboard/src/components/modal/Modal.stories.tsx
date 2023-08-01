@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Modal.stories.ts|tsx
 
 import { ComponentStory, ComponentMeta } from "@storybook/react"

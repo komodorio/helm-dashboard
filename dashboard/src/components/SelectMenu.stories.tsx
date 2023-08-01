@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @file SelectMenu.stories.tsx
  * @description This file contains the SelectMenu
@@ -9,7 +10,6 @@ import React from "react"
 import { ComponentStory, ComponentMeta } from "@storybook/react"
 import SelectMenu, { SelectMenuItem } from "./SelectMenu"
 import { SelectMenuProps } from "./SelectMenu"
-import { SelectMenuItemProps } from "./SelectMenu"
 
 //👇 This default export determines where your story goes in the story list
 export default {

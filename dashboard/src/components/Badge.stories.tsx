@@ -15,7 +15,7 @@
  */
 
 import React from "react"
-import { ComponentStory, ComponentMeta } from "@storybook/react"
+import { ComponentStory } from "@storybook/react"
 import Badge from "./Badge"
 import { BadgeProps } from "./Badge"
 

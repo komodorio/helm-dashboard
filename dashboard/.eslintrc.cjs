@@ -9,19 +9,15 @@ module.exports = {
     DD_RUM: "writable", // for analytics.js
   },
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "plugin:storybook/recommended",
+    "enpitech"
   ],
   rules: {
     // please dont make an error occure here we use console.error
-    "no-console": ["warn", { allow: ["warn"] }],
+    "no-console": ["error", { allow: ["error"] }],
     "no-alert": "error",
     "no-debugger": "error",
     "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }]
   },
-  parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint"],
   root: true,
 };
