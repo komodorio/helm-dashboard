@@ -121,15 +121,6 @@ export const InstallChartModal = ({
 
 
   const fetchDiffBody = useMemo(() => {
-    console.log('fetchDiffBody')
-    console.log({
-        userValues,
-        selectedVersion,
-        selectedRepo,
-        isInstall,
-        currentlyInstalledChartVersion,
-        versionsError,
-    })
     return ({
         userValues,
         selectedVersion,
@@ -274,7 +265,6 @@ export const InstallChartModal = ({
     if (!repo || versionsError) {
       return
     }
-    console.log('fetchDiff')
     setIsLoadingDiff(true)
     try {
       const [currentVerData] = await Promise.all([
@@ -309,7 +299,6 @@ export const InstallChartModal = ({
     if (
         fetchDiffBody.selectedVersion && fetchDiffBody.selectedRepo && (fetchDiffBody.isInstall && !loadingChartValues)
     ) {
-        console.log('here2')
       fetchDiff(fetchDiffBody)
     }
   }, [fetchDiff, fetchDiffBody, loadingChartValues])
