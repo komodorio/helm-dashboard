@@ -333,16 +333,9 @@ const Rollback = ({
 }) => {
     const { chart, namespace, revision, context } = useParams()
     const navigate = useNavigateWithSearchParams()
-    if (!chart || !namespace || !revision) {
-        return null
-    }
 
     const [showRollbackDiff, setShowRollbackDiff] = useState(false)
     const revisionInt = parseInt(revision || '', 10)
-    const rollbackRevision =
-        installedRevision.revision === release.revision
-            ? installedRevision.revision - 1
-            : revisionInt
 
     const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
         useRollbackRelease({
@@ -356,9 +349,21 @@ const Rollback = ({
             },
         })
 
+
+    if (!chart || !namespace || !revision) {
+        return null
+    }
+
+    if (release.revision <= 1) return null
+
     const handleRollback = () => {
         setShowRollbackDiff(true)
     }
+
+    const rollbackRevision =
+        installedRevision.revision === release.revision
+            ? installedRevision.revision - 1
+            : revisionInt
 
     const rollbackTitle = (
         <div className="font-semibold text-lg">
@@ -366,8 +371,6 @@ const Rollback = ({
             {installedRevision.revision} to {rollbackRevision}
         </div>
     )
-
-    if (release.revision <= 1) return null
 
     const RollbackModal = () => {
         const response = useGetReleaseInfoByType(

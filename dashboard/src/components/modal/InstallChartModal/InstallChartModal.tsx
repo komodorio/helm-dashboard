@@ -35,7 +35,6 @@ export const InstallChartModal = ({
     onClose,
     chartName,
     currentlyInstalledChartVersion,
-    latestVersion,
     isUpgrade = false,
     isInstall = false,
     latestRevision,

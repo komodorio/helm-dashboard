@@ -29,6 +29,8 @@ jobs:
       - name: NPM install
         run: npm i
         working-directory: ./dashboard
+      - name: lint project
+        run: npm run lint  
       - name: NPM build
         run: npm run build
         working-directory: ./dashboard

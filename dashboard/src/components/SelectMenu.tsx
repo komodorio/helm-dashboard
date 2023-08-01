@@ -74,7 +74,7 @@ export function SelectMenuItem({
 }
 
 export default function SelectMenu(props: SelectMenuProps): JSX.Element {
-    const { header, children, selected, onSelect } = props
+    const { header, children } = props
     return (
         <div className="card flex flex-col">
             <h2 className="text-xl font-bold">{header}</h2>

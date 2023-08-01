@@ -34,7 +34,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
     useEffect(() => {
         if (!repo_url || !repo_name) return
         setFormData({ ...formData, name: repo_name, url: repo_url })
-    }, [repo_url, repo_name])
+    }, [repo_url, repo_name, formData])
 
     const addRepository = () => {
         const body = new FormData()

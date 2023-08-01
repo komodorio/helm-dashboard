@@ -17,7 +17,7 @@ module.exports = {
     "no-alert": "error",
     "no-debugger": "error",
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }]
+    "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }]
   },
   root: true,
 };

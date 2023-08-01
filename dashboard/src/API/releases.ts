@@ -6,7 +6,6 @@ import {
 } from '@tanstack/react-query'
 import { ChartVersion, Release } from '../data/types'
 import { LatestChartVersion } from './interfaces'
-import ApiService from './apiService'
 import apiService from './apiService'
 export const HD_RESOURCE_CONDITION_TYPE = 'hdHealth' // it's our custom condition type, only one exists
 
@@ -27,42 +26,42 @@ export function useGetInstalledReleases(
 }
 
 // Install new release
-function useInstallRelease(
-    options?: UseMutationOptions<void, unknown, InstallReleaseRequest>
-) {
-    return useMutation<void, unknown, InstallReleaseRequest>((request) => {
-        const formData = new FormData()
-        Object.entries(request).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString())
-            }
-        })
+// function useInstallRelease(
+//     options?: UseMutationOptions<void, unknown, InstallReleaseRequest>
+// ) {
+//     return useMutation<void, unknown, InstallReleaseRequest>((request) => {
+//         const formData = new FormData()
+//         Object.entries(request).forEach(([key, value]) => {
+//             if (value !== undefined) {
+//                 formData.append(key, value.toString())
+//             }
+//         })
 
-        return callApi<void>('/api/helm/releases/{ns}', {
-            method: 'POST',
-            body: formData,
-        })
-    }, options)
-}
+//         return callApi<void>('/api/helm/releases/{ns}', {
+//             method: 'POST',
+//             body: formData,
+//         })
+//     }, options)
+// }
 
 // Upgrade/reconfigure existing release
-function useUpgradeRelease(
-    options?: UseMutationOptions<void, unknown, UpgradeReleaseRequest>
-) {
-    return useMutation<void, unknown, UpgradeReleaseRequest>((request) => {
-        const formData = new FormData()
-        Object.entries(request).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString())
-            }
-        })
+// function useUpgradeRelease(
+//     options?: UseMutationOptions<void, unknown, UpgradeReleaseRequest>
+// ) {
+//     return useMutation<void, unknown, UpgradeReleaseRequest>((request) => {
+//         const formData = new FormData()
+//         Object.entries(request).forEach(([key, value]) => {
+//             if (value !== undefined) {
+//                 formData.append(key, value.toString())
+//             }
+//         })
 
-        return callApi<void>('/api/helm/releases/{ns}/{name}', {
-            method: 'POST',
-            body: formData,
-        })
-    }, options)
-}
+//         return callApi<void>('/api/helm/releases/{ns}/{name}', {
+//             method: 'POST',
+//             body: formData,
+//         })
+//     }, options)
+// }
 
 export function useGetReleaseManifest(
     ns: string,
@@ -295,29 +294,29 @@ interface ReleaseInfoParams {
     namespace?: string
     revision?: string
 }
-interface InstallReleaseRequest {
-    name: string
-    chart: string
-    version?: string
-    values?: string
-    preview?: boolean
-}
+// interface InstallReleaseRequest {
+//     name: string
+//     chart: string
+//     version?: string
+//     values?: string
+//     preview?: boolean
+// }
 
-interface InstallReleaseRequest {
-    name: string
-    chart: string
-    version?: string
-    values?: string
-    preview?: boolean
-}
+// interface InstallReleaseRequest {
+//     name: string
+//     chart: string
+//     version?: string
+//     values?: string
+//     preview?: boolean
+// }
 
-interface UpgradeReleaseRequest {
-    name: string
-    chart: string
-    version?: string
-    values?: string
-    preview?: boolean
-}
+// interface UpgradeReleaseRequest {
+//     name: string
+//     chart: string
+//     version?: string
+//     values?: string
+//     preview?: boolean
+// }
 
 export interface StructuredResources {
     kind: string

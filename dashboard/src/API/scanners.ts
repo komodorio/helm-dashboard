@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
     UseMutationOptions,
     UseQueryOptions,
@@ -5,7 +6,7 @@ import {
     useQuery,
 } from '@tanstack/react-query'
 import { callApi } from './releases'
-import { ScanResult, ScanResults, ScannersList } from './interfaces'
+import {ScanResults, ScannersList } from './interfaces'
 
 // Get list of discovered scanners
 function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
