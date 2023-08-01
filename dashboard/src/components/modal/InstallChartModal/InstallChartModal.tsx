@@ -223,7 +223,7 @@ export const InstallChartModal = ({
   )
 
   // It actually fetches the manifest for the diffs
-  const fetchVersionData = async ({
+  const fetchVersionData = useCallback(async ({
     version,
     userValues,
   }: {
@@ -244,9 +244,9 @@ export const InstallChartModal = ({
     } catch (e) {
       setErrorMessage((e as Error).message as string)
     }
-  }
+  }, [getVersionManifestFormData, isInstall, namespace, releaseName])
 
-  const fetchDiff = async ({ userValues }: { userValues: string }) => {
+  const fetchDiff = useCallback(async ({ userValues }: { userValues: string }) => {
     if (!selectedRepo || versionsError) {
       return
     }
@@ -280,7 +280,7 @@ export const InstallChartModal = ({
     } finally {
       setIsLoadingDiff(false)
     }
-  }
+  }, [currentlyInstalledChartVersion, fetchVersionData, isInstall, selectedRepo, selectedVersion, versionsError])
 
   useEffect(() => {
     if (
