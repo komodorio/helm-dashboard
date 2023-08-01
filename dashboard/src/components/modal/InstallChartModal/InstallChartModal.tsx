@@ -226,14 +226,15 @@ export const InstallChartModal = ({
   const fetchVersionData = useCallback(async ({
     version,
     userValues,
+    shouldInstall,
   }: {
     version: string
     userValues?: string
   }) => {
     const formData = getVersionManifestFormData({ version, userValues })
     const fetchUrl = `/api/helm/releases/${
-      namespace ? namespace : isInstall ? "" : "[empty]"
-    }${!isInstall ? `/${releaseName}` : `${!namespace ? "default" : ""}`}` // if there is no release we don't provide anything, and we dont display version;
+      namespace ? namespace : shouldInstall ? "" : "[empty]"
+    }${!shouldInstall ? `/${releaseName}` : `${!namespace ? "default" : ""}`}` // if there is no release we don't provide anything, and we dont display version;
     try {
       setErrorMessage("")
       const data = await callApi(fetchUrl, {
@@ -244,14 +245,12 @@ export const InstallChartModal = ({
     } catch (e) {
       setErrorMessage((e as Error).message as string)
     }
-  }, [getVersionManifestFormData, isInstall, namespace, releaseName])
+  }, [getVersionManifestFormData, namespace, releaseName])
 
-  const fetchDiff = useCallback(async ({ userValues }: { userValues: string }) => {
-    if (!selectedRepo || versionsError) {
+  const fetchDiff = useCallback(async ({ userValues, selectedRepo: repo, selectedVersion: version, isError, shouldInstall, currentlyInstalledChartVersion: currentVersion }) => {
+    if (!repo || isError) {
       return
     }
-
-    const currentVersion = currentlyInstalledChartVersion
 
     setIsLoadingDiff(true)
     try {
@@ -260,13 +259,14 @@ export const InstallChartModal = ({
           ? fetchVersionData({ version: currentVersion, userValues })
           : Promise.resolve({ manifest: "" }),
         fetchVersionData({
-          version: selectedVersion || "",
+          version: version || "",
           userValues,
+          shouldInstall,
         }),
       ])
       const formData = new FormData()
 
-      formData.append("a", isInstall ? "" : (currentVerData as any).manifest)
+      formData.append("a", shouldInstall ? "" : (currentVerData as any).manifest)
       formData.append("b", (currentVerData as any).manifest)
 
       const response = await apiService.fetchWithDefaults("/diff", {
@@ -280,18 +280,24 @@ export const InstallChartModal = ({
     } finally {
       setIsLoadingDiff(false)
     }
-  }, [currentlyInstalledChartVersion, fetchVersionData, isInstall, selectedRepo, selectedVersion, versionsError])
+  }, [fetchVersionData])
 
   useEffect(() => {
     if (
-      selectedVersion &&
+      selectedVersion && selectedRepo &&
       ((!isInstall && !loadingReleaseValues) ||
-        (isInstall && !loadingChartValues)) &&
-      selectedRepo
+        (isInstall && !loadingChartValues))
     ) {
-      fetchDiff({ userValues })
+      fetchDiff({
+        userValues,
+        selectedVersion,
+        selectedRepo,
+        shouldInstall: isInstall,
+        isError: versionsError,
+        currentlyInstalledChartVersion,
+      })
     }
-  }, [selectedVersion, userValues, loadingReleaseValues, selectedRepo, isInstall, loadingChartValues, fetchDiff])
+  }, [selectedVersion, userValues, loadingReleaseValues, selectedRepo, isInstall, loadingChartValues, fetchDiff, versionsError, currentlyInstalledChartVersion])
 
   return (
     <Modal
@@ -300,7 +306,14 @@ export const InstallChartModal = ({
         setSelectedVersionData({ version: "", urls: [] })
         if (!isInstall) {
           setUserValues(releaseValues)
-          fetchDiff({ userValues: releaseValues })
+          fetchDiff({
+            userValues: releaseValues,
+            selectedVersion,
+            selectedRepo,
+            shouldInstall: isInstall,
+            isError: versionsError,
+            currentlyInstalledChartVersion,
+         })
         }
         onClose()
       }}
