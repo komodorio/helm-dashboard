@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import AddRepositoryModal from "../modal/AddRepositoryModal"
 import { Repository } from "../../data/types"
 import useCustomSearchParams from "../../hooks/useCustomSearchParams"

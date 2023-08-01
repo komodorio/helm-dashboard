@@ -73,7 +73,7 @@ class ApiService {
   getRepositoryCharts = async ({
     queryKey,
   }: QueryFunctionContext<Chart[], Repository>) => {
-    const [_, repository] = queryKey
+    const [, repository] = queryKey
     const response = await this.fetchWithDefaults(
       `/api/helm/repositories/${repository}`
     )
@@ -84,7 +84,7 @@ class ApiService {
   getChartVersions = async ({
     queryKey,
   }: QueryFunctionContext<ChartVersion[], Chart>) => {
-    const [_, chart] = queryKey
+    const [, chart] = queryKey
 
     const response = await this.fetchWithDefaults(
       `/api/helm/repositories/versions?name=${chart.name}`
@@ -110,7 +110,7 @@ class ApiService {
   getReleasesHistory = async ({
     queryKey,
   }: QueryFunctionContext<Release[], Release>): Promise<ReleaseRevision[]> => {
-    const [_, params] = queryKey
+    const [, params] = queryKey
 
     if (!params.namespace || !params.chart) return []
 
@@ -123,7 +123,7 @@ class ApiService {
   }
 
   getValues = async ({ queryKey }: any) => {
-    const [_, params] = queryKey
+    const [, params] = queryKey
     const { namespace, chart, version } = params
 
     if (!namespace || !chart || !chart.name || version === undefined)

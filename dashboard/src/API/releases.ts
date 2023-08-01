@@ -290,29 +290,29 @@ interface ReleaseInfoParams {
   namespace?: string
   revision?: string
 }
-interface InstallReleaseRequest {
-  name: string
-  chart: string
-  version?: string
-  values?: string
-  preview?: boolean
-}
+// interface InstallReleaseRequest {
+//   name: string
+//   chart: string
+//   version?: string
+//   values?: string
+//   preview?: boolean
+// }
 
-interface InstallReleaseRequest {
-  name: string
-  chart: string
-  version?: string
-  values?: string
-  preview?: boolean
-}
+// interface InstallReleaseRequest {
+//   name: string
+//   chart: string
+//   version?: string
+//   values?: string
+//   preview?: boolean
+// }
 
-interface UpgradeReleaseRequest {
-  name: string
-  chart: string
-  version?: string
-  values?: string
-  preview?: boolean
-}
+// interface UpgradeReleaseRequest {
+//   name: string
+//   chart: string
+//   version?: string
+//   values?: string
+//   preview?: boolean
+// }
 
 export interface StructuredResources {
   kind: string
