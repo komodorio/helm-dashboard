@@ -30,6 +30,22 @@ interface InstallChartModalProps {
   latestRevision?: number
 }
 
+const getVersionManifestFormData = ({ version, userValues, chart, releaseValues, isInstall, chartName }: { version: string; userValues?: string }) => {
+    const formData = new FormData()
+    // preview needs to come first, for some reason it has a meaning at the backend
+    formData.append("preview", "true")
+    formData.append("chart", chart)
+    formData.append("version", version)
+    formData.append(
+    "values",
+    userValues ? userValues : releaseValues ? releaseValues : ""
+    )
+    if (isInstall) {
+    formData.append("name", chartName)
+    }
+    return formData
+}
+
 export const InstallChartModal = ({
   isOpen,
   onClose,
@@ -103,15 +119,33 @@ export const InstallChartModal = ({
       : `${selectedVersionData?.repository}/${chartName}`
   }, [selectedVersionData, chartName])
 
+
+  const fetchDiffBody = useMemo(() => {
+    console.log('fetchDiffBody')
+    console.log({
+        userValues,
+        selectedVersion,
+        selectedRepo,
+        isInstall,
+        currentlyInstalledChartVersion,
+        versionsError,
+    })
+    return ({
+        userValues,
+        selectedVersion,
+        selectedRepo,
+        isInstall,
+        currentlyInstalledChartVersion,
+        versionsError,
+  })
+}, [currentlyInstalledChartVersion, isInstall, selectedRepo, selectedVersion, userValues, versionsError])
+
   const {
     data: chartValues,
     isLoading: loadingChartValues,
     refetch: refetchChartValues,
   } = useChartRepoValues(namespace || "default", selectedVersion || "", chart, {
-    enabled: isInstall && Boolean(selectedRepo) && selectedRepo !== "",
-    onSuccess: () => {
-      fetchDiff({ userValues: "" })
-    },
+    enabled: isInstall && Boolean(selectedRepo) && selectedRepo !== ""    
   })
 
   const { data: releaseValues, isLoading: loadingReleaseValues } =
@@ -123,7 +157,6 @@ export const InstallChartModal = ({
       options: {
         onSuccess: (data: string) => {
           if (data) {
-            fetchDiff({ userValues: "" })
             setUserValues(data)
           }
         },
@@ -203,38 +236,21 @@ export const InstallChartModal = ({
     }
   )
 
-  const getVersionManifestFormData = useCallback(
-    ({ version, userValues }: { version: string; userValues?: string }) => {
-      const formData = new FormData()
-      // preview needs to come first, for some reason it has a meaning at the backend
-      formData.append("preview", "true")
-      formData.append("chart", chart)
-      formData.append("version", version)
-      formData.append(
-        "values",
-        userValues ? userValues : releaseValues ? releaseValues : ""
-      )
-      if (isInstall) {
-        formData.append("name", chartName)
-      }
-      return formData
-    },
-    [chart, releaseValues, isInstall, chartName]
-  )
+  
 
   // It actually fetches the manifest for the diffs
   const fetchVersionData = useCallback(async ({
     version,
     userValues,
-    shouldInstall,
+    isInstall,
   }: {
     version: string
     userValues?: string
   }) => {
-    const formData = getVersionManifestFormData({ version, userValues })
+    const formData = getVersionManifestFormData({ version, userValues, chart, releaseValues, isInstall, chartName })
     const fetchUrl = `/api/helm/releases/${
-      namespace ? namespace : shouldInstall ? "" : "[empty]"
-    }${!shouldInstall ? `/${releaseName}` : `${!namespace ? "default" : ""}`}` // if there is no release we don't provide anything, and we dont display version;
+      namespace ? namespace : isInstall ? "" : "[empty]"
+    }${!isInstall ? `/${releaseName}` : `${!namespace ? "default" : ""}`}` // if there is no release we don't provide anything, and we dont display version;
     try {
       setErrorMessage("")
       const data = await callApi(fetchUrl, {
@@ -245,28 +261,35 @@ export const InstallChartModal = ({
     } catch (e) {
       setErrorMessage((e as Error).message as string)
     }
-  }, [getVersionManifestFormData, namespace, releaseName])
+  }, [chart, chartName, namespace, releaseName, releaseValues])
 
-  const fetchDiff = useCallback(async ({ userValues, selectedRepo: repo, selectedVersion: version, isError, shouldInstall, currentlyInstalledChartVersion: currentVersion }) => {
-    if (!repo || isError) {
+  const fetchDiff = useCallback(async ({
+        userValues,
+        selectedRepo: repo,
+        selectedVersion: version,
+        isInstall,
+        currentlyInstalledChartVersion,
+        versionsError
+    }) => {
+    if (!repo || versionsError) {
       return
     }
-
+    console.log('fetchDiff')
     setIsLoadingDiff(true)
     try {
       const [currentVerData] = await Promise.all([
-        currentVersion
-          ? fetchVersionData({ version: currentVersion, userValues })
+        currentlyInstalledChartVersion
+          ? fetchVersionData({ version: currentlyInstalledChartVersion, userValues, isInstall })
           : Promise.resolve({ manifest: "" }),
         fetchVersionData({
           version: version || "",
           userValues,
-          shouldInstall,
+          isInstall,
         }),
       ])
       const formData = new FormData()
 
-      formData.append("a", shouldInstall ? "" : (currentVerData as any).manifest)
+      formData.append("a", isInstall ? "" : (currentVerData as any).manifest)
       formData.append("b", (currentVerData as any).manifest)
 
       const response = await apiService.fetchWithDefaults("/diff", {
@@ -284,20 +307,19 @@ export const InstallChartModal = ({
 
   useEffect(() => {
     if (
-      selectedVersion && selectedRepo &&
-      ((!isInstall && !loadingReleaseValues) ||
-        (isInstall && !loadingChartValues))
+        fetchDiffBody.selectedVersion && fetchDiffBody.selectedRepo && (fetchDiffBody.isInstall && !loadingChartValues)
     ) {
-      fetchDiff({
-        userValues,
-        selectedVersion,
-        selectedRepo,
-        shouldInstall: isInstall,
-        isError: versionsError,
-        currentlyInstalledChartVersion,
-      })
+        console.log('here2')
+      fetchDiff(fetchDiffBody)
     }
-  }, [selectedVersion, userValues, loadingReleaseValues, selectedRepo, isInstall, loadingChartValues, fetchDiff, versionsError, currentlyInstalledChartVersion])
+  }, [fetchDiff, fetchDiffBody, loadingChartValues])
+  useEffect(() => {
+    if (
+        fetchDiffBody.selectedVersion && fetchDiffBody.selectedRepo && (!fetchDiffBody.isInstall && !loadingReleaseValues)
+    ) {
+      fetchDiff(fetchDiffBody)
+    }
+  }, [fetchDiff, fetchDiffBody, loadingReleaseValues])
 
   return (
     <Modal
@@ -306,14 +328,6 @@ export const InstallChartModal = ({
         setSelectedVersionData({ version: "", urls: [] })
         if (!isInstall) {
           setUserValues(releaseValues)
-          fetchDiff({
-            userValues: releaseValues,
-            selectedVersion,
-            selectedRepo,
-            shouldInstall: isInstall,
-            isError: versionsError,
-            currentlyInstalledChartVersion,
-         })
         }
         onClose()
       }}
@@ -361,10 +375,7 @@ export const InstallChartModal = ({
       <div className="flex w-full gap-6 mt-4">
         <UserDefinedValues
           initialValue={!isInstall ? releaseValues : ""}
-          setValues={(val) => {
-            setUserValues(val)
-            fetchDiff({ userValues: val })
-          }}
+          setValues={setUserValues}
         />
 
         <ChartValues
