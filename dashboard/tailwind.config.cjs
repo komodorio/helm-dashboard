@@ -38,6 +38,7 @@ module.exports = {
             colors: {
                 "cluster-list": "#3d4048",
                 "body": "#3d4048",
+                dark: "#3d4048",
                 "tab-color": "#3B3D45",
                 primary: "#1347FF",
                 secondary: "#ECEFF2",

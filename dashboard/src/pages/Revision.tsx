@@ -50,7 +50,7 @@ function Revision() {
   return (
     <div className="flex">
       <div className="flex flex-col gap-2 w-1/6 min-h-screen bg-[#E8EDF2] pb-4">
-        <label className="mt-5 mx-5 text-sm text-grey font-semibold">
+        <label className="mt-5 mx-5 text-sm text-dark font-semibold">
           Revisions
         </label>
         {isLoadingHistory ? (
