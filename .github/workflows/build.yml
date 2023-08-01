@@ -31,6 +31,7 @@ jobs:
         working-directory: ./dashboard
       - name: lint project
         run: npm run lint  
+        working-directory: ./dashboard
       - name: NPM build
         run: npm run build
         working-directory: ./dashboard
