@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo, useState, useRef, useEffect } from 'react'
 import { Diff2HtmlUI } from 'diff2html/lib/ui/js/diff2html-ui-slim.js'
 import { useGetReleaseInfoByType } from '../../API/releases'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import useCustomSearchParams from '../../hooks/useCustomSearchParams'
 
 import parse from 'html-react-parser'
