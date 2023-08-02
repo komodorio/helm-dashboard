@@ -8,16 +8,17 @@ module.exports = {
     heap: "writable", // for analytics.js
     DD_RUM: "writable", // for analytics.js
   },
-  extends: [
-    "enpitech"
-  ],
+  extends: ["enpitech"],
   rules: {
-    // please dont make an error occure here we use console.error
+    // please don't make an error occur here we use console.error
     "no-console": ["error", { allow: ["error"] }],
     "no-alert": "error",
     "no-debugger": "error",
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }]
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { vars: "all", args: "after-used", ignoreRestSiblings: true },
+    ],
   },
   root: true,
-};
+}

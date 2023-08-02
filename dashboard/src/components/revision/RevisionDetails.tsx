@@ -28,7 +28,7 @@ import Modal, { ModalButtonStyle } from "../modal/Modal"
 import Spinner from "../Spinner"
 import useAlertError from "../../hooks/useAlertError"
 import Button from "../Button"
-import { InstallChartModal } from "../modal/InstallChartModal/InstallChartModal"
+import { InstallReleaseChartModal } from "../modal/InstallChartModal/InstallReleaseChartModal"
 import { diffConfiguration, isNewerVersion } from "../../utils"
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams"
 import apiService from "../../API/apiService"
@@ -189,7 +189,7 @@ export default function RevisionDetails({
             </Button>
 
             {isReconfigureModalOpen && (
-              <InstallChartModal
+              <InstallReleaseChartModal
                 isOpen={isReconfigureModalOpen}
                 chartName={release.chart_name}
                 currentlyInstalledChartVersion={installedRevision.chart_ver}
@@ -340,7 +340,6 @@ const Rollback = ({
     setShowRollbackDiff(true)
   }
 
-
   if (!chart || !namespace || !revision) {
     return null
   }
@@ -348,9 +347,9 @@ const Rollback = ({
   if (release.revision <= 1) return null
 
   const rollbackRevision =
-  installedRevision.revision === release.revision
-    ? installedRevision.revision - 1
-    : revisionInt
+    installedRevision.revision === release.revision
+      ? installedRevision.revision - 1
+      : revisionInt
 
   const rollbackTitle = (
     <div className="font-semibold text-lg">
