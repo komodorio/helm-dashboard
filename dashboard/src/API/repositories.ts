@@ -3,9 +3,9 @@ import {
   UseQueryOptions,
   useMutation,
   useQuery,
-} from "@tanstack/react-query"
-import { callApi } from "./releases"
-import { HelmRepositories } from "./interfaces"
+} from "@tanstack/react-query";
+import { callApi } from "./releases";
+import { HelmRepositories } from "./interfaces";
 
 // Get list of Helm repositories
 export function useGetRepositories(
@@ -15,7 +15,7 @@ export function useGetRepositories(
     ["helm", "repositories"],
     () => callApi<HelmRepositories>("/api/helm/repositories"),
     options
-  )
+  );
 }
 
 // Update repository from remote
@@ -26,8 +26,8 @@ export function useUpdateRepo(
   return useMutation<void, unknown, void>(() => {
     return callApi<void>(`/api/helm/repositories/${repo}`, {
       method: "POST",
-    })
-  }, options)
+    });
+  }, options);
 }
 
 // Remove repository
@@ -38,16 +38,17 @@ export function useDeleteRepo(
   return useMutation<void, unknown, void>(() => {
     return callApi<void>(`/api/helm/repositories/${repo}`, {
       method: "DELETE",
-    })
-  }, options)
+    });
+  }, options);
 }
 
-export function useChartRepoValues(
-  namespace: string,
-  version: string,
-  chart: string,
-  options?: UseQueryOptions<any>
-) {
+export function useChartRepoValues({
+  version,
+  chart,
+}: {
+  version: string;
+  chart: string;
+}) {
   return useQuery<any>(
     ["helm", "repositories", "values", chart, version],
     () =>
@@ -57,6 +58,8 @@ export function useChartRepoValues(
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    options
-  )
+    {
+      enabled: Boolean(version) && Boolean(chart),
+    }
+  );
 }

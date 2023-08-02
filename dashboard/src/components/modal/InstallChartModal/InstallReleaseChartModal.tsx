@@ -98,15 +98,7 @@ export const InstallReleaseChartModal = ({
   // the original chart values
   const { data: chartValues, isLoading: loadingChartValues } =
     useChartRepoValues(
-      namespace || "default",
-      selectedVersion || "",
-      chartAddress as string, // it can't be undefined because query is enabled only if it is defined
-      {
-        enabled:
-          Boolean(selectedRepo) &&
-          selectedRepo !== "" &&
-          chartAddress !== undefined,
-      }
+      { version: selectedVersion || "", chart: chartAddress as string } // it can't be undefined because query is enabled only if it is defined
     );
 
   // The user defined values (if any we're set)
