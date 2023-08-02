@@ -2,9 +2,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 body {
-  color: #3d4048;
+  color: theme("colors.body");
   font-family: "Roboto", serif;
 }
 
@@ -53,6 +52,7 @@ code {
   font-family: SFMono-Regular, Menlo;
   font-size: 12.5px;
 }
+
 #portal {
   top: 0;
   width: 40%;

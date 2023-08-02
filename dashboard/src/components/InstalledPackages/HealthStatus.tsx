@@ -23,10 +23,10 @@ const HealthStatus = ({ statusData }: Props) => {
           <span
             className={`inline-block ${
               cond.status === "Healthy"
-                ? "bg-[#00c2ab]"
+                ? "bg-success"
                 : cond.status === "Progressing"
-                ? "bg-[#ffa800]"
-                : "bg-[#ff0072]"
+                ? "bg-warning"
+                : "bg-danger"
             } w-2.5 h-2.5 rounded-sm`}
           ></span>
         </Tooltip>

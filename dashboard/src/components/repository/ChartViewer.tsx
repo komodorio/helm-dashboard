@@ -20,7 +20,7 @@ function ChartViewer({ chart }: ChartViewerProps) {
   return (
     <>
       <div
-        className="grid grid-cols-10 gap-3 hover:bg-[#f4f7fa] p-4 text-sm"
+        className="grid grid-cols-10 gap-3 hover:bg-body-background p-4 text-sm"
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >

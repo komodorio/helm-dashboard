@@ -43,8 +43,8 @@ export default function RevisionsList({
             key={release.revision}
             className={`flex flex-col border rounded-md mx-5 p-2 gap-4 cursor-pointer ${
               release.revision === selectedRevision
-                ? "border-[#007bff] bg-white"
-                : "border-[#DCDDDF] bg-[#F4F7FA]"
+                ? "border-revision-dark bg-white"
+                : "border-revision-light bg-body-background"
             }`}
           >
             <div className="flex row justify-between">
@@ -52,7 +52,7 @@ export default function RevisionsList({
               <span className="font-bold">#{release.revision}</span>
             </div>
             <div
-              className="self-end text-[#707583] text-xs flex flex-wrap gap-1"
+              className="self-end text-muted text-xs flex flex-wrap gap-1"
               style={{
                 width: "100%",
                 display: "flex",

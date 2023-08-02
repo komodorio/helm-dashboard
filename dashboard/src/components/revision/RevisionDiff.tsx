@@ -134,7 +134,7 @@ function RevisionDiff({
 
   return (
     <div>
-      <div className="flex mb-3 p-2 border border-[#DCDDDF] flex-row items-center justify-between w-full bg-white rounded">
+      <div className="flex mb-3 p-2 border border-revision flex-row items-center justify-between w-full bg-white rounded">
         <div className="flex items-center">
           <input
             checked={viewMode === "view"}

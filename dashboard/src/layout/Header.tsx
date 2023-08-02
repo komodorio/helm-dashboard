@@ -50,7 +50,7 @@ export default function Header() {
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
       location.pathname.includes(`/${identifier}`)
-        ? " text-[#1347FF] rounded-sm bg-[#EBEFFF]"
+        ? " text-primary rounded-sm bg-header-install"
         : ""
     }`
 
@@ -142,7 +142,7 @@ export default function Header() {
           <div className="flex flex-col">
             <a
               href="https://komodor.com/helm-dash/"
-              className="text-[#0d6efd] font-bold"
+              className="text-link-color font-bold"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -151,7 +151,7 @@ export default function Header() {
                 <BsBoxArrowUpRight className="w-[14px] h-[14px]" />
               </div>
             </a>
-            <label className="text-[#707583]">
+            <label className="text-muted">
               Auth & RBAC, k8s events, troubleshooting and more
             </label>
           </div>

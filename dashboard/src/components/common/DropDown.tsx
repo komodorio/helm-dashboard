@@ -86,7 +86,7 @@ function DropDown({ items }: DropDownProps) {
                       isOpen: false,
                     }))
                   }}
-                  className={`cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-[#E9ECEF] ${
+                  className={`cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-dropdown ${
                     item.isDisabled
                       ? "cursor-default hover:bg-transparent text-gray-400"
                       : ""

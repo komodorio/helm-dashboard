@@ -32,7 +32,7 @@ export default function InstalledPackagesHeader({
 
         <div className="w-1/3">
           <input
-            className="border border-[#ced4da] rounded p-1 text-sm w-11/12"
+            className="border-installed-charts-filter  rounded p-1 text-sm w-11/12"
             placeholder="Filter..."
             type="text"
             onChange={(ev) => setFilterKey(ev.target.value)}
