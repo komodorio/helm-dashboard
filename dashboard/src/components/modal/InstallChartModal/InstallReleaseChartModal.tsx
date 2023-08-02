@@ -114,17 +114,18 @@ export const InstallReleaseChartModal = ({
     {
       version: selectedVersion || "",
       userValues,
-      chart: chartAddress,
+      chartAddress,
       releaseValues,
       namespace,
       releaseName,
     }
   );
 
-  const { data: currentVerManifest } = useGetReleaseManifest({
-    namespace,
-    chartName,
-  });
+  const { data: currentVerManifest, error: currentVerManifestError } =
+    useGetReleaseManifest({
+      namespace,
+      chartName,
+    });
 
   const {
     data: diffData,
@@ -255,9 +256,10 @@ export const InstallReleaseChartModal = ({
       </div>
 
       <ManifestDiff
-        diff={diffData}
+        diff={diffData as string}
         isLoading={isLoadingDiff}
         error={
+          (currentVerManifestError as string) ||
           (selectedVerDataError as string) ||
           (diffError as string) ||
           installError ||
