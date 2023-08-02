@@ -21,15 +21,15 @@ export const VersionToInstall: React.FC<{
     repository: string
     urls: string[]
   }) => void
-  isInstall?: boolean
-}> = ({ versions, onSelectVersion, isInstall, initialVersion }) => {
+  showCurrentVersion: boolean
+}> = ({ versions, onSelectVersion, showCurrentVersion, initialVersion }) => {
   const chartVersion = useMemo(
     () => versions.find(({ isChartVersion }) => isChartVersion)?.version,
     [versions]
   )
 
   const currentVersion =
-    chartVersion && !isInstall ? (
+    chartVersion && showCurrentVersion ? (
       <p className="text-xl text-muted ml-2">
         {`(current version is `}
         <span className="text-green-700">{`${chartVersion}`}</span>
@@ -38,12 +38,15 @@ export const VersionToInstall: React.FC<{
     ) : null
 
   // Prepare your options for react-select
-  const options = useMemo(() => (
-    versions.map(({ repository, version, urls }) => ({
-      value: { repository, version, urls },
-      label: `${repository} @ ${version}`,
-      check: chartVersion === version,
-    })) || []), [chartVersion, versions]);
+  const options = useMemo(
+    () =>
+      versions.map(({ repository, version, urls }) => ({
+        value: { repository, version, urls },
+        label: `${repository} @ ${version}`,
+        check: chartVersion === version,
+      })) || [],
+    [chartVersion, versions]
+  )
   const [selectedOption, setSelectedOption] =
     useState<(typeof options)[number]>()
   const initOpt = useMemo(
@@ -78,7 +81,7 @@ export const VersionToInstall: React.FC<{
               SingleValue: ({ children, ...props }) => (
                 <components.SingleValue {...props}>
                   <span className="text-green-700 font-bold">{children}</span>
-                  {props.data.check && !isInstall && (
+                  {props.data.check && showCurrentVersion && (
                     <BsCheck2 className="inline-block ml-2 text-green-700 font-bold" />
                   )}
                 </components.SingleValue>
@@ -89,7 +92,7 @@ export const VersionToInstall: React.FC<{
                   {...innerProps}
                 >
                   <div className="width-auto">{children}</div>
-                  {data.check && !isInstall && (
+                  {data.check && showCurrentVersion && (
                     <BsCheck2
                       fontWeight={"bold"}
                       className="inline-block ml-2 text-green-700 font-bold"
