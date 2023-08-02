@@ -5,7 +5,7 @@ import RepositoryViewer from "../components/repository/RepositoryViewer"
 import { Repository } from "../data/types"
 import { useGetRepositories } from "../API/repositories"
 import { HelmRepositories } from "../API/interfaces"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { useAppContext } from "../context/AppContext"
 import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams"
 
@@ -32,7 +32,7 @@ function RepositoryPage() {
         replace: true,
       })
     }
-  }, [selectedRepo, repoFromParams, context])
+  }, [selectedRepo, repoFromParams, context, navigate])
 
   const { data: repositories = [] } = useGetRepositories({
     onSuccess: (data: HelmRepositories) => {

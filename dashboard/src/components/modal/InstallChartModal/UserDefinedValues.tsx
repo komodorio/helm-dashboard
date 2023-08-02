@@ -13,17 +13,15 @@ export const UserDefinedValues = ({
     setLocalState(initialValue)
   }, [initialValue])
 
-  const prevValueRef = useRef(initialValue)
   const timeoutRef = useRef<any>(null)
   useEffect(() => {
     clearTimeout(timeoutRef.current)
-    if (prevValueRef.current !== localState) {
-      timeoutRef.current = setTimeout(() => {
-        setValues(localState)
-        clearTimeout(timeoutRef.current)
-      }, 800)
-    }
-  }, [localState])
+
+    timeoutRef.current = setTimeout(() => {
+      setValues(localState)
+      clearTimeout(timeoutRef.current)
+    }, 800)
+  }, [localState, setValues])
 
   return (
     <div className="w-1/2 ">
@@ -34,7 +32,7 @@ export const UserDefinedValues = ({
         User-Defined Values:
       </label>
       <textarea
-        value={localState || initialValue}
+        value={localState}
         onChange={(e) => setLocalState(e.target.value)}
         rows={14}
         className="block p-2.5 w-full text-md text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none font-monospace"

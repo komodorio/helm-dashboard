@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // DropDown.stories.ts|tsx
 
 import { ComponentStory, ComponentMeta } from "@storybook/react"
