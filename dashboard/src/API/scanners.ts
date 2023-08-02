@@ -1,3 +1,5 @@
+/** DO NOT DELETE THESE FUNCTIONS - we left this until we support scan ops again */
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   UseMutationOptions,
