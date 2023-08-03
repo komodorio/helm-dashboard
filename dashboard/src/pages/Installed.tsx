@@ -10,12 +10,11 @@ import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { Release } from "../data/types";
 
 function Installed() {
-  const [selectedNamespaces, setSelectedNamespaces] = useState<string[]>([]);
   const { searchParamsObject, upsertSearchParams } = useCustomSearchParams();
   const { context } = useParams();
   const { filteredNamespace } = searchParamsObject;
-  const namespaces = useMemo(
-    () => filteredNamespace?.split("+") ?? ["default"],
+  const selectedNamespaces = useMemo(
+    () => filteredNamespace?.split("+"),
     [filteredNamespace]
   );
   const navigate = useNavigate();
@@ -54,16 +53,19 @@ function Installed() {
   const filteredReleases = useMemo(() => {
     return (
       data?.filter((installedPackage: Release) => {
-        return (
-          // if we have selected no name spaces or if the only namespace selected is the default one then show all installed packages
-          // if that isn't the case then one can
-          (selectedNamespaces.length == 0 ||
-          (selectedNamespaces.length == 1 && selectedNamespaces[0] == "default")
-            ? true
-            : selectedNamespaces.includes(installedPackage.namespace)) &&
-          (installedPackage.name.includes(filterKey) ||
-            installedPackage.namespace.includes(filterKey))
-        );
+        if (filterKey) {
+          return (
+            installedPackage.name.includes(filterKey) ||
+            (installedPackage.namespace.includes(filterKey) &&
+            selectedNamespaces
+              ? selectedNamespaces.includes(installedPackage.namespace)
+              : true)
+          );
+        } else {
+          return selectedNamespaces
+            ? selectedNamespaces.includes(installedPackage.namespace)
+            : true;
+        }
       }) ?? []
     );
   }, [data, filterKey, selectedNamespaces]);
@@ -72,9 +74,7 @@ function Installed() {
     <div className="flex flex-row w-full">
       <ClustersList
         selectedCluster={context ?? ""}
-        selectedNamespaces={selectedNamespaces}
-        setSelectedNamespaces={setSelectedNamespaces}
-        filteredNamespaces={namespaces}
+        filteredNamespaces={selectedNamespaces}
         onClusterChange={handleClusterChange}
         installedReleases={data}
       />

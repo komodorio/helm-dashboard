@@ -8,8 +8,6 @@ import { useAppContext } from "../context/AppContext";
 type ClustersListProps = {
   onClusterChange: (clusterName: string) => void;
   selectedCluster: string;
-  selectedNamespaces: string[];
-  setSelectedNamespaces: (selectedNameSpace: string[]) => any;
   filteredNamespaces: string[];
   installedReleases?: Release[];
 };
@@ -40,7 +38,6 @@ function ClustersList({
   installedReleases,
   selectedCluster,
   filteredNamespaces,
-  setSelectedNamespaces,
   onClusterChange,
 }: ClustersListProps) {
   const { upsertSearchParams, removeSearchParam } = useCustomSearchParams();
@@ -64,7 +61,9 @@ function ClustersList({
     const mapNamespaces = new Map<string, number>();
 
     installedReleases?.forEach((release) => {
-      const amount = mapNamespaces.get(release.namespace) ?? 1;
+      const amount = mapNamespaces.get(release.namespace)
+        ? Number(mapNamespaces.get(release.namespace)) + 1
+        : 1;
       mapNamespaces.set(release.namespace, amount);
     });
 
@@ -85,7 +84,6 @@ function ClustersList({
         "filteredNamespace",
         newSelectedNamespaces.map((ns) => ns).join("+")
       );
-      setSelectedNamespaces(newSelectedNamespaces);
     }
   };
 
