@@ -1,12 +1,12 @@
-import hljs from "highlight.js"
-import Spinner from "../../Spinner"
+import hljs from "highlight.js";
+import Spinner from "../../Spinner";
 
 export const ChartValues = ({
   chartValues,
   loading,
 }: {
-  chartValues: string
-  loading: boolean
+  chartValues: string;
+  loading: boolean;
 }) => {
   return (
     <div className="w-1/2">
@@ -35,5 +35,5 @@ export const ChartValues = ({
         ) : null}
       </pre>
     </div>
-  )
-}
+  );
+};

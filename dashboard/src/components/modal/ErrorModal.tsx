@@ -1,10 +1,10 @@
-import Modal from "./Modal"
+import Modal from "./Modal";
 
 interface ErrorModalProps {
-  isOpen: boolean
-  titleText: string
-  contentText: string
-  onClose: () => void
+  isOpen: boolean;
+  titleText: string;
+  contentText: string;
+  onClose: () => void;
 }
 
 export default function ErrorModal({
@@ -30,7 +30,7 @@ export default function ErrorModal({
       </div>
       <h4 className="alert-heading" />
     </div>
-  )
+  );
 
   const bottomContent = (
     <div className="flex py-6 px-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
@@ -45,7 +45,7 @@ export default function ErrorModal({
         </a>
       </span>
     </div>
-  )
+  );
 
   return (
     <Modal
@@ -59,5 +59,5 @@ export default function ErrorModal({
     >
       <p className="text-error-color border-green-400">{contentText}</p>
     </Modal>
-  )
+  );
 }

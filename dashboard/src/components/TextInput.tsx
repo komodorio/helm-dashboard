@@ -13,13 +13,13 @@
  *
  */
 
-import React from "react"
+import React from "react";
 
 export interface TextInputProps {
-  label: string
-  placeholder: string
-  isMandatory?: boolean
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  label: string;
+  placeholder: string;
+  isMandatory?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function TextInput(props: TextInputProps): JSX.Element {
@@ -36,5 +36,5 @@ export default function TextInput(props: TextInputProps): JSX.Element {
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
       />
     </div>
-  )
+  );
 }

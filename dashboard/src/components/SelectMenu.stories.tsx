@@ -6,10 +6,10 @@
  * currently there is only the default story.
  * The default story renders the component with the default props.
  */
-import React from "react"
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import SelectMenu, { SelectMenuItem } from "./SelectMenu"
-import { SelectMenuProps } from "./SelectMenu"
+import React from "react";
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import SelectMenu, { SelectMenuItem } from "./SelectMenu";
+import { SelectMenuProps } from "./SelectMenu";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -19,14 +19,14 @@ export default {
    */
   title: "SelectMenu",
   component: SelectMenu,
-} as ComponentMeta<typeof SelectMenu>
+} as ComponentMeta<typeof SelectMenu>;
 
 //👇 We create a "template" of how args map to rendering
 const Template: ComponentStory<typeof SelectMenu> = (args: SelectMenuProps) => (
   <SelectMenu {...args} />
-)
+);
 
-export const Default = Template.bind({})
+export const Default = Template.bind({});
 Default.args = {
   header: "Header",
   children: [
@@ -36,4 +36,4 @@ Default.args = {
   ],
   selected: 1,
   onSelect: (id: number) => console.log(id),
-}
+};

@@ -5,8 +5,8 @@ export const UserDefinedValues = ({
   initialValue,
   setValues,
 }: {
-  initialValue: string
-  setValues: (val: string) => void
+  initialValue: string;
+  setValues: (val: string) => void;
 }) => {
   const [userDefinedValues, setUserDefinedValues] = useState(initialValue)
   const debouncedValue = useDebounce<string>(userDefinedValues, 500);
@@ -30,5 +30,5 @@ export const UserDefinedValues = ({
         className="block p-2.5 w-full text-md text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none font-monospace"
       ></textarea>
     </div>
-  )
-}
+  );
+};

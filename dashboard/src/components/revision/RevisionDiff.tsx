@@ -1,90 +1,90 @@
-import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react"
-import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js"
-import { useGetReleaseInfoByType } from "../../API/releases"
-import { useParams } from "react-router-dom"
-import useCustomSearchParams from "../../hooks/useCustomSearchParams"
+import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
+import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
+import { useGetReleaseInfoByType } from "../../API/releases";
+import { useParams } from "react-router-dom";
+import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
-import parse from "html-react-parser"
+import parse from "html-react-parser";
 
-import hljs from "highlight.js"
-import Spinner from "../Spinner"
-import { diffConfiguration } from "../../utils"
+import hljs from "highlight.js";
+import Spinner from "../Spinner";
+import { diffConfiguration } from "../../utils";
 
 type RevisionDiffProps = {
-  includeUserDefineOnly?: boolean
-  latestRevision: number
-}
+  includeUserDefineOnly?: boolean;
+  latestRevision: number;
+};
 
-const VIEW_MODE_VIEW_ONLY = "view"
-const VIEW_MODE_DIFF_PREV = "diff-with-previous"
-const VIEW_MODE_DIFF_SPECIFIC = "diff-with-specific-revision"
+const VIEW_MODE_VIEW_ONLY = "view";
+const VIEW_MODE_DIFF_PREV = "diff-with-previous";
+const VIEW_MODE_DIFF_SPECIFIC = "diff-with-specific-revision";
 
 function RevisionDiff({
   includeUserDefineOnly,
   latestRevision,
 }: RevisionDiffProps) {
-  const params = useParams()
+  const params = useParams();
 
-  const [specificVersion, setSpecificVersion] = useState(latestRevision)
+  const [specificVersion, setSpecificVersion] = useState(latestRevision);
   const {
     searchParamsObject: searchParams,
     upsertSearchParams,
     removeSearchParam,
-  } = useCustomSearchParams()
+  } = useCustomSearchParams();
   const {
     tab,
     mode: viewMode = VIEW_MODE_VIEW_ONLY,
     "user-defined": userDefinedValue,
-  } = searchParams
+  } = searchParams;
 
   //@ts-ignore
-  const diffElement = useRef<HTMLElement>({})
+  const diffElement = useRef<HTMLElement>({});
 
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
-    upsertSearchParams("mode", e.target.value)
-  }
+    upsertSearchParams("mode", e.target.value);
+  };
 
   const handleUserDefinedCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      upsertSearchParams("user-defined", `${e.target.checked}`)
+      upsertSearchParams("user-defined", `${e.target.checked}`);
     } else {
-      removeSearchParam("user-defined")
+      removeSearchParam("user-defined");
     }
-  }
-  const revisionInt = parseInt(params.revision || "", 10)
-  const hasMultipleRevisions = revisionInt > 1
+  };
+  const revisionInt = parseInt(params.revision || "", 10);
+  const hasMultipleRevisions = revisionInt > 1;
 
   const additionalParams = useMemo(() => {
-    let additionalParamStr = ""
+    let additionalParamStr = "";
     if (userDefinedValue) {
-      additionalParamStr += "&userDefined=true"
+      additionalParamStr += "&userDefined=true";
     }
     if (viewMode === VIEW_MODE_DIFF_PREV && hasMultipleRevisions) {
-      additionalParamStr += `&revisionDiff=${revisionInt - 1}`
+      additionalParamStr += `&revisionDiff=${revisionInt - 1}`;
     }
-    const specificRevisionInt = parseInt(specificVersion?.toString() || "", 10)
+    const specificRevisionInt = parseInt(specificVersion?.toString() || "", 10);
     if (
       viewMode === VIEW_MODE_DIFF_SPECIFIC &&
       hasMultipleRevisions &&
       !Number.isNaN(specificRevisionInt)
     ) {
-      additionalParamStr += `&revisionDiff=${specificVersion}`
+      additionalParamStr += `&revisionDiff=${specificVersion}`;
     }
-    return additionalParamStr
+    return additionalParamStr;
   }, [
     viewMode,
     userDefinedValue,
     specificVersion,
     revisionInt,
     hasMultipleRevisions,
-  ])
-  const hasRevisionToDiff = !!additionalParams
+  ]);
+  const hasRevisionToDiff = !!additionalParams;
 
   const {
     data,
     isLoading,
     isSuccess: fetchedDataSuccessfully,
-  } = useGetReleaseInfoByType({ ...params, tab }, additionalParams)
+  } = useGetReleaseInfoByType({ ...params, tab }, additionalParams);
 
   const content = useMemo(() => {
     if (
@@ -92,13 +92,13 @@ function RevisionDiff({
       !isLoading &&
       (viewMode === VIEW_MODE_VIEW_ONLY || !hasRevisionToDiff)
     ) {
-      return hljs.highlight(data, { language: "yaml" }).value
+      return hljs.highlight(data, { language: "yaml" }).value;
     }
     if (fetchedDataSuccessfully && !data && viewMode === VIEW_MODE_VIEW_ONLY) {
-      return "No value to display"
+      return "No value to display";
     }
-    return ""
-  }, [data, isLoading, viewMode, hasRevisionToDiff, fetchedDataSuccessfully])
+    return "";
+  }, [data, isLoading, viewMode, hasRevisionToDiff, fetchedDataSuccessfully]);
 
   useEffect(() => {
     if (
@@ -111,17 +111,17 @@ function RevisionDiff({
         diffElement!.current!,
         data,
         diffConfiguration
-      )
-      diff2htmlUi.draw()
-      diff2htmlUi.highlightCode()
+      );
+      diff2htmlUi.draw();
+      diff2htmlUi.highlightCode();
     } else if (viewMode === VIEW_MODE_VIEW_ONLY && diffElement.current) {
-      diffElement.current.innerHTML = ""
+      diffElement.current.innerHTML = "";
     } else if (
       fetchedDataSuccessfully &&
       (!hasRevisionToDiff || !data) &&
       diffElement.current
     ) {
-      diffElement.current.innerHTML = "No differences to display"
+      diffElement.current.innerHTML = "No differences to display";
     }
   }, [
     viewMode,
@@ -130,7 +130,7 @@ function RevisionDiff({
     isLoading,
     fetchedDataSuccessfully,
     diffElement,
-  ])
+  ]);
 
   return (
     <div>
@@ -226,7 +226,7 @@ function RevisionDiff({
         ref={diffElement}
       ></div>
     </div>
-  )
+  );
 }
 
-export default RevisionDiff
+export default RevisionDiff;

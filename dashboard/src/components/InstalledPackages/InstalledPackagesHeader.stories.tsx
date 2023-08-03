@@ -1,7 +1,7 @@
 // InstalledPackagesHeader.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import InstalledPackagesHeader from "./InstalledPackagesHeader"
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import InstalledPackagesHeader from "./InstalledPackagesHeader";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,14 +11,14 @@ export default {
    */
   title: "InstalledPackagesHeader",
   component: InstalledPackagesHeader,
-} as ComponentMeta<typeof InstalledPackagesHeader>
+} as ComponentMeta<typeof InstalledPackagesHeader>;
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof InstalledPackagesHeader> = (args) => (
   <InstalledPackagesHeader {...args} />
-)
+);
 
-export const Default = Template.bind({})
+export const Default = Template.bind({});
 
 Default.args = {
   filteredReleases: [
@@ -57,4 +57,4 @@ Default.args = {
       chartVersion: "", // duplicated in some cases in the
     },
   ],
-}
+};

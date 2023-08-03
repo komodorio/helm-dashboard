@@ -9,22 +9,22 @@ export const GeneralDetails = ({
   onNamespaceInput,
   onReleaseNameInput,
 }: {
-  releaseName: string
-  namespace?: string
-  disabled: boolean
+  releaseName: string;
+  namespace?: string;
+  disabled: boolean;
 
-  onNamespaceInput: (namespace: string) => void
-  onReleaseNameInput: (chartName: string) => void
+  onNamespaceInput: (namespace: string) => void;
+  onReleaseNameInput: (chartName: string) => void;
 }) => {
   const [namespaceInputValue, setNamespaceInputValue] = useState(namespace);
   const namespaceInputValueDebounced = useDebounce<string>(namespaceInputValue, 500);
   useEffect(() => {
       onNamespaceInput(namespaceInputValueDebounced);
   }, [namespaceInputValueDebounced, onNamespaceInput])
-  const { context } = useParams()
+  const { context } = useParams();
   const inputClassName = ` text-lg py-1 px-2 border border-1 border-gray-300 ${
     disabled ? "bg-gray-200" : "bg-white "
-  } rounded`
+  } rounded`;
   return (
     <div className="flex gap-8">
       <div>
@@ -52,5 +52,5 @@ export const GeneralDetails = ({
         </div>
       ) : null}
     </div>
-  )
-}
+  );
+};
