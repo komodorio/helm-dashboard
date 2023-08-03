@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 // DropDown.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import DropDown from "./DropDown"
-import { BsSlack, BsGithub } from "react-icons/bs"
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import DropDown from "./DropDown";
+import { BsSlack, BsGithub } from "react-icons/bs";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -13,18 +13,18 @@ export default {
    */
   title: "DropDown",
   component: DropDown,
-} as ComponentMeta<typeof DropDown>
+} as ComponentMeta<typeof DropDown>;
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof DropDown> = (args) => (
   <DropDown {...args} />
-)
+);
 
-export const Default = Template.bind({})
+export const Default = Template.bind({});
 
 const onClick = () => {
-  console.log("drop down clicked")
-}
+  console.log("drop down clicked");
+};
 
 Default.args = {
   items: [
@@ -32,4 +32,4 @@ Default.args = {
     { id: "2 ", isSeparator: true },
     { id: "3", text: "Menu Item 3", isDisabled: true, icon: <BsGithub /> },
   ],
-}
+};

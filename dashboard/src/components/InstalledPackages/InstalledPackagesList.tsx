@@ -1,9 +1,9 @@
-import InstalledPackageCard from "./InstalledPackageCard"
-import { Release } from "../../data/types"
+import InstalledPackageCard from "./InstalledPackageCard";
+import { Release } from "../../data/types";
 
 type InstalledPackagesListProps = {
-  filteredReleases: Release[]
-}
+  filteredReleases: Release[];
+};
 
 export default function InstalledPackagesList({
   filteredReleases,
@@ -16,8 +16,8 @@ export default function InstalledPackagesList({
             key={installedPackage.name}
             release={installedPackage}
           />
-        )
+        );
       })}
     </div>
-  )
+  );
 }

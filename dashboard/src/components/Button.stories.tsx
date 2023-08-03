@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 // Status.stories.ts|tsx
 
-import React from "react"
+import React from "react";
 
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import Button from "./Button"
-import { ButtonProps } from "./Button"
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import Button from "./Button";
+import { ButtonProps } from "./Button";
 //👇 This default export determines where your story goes in the story list
 export default {
   /* 👇 The title prop is optional.
@@ -14,7 +14,7 @@ export default {
    */
   title: "Button",
   component: Button,
-} as ComponentMeta<typeof Button>
+} as ComponentMeta<typeof Button>;
 
 // Recall that Button has 'props' which is of type ButtonProps
 // We want to past theme to the story with the name 'Default', so we
@@ -23,8 +23,8 @@ export default {
 // default args object.
 const Template: ComponentStory<typeof Button> = (args: ButtonProps) => (
   <Button {...args} />
-)
-export const Default = Template.bind({})
+);
+export const Default = Template.bind({});
 Default.args = {
   children: (
     <>
@@ -33,6 +33,6 @@ Default.args = {
     </>
   ),
   onClick: () => {
-    console.log("click")
+    console.log("click");
   },
-}
+};

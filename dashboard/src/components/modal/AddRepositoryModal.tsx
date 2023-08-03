@@ -1,76 +1,76 @@
-import React, { useEffect, useState } from "react"
-import Modal from "./Modal"
-import { callApi } from "../../API/releases"
-import Spinner from "../Spinner"
-import useAlertError from "../../hooks/useAlertError"
-import useCustomSearchParams from "../../hooks/useCustomSearchParams"
-import { useAppContext } from "../../context/AppContext"
-import { useQueryClient } from "@tanstack/react-query"
-import { useNavigate, useParams } from "react-router-dom"
+import React, { useEffect, useState } from "react";
+import Modal from "./Modal";
+import { callApi } from "../../API/releases";
+import Spinner from "../Spinner";
+import useAlertError from "../../hooks/useAlertError";
+import useCustomSearchParams from "../../hooks/useCustomSearchParams";
+import { useAppContext } from "../../context/AppContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface FormKeys {
-  name: string
-  url: string
-  username: string
-  password: string
+  name: string;
+  url: string;
+  username: string;
+  password: string;
 }
 
 type AddRepositoryModalProps = {
-  isOpen: boolean
-  onClose: () => void
-}
+  isOpen: boolean;
+  onClose: () => void;
+};
 
 function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
-  const [formData, setFormData] = useState<FormKeys>({} as FormKeys)
-  const [isLoading, setIsLoading] = useState(false)
-  const alertError = useAlertError()
-  const { searchParamsObject } = useCustomSearchParams()
-  const { repo_url, repo_name } = searchParamsObject
-  const { setSelectedRepo } = useAppContext()
-  const { context } = useParams()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const [formData, setFormData] = useState<FormKeys>({} as FormKeys);
+  const [isLoading, setIsLoading] = useState(false);
+  const alertError = useAlertError();
+  const { searchParamsObject } = useCustomSearchParams();
+  const { repo_url, repo_name } = searchParamsObject;
+  const { setSelectedRepo } = useAppContext();
+  const { context } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!repo_url || !repo_name) return
-    setFormData({ ...formData, name: repo_name, url: repo_url })
-  }, [repo_url, repo_name, formData])
+    if (!repo_url || !repo_name) return;
+    setFormData({ ...formData, name: repo_name, url: repo_url });
+  }, [repo_url, repo_name, formData]);
 
   const addRepository = () => {
-    const body = new FormData()
-    body.append("name", formData.name ?? "")
-    body.append("url", formData.url ?? "")
-    body.append("username", formData.username ?? "")
-    body.append("password", formData.password ?? "")
+    const body = new FormData();
+    body.append("name", formData.name ?? "");
+    body.append("url", formData.url ?? "");
+    body.append("username", formData.username ?? "");
+    body.append("password", formData.password ?? "");
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     callApi<void>("/api/helm/repositories", {
       method: "POST",
       body,
     })
       .then(() => {
-        setIsLoading(false)
-        onClose()
+        setIsLoading(false);
+        onClose();
 
         queryClient.invalidateQueries({
           queryKey: ["helm", "repositories"],
-        })
-        setSelectedRepo(formData.name || "")
+        });
+        setSelectedRepo(formData.name || "");
         navigate(`/${context}/repository/${formData.name}`, {
           replace: true,
-        })
+        });
       })
       .catch((error) => {
         alertError.setShowErrorModal({
           title: "Failed to add repo",
           msg: error.message,
-        })
+        });
       })
       .finally(() => {
-        setIsLoading(false)
-      })
-  }
+        setIsLoading(false);
+      });
+  };
 
   return (
     <Modal
@@ -160,7 +160,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
         </label>
       </div>
     </Modal>
-  )
+  );
 }
 
-export default AddRepositoryModal
+export default AddRepositoryModal;

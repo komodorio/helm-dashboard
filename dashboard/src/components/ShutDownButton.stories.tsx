@@ -1,7 +1,7 @@
 // TabsBar.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import ShutDownButton from "./ShutDownButton"
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import ShutDownButton from "./ShutDownButton";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,9 +11,11 @@ export default {
    */
   title: "ShutDownButton",
   component: ShutDownButton,
-} as ComponentMeta<typeof ShutDownButton>
+} as ComponentMeta<typeof ShutDownButton>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof ShutDownButton> = () => <ShutDownButton />
+const Template: ComponentStory<typeof ShutDownButton> = () => (
+  <ShutDownButton />
+);
 
-export const Default = Template.bind({})
+export const Default = Template.bind({});

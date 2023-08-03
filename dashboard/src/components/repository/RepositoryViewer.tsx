@@ -1,27 +1,27 @@
-import { BsTrash3, BsArrowRepeat } from "react-icons/bs"
-import { Chart, Repository } from "../../data/types"
-import ChartViewer from "./ChartViewer"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import apiService from "../../API/apiService"
-import Spinner from "../Spinner"
-import { useUpdateRepo } from "../../API/repositories"
-import { callApi } from "../../API/releases"
-import { useEffect, useMemo, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { useAppContext } from "../../context/AppContext"
+import { BsTrash3, BsArrowRepeat } from "react-icons/bs";
+import { Chart, Repository } from "../../data/types";
+import ChartViewer from "./ChartViewer";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import apiService from "../../API/apiService";
+import Spinner from "../Spinner";
+import { useUpdateRepo } from "../../API/repositories";
+import { callApi } from "../../API/releases";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppContext } from "../../context/AppContext";
 
 type RepositoryViewerProps = {
-  repository: Repository | undefined
-}
+  repository: Repository | undefined;
+};
 
 function RepositoryViewer({ repository }: RepositoryViewerProps) {
-  const [searchValue, setSearchValue] = useState("")
-  const [isRemoveLoading, setIsRemove] = useState(false)
-  const { context } = useParams()
-  const { setSelectedRepo, selectedRepo } = useAppContext()
-  const queryClient = useQueryClient()
+  const [searchValue, setSearchValue] = useState("");
+  const [isRemoveLoading, setIsRemove] = useState(false);
+  const { context } = useParams();
+  const { setSelectedRepo, selectedRepo } = useAppContext();
+  const queryClient = useQueryClient();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { data: charts, isLoading } = useQuery<Chart[]>({
     //@ts-ignore
@@ -29,49 +29,49 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
     queryFn: apiService.getRepositoryCharts,
     refetchOnWindowFocus: false,
     enabled: !!repository?.name,
-  })
+  });
 
   useEffect(() => {
-    setSearchValue("")
-  }, [repository, selectedRepo])
+    setSearchValue("");
+  }, [repository, selectedRepo]);
 
   const update = useUpdateRepo(repository?.name || "", {
     retry: false,
     onSuccess: () => {
-      window.location.reload()
+      window.location.reload();
     },
-  })
+  });
 
   const removeRepository = async () => {
     //this is expected
     //eslint-disable-next-line no-alert
     if (confirm("Confirm removing repository?")) {
       try {
-        setIsRemove(true)
-        const repo = repository?.name || ""
+        setIsRemove(true);
+        const repo = repository?.name || "";
         await callApi<void>(`/api/helm/repositories/${repo}`, {
           method: "DELETE",
-        })
-        navigate(`/${context}/repository`, { replace: true })
-        setSelectedRepo("")
+        });
+        navigate(`/${context}/repository`, { replace: true });
+        setSelectedRepo("");
         queryClient.invalidateQueries({
           queryKey: ["helm", "repositories"],
-        })
+        });
       } catch (error) {
-        console.error(error)
+        console.error(error);
       } finally {
-        setIsRemove(false)
+        setIsRemove(false);
       }
     }
-  }
+  };
 
-  const numOfCharts = (charts as Chart[])?.length
-  const showNoChartsAlert = Boolean(!numOfCharts && numOfCharts == 0)
+  const numOfCharts = (charts as Chart[])?.length;
+  const showNoChartsAlert = Boolean(!numOfCharts && numOfCharts == 0);
   const filteredCharts = useMemo(() => {
     return (charts as Chart[])?.filter((ch: Chart) =>
       ch.name.toLowerCase().includes(searchValue.toLowerCase())
-    )
-  }, [charts, searchValue])
+    );
+  }, [charts, searchValue]);
 
   if (repository == undefined) {
     return (
@@ -79,7 +79,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         Looks like you don't have any repositories installed. You can add one
         with the "Add Repository" button on the left side bar.
       </div>
-    )
+    );
   }
 
   return (
@@ -94,7 +94,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
           <div className="flex flex-row gap-2">
             <button
               onClick={() => {
-                update.mutate()
+                update.mutate();
               }}
             >
               <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded">
@@ -104,7 +104,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             </button>
             <button
               onClick={() => {
-                removeRepository()
+                removeRepository();
               }}
             >
               <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded">
@@ -147,7 +147,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default RepositoryViewer
+export default RepositoryViewer;

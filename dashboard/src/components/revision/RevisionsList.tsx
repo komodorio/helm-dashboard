@@ -1,39 +1,39 @@
-import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs"
-import { useParams } from "react-router-dom"
-import { compare } from "compare-versions"
+import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
+import { useParams } from "react-router-dom";
+import { compare } from "compare-versions";
 
-import { ReleaseRevision } from "../../data/types"
-import { getAge } from "../../timeUtils"
-import StatusLabel from "../common/StatusLabel"
-import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams"
-import { DateTime } from "luxon"
+import { ReleaseRevision } from "../../data/types";
+import { getAge } from "../../timeUtils";
+import StatusLabel from "../common/StatusLabel";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
+import { DateTime } from "luxon";
 
 type RevisionsListProps = {
-  releaseRevisions: ReleaseRevision[]
-  selectedRevision: number
-}
+  releaseRevisions: ReleaseRevision[];
+  selectedRevision: number;
+};
 
 export default function RevisionsList({
   releaseRevisions,
   selectedRevision,
 }: RevisionsListProps) {
-  const navigate = useNavigateWithSearchParams()
-  const { context, namespace, chart } = useParams()
+  const navigate = useNavigateWithSearchParams();
+  const { context, namespace, chart } = useParams();
   const changeRelease = (newRevision: number) => {
     navigate(
       `/${context}/${namespace}/${chart}/installed/revision/${newRevision}`
-    )
-  }
+    );
+  };
 
   return (
     <>
       {releaseRevisions?.map((release, idx) => {
         const hasMultipleReleases =
-          releaseRevisions.length > 1 && idx < releaseRevisions.length - 1
+          releaseRevisions.length > 1 && idx < releaseRevisions.length - 1;
         const prevRelease = hasMultipleReleases
           ? releaseRevisions[idx + 1]
-          : null
-        const isRollback = release.description.startsWith("Rollback to ")
+          : null;
+        const isRollback = release.description.startsWith("Rollback to ");
         return (
           <div
             title={
@@ -90,8 +90,8 @@ export default function RevisionsList({
               </span>
             </div>
           </div>
-        )
+        );
       })}
     </>
-  )
+  );
 }

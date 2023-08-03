@@ -1,19 +1,19 @@
-import { useMemo } from "react"
-import { useParams } from "react-router-dom"
-import RevisionDetails from "../components/revision/RevisionDetails"
-import RevisionsList from "../components/revision/RevisionsList"
-import { ReleaseRevision } from "../data/types"
-import { useQuery } from "@tanstack/react-query"
-import apiService from "../API/apiService"
-import Spinner from "../components/Spinner"
+import { useMemo } from "react";
+import { useParams } from "react-router-dom";
+import RevisionDetails from "../components/revision/RevisionDetails";
+import RevisionsList from "../components/revision/RevisionsList";
+import { ReleaseRevision } from "../data/types";
+import { useQuery } from "@tanstack/react-query";
+import apiService from "../API/apiService";
+import Spinner from "../components/Spinner";
 
 const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) =>
-  r1.revision - r2.revision < 0 ? 1 : -1
+  r1.revision - r2.revision < 0 ? 1 : -1;
 
 function Revision() {
-  const { revision = "", ...restParams } = useParams()
+  const { revision = "", ...restParams } = useParams();
 
-  const selectedRevision = revision ? parseInt(revision, 10) : 0
+  const selectedRevision = revision ? parseInt(revision, 10) : 0;
 
   const { data: releaseRevisions, isLoading: isLoadingHistory } = useQuery<
     ReleaseRevision[]
@@ -22,30 +22,30 @@ function Revision() {
     //@ts-ignore
     queryKey: ["releasesHistory", restParams],
     queryFn: apiService.getReleasesHistory,
-  })
+  });
 
   const latestRevision = useMemo(
     () =>
       Array.isArray(releaseRevisions) &&
       releaseRevisions.reduce((max, revisionData) => {
-        return Math.max(max, revisionData.revision)
+        return Math.max(max, revisionData.revision);
       }, Number.MIN_SAFE_INTEGER),
     [releaseRevisions]
-  )
+  );
 
   const sortedReleases = useMemo(
     () => (releaseRevisions as ReleaseRevision[])?.sort(descendingSort),
     [releaseRevisions]
-  )
+  );
 
   const selectedRelease = useMemo(() => {
     if (selectedRevision && releaseRevisions) {
       return (releaseRevisions as ReleaseRevision[]).find(
         (r: ReleaseRevision) => r.revision === selectedRevision
-      )
+      );
     }
-    return null
-  }, [releaseRevisions, selectedRevision])
+    return null;
+  }, [releaseRevisions, selectedRevision]);
 
   return (
     <div className="flex">
@@ -82,7 +82,7 @@ function Revision() {
         ) : null}
       </div>
     </div>
-  )
+  );
 }
 
 const RevisionSidebarSkeleton = () => {
@@ -95,7 +95,7 @@ const RevisionSidebarSkeleton = () => {
       <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
       <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
     </>
-  )
-}
+  );
+};
 
-export default Revision
+export default Revision;

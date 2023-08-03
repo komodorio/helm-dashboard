@@ -1,10 +1,10 @@
-import Modal from "./Modal"
+import Modal from "./Modal";
 
 interface ErrorModalProps {
-  isOpen: boolean
-  titleText: string
-  contentText: string
-  onClose: () => void
+  isOpen: boolean;
+  titleText: string;
+  contentText: string;
+  onClose: () => void;
 }
 
 export default function GlobalErrorModal({
@@ -30,7 +30,7 @@ export default function GlobalErrorModal({
       </div>
       <h4 className="alert-heading" />
     </div>
-  )
+  );
 
   return (
     <Modal
@@ -62,5 +62,5 @@ export default function GlobalErrorModal({
         {contentText}
       </p>
     </Modal>
-  )
+  );
 }

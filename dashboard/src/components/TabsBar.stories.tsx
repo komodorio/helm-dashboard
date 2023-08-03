@@ -1,7 +1,7 @@
 // TabsBar.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import TabsBar from "./TabsBar"
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import TabsBar from "./TabsBar";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,12 +11,14 @@ export default {
    */
   title: "TabsBar",
   component: TabsBar,
-} as ComponentMeta<typeof TabsBar>
+} as ComponentMeta<typeof TabsBar>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof TabsBar> = (args) => <TabsBar {...args} />
+const Template: ComponentStory<typeof TabsBar> = (args) => (
+  <TabsBar {...args} />
+);
 
-export const Default = Template.bind({})
+export const Default = Template.bind({});
 
 Default.args = {
   tabs: [
@@ -34,4 +36,4 @@ Default.args = {
     },
   ],
   activeTab: "tab1",
-}
+};

@@ -3,9 +3,9 @@ import {
   UseQueryOptions,
   useMutation,
   useQuery,
-} from "@tanstack/react-query"
-import { callApi } from "./releases"
-import { ApplicationStatus } from "./interfaces"
+} from "@tanstack/react-query";
+import { callApi } from "./releases";
+import { ApplicationStatus } from "./interfaces";
 
 // Shuts down the Helm Dashboard application
 export function useShutdownHelmDashboard(
@@ -17,7 +17,7 @@ export function useShutdownHelmDashboard(
         method: "DELETE",
       }),
     options
-  )
+  );
 }
 
 // Gets application status
@@ -30,5 +30,5 @@ export function useGetApplicationStatus(
     {
       ...options,
     }
-  )
+  );
 }

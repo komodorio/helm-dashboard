@@ -1,7 +1,7 @@
 // InstalledPackageCard.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import InstalledPackageCard from "./InstalledPackageCard"
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import InstalledPackageCard from "./InstalledPackageCard";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,14 +11,14 @@ export default {
    */
   title: "InstalledPackageCard",
   component: InstalledPackageCard,
-} as ComponentMeta<typeof InstalledPackageCard>
+} as ComponentMeta<typeof InstalledPackageCard>;
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof InstalledPackageCard> = (args) => (
   <InstalledPackageCard {...args} />
-)
+);
 
-export const Default = Template.bind({})
+export const Default = Template.bind({});
 
 Default.args = {
   release: {
@@ -38,4 +38,4 @@ Default.args = {
     chartName: "", // duplicated in some cases in the backend, we need to resolve this
     chartVersion: "", // duplicated in some cases in the backend, we need to resolve this
   },
-}
+};

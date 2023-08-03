@@ -1,27 +1,27 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react";
 
 export const UserDefinedValues = ({
   initialValue,
   setValues,
 }: {
-  initialValue: string
-  setValues: (val: string) => void
+  initialValue: string;
+  setValues: (val: string) => void;
 }) => {
-  const [localState, setLocalState] = useState(initialValue)
+  const [localState, setLocalState] = useState(initialValue);
 
   useEffect(() => {
-    setLocalState(initialValue)
-  }, [initialValue])
+    setLocalState(initialValue);
+  }, [initialValue]);
 
-  const timeoutRef = useRef<any>(null)
+  const timeoutRef = useRef<any>(null);
   useEffect(() => {
-    clearTimeout(timeoutRef.current)
+    clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
-      setValues(localState)
-      clearTimeout(timeoutRef.current)
-    }, 800)
-  }, [localState, setValues])
+      setValues(localState);
+      clearTimeout(timeoutRef.current);
+    }, 800);
+  }, [localState, setValues]);
 
   return (
     <div className="w-1/2 ">
@@ -38,5 +38,5 @@ export const UserDefinedValues = ({
         className="block p-2.5 w-full text-md text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none font-monospace"
       ></textarea>
     </div>
-  )
-}
+  );
+};
