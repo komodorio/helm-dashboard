@@ -120,11 +120,10 @@ export const InstallReleaseChartModal = ({
       releaseName,
     }
   );
-
   const { data: currentVerManifest, error: currentVerManifestError } =
     useGetReleaseManifest({
       namespace,
-      chartName,
+      chartName: _releaseName || '',
     });
 
   const {
