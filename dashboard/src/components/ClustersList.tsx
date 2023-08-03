@@ -85,7 +85,6 @@ function ClustersList({
         "filteredNamespace",
         newSelectedNamespaces.map((ns) => ns).join("+")
       )
-      console.log(newSelectedNamespaces)
       setSelectedNamespaces(newSelectedNamespaces)
     }
   }
