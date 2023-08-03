@@ -52,6 +52,8 @@ function Installed() {
     return (
       data?.filter((installedPackage: Release) => {
         return (
+          // if we have selected no name spaces or if the only namespace selected is the default one then show all installed packages
+          // if that isn't the case then one can
           (selectedNamespaces.length == 0 || (selectedNamespaces.length == 1 && selectedNamespaces[0] == "default")  ? true : selectedNamespaces.includes(installedPackage.namespace)) &&
           (installedPackage.name.includes(filterKey) ||
           installedPackage.namespace.includes(filterKey))
