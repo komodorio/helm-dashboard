@@ -49,17 +49,6 @@ function Installed() {
   )
 
   const filteredReleases = useMemo(() => {
-    console.log(
-      (
-        data?.filter((installedPackage: Release) => {
-          return (
-            (selectedNamespaces.length == 0 || (selectedNamespaces.length == 1 && selectedNamespaces[0] == "default")  ? true : selectedNamespaces.includes(installedPackage.namespace)) &&
-            (installedPackage.name.includes(filterKey) ||
-            installedPackage.namespace.includes(filterKey))
-          )
-        }) ?? []
-      )
-    );
     return (
       data?.filter((installedPackage: Release) => {
         return (
