@@ -1,21 +1,24 @@
-import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader"
-import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList"
-import ClustersList from "../components/ClustersList"
-import { useGetInstalledReleases } from "../API/releases"
-import { useMemo, useState } from "react"
-import Spinner from "../components/Spinner"
-import useAlertError from "../hooks/useAlertError"
-import { useParams, useNavigate } from "react-router-dom"
-import useCustomSearchParams from "../hooks/useCustomSearchParams"
-import { Release } from "../data/types"
+import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader";
+import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
+import ClustersList from "../components/ClustersList";
+import { useGetInstalledReleases } from "../API/releases";
+import { useMemo, useState } from "react";
+import Spinner from "../components/Spinner";
+import useAlertError from "../hooks/useAlertError";
+import { useParams, useNavigate } from "react-router-dom";
+import useCustomSearchParams from "../hooks/useCustomSearchParams";
+import { Release } from "../data/types";
 
 function Installed() {
   const [selectedNamespaces, setSelectedNamespaces] = useState<string[]>([]);
-  const { searchParamsObject, upsertSearchParams } = useCustomSearchParams()
-  const { context } = useParams()
-  const { filteredNamespace } = searchParamsObject
-  const namespaces = useMemo(() => filteredNamespace?.split("+") ?? ["default"], [filteredNamespace])
-  const navigate = useNavigate()
+  const { searchParamsObject, upsertSearchParams } = useCustomSearchParams();
+  const { context } = useParams();
+  const { filteredNamespace } = searchParamsObject;
+  const namespaces = useMemo(
+    () => filteredNamespace?.split("+") ?? ["default"],
+    [filteredNamespace]
+  );
+  const navigate = useNavigate();
 
   const handleClusterChange = (
     clusterName: string,
@@ -26,15 +29,15 @@ function Installed() {
       clusterNamespaces.length > 0
         ? `${clusterNamespaces.map((ns) => ns).join("+")}`
         : "default"
-    )
+    );
     navigate({
       pathname: `/${clusterName}/installed`,
       search: newSearchParams.toString(),
-    })
-  }
+    });
+  };
 
-  const [filterKey, setFilterKey] = useState<string>("")
-  const alertError = useAlertError()
+  const [filterKey, setFilterKey] = useState<string>("");
+  const alertError = useAlertError();
   const { data, isLoading, isRefetching } = useGetInstalledReleases(
     context ?? "",
     {
@@ -43,10 +46,10 @@ function Installed() {
         alertError.setShowErrorModal({
           title: "Failed to get list of charts",
           msg: (e as Error).message,
-        })
+        });
       },
     }
-  )
+  );
 
   const filteredReleases = useMemo(() => {
     return (
@@ -54,13 +57,16 @@ function Installed() {
         return (
           // if we have selected no name spaces or if the only namespace selected is the default one then show all installed packages
           // if that isn't the case then one can
-          (selectedNamespaces.length == 0 || (selectedNamespaces.length == 1 && selectedNamespaces[0] == "default")  ? true : selectedNamespaces.includes(installedPackage.namespace)) &&
+          (selectedNamespaces.length == 0 ||
+          (selectedNamespaces.length == 1 && selectedNamespaces[0] == "default")
+            ? true
+            : selectedNamespaces.includes(installedPackage.namespace)) &&
           (installedPackage.name.includes(filterKey) ||
-          installedPackage.namespace.includes(filterKey))
-        )
+            installedPackage.namespace.includes(filterKey))
+        );
       }) ?? []
-    )
-  }, [data, filterKey, namespaces, selectedNamespaces])
+    );
+  }, [data, filterKey, selectedNamespaces]);
 
   return (
     <div className="flex flex-row w-full">
@@ -89,7 +95,7 @@ function Installed() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default Installed
+export default Installed;
