@@ -10,6 +10,7 @@ import useCustomSearchParams from "../hooks/useCustomSearchParams"
 import { Release } from "../data/types"
 
 function Installed() {
+  const [selectedNamespaces, setSelectedNamespaces] = useState<string[]>([]);
   const { searchParamsObject, upsertSearchParams } = useCustomSearchParams()
   const { context } = useParams()
   const { filteredNamespace } = searchParamsObject
@@ -51,18 +52,22 @@ function Installed() {
     return (
       data?.filter((installedPackage: Release) => {
         return (
-          installedPackage.name.includes(filterKey) ||
-          (installedPackage.namespace.includes(filterKey) &&
-            namespaces.includes(installedPackage.namespace))
+          // if we have selected no name spaces or if the only namespace selected is the default one then show all installed packages
+          // if that isn't the case then one can
+          (selectedNamespaces.length == 0 || (selectedNamespaces.length == 1 && selectedNamespaces[0] == "default")  ? true : selectedNamespaces.includes(installedPackage.namespace)) &&
+          (installedPackage.name.includes(filterKey) ||
+          installedPackage.namespace.includes(filterKey))
         )
       }) ?? []
     )
-  }, [data, filterKey, namespaces])
+  }, [data, filterKey, namespaces, selectedNamespaces])
 
   return (
     <div className="flex flex-row w-full">
       <ClustersList
         selectedCluster={context ?? ""}
+        selectedNamespaces={selectedNamespaces}
+        setSelectedNamespaces={setSelectedNamespaces}
         filteredNamespaces={namespaces}
         onClusterChange={handleClusterChange}
         installedReleases={data}
