@@ -136,6 +136,11 @@ function ClustersList({
                 onNamespaceChange(event.target.value);
               }}
               value={namespace.name}
+              checked={
+                filteredNamespaces
+                  ? filteredNamespaces.includes(namespace.name)
+                  : false
+              }
             />
             <label
               htmlFor={namespace.name}
