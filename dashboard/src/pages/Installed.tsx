@@ -2,7 +2,7 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
 import { useParams, useNavigate } from "react-router-dom";
@@ -18,6 +18,13 @@ function Installed() {
     [filteredNamespace]
   );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (filteredNamespace === undefined) {
+      upsertSearchParams("filteredNamespace", "default");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // The dep array is empty on purpose, we want to run it only the initial load
 
   const handleClusterChange = (
     clusterName: string,
