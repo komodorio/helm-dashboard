@@ -60,7 +60,7 @@ function Installed() {
         )
       }) ?? []
     )
-  }, [data, filterKey, namespaces])
+  }, [data, filterKey, namespaces, selectedNamespaces])
 
   return (
     <div className="flex flex-row w-full">
