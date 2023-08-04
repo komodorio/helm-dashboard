@@ -25,6 +25,7 @@ export const UserDefinedValues = ({
       </label>
       <textarea
         value={userDefinedValues}
+        defaultValue={initialValue}
         onChange={(e) => setUserDefinedValues(e.target.value)}
         rows={14}
         className="block p-2.5 w-full text-md text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none font-monospace"
