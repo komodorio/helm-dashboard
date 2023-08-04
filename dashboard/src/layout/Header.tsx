@@ -24,6 +24,7 @@ export default function Header() {
   });
   const { context } = useParams();
   const location = useLocation();
+
   const openSupportChat = () => {
     window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
   };
@@ -57,7 +58,7 @@ export default function Header() {
   return (
     <div className="h-16 flex items-center justify-between bg-white custom-shadow">
       <div className="h-16 flex items-center gap-6 min-w-fit ">
-        <LinkWithSearchParams to={`/${context}/installed`}>
+        <LinkWithSearchParams to={`/${context}/installed`} exclude={["tab"]}>
           <img
             src={LogoHeader}
             alt="helm dashboard logo"
@@ -70,6 +71,7 @@ export default function Header() {
             <li>
               <LinkWithSearchParams
                 to={`/${context}/installed`}
+                exclude={["tab"]}
                 className={getBtnStyle("installed")}
               >
                 Installed
@@ -78,6 +80,7 @@ export default function Header() {
             <li>
               <LinkWithSearchParams
                 to={`/${context}/repository`}
+                exclude={["tab"]}
                 end={false}
                 className={getBtnStyle("repository")}
               >

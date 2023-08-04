@@ -6,11 +6,19 @@ const LinkWithSearchParams = ({
 }: {
   to: string;
   end?: boolean;
+  exclude?: string[];
   className?: string;
   children: React.ReactNode;
 }) => {
   const { search } = useLocation();
-  return <NavLink to={`${to}${search}`} {...props} />;
+  const params = new URLSearchParams(search);
+
+  // For state we don't want to keep while navigating
+  props.exclude?.forEach((key) => {
+    params.delete(key);
+  });
+
+  return <NavLink to={`${to}${params.toString()}`} {...props} />;
 };
 
 export default LinkWithSearchParams;

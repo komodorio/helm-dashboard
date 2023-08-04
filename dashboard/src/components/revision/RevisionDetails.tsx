@@ -12,7 +12,8 @@ import {
 import { Release, ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useGetReleaseInfoByType ,
+import {
+  useGetReleaseInfoByType,
   useGetLatestVersion,
   useGetResources,
   useRollbackRelease,
@@ -51,6 +52,7 @@ export default function RevisionDetails({
   latestRevision,
 }: RevisionDetailsProps) {
   const [searchParams] = useSearchParams();
+
   const revisionTabs = [
     {
       value: "resources",
