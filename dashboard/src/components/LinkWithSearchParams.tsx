@@ -18,7 +18,7 @@ const LinkWithSearchParams = ({
     params.delete(key);
   });
 
-  return <NavLink to={`${to}${params.toString()}`} {...props} />;
+  return <NavLink to={`${to}/?${params.toString()}`} {...props} />;
 };
 
 export default LinkWithSearchParams;
