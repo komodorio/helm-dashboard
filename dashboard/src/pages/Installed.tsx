@@ -10,7 +10,7 @@ import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { Release } from "../data/types";
 
 function Installed() {
-  const { searchParamsObject, upsertSearchParams } = useCustomSearchParams();
+  const { searchParamsObject } = useCustomSearchParams();
   const { context } = useParams();
   const { filteredNamespace } = searchParamsObject;
   const selectedNamespaces = useMemo(
@@ -19,19 +19,9 @@ function Installed() {
   );
   const navigate = useNavigate();
 
-  const handleClusterChange = (
-    clusterName: string,
-    clusterNamespaces: string[] = []
-  ) => {
-    const newSearchParams = upsertSearchParams(
-      "filteredNamespace",
-      clusterNamespaces.length > 0
-        ? `${clusterNamespaces.map((ns) => ns).join("+")}`
-        : "default"
-    );
+  const handleClusterChange = (clusterName: string) => {
     navigate({
       pathname: `/${clusterName}/installed`,
-      search: newSearchParams.toString(),
     });
   };
 
