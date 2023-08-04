@@ -12,17 +12,16 @@ import {
 import { Release, ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useGetReleaseInfoByType } from "../../API/releases";
-
-import RevisionDiff from "./RevisionDiff";
-import RevisionResource from "./RevisionResource";
-import Tabs from "../Tabs";
-import {
+import { useGetReleaseInfoByType ,
   useGetLatestVersion,
   useGetResources,
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
+
+import RevisionDiff from "./RevisionDiff";
+import RevisionResource from "./RevisionResource";
+import Tabs from "../Tabs";
 import { useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";

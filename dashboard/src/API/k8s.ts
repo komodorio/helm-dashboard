@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { UseQueryOptions, useQuery } from "@tanstack/react-query";
+import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { callApi } from "./releases";
 import { K8sResource, K8sResourceList, KubectlContexts } from "./interfaces";
 

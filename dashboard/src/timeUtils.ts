@@ -1,4 +1,4 @@
-import { DateTime, DurationLikeObject } from "luxon";
+import { DateTime, type DurationLikeObject } from "luxon";
 import { ReleaseRevision } from "./data/types";
 
 export function getAge(obj1: ReleaseRevision, obj2?: ReleaseRevision) {

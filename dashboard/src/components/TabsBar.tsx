@@ -15,8 +15,6 @@
  *
  */
 
-import React from "react";
-
 interface TabsBarProps {
   tabs: Array<{ name: string; component: JSX.Element }>;
   activeTab: string;

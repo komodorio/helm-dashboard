@@ -31,9 +31,9 @@ export const VersionToInstall: React.FC<{
   const currentVersion =
     chartVersion && showCurrentVersion ? (
       <p className="text-xl text-muted ml-2">
-        {`(current version is `}
+        {"(current version is "}
         <span className="text-green-700">{`${chartVersion}`}</span>
-        {`)`}
+        {")"}
       </p>
     ) : null;
 
@@ -88,7 +88,7 @@ export const VersionToInstall: React.FC<{
               ),
               Option: ({ children, innerProps, data }) => (
                 <div
-                  className={`flex items-center py-2 pl-4 pr-2 text-green-700 hover:bg-blue-100`}
+                  className={"flex items-center py-2 pl-4 pr-2 text-green-700 hover:bg-blue-100"}
                   {...innerProps}
                 >
                   <div className="width-auto">{children}</div>

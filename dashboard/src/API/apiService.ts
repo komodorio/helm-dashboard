@@ -6,7 +6,7 @@ import {
   ReleaseRevision,
   Repository,
 } from "../data/types";
-import { QueryFunctionContext } from "@tanstack/react-query";
+import { type QueryFunctionContext } from "@tanstack/react-query";
 interface ClustersResponse {
   AuthInfo: string;
   Cluster: string;
@@ -55,7 +55,7 @@ class ApiService {
   }
 
   getToolVersion = async () => {
-    const response = await fetch(`/status`);
+    const response = await fetch("/status");
     const data = await response.json();
     return data;
   };
@@ -68,23 +68,23 @@ class ApiService {
   };
 
   getInstalledReleases = async () => {
-    const data = await this.fetchWithDefaults(`/api/helm/releases`);
+    const data = await this.fetchWithDefaults("/api/helm/releases");
     return data;
   };
 
   getClusters = async () => {
-    const response = await fetch(`/api/k8s/contexts`);
+    const response = await fetch("/api/k8s/contexts");
     const data = (await response.json()) as ClustersResponse[];
     return data;
   };
 
   getNamespaces = async () => {
-    const data = await this.fetchWithDefaults(`/api/k8s/namespaces/list`);
+    const data = await this.fetchWithDefaults("/api/k8s/namespaces/list");
     return data;
   };
 
   getRepositories = async () => {
-    const data = await this.fetchWithDefaults(`/api/helm/repositories`);
+    const data = await this.fetchWithDefaults("/api/helm/repositories");
     return data;
   };
 

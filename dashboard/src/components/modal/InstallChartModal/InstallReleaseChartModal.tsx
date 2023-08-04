@@ -123,7 +123,7 @@ export const InstallReleaseChartModal = ({
   const { data: currentVerManifest, error: currentVerManifestError } =
     useGetReleaseManifest({
       namespace,
-      chartName: _releaseName || '',
+      chartName: _releaseName || "",
     });
 
   const {
@@ -175,7 +175,7 @@ export const InstallReleaseChartModal = ({
 
       if (!res.ok) {
         setShowErrorModal({
-          title: `Failed to upgrade the chart`,
+          title: "Failed to upgrade the chart",
           msg: String(await res.text()),
         });
       }

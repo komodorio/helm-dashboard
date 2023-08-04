@@ -112,7 +112,7 @@ function ClustersList({
                     type="radio"
                     id={cluster.Name}
                     value={cluster.Name}
-                    checked={cluster.Name == selectedCluster}
+                    checked={cluster.Name === selectedCluster}
                     name="clusters"
                   />
                   <label htmlFor={cluster.Name} className="ml-1 ">

@@ -1,6 +1,6 @@
 import {
-  UseMutationOptions,
-  UseQueryOptions,
+  type UseMutationOptions,
+  type UseQueryOptions,
   useMutation,
   useQuery,
 } from "@tanstack/react-query";

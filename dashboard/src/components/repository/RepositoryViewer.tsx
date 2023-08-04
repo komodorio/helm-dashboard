@@ -66,18 +66,18 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   };
 
   const numOfCharts = (charts as Chart[])?.length;
-  const showNoChartsAlert = Boolean(!numOfCharts && numOfCharts == 0);
+  const showNoChartsAlert = Boolean(!numOfCharts && numOfCharts === 0);
   const filteredCharts = useMemo(() => {
     return (charts as Chart[])?.filter((ch: Chart) =>
       ch.name.toLowerCase().includes(searchValue.toLowerCase())
     );
   }, [charts, searchValue]);
 
-  if (repository == undefined) {
+  if (repository === undefined) {
     return (
       <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
-        Looks like you don't have any repositories installed. You can add one
-        with the "Add Repository" button on the left side bar.
+        Looks like you don&apos;t have any repositories installed. You can add
+        one with the &quot;Add Repository&quot; button on the left side bar.
       </div>
     );
   }
@@ -142,8 +142,8 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
       {showNoChartsAlert && (
         <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
-          Looks like you don't have any repositories installed. You can add one
-          with the "Add Repository" button on the left side bar.
+          Looks like you don&apos;t have any repositories installed. You can add
+          one with the &quot;Add Repository&quot; button on the left side bar.
         </div>
       )}
     </div>

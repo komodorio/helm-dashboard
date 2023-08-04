@@ -13,8 +13,6 @@
  *
  */
 
-import React from "react";
-
 export interface TextInputProps {
   label: string;
   placeholder: string;

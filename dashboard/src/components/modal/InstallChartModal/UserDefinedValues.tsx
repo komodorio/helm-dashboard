@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import useDebounce from "../../../hooks/useDebounce"
+import { useEffect, useState } from "react";
+import useDebounce from "../../../hooks/useDebounce";
 
 export const UserDefinedValues = ({
   initialValue,
@@ -8,12 +8,12 @@ export const UserDefinedValues = ({
   initialValue: string;
   setValues: (val: string) => void;
 }) => {
-  const [userDefinedValues, setUserDefinedValues] = useState(initialValue)
+  const [userDefinedValues, setUserDefinedValues] = useState(initialValue);
   const debouncedValue = useDebounce<string>(userDefinedValues, 500);
 
   useEffect(() => {
-    setValues(debouncedValue)
-  }, [debouncedValue, setValues])
+    setValues(debouncedValue);
+  }, [debouncedValue, setValues]);
 
   return (
     <div className="w-1/2 ">

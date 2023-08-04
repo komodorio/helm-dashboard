@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
-import useDebounce from "../../../hooks/useDebounce"
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import useDebounce from "../../../hooks/useDebounce";
 
 export const GeneralDetails = ({
   releaseName,
@@ -20,7 +20,7 @@ export const GeneralDetails = ({
   const namespaceInputValueDebounced = useDebounce<string>(namespaceInputValue, 500);
   useEffect(() => {
       onNamespaceInput(namespaceInputValueDebounced);
-  }, [namespaceInputValueDebounced, onNamespaceInput])
+  }, [namespaceInputValueDebounced, onNamespaceInput]);
   const { context } = useParams();
   const inputClassName = ` text-lg py-1 px-2 border border-1 border-gray-300 ${
     disabled ? "bg-gray-200" : "bg-white "

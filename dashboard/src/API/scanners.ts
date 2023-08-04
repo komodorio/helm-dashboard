@@ -2,8 +2,8 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  UseMutationOptions,
-  UseQueryOptions,
+  type UseMutationOptions,
+  type UseQueryOptions,
   useMutation,
   useQuery,
 } from "@tanstack/react-query";

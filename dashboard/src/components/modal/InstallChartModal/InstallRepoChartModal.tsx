@@ -152,7 +152,7 @@ export const InstallRepoChartModal = ({
 
       if (!res.ok) {
         setShowErrorModal({
-          title: `Failed to install" the chart`,
+          title: "Failed to install\" the chart",
           msg: String(await res.text()),
         });
       }

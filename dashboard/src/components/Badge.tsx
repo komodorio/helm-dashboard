@@ -18,7 +18,6 @@
  *
  */
 
-import React from "react";
 export type BadgeCode = "success" | "warning" | "error" | "unknown";
 
 export const BadgeCodes = Object.freeze({

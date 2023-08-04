@@ -14,10 +14,8 @@
  * @see https://storybook.js.org/docs/react/writing-stories/introduction
  */
 
-import React from "react";
 import { ComponentStory } from "@storybook/react";
-import Badge from "./Badge";
-import { BadgeProps } from "./Badge";
+import Badge, { BadgeProps } from "./Badge";
 
 // We create a generic template for the component.
 

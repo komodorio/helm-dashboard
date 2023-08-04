@@ -1,8 +1,8 @@
 import {
   useQuery,
-  UseQueryOptions,
+  type UseQueryOptions,
   useMutation,
-  UseMutationOptions,
+  type UseMutationOptions,
 } from "@tanstack/react-query";
 import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
@@ -151,7 +151,7 @@ export function useGetDiff(
   return useQuery<string>(
     ["diff", formData],
     () => {
-      return callApi<string>(`/diff`, {
+      return callApi<string>("/diff", {
         body: formData,
 
         method: "POST",

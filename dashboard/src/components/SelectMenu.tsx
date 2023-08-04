@@ -25,8 +25,6 @@
  *
  */
 
-import React from "react";
-
 // define the SelectMenuItem type:
 // This is an object with a label and id.
 // The label is a string, and the id is a number.

@@ -1,11 +1,8 @@
 /* eslint-disable no-console */
 // Status.stories.ts|tsx
 
-import React from "react";
-
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import Button from "./Button";
-import { ButtonProps } from "./Button";
+import Button, { ButtonProps } from "./Button";
 //👇 This default export determines where your story goes in the story list
 export default {
   /* 👇 The title prop is optional.

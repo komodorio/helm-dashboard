@@ -13,7 +13,6 @@
  *
  */
 
-import React from "react";
 // this is a type declaration for the action prop.
 // it is a function that takes a string as an argument and returns void.
 export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {

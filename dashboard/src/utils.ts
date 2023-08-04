@@ -34,9 +34,9 @@ export const diffConfiguration: Diff2HtmlUIConfig = {
   fileContentToggle: false,
   stickyFileHeaders: false,
   rawTemplates: {
-    "file-summary-wrapper": '<div class="hidden"></div>', // hide this element
+    "file-summary-wrapper": "<div class='hidden'></div>", // hide this element
     "generic-line":
-      '<tr><td class="{{lineClass}} {{type}}">{{{lineNumber}}}</td><td class="{{type}}"><div class="{{contentClass}} w-auto">{{#prefix}}<span class="d2h-code-line-prefix">{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class="d2h-code-line-prefix">&nbsp;</span>{{/prefix}}{{#content}}<span class="d2h-code-line-ctn">{{{content}}}</span>{{/content}}{{^content}}<span class="d2h-code-line-ctn"><br></span>{{/content}}</div></td></tr>', // added "w-auto" to most outer div to prevent horizontal scroll
+      "<tr><td class='{{lineClass}} {{type}}'>{{{lineNumber}}}</td><td class='{{type}}'><div class='{{contentClass}} w-auto'>{{#prefix}}<span class='d2h-code-line-prefix'>{{{prefix}}}</span>{{/prefix}}{{^prefix}}<span class='d2h-code-line-prefix'>&nbsp;</span>{{/prefix}}{{#content}}<span class='d2h-code-line-ctn'>{{{content}}}</span>{{/content}}{{^content}}<span class='d2h-code-line-ctn'><br></span>{{/content}}</div></td></tr>", // added 'w-auto' to most outer div to prevent horizontal scroll
     "tag-file-changed": "",
     "tag-file-renamed": "",
     "tag-file-added": "",
