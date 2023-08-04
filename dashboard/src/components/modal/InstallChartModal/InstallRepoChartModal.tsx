@@ -12,7 +12,6 @@ import { useChartRepoValues } from "../../../API/repositories";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
 import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
-import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useDiffData } from "../../../API/shared";
 
 interface InstallRepoChartModalProps {
@@ -39,11 +38,7 @@ export const InstallRepoChartModal = ({
 
   const { context: selectedCluster, selectedRepo: currentRepoCtx } =
     useParams();
-  const { searchParamsObject } = useCustomSearchParams();
-  const { filteredNamespace } = searchParamsObject;
-  const [namespace, setNamespace] = useState(
-    filteredNamespace !== "default" ? filteredNamespace : ""
-  );
+  const [namespace, setNamespace] = useState("");
   const [releaseName, setReleaseName] = useState(chartName);
 
   const { error: versionsError, data: _versions } = useGetVersions(chartName, {
@@ -152,7 +147,7 @@ export const InstallRepoChartModal = ({
 
       if (!res.ok) {
         setShowErrorModal({
-          title: "Failed to install\" the chart",
+          title: "Failed to install the chart",
           msg: String(await res.text()),
         });
       }
