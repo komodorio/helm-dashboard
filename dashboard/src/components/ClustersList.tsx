@@ -54,6 +54,15 @@ function ClustersList({
       if (sortedData && sortedData.length > 0 && !selectedCluster) {
         onClusterChange(sortedData[0].Name);
       }
+
+      if (selectedCluster) {
+        const cluster = data.find(
+          (cluster) => getCleanClusterName(cluster.Name) === selectedCluster
+        );
+        if (!filteredNamespaces && cluster?.Namespace) {
+          upsertSearchParams("filteredNamespace", cluster.Namespace);
+        }
+      }
     },
   });
 
