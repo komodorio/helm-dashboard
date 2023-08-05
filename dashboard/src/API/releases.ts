@@ -1,8 +1,8 @@
 import {
   useQuery,
-  UseQueryOptions,
+  type UseQueryOptions,
   useMutation,
-  UseMutationOptions,
+  type UseMutationOptions,
 } from "@tanstack/react-query";
 import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
@@ -151,7 +151,7 @@ export function useGetDiff(
   return useQuery<string>(
     ["diff", formData],
     () => {
-      return callApi<string>(`/diff`, {
+      return callApi<string>("/diff", {
         body: formData,
 
         method: "POST",
@@ -231,31 +231,44 @@ export function useChartReleaseValues({
 export const useVersionData = ({
   version,
   userValues,
-  chart,
+  chartAddress,
   releaseValues,
   namespace,
   releaseName,
+  isInstallRepoChart = false,
 }: {
   version: string;
   userValues: string;
-  chart: string;
+  chartAddress: string;
   releaseValues: string;
   namespace: string;
   releaseName: string;
+  isInstallRepoChart?: boolean;
 }) => {
   return useQuery(
-    [version, userValues, chart, releaseValues, namespace, releaseName],
+    [
+      version,
+      userValues,
+      chartAddress,
+      releaseValues,
+      namespace,
+      releaseName,
+      isInstallRepoChart,
+    ],
     async () => {
       const formData = getVersionManifestFormData({
         version,
         userValues,
-        chart,
+        chart: chartAddress,
         releaseValues,
+        releaseName,
       });
 
-      const fetchUrl = `/api/helm/releases/${
-        namespace ? namespace : "[empty]"
-      }${`/${releaseName}`}`;
+      const fetchUrl = isInstallRepoChart
+        ? `/api/helm/releases/${namespace || "default"}`
+        : `/api/helm/releases/${
+            namespace ? namespace : "[empty]"
+          }${`/${releaseName}`}`;
 
       const data = await callApi(fetchUrl, {
         method: "post",
@@ -266,11 +279,10 @@ export const useVersionData = ({
     },
     {
       enabled:
-        Boolean(chart) &&
+        Boolean(chartAddress) &&
         Boolean(version) &&
         Boolean(releaseName) &&
-        Boolean(namespace) &&
-        Boolean(releaseValues),
+        releaseValues !== undefined,
     }
   );
 };
@@ -315,24 +327,13 @@ export interface Condition {
   message: string;
 }
 
+// TODO: there is no need at this anymore, we can use apiService.fetchWithDefaults directly
+// so this function can be removed
 export async function callApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const response = await apiService.fetchWithDefaults(url, options);
+  const data = await apiService.fetchWithDefaults(url, options);
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error);
-  }
-
-  let data;
-  if (!response.headers.get("Content-Type")) {
-    return {} as T;
-  } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
-    data = await response.text();
-  } else {
-    data = await response.json();
-  }
   return data;
 }

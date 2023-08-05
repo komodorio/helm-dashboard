@@ -1,4 +1,4 @@
-import { RiExternalLinkLine } from "react-icons/ri"
+import { RiExternalLinkLine } from "react-icons/ri";
 
 export const Troubleshoot = () => {
   return (
@@ -14,5 +14,5 @@ export const Troubleshoot = () => {
         </button>
       </a>
     </div>
-  )
-}
+  );
+};

@@ -1,7 +1,7 @@
 // ChartViewer.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react"
-import ChartViewer from "./ChartViewer"
+import { ComponentStory, ComponentMeta } from "@storybook/react";
+import ChartViewer from "./ChartViewer";
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -11,14 +11,14 @@ export default {
    */
   title: "ChartViewer",
   component: ChartViewer,
-} as ComponentMeta<typeof ChartViewer>
+} as ComponentMeta<typeof ChartViewer>;
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof ChartViewer> = (args) => (
   <ChartViewer {...args} />
-)
+);
 
-export const Default = Template.bind({})
+export const Default = Template.bind({});
 
 const defaultArgs = {
   chart: {
@@ -26,7 +26,7 @@ const defaultArgs = {
     description: "chart1 description",
     version: "v1.0.0",
   },
-}
+};
 
 //@ts-ignore
-Default.args = defaultArgs
+Default.args = defaultArgs;

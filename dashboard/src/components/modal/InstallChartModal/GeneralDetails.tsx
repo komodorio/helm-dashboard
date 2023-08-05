@@ -1,4 +1,6 @@
-import { useParams } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import useDebounce from "../../../hooks/useDebounce";
 
 export const GeneralDetails = ({
   releaseName,
@@ -7,17 +9,22 @@ export const GeneralDetails = ({
   onNamespaceInput,
   onReleaseNameInput,
 }: {
-  releaseName: string
-  namespace?: string
-  disabled: boolean
+  releaseName: string;
+  namespace?: string;
+  disabled: boolean;
 
-  onNamespaceInput: (namespace: string) => void
-  onReleaseNameInput: (chartName: string) => void
+  onNamespaceInput: (namespace: string) => void;
+  onReleaseNameInput: (chartName: string) => void;
 }) => {
-  const { context } = useParams()
+  const [namespaceInputValue, setNamespaceInputValue] = useState(namespace);
+  const namespaceInputValueDebounced = useDebounce<string>(namespaceInputValue, 500);
+  useEffect(() => {
+      onNamespaceInput(namespaceInputValueDebounced);
+  }, [namespaceInputValueDebounced, onNamespaceInput]);
+  const { context } = useParams();
   const inputClassName = ` text-lg py-1 px-2 border border-1 border-gray-300 ${
     disabled ? "bg-gray-200" : "bg-white "
-  } rounded`
+  } rounded`;
   return (
     <div className="flex gap-8">
       <div>
@@ -33,9 +40,9 @@ export const GeneralDetails = ({
         <h4 className="text-lg">Namespace (optional):</h4>
         <input
           className={inputClassName}
-          value={namespace}
+          value={namespaceInputValue}
           disabled={disabled}
-          onChange={(e) => onNamespaceInput(e.target.value)}
+          onChange={(e) => setNamespaceInputValue(e.target.value)}
         ></input>
       </div>
       {context ? (
@@ -45,5 +52,5 @@ export const GeneralDetails = ({
         </div>
       ) : null}
     </div>
-  )
-}
+  );
+};

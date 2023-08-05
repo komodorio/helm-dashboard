@@ -1,5 +1,3 @@
-import React from "react"
-
 function NotFound() {
   return (
     <div
@@ -10,7 +8,7 @@ function NotFound() {
     >
       404 page not found
     </div>
-  )
+  );
 }
 
-export default NotFound
+export default NotFound;

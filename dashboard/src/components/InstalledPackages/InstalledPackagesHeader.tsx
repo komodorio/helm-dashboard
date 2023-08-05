@@ -1,21 +1,21 @@
-import HeaderLogo from "../../assets/packges-header.svg"
-import { Release } from "../../data/types"
+import HeaderLogo from "../../assets/packges-header.svg";
+import { Release } from "../../data/types";
 
 type InstalledPackagesHeaderProps = {
-  filteredReleases?: Release[]
-  setFilterKey: React.Dispatch<React.SetStateAction<string>>
-  isLoading: boolean
-}
+  filteredReleases?: Release[];
+  setFilterKey: React.Dispatch<React.SetStateAction<string>>;
+  isLoading: boolean;
+};
 
 export default function InstalledPackagesHeader({
   filteredReleases,
   setFilterKey,
   isLoading,
 }: InstalledPackagesHeaderProps) {
-  const numOfPackages = filteredReleases?.length
+  const numOfPackages = filteredReleases?.length;
   const showNoPackageAlert = Boolean(
-    !isLoading && (numOfPackages == undefined || numOfPackages == 0)
-  )
+    !isLoading && (numOfPackages === undefined || numOfPackages === 0)
+  );
   return (
     <div className="custom-shadow rounded-t-md  ">
       <div className="flex items-center justify-between bg-white px-2 py-0.5 font-inter rounded-t-md ">
@@ -42,10 +42,10 @@ export default function InstalledPackagesHeader({
 
       {showNoPackageAlert && (
         <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
-          Looks like you don't have any charts installed. "Repository" section
-          may be a good place to start.
+          Looks like you don&apos;t have any charts installed.
+          &quot;Repository&quot; section may be a good place to start.
         </div>
       )}
     </div>
-  )
+  );
 }

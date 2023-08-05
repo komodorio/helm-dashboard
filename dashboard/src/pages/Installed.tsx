@@ -1,39 +1,32 @@
-import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader"
-import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList"
-import ClustersList from "../components/ClustersList"
-import { useGetInstalledReleases } from "../API/releases"
-import { useMemo, useState } from "react"
-import Spinner from "../components/Spinner"
-import useAlertError from "../hooks/useAlertError"
-import { useParams, useNavigate } from "react-router-dom"
-import useCustomSearchParams from "../hooks/useCustomSearchParams"
-import { Release } from "../data/types"
+import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader";
+import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
+import ClustersList from "../components/ClustersList";
+import { useGetInstalledReleases } from "../API/releases";
+import { useMemo, useState } from "react";
+import Spinner from "../components/Spinner";
+import useAlertError from "../hooks/useAlertError";
+import { useParams, useNavigate } from "react-router-dom";
+import useCustomSearchParams from "../hooks/useCustomSearchParams";
+import { Release } from "../data/types";
 
 function Installed() {
-  const { searchParamsObject, upsertSearchParams } = useCustomSearchParams()
-  const { context } = useParams()
-  const { filteredNamespace } = searchParamsObject
-  const namespaces = useMemo(() => filteredNamespace?.split("+") ?? ["default"], [filteredNamespace])
-  const navigate = useNavigate()
+  const { searchParamsObject } = useCustomSearchParams();
+  const { context } = useParams();
+  const { filteredNamespace } = searchParamsObject;
+  const selectedNamespaces = useMemo(
+    () => filteredNamespace?.split("+"),
+    [filteredNamespace]
+  );
+  const navigate = useNavigate();
 
-  const handleClusterChange = (
-    clusterName: string,
-    clusterNamespaces: string[] = []
-  ) => {
-    const newSearchParams = upsertSearchParams(
-      "filteredNamespace",
-      clusterNamespaces.length > 0
-        ? `${clusterNamespaces.map((ns) => ns).join("+")}`
-        : "default"
-    )
+  const handleClusterChange = (clusterName: string) => {
     navigate({
       pathname: `/${clusterName}/installed`,
-      search: newSearchParams.toString(),
-    })
-  }
+    });
+  };
 
-  const [filterKey, setFilterKey] = useState<string>("")
-  const alertError = useAlertError()
+  const [filterKey, setFilterKey] = useState<string>("");
+  const alertError = useAlertError();
   const { data, isLoading, isRefetching } = useGetInstalledReleases(
     context ?? "",
     {
@@ -42,28 +35,36 @@ function Installed() {
         alertError.setShowErrorModal({
           title: "Failed to get list of charts",
           msg: (e as Error).message,
-        })
+        });
       },
     }
-  )
+  );
 
   const filteredReleases = useMemo(() => {
     return (
       data?.filter((installedPackage: Release) => {
-        return (
-          installedPackage.name.includes(filterKey) ||
-          (installedPackage.namespace.includes(filterKey) &&
-            namespaces.includes(installedPackage.namespace))
-        )
+        if (filterKey) {
+          return (
+            installedPackage.name.includes(filterKey) ||
+            (installedPackage.namespace.includes(filterKey) &&
+            selectedNamespaces
+              ? selectedNamespaces.includes(installedPackage.namespace)
+              : true)
+          );
+        } else {
+          return selectedNamespaces
+            ? selectedNamespaces.includes(installedPackage.namespace)
+            : true;
+        }
       }) ?? []
-    )
-  }, [data, filterKey, namespaces])
+    );
+  }, [data, filterKey, selectedNamespaces]);
 
   return (
     <div className="flex flex-row w-full">
       <ClustersList
         selectedCluster={context ?? ""}
-        filteredNamespaces={namespaces}
+        filteredNamespaces={selectedNamespaces}
         onClusterChange={handleClusterChange}
         installedReleases={data}
       />
@@ -84,7 +85,7 @@ function Installed() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default Installed
+export default Installed;

@@ -1,51 +1,27 @@
-import { useParams } from "react-router-dom"
-import useAlertError from "../../../hooks/useAlertError"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { callApi, useGetVersions } from "../../../API/releases"
-import Modal, { ModalButtonStyle } from "../Modal"
-import { GeneralDetails } from "./GeneralDetails"
-import { UserDefinedValues } from "./UserDefinedValues"
-import { ChartValues } from "./ChartValues"
-import { ManifestDiff } from "./ManifestDiff"
-import { useMutation } from "@tanstack/react-query"
-import { useChartRepoValues } from "../../../API/repositories"
-import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams"
-import { VersionToInstall } from "./VersionToInstall"
-import apiService from "../../../API/apiService"
-import { isNewerVersion, isNoneEmptyArray } from "../../../utils"
-import useCustomSearchParams from "../../../hooks/useCustomSearchParams"
+import { useParams } from "react-router-dom";
+import useAlertError from "../../../hooks/useAlertError";
+import { useMemo, useState } from "react";
+import { useGetVersions, useVersionData } from "../../../API/releases";
+import Modal, { ModalButtonStyle } from "../Modal";
+import { GeneralDetails } from "./GeneralDetails";
+import { UserDefinedValues } from "./UserDefinedValues";
+import { ChartValues } from "./ChartValues";
+import { ManifestDiff } from "./ManifestDiff";
+import { useMutation } from "@tanstack/react-query";
+import { useChartRepoValues } from "../../../API/repositories";
+import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
+import { VersionToInstall } from "./VersionToInstall";
+import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
+import { useDiffData } from "../../../API/shared";
 
 interface InstallRepoChartModalProps {
-  isOpen: boolean
-  onClose: () => void
-  chartName: string
-  currentlyInstalledChartVersion?: string
-  latestVersion?: string
-  isUpgrade?: boolean
-  latestRevision?: number
-}
-
-const getVersionManifestFormData = ({
-  version,
-  userValues,
-  chart,
-  chartName,
-}: {
-  version: string
-  userValues?: string
-  chart: string
-  releaseValues?: string
-  chartName: string
-}) => {
-  const formData = new FormData()
-  // preview needs to come first, for some reason it has a meaning at the backend
-  formData.append("preview", "true")
-  formData.append("chart", chart)
-  formData.append("version", version)
-  formData.append("values", userValues || "")
-  formData.append("name", chartName)
-
-  return formData
+  isOpen: boolean;
+  onClose: () => void;
+  chartName: string;
+  currentlyInstalledChartVersion?: string;
+  latestVersion?: string;
+  isUpgrade?: boolean;
+  latestRevision?: number;
 }
 
 export const InstallRepoChartModal = ({
@@ -55,88 +31,88 @@ export const InstallRepoChartModal = ({
   currentlyInstalledChartVersion,
   latestVersion,
 }: InstallRepoChartModalProps) => {
-  const navigate = useNavigateWithSearchParams()
-  const { setShowErrorModal } = useAlertError()
-  const [userValues, setUserValues] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
-  const [isLoadingDiff, setIsLoadingDiff] = useState(false)
-  const [diff, setDiff] = useState("")
+  const navigate = useNavigateWithSearchParams();
+  const { setShowErrorModal } = useAlertError();
+  const [userValues, setUserValues] = useState("");
+  const [installError, setInstallError] = useState("");
 
-  const { context: selectedCluster, selectedRepo: currentRepoCtx } = useParams()
-  const { searchParamsObject } = useCustomSearchParams()
-  const { filteredNamespace } = searchParamsObject
-  const [namespace, setNamespace] = useState(
-    filteredNamespace !== "default" ? filteredNamespace : undefined
-  )
-  const [releaseName, setReleaseName] = useState(chartName)
+  const { context: selectedCluster, selectedRepo: currentRepoCtx } =
+    useParams();
+  const [namespace, setNamespace] = useState("");
+  const [releaseName, setReleaseName] = useState(chartName);
 
   const { error: versionsError, data: _versions } = useGetVersions(chartName, {
     select: (data) => {
       return data?.sort((a, b) =>
         isNewerVersion(a.version, b.version) ? 1 : -1
-      )
+      );
     },
     onSuccess: (data) => {
-      const empty = { version: "", repository: "", urls: [] }
-      const versionsToRepo = data.filter((v) => v.repository === currentRepoCtx)
-      return setSelectedVersionData(versionsToRepo[0] ?? empty)
+      const empty = { version: "", repository: "", urls: [] };
+      const versionsToRepo = data.filter(
+        (v) => v.repository === currentRepoCtx
+      );
+      return setSelectedVersionData(versionsToRepo[0] ?? empty);
     },
-  })
+  });
 
   const versions = _versions?.map((v) => ({
     ...v,
     isChartVersion: v.version === currentlyInstalledChartVersion,
-  }))
+  }));
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  latestVersion = latestVersion ?? currentlyInstalledChartVersion // a guard for typescript, latestVersion is always defined
+  latestVersion = latestVersion ?? currentlyInstalledChartVersion; // a guard for typescript, latestVersion is always defined
   const [selectedVersionData, setSelectedVersionData] = useState<{
-    version: string
-    repository?: string
-    urls: string[]
-  }>()
+    version: string;
+    repository?: string;
+    urls: string[];
+  }>();
 
   const selectedVersion = useMemo(() => {
-    return selectedVersionData?.version
-  }, [selectedVersionData])
+    return selectedVersionData?.version;
+  }, [selectedVersionData]);
 
   const selectedRepo = useMemo(() => {
-    return selectedVersionData?.repository
-  }, [selectedVersionData])
+    return selectedVersionData?.repository;
+  }, [selectedVersionData]);
 
-  const chart = useMemo(() => {
+  const chartAddress = useMemo(() => {
     return selectedVersionData?.urls?.[0]?.startsWith("file://")
       ? selectedVersionData?.urls[0]
-      : `${selectedVersionData?.repository}/${chartName}`
-  }, [selectedVersionData, chartName])
-
-  const fetchDiffBody = useMemo(() => {
-    return {
-      userValues,
-      selectedVersion,
-      selectedRepo,
-      currentlyInstalledChartVersion,
-      versionsError,
-    }
-  }, [
-    currentlyInstalledChartVersion,
-    selectedRepo,
-    selectedVersion,
-    userValues,
-    versionsError,
-  ])
+      : `${selectedVersionData?.repository}/${chartName}`;
+  }, [selectedVersionData, chartName]);
 
   const { data: chartValues, isLoading: loadingChartValues } =
-    useChartRepoValues(namespace || "default", selectedVersion || "", chart, {
-      queryKey: [
-        "chartValues",
-        namespace,
-        selectedVersion,
-        chart,
-        selectedRepo,
-      ],
-      enabled: Boolean(selectedRepo) && selectedRepo !== "",
-    })
+    useChartRepoValues({
+      version: selectedVersion || "",
+      chart: chartAddress,
+    });
+
+  // This hold the selected version manifest, we use it for the diff
+  const { data: selectedVerData, error: selectedVerDataError } = useVersionData(
+    {
+      version: selectedVersion || "",
+      userValues,
+      chartAddress,
+      releaseValues: userValues,
+      namespace,
+      releaseName,
+      isInstallRepoChart: true,
+    }
+  );
+
+  const {
+    data: diffData,
+    isLoading: isLoadingDiff,
+    error: diffError,
+  } = useDiffData({
+    selectedRepo: selectedRepo || "",
+    versionsError: versionsError as string,
+    currentVerManifest: "", // current version manifest should always be empty since its a fresh install
+    selectedVerData: selectedVerData as any,
+    chart: chartAddress,
+  });
 
   // Confirm method (install)
   const setReleaseVersionMutation = useMutation(
@@ -147,16 +123,16 @@ export const InstallRepoChartModal = ({
       selectedVersion,
       selectedRepo,
       selectedCluster,
-      chart,
+      chartAddress,
     ],
     async () => {
-      setErrorMessage("")
-      const formData = new FormData()
-      formData.append("preview", "false")
-      formData.append("chart", chart)
-      formData.append("version", selectedVersion || "")
-      formData.append("values", userValues)
-      formData.append("name", releaseName || "")
+      setInstallError("");
+      const formData = new FormData();
+      formData.append("preview", "false");
+      formData.append("chart", chartAddress);
+      formData.append("version", selectedVersion || "");
+      formData.append("values", userValues);
+      formData.append("name", releaseName || "");
       const res = await fetch(
         // Todo: Change to BASE_URL from env
         `/api/helm/releases/${namespace ? namespace : "default"}`,
@@ -167,119 +143,36 @@ export const InstallRepoChartModal = ({
             "X-Kubecontext": selectedCluster as string,
           },
         }
-      )
+      );
 
       if (!res.ok) {
         setShowErrorModal({
-          title: `Failed to install" the chart`,
+          title: "Failed to install the chart",
           msg: String(await res.text()),
-        })
+        });
       }
 
-      return res.json()
+      return res.json();
     },
     {
       onSuccess: async (response) => {
-        onClose()
+        onClose();
         navigate(
           `/${selectedCluster}/${response.namespace}/${response.name}/installed/revision/1`
-        )
+        );
       },
       onError: (error) => {
-        setErrorMessage((error as Error)?.message || "Failed to update")
+        setInstallError((error as Error)?.message || "Failed to update");
       },
     }
-  )
-
-  // It actually fetches the manifest for the diffs
-  const fetchVersionData = useCallback(
-    async ({
-      version,
-      userValues,
-    }: {
-      version: string
-      userValues?: string
-    }) => {
-      const formData = getVersionManifestFormData({
-        version,
-        userValues,
-        chart,
-        chartName,
-      })
-      const fetchUrl = `/api/helm/releases/${namespace || "default"}`
-      try {
-        setErrorMessage("")
-        const data = await callApi(fetchUrl, {
-          method: "post",
-          body: formData,
-        })
-        return data
-      } catch (e) {
-        setErrorMessage((e as Error).message as string)
-      }
-    },
-    [chart, chartName, namespace]
-  )
-
-  const fetchDiff = useCallback(
-    async ({
-      userValues,
-      selectedRepo,
-      selectedVersion = "",
-      versionsError,
-    }: {
-      userValues?: string
-      selectedRepo?: string
-      selectedVersion?: string
-      versionsError?: string
-    }) => {
-      if (!selectedRepo || versionsError) {
-        return
-      }
-      setIsLoadingDiff(true)
-      try {
-        const [currentVerData] = await Promise.all([
-          fetchVersionData({
-            version: selectedVersion,
-            userValues,
-          }),
-        ])
-        const formData = new FormData()
-
-        formData.append("a", "")
-        formData.append("b", (currentVerData as any).manifest)
-
-        const response = await apiService.fetchWithDefaults("/diff", {
-          method: "post",
-          body: formData,
-        })
-        const diff = await response.text()
-        setDiff(diff)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setIsLoadingDiff(false)
-      }
-    },
-    [fetchVersionData]
-  )
-
-  useEffect(() => {
-    if (
-      fetchDiffBody.selectedVersion &&
-      fetchDiffBody.selectedRepo &&
-      !loadingChartValues
-    ) {
-      fetchDiff(fetchDiffBody)
-    }
-  }, [fetchDiff, fetchDiffBody, loadingChartValues])
+  );
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={() => {
-        setSelectedVersionData({ version: "", urls: [] })
-        onClose()
+        setSelectedVersionData({ version: "", urls: [] });
+        onClose();
       }}
       title={
         <div className="font-bold">
@@ -323,10 +216,15 @@ export const InstallRepoChartModal = ({
       </div>
 
       <ManifestDiff
-        diff={diff}
-        isLoading={isLoadingDiff || loadingChartValues}
-        error={errorMessage || (versionsError as string)}
+        diff={diffData as string}
+        isLoading={isLoadingDiff}
+        error={
+          (selectedVerDataError as string) ||
+          (diffError as string) ||
+          installError ||
+          (versionsError as string)
+        }
       />
     </Modal>
-  )
-}
+  );
+};

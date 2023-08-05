@@ -98,15 +98,7 @@ export const InstallReleaseChartModal = ({
   // the original chart values
   const { data: chartValues, isLoading: loadingChartValues } =
     useChartRepoValues(
-      namespace || "default",
-      selectedVersion || "",
-      chartAddress as string, // it can't be undefined because query is enabled only if it is defined
-      {
-        enabled:
-          Boolean(selectedRepo) &&
-          selectedRepo !== "" &&
-          chartAddress !== undefined,
-      }
+      { version: selectedVersion || "", chart: chartAddress as string } // it can't be undefined because query is enabled only if it is defined
     );
 
   // The user defined values (if any we're set)
@@ -122,17 +114,17 @@ export const InstallReleaseChartModal = ({
     {
       version: selectedVersion || "",
       userValues,
-      chart: chartAddress,
+      chartAddress,
       releaseValues,
       namespace,
       releaseName,
     }
   );
-
-  const { data: currentVerManifest } = useGetReleaseManifest({
-    namespace,
-    chartName,
-  });
+  const { data: currentVerManifest, error: currentVerManifestError } =
+    useGetReleaseManifest({
+      namespace,
+      chartName: _releaseName || "",
+    });
 
   const {
     data: diffData,
@@ -183,7 +175,7 @@ export const InstallReleaseChartModal = ({
 
       if (!res.ok) {
         setShowErrorModal({
-          title: `Failed to upgrade the chart`,
+          title: "Failed to upgrade the chart",
           msg: String(await res.text()),
         });
       }
@@ -263,9 +255,10 @@ export const InstallReleaseChartModal = ({
       </div>
 
       <ManifestDiff
-        diff={diffData}
+        diff={diffData as string}
         isLoading={isLoadingDiff}
         error={
+          (currentVerManifestError as string) ||
           (selectedVerDataError as string) ||
           (diffError as string) ||
           installError ||

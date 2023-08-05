@@ -1,63 +1,64 @@
-import { useLocation, useParams } from "react-router-dom"
-import LogoHeader from "../assets/logo-header.svg"
-import DropDown from "../components/common/DropDown"
-import WatcherIcon from "../assets/k8s-watcher.svg"
-import ShutDownButton from "../components/ShutDownButton"
+import { useLocation, useParams } from "react-router-dom";
+import LogoHeader from "../assets/logo-header.svg";
+import DropDown from "../components/common/DropDown";
+import WatcherIcon from "../assets/k8s-watcher.svg";
+import ShutDownButton from "../components/ShutDownButton";
 import {
   BsSlack,
   BsGithub,
   BsArrowRepeat,
   BsBraces,
   BsBoxArrowUpRight,
-} from "react-icons/bs"
-import { useGetApplicationStatus } from "../API/other"
-import LinkWithSearchParams from "../components/LinkWithSearchParams"
-import apiService from "../API/apiService"
-import { useAppContext } from "../context/AppContext"
+} from "react-icons/bs";
+import { useGetApplicationStatus } from "../API/other";
+import LinkWithSearchParams from "../components/LinkWithSearchParams";
+import apiService from "../API/apiService";
+import { useAppContext } from "../context/AppContext";
 
 export default function Header() {
-  const { clusterMode, setClusterMode } = useAppContext()
+  const { clusterMode, setClusterMode } = useAppContext();
   const { data: statusData } = useGetApplicationStatus({
     onSuccess: (data) => {
-      setClusterMode(data.ClusterMode)
+      setClusterMode(data.ClusterMode);
     },
-  })
-  const { context } = useParams()
-  const location = useLocation()
+  });
+  const { context } = useParams();
+  const location = useLocation();
+
   const openSupportChat = () => {
-    window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank")
-  }
+    window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
+  };
 
   const openProjectPage = () => {
-    window.open("https://github.com/komodorio/helm-dashboard", "_blank")
-  }
+    window.open("https://github.com/komodorio/helm-dashboard", "_blank");
+  };
 
   const resetCache = async () => {
     try {
       await apiService.fetchWithDefaults("/api/cache", {
         method: "DELETE",
-      })
-      window.location.reload()
+      });
+      window.location.reload();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   const openAPI = () => {
-    window.open("/#/docs", "_blank")
-  }
+    window.open("/#/docs", "_blank");
+  };
 
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
       location.pathname.includes(`/${identifier}`)
         ? " text-primary rounded-sm bg-header-install"
         : ""
-    }`
+    }`;
 
   return (
     <div className="h-16 flex items-center justify-between bg-white custom-shadow">
       <div className="h-16 flex items-center gap-6 min-w-fit ">
-        <LinkWithSearchParams to={`/${context}/installed`}>
+        <LinkWithSearchParams to={`/${context}/installed`} exclude={["tab"]}>
           <img
             src={LogoHeader}
             alt="helm dashboard logo"
@@ -70,6 +71,7 @@ export default function Header() {
             <li>
               <LinkWithSearchParams
                 to={`/${context}/installed`}
+                exclude={["tab"]}
                 className={getBtnStyle("installed")}
               >
                 Installed
@@ -78,6 +80,7 @@ export default function Header() {
             <li>
               <LinkWithSearchParams
                 to={`/${context}/repository`}
+                exclude={["tab"]}
                 end={false}
                 className={getBtnStyle("repository")}
               >
@@ -161,5 +164,5 @@ export default function Header() {
         {!clusterMode ? <ShutDownButton /> : null}
       </div>
     </div>
-  )
+  );
 }

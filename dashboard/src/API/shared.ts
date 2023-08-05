@@ -6,11 +6,13 @@ export const getVersionManifestFormData = ({
   userValues,
   chart,
   releaseValues,
+  releaseName,
 }: {
   version: string;
   userValues?: string;
   chart: string;
   releaseValues?: string;
+  releaseName?: string;
 }) => {
   const formData = new FormData();
   // preview needs to come first, for some reason it has a meaning at the backend
@@ -21,6 +23,10 @@ export const getVersionManifestFormData = ({
     "values",
     userValues ? userValues : releaseValues ? releaseValues : ""
   );
+  if (releaseName) {
+    formData.append("name", releaseName);
+  }
+
   return formData;
 };
 
@@ -44,12 +50,10 @@ export const useDiffData = ({
       formData.append("a", currentVerManifest);
       formData.append("b", (selectedVerData as any).manifest);
 
-      const response = await apiService.fetchWithDefaults("/diff", {
+      const diff = await apiService.fetchWithDefaults("/diff", {
         method: "post",
         body: formData,
       });
-
-      const diff = await response.text();
 
       return diff;
     },
@@ -58,7 +62,7 @@ export const useDiffData = ({
         Boolean(selectedRepo) &&
         !versionsError &&
         Boolean(chart) &&
-        Boolean(currentVerManifest) &&
+        currentVerManifest !== undefined &&
         Boolean(selectedVerData),
     }
   );

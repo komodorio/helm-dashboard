@@ -1,11 +1,11 @@
-import SwaggerUI from "swagger-ui-react"
-import "swagger-ui-react/swagger-ui.css"
+import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
 
 const DocsPage = () => {
-  return <SwaggerUI spec={obj} />
-}
+  return <SwaggerUI spec={obj} />;
+};
 
-export default DocsPage
+export default DocsPage;
 
 const obj = {
   openapi: "3.0.3",
@@ -709,4 +709,4 @@ const obj = {
       },
     },
   },
-}
+};
