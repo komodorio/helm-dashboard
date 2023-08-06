@@ -4975,10 +4975,10 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-enpitech@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.npmjs.org/eslint-config-enpitech/-/eslint-config-enpitech-1.0.6.tgz"
-  integrity sha512-pe4vCbIlDEBLV6c64CM6fIAWfbt6BDyNDmbAMya+Ud1s4jZkJfcIlhp9t5xZDDDIVaXPHEyxDRSa/eTKZ5VVQQ==
+eslint-config-enpitech@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.npmjs.org/eslint-config-enpitech/-/eslint-config-enpitech-1.0.9.tgz"
+  integrity sha512-J/z9D8zvM2d3wpokwfqq7FX4jbxLsmIOxQEdIDPP71cKlrSS7zvjuMvyvPaCaVUjb2hI9FXlh1CgXWpXSMj0qQ==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^6.0.0"
     eslint-config-prettier "^8.8.0"
