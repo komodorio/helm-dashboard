@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ["enpitech"],
+  extends: ["enpitech", "plugin:@typescript-eslint/recommended"],
   globals: {
     heap: "writable",
     DD_RUM: "writable",
