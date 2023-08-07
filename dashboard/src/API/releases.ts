@@ -17,7 +17,7 @@ export function useGetInstalledReleases(
   return useQuery<Release[]>(
     ["installedReleases", context],
     () =>
-      callApi<Release[]>("/api/helm/releases", {
+      apiService.fetchWithDefaults<Release[]>("/api/helm/releases", {
         headers: {
           "X-Kubecontext": context,
         },
@@ -38,7 +38,9 @@ export function useGetReleaseManifest({
   return useQuery<any>(
     ["manifest", namespace, chartName],
     () =>
-      callApi<any>(`/api/helm/releases/${namespace}/${chartName}/manifests`),
+      apiService.fetchWithDefaults<any>(
+        `/api/helm/releases/${namespace}/${chartName}/manifests`
+      ),
     options
   );
 }
@@ -52,7 +54,7 @@ export function useGetResources(
   const { data, ...rest } = useQuery<StructuredResources[]>(
     ["resources", ns, name],
     () =>
-      callApi<StructuredResources[]>(
+      apiService.fetchWithDefaults<StructuredResources[]>(
         `/api/helm/releases/${ns}/${name}/resources?health=true`
       ),
     options
@@ -89,7 +91,7 @@ export function useGetResourceDescription(
   return useQuery<string>(
     ["describe", type, ns, name],
     () =>
-      callApi<string>(
+      apiService.fetchWithDefaults<string>(
         `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
@@ -105,7 +107,7 @@ export function useGetLatestVersion(
   return useQuery<ChartVersion[]>(
     ["latestver", chartName],
     () =>
-      callApi<ChartVersion[]>(
+      apiService.fetchWithDefaults<ChartVersion[]>(
         `/api/helm/repositories/latestver?name=${chartName}`
       ),
     options
@@ -118,7 +120,7 @@ export function useGetVersions(
   return useQuery<LatestChartVersion[]>(
     ["versions", chartName],
     () =>
-      callApi<LatestChartVersion[]>(
+      apiService.fetchWithDefaults<LatestChartVersion[]>(
         `/api/helm/repositories/versions?name=${chartName}`
       ),
     options
@@ -134,7 +136,7 @@ export function useGetReleaseInfoByType(
   return useQuery<string>(
     [tab, namespace, chart, revision, additionalParams],
     () =>
-      callApi<string>(
+      apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
@@ -151,7 +153,7 @@ export function useGetDiff(
   return useQuery<string>(
     ["diff", formData],
     () => {
-      return callApi<string>("/diff", {
+      return apiService.fetchWithDefaults<string>("/diff", {
         body: formData,
 
         method: "POST",
@@ -177,10 +179,13 @@ export function useRollbackRelease(
     const formData = new FormData();
     formData.append("revision", revision.toString());
 
-    return callApi<void>(`/api/helm/releases/${ns}/${name}/rollback`, {
-      method: "POST",
-      body: formData,
-    });
+    return apiService.fetchWithDefaults<void>(
+      `/api/helm/releases/${ns}/${name}/rollback`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
   }, options);
 }
 
@@ -190,9 +195,12 @@ export function useTestRelease(
 ) {
   return useMutation<void, unknown, { ns: string; name: string }>(
     ({ ns, name }) => {
-      return callApi<void>(`/api/helm/releases/${ns}/${name}/test`, {
-        method: "POST",
-      });
+      return apiService.fetchWithDefaults<void>(
+        `/api/helm/releases/${ns}/${name}/test`,
+        {
+          method: "POST",
+        }
+      );
     },
     options
   );
@@ -216,7 +224,7 @@ export function useChartReleaseValues({
   return useQuery<any>(
     ["values", namespace, release, userDefinedValue, version],
     () =>
-      callApi<any>(
+      apiService.fetchWithDefaults<any>(
         `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
           revision ? `&revision=${revision}` : ""
         }`,
@@ -270,7 +278,7 @@ export const useVersionData = ({
             namespace ? namespace : "[empty]"
           }${`/${releaseName}`}`;
 
-      const data = await callApi(fetchUrl, {
+      const data = await apiService.fetchWithDefaults(fetchUrl, {
         method: "post",
         body: formData,
       });
@@ -325,15 +333,4 @@ export interface Condition {
   lastTransitionTime: any;
   reason: string;
   message: string;
-}
-
-// TODO: there is no need at this anymore, we can use apiService.fetchWithDefaults directly
-// so this function can be removed
-export async function callApi<T>(
-  url: string,
-  options?: RequestInit
-): Promise<T> {
-  const data = await apiService.fetchWithDefaults(url, options);
-
-  return data;
 }

@@ -4,8 +4,8 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { callApi } from "./releases";
 import { HelmRepositories } from "./interfaces";
+import apiService from "./apiService";
 
 // Get list of Helm repositories
 export function useGetRepositories(
@@ -13,7 +13,7 @@ export function useGetRepositories(
 ) {
   return useQuery<HelmRepositories>(
     ["helm", "repositories"],
-    () => callApi<HelmRepositories>("/api/helm/repositories"),
+    () => apiService.fetchWithDefaults<HelmRepositories>("/api/helm/repositories"),
     options
   );
 }
@@ -24,7 +24,7 @@ export function useUpdateRepo(
   options?: UseMutationOptions<void, unknown, void>
 ) {
   return useMutation<void, unknown, void>(() => {
-    return callApi<void>(`/api/helm/repositories/${repo}`, {
+    return apiService.fetchWithDefaults<void>(`/api/helm/repositories/${repo}`, {
       method: "POST",
     });
   }, options);
@@ -36,7 +36,7 @@ export function useDeleteRepo(
   options?: UseMutationOptions<void, unknown, void>
 ) {
   return useMutation<void, unknown, void>(() => {
-    return callApi<void>(`/api/helm/repositories/${repo}`, {
+    return apiService.fetchWithDefaults<void>(`/api/helm/repositories/${repo}`, {
       method: "DELETE",
     });
   }, options);
@@ -52,7 +52,7 @@ export function useChartRepoValues({
   return useQuery<any>(
     ["helm", "repositories", "values", chart, version],
     () =>
-      callApi<any>(
+      apiService.fetchWithDefaults<any>(
         `/api/helm/repositories/values?chart=${chart}&version=${version}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },

@@ -5,7 +5,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
 import { useUpdateRepo } from "../../API/repositories";
-import { callApi } from "../../API/releases";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
@@ -49,9 +48,12 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
       try {
         setIsRemove(true);
         const repo = repository?.name || "";
-        await callApi<void>(`/api/helm/repositories/${repo}`, {
-          method: "DELETE",
-        });
+        await apiService.fetchWithDefaults<void>(
+          `/api/helm/repositories/${repo}`,
+          {
+            method: "DELETE",
+          }
+        );
         navigate(`/${context}/repository`, { replace: true });
         setSelectedRepo("");
         queryClient.invalidateQueries({
