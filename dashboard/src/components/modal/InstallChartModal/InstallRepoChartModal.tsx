@@ -13,16 +13,7 @@ import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchPar
 import { VersionToInstall } from "./VersionToInstall";
 import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
-
-interface InstallRepoChartModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  chartName: string;
-  currentlyInstalledChartVersion?: string;
-  latestVersion?: string;
-  isUpgrade?: boolean;
-  latestRevision?: number;
-}
+import { InstallChartModalProps } from "../../../data/types";
 
 export const InstallRepoChartModal = ({
   isOpen,
@@ -30,7 +21,7 @@ export const InstallRepoChartModal = ({
   chartName,
   currentlyInstalledChartVersion,
   latestVersion,
-}: InstallRepoChartModalProps) => {
+}: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
   const [userValues, setUserValues] = useState("");

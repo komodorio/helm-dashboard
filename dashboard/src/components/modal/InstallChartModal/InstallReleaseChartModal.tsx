@@ -19,16 +19,7 @@ import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
 import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
-
-interface InstallReleaseChartModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  chartName: string;
-  currentlyInstalledChartVersion?: string;
-  latestVersion?: string;
-  isUpgrade?: boolean;
-  latestRevision?: number;
-}
+import { InstallChartModalProps } from "../../../data/types";
 
 export const InstallReleaseChartModal = ({
   isOpen,
@@ -38,7 +29,7 @@ export const InstallReleaseChartModal = ({
   latestVersion,
   isUpgrade = false,
   latestRevision,
-}: InstallReleaseChartModalProps) => {
+}: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
   const [userValues, setUserValues] = useState("");
