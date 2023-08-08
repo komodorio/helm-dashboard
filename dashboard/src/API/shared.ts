@@ -30,7 +30,7 @@ export const getVersionManifestFormData = ({
   return formData;
 };
 
-export const useDiffData = ({
+export const useDiffData = <T>({
   selectedRepo,
   versionsError,
   currentVerManifest,
@@ -40,7 +40,7 @@ export const useDiffData = ({
   selectedRepo: string;
   versionsError: string;
   currentVerManifest: string;
-  selectedVerData: Promise<any>;
+  selectedVerData: Promise<T>;
   chart: string;
 }) => {
   return useQuery(

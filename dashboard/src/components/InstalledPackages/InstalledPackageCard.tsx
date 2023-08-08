@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Release } from "../../data/types";
+import { Release, ReleaseHealthStatus } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { getAge } from "../../timeUtils";
 import StatusLabel, {
@@ -34,7 +34,7 @@ export default function InstalledPackageCard({
     cacheTime: 0,
   });
 
-  const { data: statusData } = useQuery<any>({
+  const { data: statusData } = useQuery<ReleaseHealthStatus[] | null>({
     queryKey: ["resourceStatus", release],
     queryFn: () => apiService.getResourceStatus({ release }),
   });

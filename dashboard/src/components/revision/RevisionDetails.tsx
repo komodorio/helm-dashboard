@@ -23,7 +23,7 @@ import {
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
-import { useMutation } from "@tanstack/react-query";
+import { UseQueryResult, useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
@@ -398,7 +398,7 @@ const Rollback = ({
     );
   };
 
-  const RollbackModalContent = ({ dataResponse }: { dataResponse: any }) => {
+  const RollbackModalContent = ({ dataResponse }: { dataResponse: UseQueryResult<string, unknown> }) => {
     const {
       data,
       isLoading,
