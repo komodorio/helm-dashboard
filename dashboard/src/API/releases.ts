@@ -333,7 +333,7 @@ export async function callApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const data = await apiService.fetchWithDefaults(url, options);
+  const data = await apiService.fetchWithDefaults<T>(url, options);
 
   return data;
 }
