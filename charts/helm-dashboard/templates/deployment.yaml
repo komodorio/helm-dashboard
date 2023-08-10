@@ -48,7 +48,7 @@ spec:
             - name: HELM_DATA_HOME
               value: /opt/dashboard/helm/data
             - name: DEBUG
-              value: {{- ternary " 1" "" .Values.debug }}
+              value: {{- ternary " '1'" "" .Values.debug }}
             {{- if .Values.dashboard.namespace }}
             - name: HELM_NAMESPACE
               value: {{ .Values.dashboard.namespace }}
