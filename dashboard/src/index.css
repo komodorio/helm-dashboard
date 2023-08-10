@@ -2,9 +2,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body {
-  color: theme("colors.body");
-  font-family: "Roboto", serif;
+
+@layer base {
+  body {
+    color: theme("colors.body");
+    font-family: "Roboto", serif;
+  }
 }
 
 button,
