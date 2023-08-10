@@ -41,7 +41,7 @@ export const InstallReleaseChartModal = ({
 }: InstallReleaseChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
-  const [userValues, setUserValues] = useState("");
+  const [userValues, setUserValues] = useState();
   const [installError, setInstallError] = useState("");
 
   const {
@@ -157,7 +157,7 @@ export const InstallReleaseChartModal = ({
         formData.append("chart", chartAddress);
       }
       formData.append("version", selectedVersion || "");
-      formData.append("values", userValues || "");
+      formData.append("values", userValues || releaseValues || ""); // if userValues is empty, we use the release values
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
