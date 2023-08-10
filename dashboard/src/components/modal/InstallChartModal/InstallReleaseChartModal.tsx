@@ -150,6 +150,7 @@ export const InstallReleaseChartModal = ({
       chartAddress,
     ],
     async () => {
+      debugger;
       setInstallError("");
       const formData = new FormData();
       formData.append("preview", "false");
@@ -157,7 +158,7 @@ export const InstallReleaseChartModal = ({
         formData.append("chart", chartAddress);
       }
       formData.append("version", selectedVersion || "");
-      formData.append("values", userValues);
+      formData.append("values", userValues || "");
 
       const res = await fetch(
         // Todo: Change to BASE_URL from env
