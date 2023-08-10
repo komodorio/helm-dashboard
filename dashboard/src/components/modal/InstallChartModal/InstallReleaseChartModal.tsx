@@ -150,7 +150,6 @@ export const InstallReleaseChartModal = ({
       chartAddress,
     ],
     async () => {
-      debugger;
       setInstallError("");
       const formData = new FormData();
       formData.append("preview", "false");
