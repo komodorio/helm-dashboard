@@ -4,8 +4,8 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { callApi } from "./releases";
 import { ApplicationStatus } from "./interfaces";
+import apiService from "./apiService";
 
 // Shuts down the Helm Dashboard application
 export function useShutdownHelmDashboard(
@@ -13,7 +13,7 @@ export function useShutdownHelmDashboard(
 ) {
   return useMutation<void, Error>(
     () =>
-      callApi("/", {
+      apiService.fetchWithDefaults("/", {
         method: "DELETE",
       }),
     options
@@ -26,7 +26,7 @@ export function useGetApplicationStatus(
 ) {
   return useQuery<ApplicationStatus>(
     ["status"],
-    () => callApi<ApplicationStatus>("/status"),
+    () => apiService.fetchWithDefaults<ApplicationStatus>("/status"),
     {
       ...options,
     }

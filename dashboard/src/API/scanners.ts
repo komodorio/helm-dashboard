@@ -7,14 +7,14 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { callApi } from "./releases";
 import { ScanResult, ScanResults, ScannersList } from "./interfaces";
+import apiService from "./apiService";
 
 // Get list of discovered scanners
 function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
   return useQuery<ScannersList>(
     ["scanners"],
-    () => callApi<ScannersList>("/api/scanners"),
+    () => apiService.fetchWithDefaults<ScannersList>("/api/scanners"),
     options
   );
 }
@@ -28,7 +28,7 @@ function useScanManifests(
   formData.append("manifest", manifest);
   return useMutation<ScanResults, Error, string>(
     () =>
-      callApi<ScanResults>("/api/scanners/manifests", {
+      apiService.fetchWithDefaults<ScanResults>("/api/scanners/manifests", {
         method: "POST",
         body: formData,
       }),
@@ -46,7 +46,7 @@ function useScanK8sResource(
   return useQuery<ScanResults>(
     ["scanners", "resource", kind, namespace, name],
     () =>
-      callApi<ScanResults>(
+      apiService.fetchWithDefaults<ScanResults>(
         `/api/scanners/resource/${kind}?namespace=${namespace}&name=${name}`
       ),
     options

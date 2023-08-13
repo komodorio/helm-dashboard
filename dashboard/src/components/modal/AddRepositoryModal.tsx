@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
-import { callApi } from "../../API/releases";
 import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { useAppContext } from "../../context/AppContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import apiService from "../../API/apiService";
 
 interface FormKeys {
   name: string;
@@ -45,7 +45,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
 
     setIsLoading(true);
 
-    callApi<void>("/api/helm/repositories", {
+    apiService.fetchWithDefaults<void>("/api/helm/repositories", {
       method: "POST",
       body,
     })
