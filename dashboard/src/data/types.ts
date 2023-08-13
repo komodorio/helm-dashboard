@@ -117,4 +117,14 @@ export type ChartVersion = {
   isSuggestedRepo: boolean;
 };
 
+export type InstallChartModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  chartName: string;
+  currentlyInstalledChartVersion?: string;
+  latestVersion?: string;
+  isUpgrade?: boolean;
+  latestRevision?: number;
+};
+
 export type NonEmptyArray<T> = [T, ...T[]];
