@@ -115,7 +115,7 @@ export default function InstalledPackageCard({
           <div className="col-span-3 h-12 line-clamp-3 mr-1">
             {release.description}
           </div>
-          <div className="col-span-3">
+          <div className="col-span-3 mr-2">
             {statusData ? (
               <HealthStatus statusData={statusData} />
             ) : (
