@@ -145,7 +145,6 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 
 	configureHelms(api.Group("/api/helm"), data)
 	configureKubectls(api.Group("/api/k8s"), data)
-	configureScanners(api.Group("/api/scanners"), data)
 }
 
 func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
@@ -203,15 +202,4 @@ func configureStatic(api *gin.Engine) {
 	api.GET("/static/*filepath", func(c *gin.Context) {
 		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
 	})
-}
-
-func configureScanners(api *gin.RouterGroup, data *objects.DataLayer) {
-	h := handlers.ScannersHandler{
-		Contexted: &handlers.Contexted{
-			Data: data,
-		},
-	}
-	api.GET("", h.List)
-	api.POST("/manifests", h.ScanManifest)
-	api.GET("/resource/:kind", h.ScanResource)
 }
