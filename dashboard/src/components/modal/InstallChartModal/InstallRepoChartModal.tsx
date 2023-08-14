@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import useAlertError from "../../../hooks/useAlertError";
 import { useMemo, useState } from "react";
 import { useGetVersions, useVersionData } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
@@ -9,11 +8,11 @@ import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
-import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
 import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
+import useInstallModal from "../../../hooks/useInstallModal";
 
 export const InstallRepoChartModal = ({
   isOpen,
@@ -22,10 +21,14 @@ export const InstallRepoChartModal = ({
   currentlyInstalledChartVersion,
   latestVersion,
 }: InstallChartModalProps) => {
-  const navigate = useNavigateWithSearchParams();
-  const { setShowErrorModal } = useAlertError();
-  const [userValues, setUserValues] = useState("");
-  const [installError, setInstallError] = useState("");
+  const {
+    navigate,
+    setShowErrorModal,
+    userValues,
+    setUserValues,
+    installError,
+    setInstallError,
+  } = useInstallModal();
 
   const { context: selectedCluster, selectedRepo: currentRepoCtx } =
     useParams();

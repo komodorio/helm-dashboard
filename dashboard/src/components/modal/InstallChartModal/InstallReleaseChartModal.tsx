@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import useAlertError from "../../../hooks/useAlertError";
 import { useMemo, useState } from "react";
 import {
   useChartReleaseValues,
@@ -13,13 +12,13 @@ import { UserDefinedValues } from "./UserDefinedValues";
 import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
-import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
 import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
 import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
+import useInstallModal from "../../../hooks/useInstallModal";
 
 export const InstallReleaseChartModal = ({
   isOpen,
@@ -30,10 +29,14 @@ export const InstallReleaseChartModal = ({
   isUpgrade = false,
   latestRevision,
 }: InstallChartModalProps) => {
-  const navigate = useNavigateWithSearchParams();
-  const { setShowErrorModal } = useAlertError();
-  const [userValues, setUserValues] = useState();
-  const [installError, setInstallError] = useState("");
+  const {
+    navigate,
+    setShowErrorModal,
+    userValues,
+    setUserValues,
+    installError,
+    setInstallError,
+  } = useInstallModal();
 
   const {
     namespace: queryNamespace,
