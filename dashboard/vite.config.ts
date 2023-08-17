@@ -15,6 +15,10 @@ export default defineConfig(({ mode }) => {
             dest: "assets/",
           },
           {
+            src: 'public/openapi.json',
+            dest: "assets/",
+          },
+          {
             src: 'public/logo.svg',
             dest: "assets/",
           },
