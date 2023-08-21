@@ -15,9 +15,6 @@
         "name": "K8s"
       },
       {
-        "name": "Scanners"
-      },
-      {
         "name": "Miscellaneous"
       }
     ],
@@ -645,76 +642,6 @@
                 "text/plain": {}
               },
               "description": "Returns describe text"
-            }
-          }
-        }
-      },
-      "/api/scanners": {
-        "get": {
-          "tags": [
-            "Scanners"
-          ],
-          "description": "Get list of discovered scanners",
-          "responses": {
-            "200": {
-              "description": "List of scanners"
-            }
-          }
-        }
-      },
-      "/api/scanners/manifests": {
-        "post": {
-          "tags": [
-            "Scanners"
-          ],
-          "description": "Scan manifests using all applicable scanners",
-          "requestBody": {
-            "content": {
-              "multipart/form-data": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "manifest": {
-                      "type": "string",
-                      "description": "Text of manifest to scan"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Map of scan results per scanner type"
-            }
-          }
-        }
-      },
-      "/api/scanners/resource/{kind}": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "kind"
-          },
-          {
-            "in": "query",
-            "name": "namespace",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "name",
-            "required": true
-          }
-        ],
-        "get": {
-          "tags": [
-            "Scanners"
-          ],
-          "description": "Scan specified k8s resource in cluster",
-          "responses": {
-            "200": {
-              "description": "Information with scan results per scanner type"
             }
           }
         }
