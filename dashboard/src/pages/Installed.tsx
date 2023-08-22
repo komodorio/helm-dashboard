@@ -46,7 +46,7 @@ function Installed() {
         if (filterKey) {
           return (
             installedPackage.name.includes(filterKey) ||
-            (installedPackage.namespace.includes(filterKey) && selectedNamespaces.includes(installedPackage.namespace))
+            (installedPackage.namespace.includes(filterKey) && (selectedNamespaces && selectedNamespaces.includes(installedPackage.namespace)))
           );
         } else {
           return selectedNamespaces
