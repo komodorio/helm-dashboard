@@ -238,18 +238,11 @@ export const InstallReleaseChartModal = ({
 
       <DefinedValues
         initialValue={releaseValues}
-        setValues={setUserValues}
+        onUserValuesChange={setUserValues}
         chartValues={chartValues}
         loading={loadingChartValues}
       />
 
-      {/* <div className="flex w-full gap-6 mt-4">
-        <UserDefinedValues
-          initialValue={releaseValues}
-          setValues={setUserValues}
-        />
-        <ChartValues chartValues={chartValues} loading={loadingChartValues} />
-      </div> */}
 
       <ManifestDiff
         diff={diffData as string}

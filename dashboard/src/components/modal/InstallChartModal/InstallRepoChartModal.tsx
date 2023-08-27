@@ -202,7 +202,7 @@ export const InstallRepoChartModal = ({
 
       <DefinedValues
         initialValue={""}
-        setValues={setUserValues}
+        onUserValuesChange={setUserValues}
         chartValues={chartValues}
         loading={loadingChartValues}
       />
