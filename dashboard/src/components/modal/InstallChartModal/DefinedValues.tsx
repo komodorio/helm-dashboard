@@ -1,7 +1,7 @@
 import { ChartValues } from "./ChartValues";
 import { UserDefinedValues } from "./UserDefinedValues";
 
-interface DefinedValues {
+interface DefinedValuesProps {
   initialValue: string;
   onUserValuesChange: (values: string) => void;
   chartValues: string;
@@ -13,7 +13,7 @@ export const DefinedValues = ({
   chartValues,
   onUserValuesChange,
   loading,
-}: DefinedValues) => {
+}: DefinedValuesProps) => {
   return (
     <div className="flex w-full gap-6 mt-4">
       <UserDefinedValues
