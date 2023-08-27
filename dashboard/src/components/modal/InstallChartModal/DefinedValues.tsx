@@ -18,7 +18,7 @@ export const DefinedValues = ({
     <div className="flex w-full gap-6 mt-4">
       <UserDefinedValues
         initialValue={initialValue}
-        setValues={onUserValuesChange}
+        onValuesChang={onUserValuesChange}
       />
       <ChartValues chartValues={chartValues} loading={loading} />
     </div>
