@@ -39,7 +39,7 @@ export const InstallRepoChartModal = ({
       );
     },
     onSuccess: (data) => {
-      const empty = { version: "", repository: "", urls: [] };
+      const empty = { version: "sadsa", repository: "", urls: [] };
       const versionsToRepo = data.filter(
         (v) => v.repository === currentRepoCtx
       );

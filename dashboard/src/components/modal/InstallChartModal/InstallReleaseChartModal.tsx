@@ -35,6 +35,8 @@ export const InstallReleaseChartModal = ({
   const [userValues, setUserValues] = useState();
   const [installError, setInstallError] = useState("");
 
+  const [isChartExist, setIsChartExist] = useState(true);
+
   const {
     namespace: queryNamespace,
     chart: _releaseName,
@@ -53,7 +55,12 @@ export const InstallReleaseChartModal = ({
     },
     onSuccess: (data) => {
       const empty = { version: "", repository: "", urls: [] };
-      return setSelectedVersionData(data[0] ?? empty);
+      if (data.length === 0) {
+        return setIsChartExist(false);
+      } else {
+        setIsChartExist(true);
+        return setSelectedVersionData(data[0] ?? empty);
+      }
     },
   });
 
@@ -242,12 +249,15 @@ export const InstallReleaseChartModal = ({
           setValues={setUserValues}
         />
 
-        <ChartValues chartValues={chartValues} loading={loadingChartValues} />
+        <ChartValues
+          chartValues={isChartExist && chartValues}
+          loading={isChartExist && loadingChartValues}
+        />
       </div>
 
       <ManifestDiff
         diff={diffData as string}
-        isLoading={isLoadingDiff}
+        isLoading={isChartExist && isLoadingDiff}
         error={
           (currentVerManifestError as string) ||
           (selectedVerDataError as string) ||
