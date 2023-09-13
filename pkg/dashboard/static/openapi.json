@@ -40,7 +40,7 @@
         {
           "name": "ns",
           "in": "path",
-          "description": "Name of kubernetes namespace, use '[emtpy]' if you want to use k8s context default"
+          "description": "Name of kubernetes namespace, use '[empty]' if you want to use k8s context default"
         }
       ],
       "post": {

@@ -109,7 +109,7 @@ func TestConfigureRoutes(t *testing.T) {
 	// Create a API Engine
 	api := gin.Default()
 
-	// Required arguements for route configuration
+	// Required arguments for route configuration
 	abortWeb := func() {}
 	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
@@ -130,7 +130,7 @@ func TestContextSetter(t *testing.T) {
 	w := httptest.NewRecorder()
 	con := GetTestGinContext(w)
 
-	// Required arguements
+	// Required arguments
 	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
 	if err != nil {
