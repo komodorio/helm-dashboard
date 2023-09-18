@@ -3,17 +3,17 @@ import useDebounce from "../../../hooks/useDebounce";
 
 export const UserDefinedValues = ({
   initialValue,
-  setValues,
+  onValuesChange,
 }: {
   initialValue: string;
-  setValues: (val: string) => void;
+  onValuesChange: (val: string) => void;
 }) => {
   const [userDefinedValues, setUserDefinedValues] = useState(initialValue);
   const debouncedValue = useDebounce<string>(userDefinedValues, 500);
 
   useEffect(() => {
-    setValues(debouncedValue);
-  }, [debouncedValue, setValues]);
+    onValuesChange(debouncedValue);
+  }, [debouncedValue, onValuesChange]);
 
   return (
     <div className="w-1/2 ">

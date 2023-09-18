@@ -4,8 +4,6 @@ import { useMemo, useState } from "react";
 import { useGetVersions, useVersionData } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
-import { UserDefinedValues } from "./UserDefinedValues";
-import { ChartValues } from "./ChartValues";
 import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
@@ -14,6 +12,7 @@ import { VersionToInstall } from "./VersionToInstall";
 import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
+import { DefinedValues } from "./DefinedValues";
 
 export const InstallRepoChartModal = ({
   isOpen,
@@ -200,11 +199,13 @@ export const InstallRepoChartModal = ({
         onReleaseNameInput={setReleaseName}
         onNamespaceInput={setNamespace}
       />
-      <div className="flex w-full gap-6 mt-4">
-        <UserDefinedValues initialValue={""} setValues={setUserValues} />
 
-        <ChartValues chartValues={chartValues} loading={loadingChartValues} />
-      </div>
+      <DefinedValues
+        initialValue={""}
+        onUserValuesChange={setUserValues}
+        chartValues={chartValues}
+        loading={loadingChartValues}
+      />
 
       <ManifestDiff
         diff={diffData as string}
