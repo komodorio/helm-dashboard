@@ -79,7 +79,7 @@ export const InstallReleaseChartModal = ({
   }, [selectedVersionData]);
 
   const chartAddress = useMemo(() => {
-    if (!selectedVersionData) return "";
+    if (!selectedVersionData || !selectedVersionData.repository) return "";
 
     return selectedVersionData.urls?.[0]?.startsWith("file://")
       ? selectedVersionData.urls[0]
