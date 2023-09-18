@@ -44,13 +44,23 @@ function Installed() {
     return (
       data?.filter((installedPackage: Release) => {
         if (filterKey) {
-          return (
-            installedPackage.name.includes(filterKey) ||
-            (installedPackage.namespace.includes(filterKey) &&
-            selectedNamespaces
-              ? selectedNamespaces.includes(installedPackage.namespace)
-              : true)
-          );
+          const {
+            namespace: releaseNamespace,
+            name: releaseName,
+            chartName,
+          } = installedPackage;
+
+          const shownByNS =
+            !selectedNamespaces ||
+            !selectedNamespaces.length ||
+            selectedNamespaces.includes(releaseNamespace);
+          const shownByStr =
+            releaseName.includes(filterKey) || chartName.includes(filterKey);
+          if (shownByNS && shownByStr) {
+            return true;
+          } else {
+            return false;
+          }
         } else {
           return selectedNamespaces
             ? selectedNamespaces.includes(installedPackage.namespace)
