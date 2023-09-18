@@ -87,7 +87,7 @@ export const InstallReleaseChartModal = ({
   }, [selectedVersionData, chartName]);
 
   // the original chart values
-  const { data: chartValues, isLoading: loadingChartValues } =
+  const { data: chartValues, isFetching: loadingChartValues } =
     useChartRepoValues(
       { version: selectedVersion || "", chart: chartAddress as string } // it can't be undefined because query is enabled only if it is defined
     );
@@ -119,7 +119,7 @@ export const InstallReleaseChartModal = ({
 
   const {
     data: diffData,
-    isLoading: isLoadingDiff,
+    isFetching: isLoadingDiff,
     error: diffError,
   } = useDiffData({
     selectedRepo,
