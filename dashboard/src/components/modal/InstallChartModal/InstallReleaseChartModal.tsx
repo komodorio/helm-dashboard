@@ -125,7 +125,7 @@ export const InstallReleaseChartModal = ({
     selectedRepo,
     versionsError: versionsError as string,
     currentVerManifest,
-    selectedVerData: selectedVerData,
+    selectedVerData,
     chart: chartAddress,
   });
 
