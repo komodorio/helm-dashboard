@@ -284,13 +284,6 @@ export const useVersionData = ({
       });
 
       return data;
-    },
-    {
-      enabled:
-        Boolean(chartAddress) &&
-        Boolean(version) &&
-        Boolean(releaseName) &&
-        releaseValues !== undefined,
     }
   );
 };

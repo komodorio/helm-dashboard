@@ -40,7 +40,7 @@ export const useDiffData = ({
   selectedRepo: string;
   versionsError: string;
   currentVerManifest: string;
-  selectedVerData: Promise<any>;
+  selectedVerData: any;
   chart: string;
 }) => {
   return useQuery(
@@ -48,7 +48,7 @@ export const useDiffData = ({
     async () => {
       const formData = new FormData();
       formData.append("a", currentVerManifest);
-      formData.append("b", (selectedVerData as any).manifest);
+      formData.append("b", selectedVerData.manifest);
 
       const diff = await apiService.fetchWithDefaults("/diff", {
         method: "post",
@@ -58,12 +58,7 @@ export const useDiffData = ({
       return diff;
     },
     {
-      enabled:
-        Boolean(selectedRepo) &&
-        !versionsError &&
-        Boolean(chart) &&
-        currentVerManifest !== undefined &&
-        Boolean(selectedVerData),
+      enabled: Boolean(selectedVerData),
     }
   );
 };

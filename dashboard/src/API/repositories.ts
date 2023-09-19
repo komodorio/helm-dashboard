@@ -13,7 +13,8 @@ export function useGetRepositories(
 ) {
   return useQuery<HelmRepositories>(
     ["helm", "repositories"],
-    () => apiService.fetchWithDefaults<HelmRepositories>("/api/helm/repositories"),
+    () =>
+      apiService.fetchWithDefaults<HelmRepositories>("/api/helm/repositories"),
     options
   );
 }
@@ -24,9 +25,12 @@ export function useUpdateRepo(
   options?: UseMutationOptions<void, unknown, void>
 ) {
   return useMutation<void, unknown, void>(() => {
-    return apiService.fetchWithDefaults<void>(`/api/helm/repositories/${repo}`, {
-      method: "POST",
-    });
+    return apiService.fetchWithDefaults<void>(
+      `/api/helm/repositories/${repo}`,
+      {
+        method: "POST",
+      }
+    );
   }, options);
 }
 
@@ -36,9 +40,12 @@ export function useDeleteRepo(
   options?: UseMutationOptions<void, unknown, void>
 ) {
   return useMutation<void, unknown, void>(() => {
-    return apiService.fetchWithDefaults<void>(`/api/helm/repositories/${repo}`, {
-      method: "DELETE",
-    });
+    return apiService.fetchWithDefaults<void>(
+      `/api/helm/repositories/${repo}`,
+      {
+        method: "DELETE",
+      }
+    );
   }, options);
 }
 

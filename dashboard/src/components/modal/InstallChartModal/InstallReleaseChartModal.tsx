@@ -31,7 +31,7 @@ export const InstallReleaseChartModal = ({
 }: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
   const { setShowErrorModal } = useAlertError();
-  const [userValues, setUserValues] = useState();
+  const [userValues, setUserValues] = useState<string>();
   const [installError, setInstallError] = useState("");
 
   const {
@@ -86,10 +86,10 @@ export const InstallReleaseChartModal = ({
   }, [selectedVersionData, chartName]);
 
   // the original chart values
-  const { data: chartValues, isFetching: loadingChartValues } =
-    useChartRepoValues(
-      { version: selectedVersion || "", chart: chartAddress as string } // it can't be undefined because query is enabled only if it is defined
-    );
+  const { data: chartValues } = useChartRepoValues({
+    version: selectedVersion || "",
+    chart: chartAddress,
+  });
 
   // The user defined values (if any we're set)
   const { data: releaseValues, isLoading: loadingReleaseValues } =
@@ -103,13 +103,14 @@ export const InstallReleaseChartModal = ({
   const { data: selectedVerData, error: selectedVerDataError } = useVersionData(
     {
       version: selectedVersion || "",
-      userValues,
+      userValues: userValues || "",
       chartAddress,
       releaseValues,
       namespace,
       releaseName,
     }
   );
+
   const { data: currentVerManifest, error: currentVerManifestError } =
     useGetReleaseManifest({
       namespace,
@@ -118,13 +119,13 @@ export const InstallReleaseChartModal = ({
 
   const {
     data: diffData,
-    isFetching: isLoadingDiff,
+    isLoading: isLoadingDiff,
     error: diffError,
   } = useDiffData({
     selectedRepo,
     versionsError: versionsError as string,
     currentVerManifest,
-    selectedVerData: selectedVerData as any,
+    selectedVerData: selectedVerData,
     chart: chartAddress,
   });
 
@@ -238,11 +239,10 @@ export const InstallReleaseChartModal = ({
 
       <DefinedValues
         initialValue={releaseValues}
-        onUserValuesChange={setUserValues}
+        onUserValuesChange={(values: string) => setUserValues(values)}
         chartValues={chartValues}
-        loading={loadingChartValues}
+        loading={loadingReleaseValues}
       />
-
 
       <ManifestDiff
         diff={diffData as string}
