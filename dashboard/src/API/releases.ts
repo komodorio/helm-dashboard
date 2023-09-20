@@ -244,6 +244,7 @@ export const useVersionData = ({
   namespace,
   releaseName,
   isInstallRepoChart = false,
+  options,
 }: {
   version: string;
   userValues: string;
@@ -252,6 +253,7 @@ export const useVersionData = ({
   namespace: string;
   releaseName: string;
   isInstallRepoChart?: boolean;
+  options?: UseQueryOptions<any>;
 }) => {
   return useQuery(
     [
@@ -284,7 +286,9 @@ export const useVersionData = ({
       });
 
       return data;
-    }
+    },
+
+    options
   );
 };
 

@@ -42,6 +42,7 @@ export const InstallRepoChartModal = ({
       const versionsToRepo = data.filter(
         (v) => v.repository === currentRepoCtx
       );
+
       return setSelectedVersionData(versionsToRepo[0] ?? empty);
     },
   });
@@ -68,6 +69,9 @@ export const InstallRepoChartModal = ({
   }, [selectedVersionData]);
 
   const chartAddress = useMemo(() => {
+    if (!selectedVersionData || !selectedVersionData?.repository) {
+      return "";
+    }
     return selectedVersionData?.urls?.[0]?.startsWith("file://")
       ? selectedVersionData?.urls[0]
       : `${selectedVersionData?.repository}/${chartName}`;
@@ -89,6 +93,9 @@ export const InstallRepoChartModal = ({
       namespace,
       releaseName,
       isInstallRepoChart: true,
+      options: {
+        enabled: Boolean(chartAddress),
+      },
     }
   );
 
@@ -100,7 +107,7 @@ export const InstallRepoChartModal = ({
     selectedRepo: selectedRepo || "",
     versionsError: versionsError as string,
     currentVerManifest: "", // current version manifest should always be empty since its a fresh install
-    selectedVerData: selectedVerData as any,
+    selectedVerData,
     chart: chartAddress,
   });
 
