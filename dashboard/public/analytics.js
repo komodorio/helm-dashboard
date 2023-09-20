@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 const xhr = new XMLHttpRequest();
 const TRACK_EVENT_TYPE = "track";
 const IDENTIFY_EVENT_TYPE = "identify";
@@ -155,7 +153,7 @@ const getUserId = (() => {
   let userId = null;
   return () => {
     if (!userId) {
-      userId = uuidv4();
+      userId = crypto.randomUUID();
     }
     return userId;
   };
