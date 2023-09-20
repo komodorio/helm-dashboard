@@ -1,6 +1,7 @@
 import { HD_RESOURCE_CONDITION_TYPE } from "../../API/releases";
 import { Tooltip } from "flowbite-react";
 import { ReleaseHealthStatus } from "../../data/types";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   statusData: ReleaseHealthStatus[];
@@ -17,7 +18,7 @@ const HealthStatus = ({ statusData }: Props) => {
 
       return (
         <Tooltip
-          key={crypto.randomUUID()} // this is not a good practice, we need to fetch some unique id from the backend
+          key={uuidv4()} // this is not a good practice, we need to fetch some unique id from the backend
           content={`${cond.status} ${item.kind} ${item.metadata.name}`}
         >
           <span

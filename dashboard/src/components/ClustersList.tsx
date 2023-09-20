@@ -4,6 +4,7 @@ import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { useAppContext } from "../context/AppContext";
+import { v4 as uuidv4 } from "uuid";
 
 type ClustersListProps = {
   onClusterChange: (clusterName: string) => void;
@@ -77,7 +78,7 @@ function ClustersList({
     });
 
     return Array.from(mapNamespaces, ([key, value]) => ({
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       name: key,
       amount: value,
     }));
