@@ -88,7 +88,9 @@ export const VersionToInstall: React.FC<{
               ),
               Option: ({ children, innerProps, data }) => (
                 <div
-                  className={"flex items-center py-2 pl-4 pr-2 text-green-700 hover:bg-blue-100"}
+                  className={
+                    "flex items-center py-2 pl-4 pr-2 text-green-700 hover:bg-blue-100"
+                  }
                   {...innerProps}
                 >
                   <div className="width-auto">{children}</div>
