@@ -67,7 +67,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx cypress open",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "lint": "npx eslint src/",
