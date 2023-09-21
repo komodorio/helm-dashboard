@@ -12,8 +12,12 @@ export const UserDefinedValues = ({
   const debouncedValue = useDebounce<string>(userDefinedValues, 500);
 
   useEffect(() => {
+    if (!debouncedValue || debouncedValue === initialValue) {
+      return;
+    }
+
     onValuesChange(debouncedValue);
-  }, [debouncedValue, onValuesChange]);
+  }, [debouncedValue, onValuesChange, initialValue]);
 
   return (
     <div className="w-1/2 ">
