@@ -45,7 +45,7 @@ export const VersionToInstall: React.FC<{
         label: `${repository} @ ${version}`,
         check: chartVersion === version,
       })) || [],
-    [chartVersion, versions]
+    [chartVersion]
   );
   const [selectedOption, setSelectedOption] =
     useState<(typeof options)[number]>();
