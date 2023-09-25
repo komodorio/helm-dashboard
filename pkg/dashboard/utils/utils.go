@@ -33,7 +33,7 @@ func ChartAndVersion(x string) (string, string, error) {
 }
 
 func TempFile(txt string) (string, func(), error) {
-	file, err := os.CreateTemp("", "helm_dahsboard_*.yaml")
+	file, err := os.CreateTemp("", "helm_dashboard_*.yaml")
 	if err != nil {
 		return "", nil, err
 	}
