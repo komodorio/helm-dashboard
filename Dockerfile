@@ -3,7 +3,7 @@ FROM node:latest as frontend
 
 WORKDIR /build
 
-COPY dashboard ./
+COPY frontend ./
 
 RUN npm i && npm run build
 
