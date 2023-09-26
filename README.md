@@ -35,13 +35,13 @@ Key capabilities of the tool:
 
 All the features of the tool can be discovered via our [features overview page](FEATURES.md).
 
-## Setup
+## Installation
 
 ### Standalone Binary
 
 Since version 1.0, the recommended install method is to just use standalone binary. It does not require Helm or kubectl to be installed. 
 
-Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
+Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it. See below section for some more CLI parameters to use.
 
 ### Using Helm plugin manager
 
@@ -116,23 +116,30 @@ Kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand ab
 
 Prerequisites, binaries installed and operational:
 
-- [Go](https://go.dev/doc/install)
+- [Golang](https://go.dev/doc/install)
+- NodeJS 
 
-There is a need to build binary for plugin to function, run:
+There is a need to build frontend and then backend as series of commands, run:
 
 ### Linux
 
 ```shell
+cd frontend && npm run build && cd ..
 go build -o bin/dashboard .
 ```
+
+or just `make build` that will do everything inside.
+
+Then, you can run `npm run dev` from `frontend` directory to work on frontend with Vite hot reload.
 
 ### Windows
 
 ```bat
+cd frontend && npm run build && cd ..
 go build -o bin\dashboard.exe .
 ```
 
-You can just run the `dashboard` or `dashboard.exe` binary directly, it will just work.
+You can just run the `dashboard` or `dashboard.exe` binary directly.
 
 To install, checkout the source code and run from source dir:
 
@@ -151,3 +158,15 @@ helm dashboard
 ```
 
 Then, use the web UI.
+
+
+## Development Snapshots
+
+In our GitHub actions, we attach the built binaries as build artifacts, you can download and test it fully assembled.
+
+Also, we upload `unstable` tag for Docker image upon every build of `main` branch, you can make our Helm chart to use that image by providing values:
+```yaml
+image:
+    pullPolicy: Always
+    tag: unstable
+```
