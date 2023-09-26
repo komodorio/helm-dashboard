@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="pkg/dashboard/static/logo-header-inverted.svg">
-    <source media="(prefers-color-scheme: light)" srcset="pkg/dashboard/static/logo-header.svg#gh-light-mode-only">
-    <img alt="Helm Dashboard" src="pkg/dashboard/static/logo-header.svg#gh-light-mode-only">
+    <source media="(prefers-color-scheme: dark)" srcset="images/logo-header-inverted.svg">
+    <source media="(prefers-color-scheme: light)" srcset="images/logo-header.svg#gh-light-mode-only">
+    <img alt="Helm Dashboard" src="images/logo-header.svg#gh-light-mode-only">
   </picture>
 </p>
 
