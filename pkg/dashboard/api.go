@@ -2,24 +2,29 @@ package dashboard
 
 import (
 	"context"
-	"embed"
-	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	log "github.com/sirupsen/logrus"
+	"github.com/komodorio/helm-dashboard/pkg/frontend"
 	"html"
 	"net/http"
 	"os"
 	"path"
-)
 
-//go:embed static/*
-var staticFS embed.FS
+	"github.com/gin-gonic/gin"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	log "github.com/sirupsen/logrus"
+)
 
 func noCache(c *gin.Context) {
 	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
 		c.Header("Cache-Control", "no-cache")
 	}
+
+	c.Next()
+}
+
+func allowCORS(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Headers", "*")
 	c.Next()
 }
 
@@ -60,6 +65,22 @@ func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	}
 }
 
+// Middleware for CORS
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "*")
+
+		// Handle preflight requests
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+
+		c.Next()
+	}
+}
 func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool) *gin.Engine {
 	var api *gin.Engine
 	if debug {
@@ -72,6 +93,11 @@ func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool)
 	api.Use(contextSetter(data))
 	api.Use(noCache)
 	api.Use(errorHandler)
+	api.Use(corsMiddleware())
+
+	if os.Getenv("HD_CORS") != "" {
+		api.Use(allowCORS)
+	}
 
 	configureStatic(api)
 	configureRoutes(abortWeb, data, api)
@@ -119,7 +145,6 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 
 	configureHelms(api.Group("/api/helm"), data)
 	configureKubectls(api.Group("/api/k8s"), data)
-	configureScanners(api.Group("/api/scanners"), data)
 }
 
 func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
@@ -164,42 +189,17 @@ func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
 }
 
 func configureStatic(api *gin.Engine) {
-	fs := http.FS(staticFS)
+	fs := http.FS(frontend.StaticFS)
 
-	// local dev speed-up
-	localDevPath := "pkg/dashboard/static"
-	if _, err := os.Stat(localDevPath); err == nil {
-		log.Warnf("Using local development path to serve static files")
+	api.GET("/", func(c *gin.Context) {
+		c.FileFromFS("/dist/", fs)
+	})
 
-		// the root page
-		api.GET("/", func(c *gin.Context) {
-			c.File(path.Join(localDevPath, "index.html"))
-		})
+	api.GET("/assets/*filepath", func(c *gin.Context) {
+		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
+	})
 
-		// serve a directory called static
-		api.GET("/static/*filepath", func(c *gin.Context) {
-			c.File(path.Join(localDevPath, c.Param("filepath")))
-		})
-	} else {
-		// the root page
-		api.GET("/", func(c *gin.Context) {
-			c.FileFromFS("/static/", fs)
-		})
-
-		// serve a directory called static
-		api.GET("/static/*filepath", func(c *gin.Context) {
-			c.FileFromFS(c.Request.URL.Path, fs)
-		})
-	}
-}
-
-func configureScanners(api *gin.RouterGroup, data *objects.DataLayer) {
-	h := handlers.ScannersHandler{
-		Contexted: &handlers.Contexted{
-			Data: data,
-		},
-	}
-	api.GET("", h.List)
-	api.POST("/manifests", h.ScanManifest)
-	api.GET("/resource/:kind", h.ScanResource)
+	api.GET("/static/*filepath", func(c *gin.Context) {
+		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
+	})
 }

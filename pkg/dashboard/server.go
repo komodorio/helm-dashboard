@@ -11,14 +11,12 @@ import (
 
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-version"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/scanners"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -50,8 +48,6 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 	}
 
 	go checkUpgrade(data.StatusInfo)
-
-	discoverScanners(data)
 
 	go data.PeriodicTasks(ctx)
 
@@ -133,20 +129,6 @@ func (s *Server) itIsUs() bool {
 	defer r.Body.Close()
 
 	return strings.HasPrefix(r.Header.Get("X-Application-Name"), "Helm Dashboard")
-}
-
-func discoverScanners(data *objects.DataLayer) {
-	potential := []subproc.Scanner{
-		&scanners.Checkov{Data: data},
-		&scanners.Trivy{Data: data},
-	}
-
-	data.Scanners = []subproc.Scanner{}
-	for _, scanner := range potential {
-		if scanner.Test() {
-			data.Scanners = append(data.Scanners, scanner)
-		}
-	}
 }
 
 func checkUpgrade(d *objects.StatusInfo) { // TODO: check it once an hour

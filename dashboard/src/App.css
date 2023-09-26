@@ -1,0 +1,96 @@
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px;
+  padding: 10px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex: 0.6;
+}
+.header-items {
+  display: flex;
+  flex: 0.8;
+  justify-content: space-evenly;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  flex: 0.2;
+  justify-content: space-around;
+}
+.redirect {
+  display: flex;
+  flex: 0.8;
+}
+.redirect > img {
+  margin-right: 5px;
+}
+.signout-btn {
+  display: flex;
+  align-items: center;
+}
+.signout-btn:hover {
+  cursor: pointer;
+}
+.signout-btn > span {
+  font-weight: bolder;
+  font-size: x-large;
+  color: gray;
+}
+.card {
+  display: flex;
+  height: 100vh;
+}
+.card-left {
+  flex: 0.2;
+  margin-top: 5px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+.card-left > h2,
+form {
+  margin-bottom: 10px;
+}
+.btn {
+  margin-bottom: 10px;
+}
+.card-right {
+  flex: 0.8;
+  margin-top: 5px;
+  margin-left: 4px;
+  margin-right: 1px;
+}
+.card-right-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.card-right-header-right-btn {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.title {
+  flex: 0.2;
+}
+.description {
+  flex: 0.6;
+}
+.version {
+  flex: 0.2;
+}
+.charts {
+  display: flex;
+  justify-content: space-between;
+}
+.charts > h3 {
+  flex: 0.2;
+}

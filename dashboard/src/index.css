@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&family=Inter&family=Poppins:wght@600&family=Poppins:wght@500&family=Inter:wght@500&family=Roboto+Slab:wght@400&family=Roboto+Slab:wght@700&family=Roboto:wght@700&family=Roboto:wght@500");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    color: theme("colors.body");
+    font-family: "Roboto", serif;
+  }
+}
+
+button,
+input,
+input::placeholder {
+  font-family: "Roboto", serif;
+}
+
+@layer components {
+  .card {
+    background-color: theme("colors.white");
+    border-radius: theme("borderRadius.lg");
+    border: theme("borderWidth.DEFAULT") solid theme("colors.gray.200");
+    padding: theme("spacing.6");
+    box-shadow: theme("boxShadow.xl");
+    padding-top: theme("spacing.12");
+  }
+  .card-hover {
+    background-color: theme("colors.gray.100");
+    border-radius: theme("borderRadius.lg");
+    padding: theme("spacing.6");
+    box-shadow: theme("boxShadow.xl");
+  }
+  .card-active {
+    background-color: theme("colors.gray.200");
+    border-radius: theme("borderRadius.lg");
+    padding: theme("spacing.6");
+    box-shadow: theme("boxShadow.xl");
+  }
+  .card-disabled {
+    background-color: theme("colors.gray.300");
+    border-radius: theme("borderRadius.lg");
+    padding: theme("spacing.6");
+    box-shadow: theme("boxShadow.xl");
+  }
+  .custom-shadow {
+    position: relative;
+    box-sizing: border-box;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+  }
+}
+
+pre,
+code {
+  font-family: SFMono-Regular, Menlo;
+  font-size: 12.5px;
+}
+
+#portal {
+  top: 0;
+  width: 40%;
+  left: 30%;
+  position: absolute;
+}
+
+.require:after {
+  content: " *";
+  color: red;
+}
+
+.input-box-shadow:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}

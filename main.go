@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/joomcode/errorx"
 	"os"
@@ -110,7 +111,8 @@ func parseFlags() options {
 	opts := options{Namespace: ns}
 	args, err := flags.Parse(&opts)
 	if err != nil {
-		if e, ok := err.(*flags.Error); ok {
+		var e *flags.Error
+		if errors.As(err, &e) {
 			if e.Type == flags.ErrHelp {
 				os.Exit(0)
 			}
