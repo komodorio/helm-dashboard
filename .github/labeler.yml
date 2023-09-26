@@ -44,9 +44,6 @@ docker:
 helm-charts:
   - charts/*
 
-helm-dashboard-v2:
-  - dashboard/*
-
 github-actions:
   - .github/ISSUE_TEMPLATE/*
   - .github/labeler.yml

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - helm-dashboard-v2
   pull_request:
     branches:
       - "*"
@@ -25,16 +24,13 @@ jobs:
         uses: actions/setup-node@v2.5.2
         with:
           cache: 'npm'
-          cache-dependency-path: dashboard/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
       - name: NPM install
         run: npm i
-        working-directory: ./dashboard
-      - name: lint project
-        run: npm run lint  
-        working-directory: ./dashboard
+        working-directory: ./frontend
       - name: NPM build
         run: npm run build
-        working-directory: ./dashboard
+        working-directory: ./frontend
 
       # Golang part
       - name: Set up Go
@@ -124,13 +120,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: 'npm'
-          cache-dependency-path: ./dashboard/package-lock.json
+          cache-dependency-path: ./frontend/package-lock.json
       - name: NPM install
         run: npm i
-        working-directory: ./dashboard
+        working-directory: ./frontend
       - name: NPM lint
         run: npm run lint
-        working-directory: ./dashboard
+        working-directory: ./frontend
 
       - name: Helm Template Check For Sanity
         uses: igabaydulin/helm-check-action@0.1.4
