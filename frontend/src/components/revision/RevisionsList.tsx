@@ -47,7 +47,7 @@ export default function RevisionsList({
                 : "border-revision-light bg-body-background"
             }`}
           >
-            <div className="flex row justify-between">
+            <div className="flex flex-wrap row justify-between">
               <StatusLabel status={release.status} isRollback={isRollback} />
               <span className="font-bold">#{release.revision}</span>
             </div>
