@@ -16,6 +16,7 @@ import { isNewerVersion } from "../../utils";
 import { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import { useParams } from "react-router-dom";
+import { useAppContext } from "../../context/AppContext";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -25,6 +26,7 @@ export default function InstalledPackageCard({
   release,
 }: InstalledPackageCardProps) {
   const navigate = useNavigateWithSearchParams();
+  const { clusterMode } = useAppContext();
 
   const { context: selectedCluster } = useParams();
   const [isMouseOver, setIsMouseOver] = useState(false);
@@ -62,7 +64,7 @@ export default function InstalledPackageCard({
   const handleOnClick = () => {
     const { name, namespace } = release;
     navigate(
-      `/${selectedCluster}/${namespace}/${name}/installed/revision/${release.revision}`,
+      `/${!clusterMode ? `${selectedCluster}/`: ""}${namespace}/${name}/installed/revision/${release.revision}`,
       { state: release }
     );
   };
