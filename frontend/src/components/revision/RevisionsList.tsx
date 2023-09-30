@@ -7,6 +7,7 @@ import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import { DateTime } from "luxon";
+import { useAppContext } from "../../context/AppContext";
 
 type RevisionsListProps = {
   releaseRevisions: ReleaseRevision[];
@@ -19,9 +20,11 @@ export default function RevisionsList({
 }: RevisionsListProps) {
   const navigate = useNavigateWithSearchParams();
   const { context, namespace, chart } = useParams();
+  const {clusterMode} = useAppContext();
+
   const changeRelease = (newRevision: number) => {
     navigate(
-      `/${context}/${namespace}/${chart}/installed/revision/${newRevision}`
+      `/${!clusterMode ? `${context}/`: ""}${namespace}/${chart}/installed/revision/${newRevision}`
     );
   };
 
