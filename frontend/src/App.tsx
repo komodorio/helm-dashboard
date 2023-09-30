@@ -55,7 +55,7 @@ export default function App() {
             <Routes>
               <Route path="docs/" element={<DocsPage />} />
               <Route path="*" element={<PageLayout />}>
-                <Route path=":context/*" element={<SyncContext />}>
+                <Route path=":context?/*" element={<SyncContext />}>
                   <Route path="installed/?" element={<Installed />} />
                   <Route
                     path=":namespace/:chart/installed/revision/:revision"
