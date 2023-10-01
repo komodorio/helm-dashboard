@@ -6,7 +6,7 @@ import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
 import { useUpdateRepo } from "../../API/repositories";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
 
 type RepositoryViewerProps = {
@@ -16,7 +16,6 @@ type RepositoryViewerProps = {
 function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const [searchValue, setSearchValue] = useState("");
   const [isRemoveLoading, setIsRemove] = useState(false);
-  const { context } = useParams();
   const { setSelectedRepo, selectedRepo } = useAppContext();
   const queryClient = useQueryClient();
 
@@ -54,7 +53,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             method: "DELETE",
           }
         );
-        navigate(`/${context}/repository`, { replace: true });
+        navigate("/repository", { replace: true });
         setSelectedRepo("");
         queryClient.invalidateQueries({
           queryKey: ["helm", "repositories"],

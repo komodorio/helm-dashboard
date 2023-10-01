@@ -27,7 +27,6 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const { searchParamsObject } = useCustomSearchParams();
   const { repo_url, repo_name } = searchParamsObject;
   const { setSelectedRepo } = useAppContext();
-  const { context } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -57,7 +56,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
           queryKey: ["helm", "repositories"],
         });
         setSelectedRepo(formData.name || "");
-        navigate(`/${context}/repository/${formData.name}`, {
+        navigate(`/repository/${formData.name}`, {
           replace: true,
         });
       })

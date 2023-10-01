@@ -17,11 +17,7 @@ export function useGetInstalledReleases(
   return useQuery<Release[]>(
     ["installedReleases", context],
     () =>
-      apiService.fetchWithDefaults<Release[]>("/api/helm/releases", {
-        headers: {
-          "X-Kubecontext": context,
-        },
-      }),
+      apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
     options
   );
 }

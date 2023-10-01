@@ -13,6 +13,7 @@ import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
+import apiService from "../../../API/apiService";
 
 export const InstallRepoChartModal = ({
   isOpen,
@@ -130,32 +131,20 @@ export const InstallRepoChartModal = ({
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues);
       formData.append("name", releaseName || "");
-      const res = await fetch(
-        // Todo: Change to BASE_URL from env
+      const data = await apiService.fetchWithDefaults(
         `/api/helm/releases/${namespace ? namespace : "default"}`,
         {
           method: "post",
           body: formData,
-          headers: {
-            "X-Kubecontext": selectedCluster as string,
-          },
         }
       );
-
-      if (!res.ok) {
-        setShowErrorModal({
-          title: "Failed to install the chart",
-          msg: String(await res.text()),
-        });
-      }
-
-      return res.json();
+      return data;
     },
     {
       onSuccess: async (response) => {
         onClose();
         navigate(
-          `/${selectedCluster}/${response.namespace}/${response.name}/installed/revision/1`
+          `/${response.namespace}/${response.name}/installed/revision/1`
         );
       },
       onError: (error) => {

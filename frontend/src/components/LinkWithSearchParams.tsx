@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 const LinkWithSearchParams = ({
   to,
@@ -11,14 +12,22 @@ const LinkWithSearchParams = ({
   children: React.ReactNode;
 }) => {
   const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const { context } = useParams();
+  const {clusterMode} = useAppContext();
 
+  const params = new URLSearchParams(search);
   // For state we don't want to keep while navigating
   props.exclude?.forEach((key) => {
     params.delete(key);
   });
 
-  return <NavLink to={`${to}/?${params.toString()}`} {...props} />;
+  let prefixedUrl = to;
+
+  if (!clusterMode) {
+    prefixedUrl = `/${context}${to}`;
+  }
+
+  return <NavLink to={`${prefixedUrl}/?${params.toString()}`} {...props} />;
 };
 
 export default LinkWithSearchParams;

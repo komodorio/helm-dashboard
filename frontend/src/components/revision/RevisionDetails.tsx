@@ -207,7 +207,7 @@ export default function RevisionDetails({
               <span
                 onClick={() => {
                   navigate(
-                    `/${context}/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
+                    `/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
                   );
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
@@ -320,7 +320,7 @@ const Rollback = ({
   release: Release;
   installedRevision: ReleaseRevision;
 }) => {
-  const { chart, namespace, revision, context } = useParams();
+  const { chart, namespace, revision } = useParams();
   const navigate = useNavigateWithSearchParams();
 
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
@@ -330,7 +330,7 @@ const Rollback = ({
     useRollbackRelease({
       onSuccess: () => {
         navigate(
-          `/${context}/${namespace}/${chart}/installed/revision/${
+          `/${namespace}/${chart}/installed/revision/${
             revisionInt + 1
           }`
         );
