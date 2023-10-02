@@ -26,7 +26,7 @@ export interface Scanner {
 
 export interface ScanResult {
   scannerType: string;
-  result: any;
+  result: string;
 }
 
 export interface ScannersList {

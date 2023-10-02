@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import useAlertError from "../../../hooks/useAlertError";
 import { useMemo, useState } from "react";
 import { useGetVersions, useVersionData } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
@@ -23,7 +22,6 @@ export const InstallRepoChartModal = ({
   latestVersion,
 }: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
-  const { setShowErrorModal } = useAlertError();
   const [userValues, setUserValues] = useState("");
   const [installError, setInstallError] = useState("");
 

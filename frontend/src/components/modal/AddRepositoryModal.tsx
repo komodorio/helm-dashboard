@@ -5,7 +5,7 @@ import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { useAppContext } from "../../context/AppContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import apiService from "../../API/apiService";
 
 interface FormKeys {
@@ -44,10 +44,11 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
 
     setIsLoading(true);
 
-    apiService.fetchWithDefaults<void>("/api/helm/repositories", {
-      method: "POST",
-      body,
-    })
+    apiService
+      .fetchWithDefaults<void>("/api/helm/repositories", {
+        method: "POST",
+        body,
+      })
       .then(() => {
         setIsLoading(false);
         onClose();

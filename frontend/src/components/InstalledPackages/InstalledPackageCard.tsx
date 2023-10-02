@@ -32,7 +32,7 @@ export default function InstalledPackageCard({
     cacheTime: 0,
   });
 
-  const { data: statusData } = useQuery<any>({
+  const { data: statusData } = useQuery<unknown>({
     queryKey: ["resourceStatus", release],
     queryFn: () => apiService.getResourceStatus({ release }),
   });
@@ -59,10 +59,9 @@ export default function InstalledPackageCard({
 
   const handleOnClick = () => {
     const { name, namespace } = release;
-    navigate(
-      `/${namespace}/${name}/installed/revision/${release.revision}`,
-      { state: release }
-    );
+    navigate(`/${namespace}/${name}/installed/revision/${release.revision}`, {
+      state: release,
+    });
   };
 
   const statusColor = getStatusColor(release.status as DeploymentStatus);

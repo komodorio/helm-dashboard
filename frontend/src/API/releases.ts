@@ -16,10 +16,41 @@ export function useGetInstalledReleases(
 ) {
   return useQuery<Release[]>(
     ["installedReleases", context],
-    () =>
-      apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
+    () => apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
     options
   );
+}
+
+export interface ReleaseManifest {
+  apiVersion: string;
+  kind: string;
+  metadata: {
+    name: string;
+    namespace: string;
+    labels: Record<string, string>;
+  };
+  spec: {
+    replicas: number;
+    selector: Record<string, string>;
+    template: {
+      metadata: {
+        labels: Record<string, string>;
+      };
+      spec: {
+        containers: {
+          name: string;
+          image: string;
+          ports: {
+            containerPort: number;
+          }[];
+          env: {
+            name: string;
+            value: string;
+          }[];
+        }[];
+      };
+    };
+  };
 }
 
 export function useGetReleaseManifest({
@@ -29,12 +60,12 @@ export function useGetReleaseManifest({
 }: {
   namespace: string;
   chartName: string;
-  options?: UseQueryOptions<any>;
+  options?: UseQueryOptions<ReleaseManifest[]>;
 }) {
-  return useQuery<any>(
+  return useQuery<ReleaseManifest[]>(
     ["manifest", namespace, chartName],
     () =>
-      apiService.fetchWithDefaults<any>(
+      apiService.fetchWithDefaults<ReleaseManifest[]>(
         `/api/helm/releases/${namespace}/${chartName}/manifests`
       ),
     options
@@ -215,12 +246,12 @@ export function useChartReleaseValues({
   userDefinedValue?: string;
   revision?: number;
   version?: string;
-  options?: UseQueryOptions<any>;
+  options?: UseQueryOptions<unknown>;
 }) {
-  return useQuery<any>(
+  return useQuery<unknown>(
     ["values", namespace, release, userDefinedValue, version],
     () =>
-      apiService.fetchWithDefaults<any>(
+      apiService.fetchWithDefaults<unknown>(
         `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
           revision ? `&revision=${revision}` : ""
         }`,
@@ -249,7 +280,7 @@ export const useVersionData = ({
   namespace: string;
   releaseName: string;
   isInstallRepoChart?: boolean;
-  options?: UseQueryOptions<any>;
+  options?: UseQueryOptions;
 }) => {
   return useQuery(
     [
@@ -283,7 +314,7 @@ export const useVersionData = ({
 
       return data;
     },
-
+    // @ts-ignore
     options
   );
 };
@@ -307,12 +338,12 @@ export interface StructuredResources {
 export interface Metadata {
   name: string;
   namespace: string;
-  creationTimestamp: any;
-  labels: any;
+  creationTimestamp: Date;
+  labels: string[];
 }
 
 export interface Spec {
-  [key: string]: any;
+  [key: string]: string;
 }
 
 export interface Status {
@@ -322,8 +353,8 @@ export interface Status {
 export interface Condition {
   type: string;
   status: string;
-  lastProbeTime: any;
-  lastTransitionTime: any;
+  lastProbeTime: Date;
+  lastTransitionTime: Date;
   reason: string;
   message: string;
 }
