@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import useAlertError from "../../../hooks/useAlertError";
 import { useMemo, useState } from "react";
 import {
   useChartReleaseValues,
@@ -19,6 +18,7 @@ import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
+import apiService from "../../../API/apiService";
 
 export const InstallReleaseChartModal = ({
   isOpen,
@@ -30,7 +30,6 @@ export const InstallReleaseChartModal = ({
   latestRevision,
 }: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
-  const { setShowErrorModal } = useAlertError();
   const [userValues, setUserValues] = useState<string>();
   const [installError, setInstallError] = useState("");
 
@@ -150,35 +149,23 @@ export const InstallReleaseChartModal = ({
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues || releaseValues || ""); // if userValues is empty, we use the release values
 
-      const res = await fetch(
-        // Todo: Change to BASE_URL from env
+      const data = await apiService.fetchWithDefaults(
         `/api/helm/releases/${
           namespace ? namespace : "default"
         }${`/${releaseName}`}`,
         {
           method: "post",
           body: formData,
-          headers: {
-            "X-Kubecontext": selectedCluster as string,
-          },
         }
       );
-
-      if (!res.ok) {
-        setShowErrorModal({
-          title: "Failed to upgrade the chart",
-          msg: String(await res.text()),
-        });
-      }
-
-      return res.json();
+      return data;
     },
     {
       onSuccess: async (response) => {
         onClose();
         setSelectedVersionData({ version: "", urls: [] }); //cleanup
         navigate(
-          `/${selectedCluster}/${
+          `/${
             namespace ? namespace : "default"
           }/${releaseName}/installed/revision/${response.version}`
         );

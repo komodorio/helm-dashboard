@@ -15,7 +15,7 @@ function RepositoryPage() {
   const { setSelectedRepo, selectedRepo } = useAppContext();
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/${context}/repository/${selectedRepository.name}`, {
+    navigate(`/repository/${selectedRepository.name}`, {
       replace: true,
     });
   };
@@ -28,7 +28,7 @@ function RepositoryPage() {
 
   useEffect(() => {
     if (selectedRepo && !repoFromParams) {
-      navigate(`/${context}/repository/${selectedRepo}`, {
+      navigate(`/repository/${selectedRepo}`, {
         replace: true,
       });
     }

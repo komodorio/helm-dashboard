@@ -5,7 +5,7 @@ import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { useAppContext } from "../../context/AppContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import apiService from "../../API/apiService";
 
 interface FormKeys {
@@ -27,7 +27,6 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const { searchParamsObject } = useCustomSearchParams();
   const { repo_url, repo_name } = searchParamsObject;
   const { setSelectedRepo } = useAppContext();
-  const { context } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -45,10 +44,11 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
 
     setIsLoading(true);
 
-    apiService.fetchWithDefaults<void>("/api/helm/repositories", {
-      method: "POST",
-      body,
-    })
+    apiService
+      .fetchWithDefaults<void>("/api/helm/repositories", {
+        method: "POST",
+        body,
+      })
       .then(() => {
         setIsLoading(false);
         onClose();
@@ -57,7 +57,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
           queryKey: ["helm", "repositories"],
         });
         setSelectedRepo(formData.name || "");
-        navigate(`/${context}/repository/${formData.name}`, {
+        navigate(`/repository/${formData.name}`, {
           replace: true,
         });
       })

@@ -56,10 +56,10 @@ export function useChartRepoValues({
   version: string;
   chart: string;
 }) {
-  return useQuery<any>(
+  return useQuery<string>(
     ["helm", "repositories", "values", chart, version],
     () =>
-      apiService.fetchWithDefaults<any>(
+      apiService.fetchWithDefaults<string>(
         `/api/helm/repositories/values?chart=${chart}&version=${version}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },

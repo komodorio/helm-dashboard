@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -22,7 +22,7 @@ export default function Header() {
       setClusterMode(data.ClusterMode);
     },
   });
-  const { context } = useParams();
+
   const location = useLocation();
 
   const openSupportChat = () => {
@@ -58,7 +58,7 @@ export default function Header() {
   return (
     <div className="h-16 flex items-center justify-between bg-white custom-shadow">
       <div className="h-16 flex items-center gap-6 min-w-fit ">
-        <LinkWithSearchParams to={`/${context}/installed`} exclude={["tab"]}>
+        <LinkWithSearchParams to={"/installed"} exclude={["tab"]}>
           <img
             src={LogoHeader}
             alt="helm dashboard logo"
@@ -70,7 +70,7 @@ export default function Header() {
           <ul className="w-full items-center flex md:flex-row md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
             <li>
               <LinkWithSearchParams
-                to={`/${context}/installed`}
+                to={"/installed"}
                 exclude={["tab"]}
                 className={getBtnStyle("installed")}
               >
@@ -79,7 +79,7 @@ export default function Header() {
             </li>
             <li>
               <LinkWithSearchParams
-                to={`/${context}/repository`}
+                to={"/repository"}
                 exclude={["tab"]}
                 end={false}
                 className={getBtnStyle("repository")}

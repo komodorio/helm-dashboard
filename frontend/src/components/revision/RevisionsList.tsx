@@ -18,10 +18,11 @@ export default function RevisionsList({
   selectedRevision,
 }: RevisionsListProps) {
   const navigate = useNavigateWithSearchParams();
-  const { context, namespace, chart } = useParams();
+  const { namespace, chart } = useParams();
+
   const changeRelease = (newRevision: number) => {
     navigate(
-      `/${context}/${namespace}/${chart}/installed/revision/${newRevision}`
+      `/${namespace}/${chart}/installed/revision/${newRevision}`
     );
   };
 
