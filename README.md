@@ -167,6 +167,6 @@ In our GitHub actions, we attach the built binaries as build artifacts, you can 
 Also, we upload `unstable` tag for Docker image upon every build of `main` branch, you can make our Helm chart to use that image by providing values:
 ```yaml
 image:
-    pullPolicy: Always
-    tag: unstable
+  pullPolicy: Always
+  tag: unstable
 ```
