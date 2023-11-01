@@ -1,39 +1,37 @@
-import { ComponentStory } from "@storybook/react";
+import { Meta } from "@storybook/react";
 import StatusLabel, { DeploymentStatus } from "./StatusLabel";
 
-export default {
+const meta = {
   title: "StatusLabel",
   component: StatusLabel,
+} satisfies Meta<typeof StatusLabel>;
+
+export default meta;
+
+export const Deployed = {
+  args: {
+    status: DeploymentStatus.DEPLOYED,
+    isRollback: false,
+  },
 };
 
-const Template: ComponentStory<typeof StatusLabel> = (args) => (
-  <StatusLabel {...args} />
-);
-
-export const Deployed = Template.bind({});
-
-Deployed.args = {
-  status: DeploymentStatus.DEPLOYED,
-  isRollback: false,
+export const Failed = {
+  args: {
+    status: DeploymentStatus.FAILED,
+    isRollback: false,
+  },
 };
 
-export const Failed = Template.bind({});
-
-Failed.args = {
-  status: DeploymentStatus.FAILED,
-  isRollback: false,
+export const Pending = {
+  args: {
+    status: DeploymentStatus.PENDING,
+    isRollback: false,
+  },
 };
 
-export const Pending = Template.bind({});
-
-Pending.args = {
-  status: DeploymentStatus.PENDING,
-  isRollback: false,
-};
-
-export const Superseded = Template.bind({});
-
-Superseded.args = {
-  status: DeploymentStatus.SUPERSEDED,
-  isRollback: false,
+export const Superseded = {
+  args: {
+    status: DeploymentStatus.SUPERSEDED,
+    isRollback: false,
+  },
 };
