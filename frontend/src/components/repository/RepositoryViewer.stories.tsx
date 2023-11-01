@@ -1,6 +1,6 @@
 // RepositoryViewer.stories.ts|tsx
 
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react";
 import RepositoryViewer from "./RepositoryViewer";
 
 //👇 This default export determines where your story goes in the story list
@@ -11,11 +11,13 @@ export default {
    */
   title: "RepositoryViewer",
   component: RepositoryViewer,
-} as ComponentMeta<typeof RepositoryViewer>;
+} as Meta<typeof RepositoryViewer>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof RepositoryViewer> = () => (
+const Template: StoryFn<typeof RepositoryViewer> = () => (
   <RepositoryViewer repository={undefined} />
 );
 
-export const Default = Template.bind({});
+export const Default = {
+  render: Template,
+};
