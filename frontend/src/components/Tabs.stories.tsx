@@ -1,22 +1,16 @@
-// TabsBar.stories.ts|tsx
-
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { Meta } from "@storybook/react";
 import Tabs from "./Tabs";
 
-//👇 This default export determines where your story goes in the story list
-export default {
+const meta = {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
   title: "Tabs",
   component: Tabs,
-} as ComponentMeta<typeof Tabs>;
+} satisfies Meta<typeof Tabs>;
 
-//👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Tabs> = (args) => <Tabs {...args} />;
-
-export const Default = Template.bind({});
+export default meta;
 
 const defaultArgs = {
   tabs: [
@@ -35,5 +29,6 @@ const defaultArgs = {
   ],
 };
 
-//@ts-ignore
-Default.args = defaultArgs;
+export const Default = {
+  args: defaultArgs,
+};
