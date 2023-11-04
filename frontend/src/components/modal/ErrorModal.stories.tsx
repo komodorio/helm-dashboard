@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import ErrorModal from "./ErrorModal";
 
@@ -16,7 +16,7 @@ export default meta;
 export const Default = {
   args: {
     onClose: () => {
-      console.log("on Close clicked");
+      action("onClose")("on Close clicked");
     },
     titleText: "Failed to get list of charts",
     contentText:

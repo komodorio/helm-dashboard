@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { StoryFn, Meta } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import ClustersList from "./ClustersList";
 
 const meta = {
@@ -14,17 +13,14 @@ const meta = {
 export default meta;
 
 //👇 We create a “template” of how args map to rendering
-const Template: StoryFn<typeof ClustersList> = () => (
-  <ClustersList
-    filteredNamespaces={[""]}
-    installedReleases={[]}
-    onClusterChange={() => {
-      console.log("onClusterChange called");
-    }}
-    selectedCluster={""}
-  />
-);
+export const Default: StoryObj<typeof ClustersList> = {
+  args: {
+    filteredNamespaces: [""],
+    installedReleases: [],
+    selectedCluster: "",
+  },
 
-export const Default = {
-  render: Template,
+  argTypes: {
+    onClusterChange: { actions: "onClusterChange called" },
+  },
 };

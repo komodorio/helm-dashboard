@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { Meta } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import Button from "./Button";
 
 const meta = {
@@ -13,7 +12,7 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+export const Default: StoryObj<typeof Button> = {
   args: {
     children: (
       <>
@@ -21,8 +20,8 @@ export const Default = {
         <span>Update</span>
       </>
     ),
-    onClick: () => {
-      console.log("click");
-    },
+  },
+  argTypes: {
+    onClick: { action: "clicked" },
   },
 };
