@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react";
+import { action } from "@storybook/addon-actions";
 import DropDown from "./DropDown";
 import { BsSlack, BsGithub } from "react-icons/bs";
 
@@ -14,8 +15,7 @@ const meta = {
 export default meta;
 
 const onClick = () => {
-  // eslint-disable-next-line no-console
-  console.log("drop down clicked");
+  action("onClick")("drop down clicked");
 };
 
 export const Default = {

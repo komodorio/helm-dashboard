@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * @file SelectMenu.stories.tsx
  * @description This file contains the SelectMenu
@@ -7,7 +6,8 @@
  * The default story renders the component with the default props.
  */
 
-import { Meta } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
+import { action } from "@storybook/addon-actions";
 import SelectMenu, { SelectMenuItem } from "./SelectMenu";
 
 const meta = {
@@ -21,7 +21,7 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+export const Default: StoryObj<typeof SelectMenu> = {
   args: {
     header: "Header",
     children: [
@@ -30,6 +30,6 @@ export const Default = {
       <SelectMenuItem label="Item 3" id={3} key="item3" />,
     ],
     selected: 1,
-    onSelect: (id: number) => console.log(id),
+    onSelect: (id: number) => action("onSelect")(id),
   },
 };
