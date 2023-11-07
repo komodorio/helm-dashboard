@@ -7,9 +7,10 @@ metadata:
   annotations:
     "helm.sh/hook": test
 spec:
+  {{- include "helm-dashboard.imagePullSecrets" . | nindent 2 }}
   containers:
     - name: wget
-      image: busybox
+      image: {{ include "test.image" . }}
       command: ['wget']
       args: ['--timeout=5', '{{ include "helm-dashboard.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never

@@ -21,10 +21,7 @@ spec:
       labels:
         {{- include "helm-dashboard.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "helm-dashboard.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "helm-dashboard.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -38,7 +35,7 @@ spec:
           {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ include "helm-dashboard.image" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: HELM_CACHE_HOME
