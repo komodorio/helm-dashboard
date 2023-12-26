@@ -3,6 +3,7 @@ import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
 import ShutDownButton from "../components/ShutDownButton";
+import { BsPower } from "react-icons/bs";
 import {
   BsSlack,
   BsGithub,
@@ -54,6 +55,27 @@ export default function Header() {
         ? " text-primary rounded-sm bg-header-install"
         : ""
     }`;
+  const handleLogin = () => {
+    let url: string = window.location.hostname;
+    
+    if (window.location.hostname === 'localhost') {
+      url = `${window.location.hostname}:${window.location.port}`;
+    }
+  
+    const redirect_uri: string = `http://${url}/callback`;
+  
+    fetch(`/loginlink?redirect_uri=${redirect_uri}&state=${btoa(`http://${url}`)}`, {
+      method: 'GET',
+    })
+    .then(response => response.text())
+    .then(resp => {
+      window.location.href = resp.replace(/"/g, '').replace(/"|\\u0026/g, '&');
+    })
+    .catch(err => {
+      console.log(err);
+    });
+  };
+    
 
   return (
     <div className="h-16 flex items-center justify-between bg-white custom-shadow">
@@ -124,41 +146,11 @@ export default function Header() {
                 ]}
               />
             </li>
-            {statusData?.LatestVer ? (
-              <li className="min-w-[130px]">
-                <a
-                  href="https://github.com/komodorio/helm-dashboard/releases"
-                  className="text-upgrade-color"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Upgrade to {statusData?.LatestVer}
-                </a>
-              </li>
-            ) : null}
           </ul>
         </div>
       </div>
       <div className="h-16 flex items-center text-sm ">
-        <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-max">
-          <img src={WatcherIcon} width={40} height={40} />
-          <div className="flex flex-col">
-            <a
-              href="https://komodor.com/helm-dash/"
-              className="text-link-color font-bold"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div className="flex font-bold items-center gap-2 min-w-[25%] ">
-                Upgrade your HELM experience - Free
-                <BsBoxArrowUpRight className="w-[14px] h-[14px]" />
-              </div>
-            </a>
-            <label className="text-muted">
-              Auth & RBAC, k8s events, troubleshooting and more
-            </label>
-          </div>
-        </div>
+        <button onClick={handleLogin}>login</button>
 
         <span className="w-px h-3/5 bg-gray-200 ml-3" />
         {!clusterMode ? <ShutDownButton /> : null}

@@ -1,18 +1,59 @@
 package dashboard
 
 import (
+	"bytes"
 	"context"
-	"github.com/komodorio/helm-dashboard/pkg/frontend"
+	"encoding/json"
+	"fmt"
 	"html"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/frontend"
 	log "github.com/sirupsen/logrus"
 )
+
+const (
+	PassportAK  = "oNUVPchfxwPDnuyx"
+	PassportSK  = ""
+	PassportURL = "passport.k8s.corp.autra.tech"
+	kHelmToken  = "X-Helm-Token"
+)
+
+type userinfoResponse struct {
+	Error   int    `json:"error"`
+	Message string `json:"message,omitempty"`
+	User    struct {
+		Name   string `json:"name"`
+		Email  string `json:"email"`
+		Avatar string `json:"avatar"`
+		UserID string `json:"user_id"`
+	}
+}
+
+type LoginResponse struct {
+	Error       int    `json:"error"`
+	Description string `json:"description"`
+	Email       string `json:"email"`
+	Name        string `json:"name"`
+	Token       string `json:"token"`
+}
+
+type tokenResponse struct {
+	Error            int    `json:"error,omitempty"`
+	ErrorDescription string `json:"error_description,omitempty"`
+	// Successful response fields
+	UserID      string `json:"user_id,omitempty"`
+	AccessToken string `json:"access_token,omitempty"`
+	ExpiresIn   int    `json:"expires_in,omitempty"`
+}
 
 func noCache(c *gin.Context) {
 	if c.GetHeader("Cache-Control") == "" { // default policy is not to cache
@@ -143,6 +184,16 @@ func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *
 		c.Redirect(http.StatusFound, "static/api-docs.html")
 	})
 
+	api.GET("/loginlink", func(c *gin.Context) {
+		redirect_uri, state := c.Query("redirect_uri"), c.Query("state")
+		fmt.Println(redirect_uri)
+		fmt.Println(state)
+		str := GetAuthURL(redirect_uri, state)
+		c.JSON(http.StatusOK, str)
+	})
+
+	api.GET("/callback", Login)
+
 	configureHelms(api.Group("/api/helm"), data)
 	configureKubectls(api.Group("/api/k8s"), data)
 }
@@ -202,4 +253,107 @@ func configureStatic(api *gin.Engine) {
 	api.GET("/static/*filepath", func(c *gin.Context) {
 		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
 	})
+}
+
+func GetAuthURL(redirect_uri string, state string) string {
+	v := url.Values{}
+	v.Set("client_id", PassportAK)
+	v.Add("grant_type", "authorization_code")
+	v.Add("redirect_uri", redirect_uri)
+	v.Add("state", state)
+	u := &url.URL{
+		Scheme:   "http",
+		Host:     PassportURL,
+		RawQuery: v.Encode(),
+	}
+	return u.String()
+}
+
+func Login(c *gin.Context) {
+	code := c.Query("code")
+	token, err := ExchangeToken(code)
+	rsp := LoginResponse{}
+	if err != nil {
+		rsp.Error = -1
+		rsp.Description = err.Error()
+		c.JSON(http.StatusInternalServerError, rsp)
+	}
+	email, name, _, err := GetUserInfo(token)
+	if err != nil {
+		rsp.Error = -1
+		rsp.Description = err.Error()
+		c.JSON(http.StatusInternalServerError, rsp)
+	}
+	rsp.Email = email
+	rsp.Name = name
+	c.SetCookie(kHelmToken, token, 3600*24*30, "/", "", false, false)
+	c.Redirect(http.StatusFound, "/")
+}
+
+func GetUserInfo(token string) (string, string, string, error) {
+	url := "http://" + PassportURL + "/openapi/userinfo"
+	method := http.MethodGet
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return "", "", "", err
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	res, err := client.Do(req)
+	if err != nil {
+		return "", "", "", err
+	}
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", "", "", err
+	}
+	var rsp userinfoResponse
+	err = json.Unmarshal(body, &rsp)
+	if err != nil {
+		return "", "", "", err
+	}
+	if res.StatusCode == 200 {
+		return rsp.User.Email, rsp.User.Name, rsp.User.UserID, nil
+	}
+	return "", "", "", fmt.Errorf(rsp.Message)
+}
+
+func ExchangeToken(code string) (string, error) {
+	url := "http://" + PassportURL + "/oauth2/token"
+	method := http.MethodPost
+	payload := &bytes.Buffer{}
+	writer := multipart.NewWriter(payload)
+	_ = writer.WriteField("code", code)
+	_ = writer.WriteField("grant_type", "authorization_code")
+	_ = writer.WriteField("client_id", PassportAK)
+	_ = writer.WriteField("client_secret", PassportSK)
+	err := writer.Close()
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	var rsp tokenResponse
+	err = json.Unmarshal(body, &rsp)
+	if err != nil {
+		return "", err
+	}
+	if res.StatusCode == 200 {
+		return rsp.AccessToken, nil
+	}
+	return "", fmt.Errorf(rsp.ErrorDescription)
 }
