@@ -40,7 +40,7 @@ export const useDiffData = ({
   selectedRepo: string;
   versionsError: string;
   currentVerManifest: string;
-  selectedVerData: any;
+  selectedVerData: { [key: string]: string };
   chart: string;
 }) => {
   return useQuery(

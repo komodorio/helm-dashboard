@@ -116,7 +116,9 @@ class ApiService {
   }): Promise<ReleaseHealthStatus[] | null> => {
     if (!release) return null;
 
-    const data = await this.fetchWithDefaults(
+    const data = await this.fetchWithDefaults<
+      Promise<ReleaseHealthStatus[] | null>
+    >(
       `/api/helm/releases/${release.namespace}/${release.name}/resources?health=true`
     );
     return data;
@@ -129,14 +131,21 @@ class ApiService {
 
     if (!params.namespace || !params.chart) return [];
 
-    const data = await this.fetchWithDefaults(
+    const data = await this.fetchWithDefaults<ReleaseRevision[]>(
       `/api/helm/releases/${params.namespace}/${params.chart}/history`
     );
 
     return data;
   };
 
-  getValues = async ({ queryKey }: any) => {
+  getValues = async ({
+    queryKey,
+  }: {
+    queryKey: [
+      string,
+      { namespace: string; chart: { name: string }; version: number }
+    ];
+  }) => {
     const [, params] = queryKey;
     const { namespace, chart, version } = params;
 

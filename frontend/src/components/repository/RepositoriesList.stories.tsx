@@ -1,20 +1,19 @@
-// RepositoriesList.stories.ts|tsx
-
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react";
 import RepositoriesList from "./RepositoriesList";
 
-//👇 This default export determines where your story goes in the story list
-export default {
+const meta = {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
   title: "RepositoriesList",
   component: RepositoriesList,
-} as ComponentMeta<typeof RepositoriesList>;
+} satisfies Meta<typeof RepositoriesList>;
+
+export default meta;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof RepositoriesList> = () => (
+const Template: StoryFn<typeof RepositoriesList> = () => (
   <RepositoriesList
     selectedRepository={undefined}
     // in this case we allow Unexpected empty method
@@ -24,4 +23,6 @@ const Template: ComponentStory<typeof RepositoriesList> = () => (
   />
 );
 
-export const Default = Template.bind({});
+export const Default = {
+  render: Template,
+};

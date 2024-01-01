@@ -1,10 +1,15 @@
 import { Meta, StoryFn } from "@storybook/react";
 import { Troubleshoot } from "./Troubleshoot";
 
-export default {
+const meta = {
   title: "Troubleshoot",
   component: Troubleshoot,
-} as Meta<typeof Troubleshoot>;
+} satisfies Meta<typeof Troubleshoot>;
+
+export default meta;
 
 const Template: StoryFn<typeof Troubleshoot> = () => <Troubleshoot />;
-export const Default = Template.bind({});
+
+export const Default = {
+  render: Template,
+};

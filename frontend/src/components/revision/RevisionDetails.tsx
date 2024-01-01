@@ -23,7 +23,7 @@ import {
 import RevisionDiff from "./RevisionDiff";
 import RevisionResource from "./RevisionResource";
 import Tabs from "../Tabs";
-import { useMutation } from "@tanstack/react-query";
+import { type UseQueryResult, useMutation } from "@tanstack/react-query";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
@@ -125,10 +125,10 @@ export default function RevisionDetails({
         ns: namespace,
         name: chart,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       setShowErrorModal({
         title: "Test failed to run",
-        msg: error.message,
+        msg: (error as Error).message,
       });
     }
     setShowTestResults(true);
@@ -207,7 +207,7 @@ export default function RevisionDetails({
               <span
                 onClick={() => {
                   navigate(
-                    `/${context}/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
+                    `/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
                   );
                 }}
                 className="underline text-sm cursor-pointer text-blue-600"
@@ -320,7 +320,7 @@ const Rollback = ({
   release: Release;
   installedRevision: ReleaseRevision;
 }) => {
-  const { chart, namespace, revision, context } = useParams();
+  const { chart, namespace, revision } = useParams();
   const navigate = useNavigateWithSearchParams();
 
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
@@ -330,9 +330,7 @@ const Rollback = ({
     useRollbackRelease({
       onSuccess: () => {
         navigate(
-          `/${context}/${namespace}/${chart}/installed/revision/${
-            revisionInt + 1
-          }`
+          `/${namespace}/${chart}/installed/revision/${revisionInt + 1}`
         );
         window.location.reload();
       },
@@ -398,7 +396,11 @@ const Rollback = ({
     );
   };
 
-  const RollbackModalContent = ({ dataResponse }: { dataResponse: any }) => {
+  const RollbackModalContent = ({
+    dataResponse,
+  }: {
+    dataResponse: UseQueryResult<string, unknown>;
+  }) => {
     const {
       data,
       isLoading,

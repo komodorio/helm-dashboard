@@ -1,29 +1,26 @@
-/* eslint-disable no-console */
-// ClustersListBar.stories.ts|tsx
-
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import ClustersList from "./ClustersList";
 
-//👇 This default export determines where your story goes in the story list
-export default {
+const meta = {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
   title: "ClustersList",
   component: ClustersList,
-} as ComponentMeta<typeof ClustersList>;
+} satisfies Meta<typeof ClustersList>;
+
+export default meta;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof ClustersList> = () => (
-  <ClustersList
-    filteredNamespaces={[""]}
-    installedReleases={[]}
-    onClusterChange={() => {
-      console.log("onClusterChange called");
-    }}
-    selectedCluster={""}
-  />
-);
+export const Default: StoryObj<typeof ClustersList> = {
+  args: {
+    filteredNamespaces: [""],
+    installedReleases: [],
+    selectedCluster: "",
+  },
 
-export const Default = Template.bind({});
+  argTypes: {
+    onClusterChange: { actions: "onClusterChange called" },
+  },
+};

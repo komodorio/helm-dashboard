@@ -1,10 +1,10 @@
 // .storybook/main.ts
 
-import type { StorybookViteConfig } from "@storybook/builder-vite";
-import path from "path";
-const config: StorybookViteConfig = {
+import type { StorybookConfig } from "@storybook/react-vite";
+const config: StorybookConfig = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
+    "@storybook/addon-actions",
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-styling",
