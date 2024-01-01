@@ -77,7 +77,7 @@
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier src/ --check",
     "prettier:fix": "npm run prettier -- --write",
-    "cypress:open": "cypress open"
+    "cypress": "cypress open"
   },
   "keywords": [],
   "author": "",
