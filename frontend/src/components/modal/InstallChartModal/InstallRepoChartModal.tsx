@@ -13,6 +13,7 @@ import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
+import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
 
 export const InstallRepoChartModal = ({
   isOpen,
@@ -159,9 +160,11 @@ export const InstallRepoChartModal = ({
         onClose();
       }}
       title={
-        <div className="font-bold">
-          Install <span className="text-green-700 ">{chartName}</span>
-        </div>
+        <InstallUpgradeTitle
+          isUpgrade={false}
+          releaseValues={false}
+          chartName={chartName}
+        />
       }
       containerClassNames="w-full text-2xl h-2/3"
       actions={[
