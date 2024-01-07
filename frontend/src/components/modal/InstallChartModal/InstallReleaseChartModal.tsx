@@ -19,6 +19,7 @@ import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
+import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
 
 export const InstallReleaseChartModal = ({
   isOpen,
@@ -186,12 +187,11 @@ export const InstallReleaseChartModal = ({
         onClose();
       }}
       title={
-        <div className="font-bold">
-          {`${isUpgrade ? "Upgrade" : "Install"} `}
-          {(isUpgrade || releaseValues) && (
-            <span className="text-green-700 ">{chartName}</span>
-          )}
-        </div>
+        <InstallUpgradeTitle
+          isUpgrade={isUpgrade}
+          releaseValues={isUpgrade || releaseValues}
+          chartName={chartName}
+        />
       }
       containerClassNames="w-full text-2xl h-2/3"
       actions={[
