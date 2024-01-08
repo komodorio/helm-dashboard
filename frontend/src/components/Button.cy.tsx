@@ -9,6 +9,15 @@ describe("Button component tests", () => {
     cy.get("button").should("exist");
   });
 
+  it("Should have correct text", () => {
+    mount(
+      <Button label={buttonText} onClick={() => {}}>
+        {buttonText}
+      </Button>
+    );
+    cy.get("button").contains(buttonText);
+  });
+
   it("calls onClick when clicked", () => {
     const onClickStub = cy.stub().as("onClick");
 
