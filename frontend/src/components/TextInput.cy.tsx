@@ -1,4 +1,4 @@
-import TextInput from "./TextInput";
+import TextInput from "../components/TextInput";
 
 describe("TextInput", () => {
   const label = "label";
