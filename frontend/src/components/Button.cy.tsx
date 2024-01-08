@@ -1,24 +1,27 @@
-import Button from "./Button";
+import { mount } from "cypress/react18";
+import { Button } from "./common/Button/Button";
 
 describe("Button component tests", () => {
+  const buttonText = "buttonText";
+
   it("renders", () => {
-    cy.mount(<Button onClick={() => {}}>Click me</Button>);
+    mount(<Button onClick={() => {}}>{buttonText}</Button>);
     cy.get("button").should("exist");
   });
 
   it("calls onClick when clicked", () => {
     const onClickStub = cy.stub().as("onClick");
 
-    cy.mount(<Button onClick={onClickStub}>Click me</Button>);
+    mount(<Button onClick={onClickStub}>{buttonText}</Button>);
 
     cy.get("button").click();
     cy.get("@onClick").should("have.been.calledOnce");
   });
 
   it("should be disabled", () => {
-    cy.mount(
+    mount(
       <Button onClick={() => {}} disabled>
-        Click me
+        {buttonText}
       </Button>
     );
 
