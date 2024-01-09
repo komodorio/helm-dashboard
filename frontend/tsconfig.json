@@ -14,8 +14,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["cypress"]
   },
-  "include": ["src", "public/static",   ".storybook/**/*.ts", "public/analytics.js"],
+  "include": [
+    "src",
+    "public/static",
+    ".storybook/**/*.ts",
+    "public/analytics.js",
+    "cypress"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
