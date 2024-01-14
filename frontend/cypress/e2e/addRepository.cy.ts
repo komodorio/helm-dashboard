@@ -3,25 +3,22 @@ describe("Adding repository flow", () => {
     cy.visit(
       "http://localhost:5173/#/minikube/installed?filteredNamespace=default"
     );
-    cy.contains("Repository").click();
-    cy.contains("+ Add Repository").click();
 
-    cy.get("#name").type("Komodorio");
-    cy.get("#url").type("https://helm-charts.komodor.io");
-    cy.get(".p-5.text-sm button").contains("Add Repository").click();
+    cy.get("[data-cy='navigation-link']").contains("Repository").click();
+    cy.get("[data-cy='install-repository-button']").click();
+
+    cy.get("[data-cy='add-chart-name']").type("Komodorio");
+    cy.get("[data-cy='add-chart-url']").type("https://helm-charts.komodor.io");
+
+    cy.get("[data-cy='add-chart-repository-button']").click();
 
     cy.contains("https://helm-charts.komodor.io");
-    cy.get(".flex.flex-col.p-6 .grid.grid-cols-10 button")
+
+    cy.get("[data-cy='chart-viewer-install-button']")
       .eq(0)
-      .should("have.text", "Install")
-      .click({ force: true });
-
-    cy.wait(3000);
-
-    cy.contains("Chart Value Reference");
-
-    cy.get("pre").scrollTo("bottom");
-    cy.get(".p-4.space-y-6.overflow-y-auto").scrollTo("bottom");
+      .click({ force: true })
+      .contains("Install")
+      .click();
 
     cy.contains("Confirm").click();
   });

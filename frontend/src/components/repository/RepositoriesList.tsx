@@ -57,6 +57,7 @@ function RepositoriesList({
           ))}
         </div>
         <button
+          data-cy="install-repository-button"
           type="button"
           style={{ marginTop: "10px" }}
           className="h-8 w-fit flex items-center gap-2 border rounded text-muted border-gray-300 px-3 py-1 text-sm font-semibold"
