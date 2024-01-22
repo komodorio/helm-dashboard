@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
 	"sort"
 	"strconv"
@@ -24,6 +22,8 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
 	helmtime "helm.sh/helm/v3/pkg/time"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/utils/strings/slices"
 )
 

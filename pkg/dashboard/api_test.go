@@ -297,8 +297,8 @@ func TestE2E(t *testing.T) {
 	form.Add("values", "dashboard:\n  allowWriteActions: true\n")
 	req, err = http.NewRequest("POST", "/api/helm/releases/test1/release1", strings.NewReader(form.Encode()))
 	assert.NilError(t, err)
-	newRouter.ServeHTTP(w, req)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusAccepted)
 
 	// get history of revisions for release
