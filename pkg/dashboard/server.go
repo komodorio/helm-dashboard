@@ -199,6 +199,7 @@ func NewHelmConfig(origSettings *cli.EnvSettings, ns string) (*action.Configurat
 		helmDriver, log.Debugf); err != nil {
 		return nil, errorx.Decorate(err, "failed to init Helm action config")
 	}
+	actionConfig.Releases.MaxHistory = origSettings.MaxHistory
 
 	return actionConfig, nil
 }
