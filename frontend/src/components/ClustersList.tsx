@@ -112,10 +112,10 @@ function ClustersList({
               return (
                 <span
                   key={cluster.Name}
-                  className="flex items-center mt-2 text-xs"
+                  className="data-cy-clusterName flex items-center mt-2 text-xs"
                 >
                   <input
-                    className="cursor-pointer"
+                    className="cursor-pointer data-cy-clustersInput"
                     onChange={(e) => {
                       onClusterChange(e.target.value);
                     }}

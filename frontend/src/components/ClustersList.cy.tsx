@@ -38,5 +38,8 @@ describe("<ClustersList />", () => {
         </BrowserRouter>
       </AppContextProvider>
     );
+
+    cy.get(".data-cy-clusterName").should("exist");
+    cy.get(".data-cy-clustersInput").should("be.checked");
   });
 });
