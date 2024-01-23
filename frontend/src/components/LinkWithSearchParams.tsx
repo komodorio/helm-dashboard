@@ -13,7 +13,7 @@ const LinkWithSearchParams = ({
 }) => {
   const { search } = useLocation();
   const { context } = useParams();
-  const {clusterMode} = useAppContext();
+  const { clusterMode } = useAppContext();
 
   const params = new URLSearchParams(search);
   // For state we don't want to keep while navigating
@@ -27,7 +27,13 @@ const LinkWithSearchParams = ({
     prefixedUrl = `/${context}${to}`;
   }
 
-  return <NavLink to={`${prefixedUrl}/?${params.toString()}`} {...props} />;
+  return (
+    <NavLink
+      data-cy="navigation-link"
+      to={`${prefixedUrl}/?${params.toString()}`}
+      {...props}
+    />
+  );
 };
 
 export default LinkWithSearchParams;
