@@ -154,7 +154,7 @@ function ClustersList({
             />
             <label
               htmlFor={namespace.name}
-              className="ml-1"
+              className="data-cy-clusterList-namespace ml-1"
             >{`${namespace.name} [${namespace.amount}]`}</label>
           </span>
         ))}
