@@ -2,8 +2,6 @@ package objects
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v3"
-	"helm.sh/helm/v3/pkg/registry"
 	"io"
 	"os"
 	"path"
@@ -12,12 +10,14 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 )
@@ -94,6 +94,9 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 	cmd.Version = version
 
 	cmd.DryRun = justTemplate
+	if cmd.DryRun {
+		cmd.DryRunOption = "server"
+	}
 
 	chrt, err := locateChart(cmd.ChartPathOptions, repoChart, a.Settings)
 	if err != nil {
@@ -332,6 +335,9 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 	cmd.Version = version
 
 	cmd.DryRun = justTemplate
+	if cmd.DryRun {
+		cmd.DryRunOption = "server"
+	}
 	cmd.ResetValues = true
 
 	chrt, err := locateChart(cmd.ChartPathOptions, repoChart, r.Settings)
