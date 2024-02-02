@@ -330,6 +330,7 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, v
 	}
 
 	cmd := action.NewUpgrade(hc)
+	cmd.MaxHistory = r.Settings.MaxHistory
 
 	cmd.Namespace = r.Settings.Namespace()
 	cmd.Version = version
