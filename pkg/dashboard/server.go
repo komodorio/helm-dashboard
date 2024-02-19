@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/joomcode/errorx"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/env"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
@@ -38,9 +39,7 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 	}
 
 	data.LocalCharts = s.LocalCharts
-
-	isDevModeWithAnalytics := os.Getenv("HD_DEV_ANALYTICS") == "true"
-	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || isDevModeWithAnalytics
+	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || env.ParseEnvAsBool("HD_DEV_ANALYTICS", false)
 
 	err = s.detectClusterMode(data)
 	if err != nil {
@@ -58,7 +57,7 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 }
 
 func (s *Server) detectClusterMode(data *objects.DataLayer) error {
-	data.StatusInfo.ClusterMode = os.Getenv("HD_CLUSTER_MODE") != ""
+	data.StatusInfo.ClusterMode = env.ParseEnvAsBool("HD_CLUSTER_MODE", false)
 	if data.StatusInfo.ClusterMode {
 		return nil
 	}
