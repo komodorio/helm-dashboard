@@ -3,4 +3,4 @@ Dockerfile
 bin
 .idea
 .git
-dashboard/node_modules
+frontend/node_modules
