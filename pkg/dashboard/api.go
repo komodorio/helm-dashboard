@@ -7,9 +7,9 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/env"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/komodorio/helm-dashboard/pkg/frontend"
 	log "github.com/sirupsen/logrus"
 )
@@ -95,7 +95,7 @@ func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool)
 	api.Use(errorHandler)
 	api.Use(corsMiddleware())
 
-	if env.ParseEnvAsBool("HD_CORS", false) {
+	if utils.EnvAsBool("HD_CORS", false) {
 		api.Use(allowCORS)
 	}
 

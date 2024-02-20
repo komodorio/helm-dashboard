@@ -13,7 +13,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/env"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/pkg/browser"
 	log "github.com/sirupsen/logrus"
 )
@@ -51,7 +51,7 @@ func main() {
 		opts.BindHost = host
 	}
 
-	opts.Verbose = opts.Verbose || env.ParseEnvAsBool("DEBUG", false)
+	opts.Verbose = opts.Verbose || utils.EnvAsBool("DEBUG", false)
 	setupLogging(opts.Verbose)
 
 	server := dashboard.Server{

@@ -10,7 +10,7 @@ import (
 	"io"
 
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/env"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
@@ -193,7 +193,7 @@ func (d *DataLayer) nsForCtx(ctx string) string {
 }
 
 func (d *DataLayer) PeriodicTasks(ctx context.Context) {
-	if !env.ParseEnvAsBool("HD_NO_AUTOUPDATE", false) {
+	if !utils.EnvAsBool("HD_NO_AUTOUPDATE", false) {
 		// auto-update repos
 		go d.loopUpdateRepos(ctx, 10*time.Minute) // TODO: parameterize interval?
 	}
