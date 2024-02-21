@@ -5425,15 +5425,15 @@ didyoumean@^1.2.2:
   resolved "https://registry.npmjs.org/didyoumean/-/didyoumean-1.2.2.tgz"
   integrity sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==
 
-diff2html@^3.4.35:
-  version "3.4.35"
-  resolved "https://registry.npmjs.org/diff2html/-/diff2html-3.4.35.tgz"
-  integrity sha512-+pKs1BrA7l8DAwY33awHyznE3iuTIo58xmINmDBUwGsnou2KvBoSr6dAa6AvQAM7SH+nGtuOKNXmxumgbGp/Pw==
+diff2html@^3.4.46:
+  version "3.4.47"
+  resolved "https://registry.yarnpkg.com/diff2html/-/diff2html-3.4.47.tgz#a9d33bb63815031981fac682eeb2a5d74a931109"
+  integrity sha512-2llDp8750FRUJl8n7apM0tlcqZYxbDHTw7qhzv/kGddByHRpn3Xg/sWHHIy34h492aGSpStEULydxqrITYpuoA==
   dependencies:
     diff "5.1.0"
     hogan.js "3.0.2"
   optionalDependencies:
-    highlight.js "11.6.0"
+    highlight.js "11.9.0"
 
 diff@5.1.0, diff@^5.0.0:
   version "5.1.0"
@@ -6887,10 +6887,10 @@ hastscript@^6.0.0:
     property-information "^5.0.0"
     space-separated-tokens "^1.0.0"
 
-highlight.js@11.6.0:
-  version "11.6.0"
-  resolved "https://registry.npmjs.org/highlight.js/-/highlight.js-11.6.0.tgz"
-  integrity sha512-ig1eqDzJaB0pqEvlPVIpSSyMaO92bH1N2rJpLMN/nX396wTpDA4Eq0uK+7I/2XG17pFaaKE0kjV/XPeGt7Evjw==
+highlight.js@11.9.0:
+  version "11.9.0"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-11.9.0.tgz#04ab9ee43b52a41a047432c8103e2158a1b8b5b0"
+  integrity sha512-fJ7cW7fQGCYAkgv4CPfwFHrfd/cLS4Hau96JuJ+ZTOWhjnhoeN1ub1tFmALm/+lW5z4WCAuAV9bm05AP0mS6Gw==
 
 highlight.js@^10.4.1, highlight.js@~10.7.0:
   version "10.7.3"
@@ -7096,9 +7096,9 @@ invariant@^2.2.2, invariant@^2.2.4:
     loose-envify "^1.0.0"
 
 ip@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/ip/-/ip-2.0.0.tgz"
-  integrity sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/ip/-/ip-2.0.1.tgz#e8f3595d33a3ea66490204234b77636965307105"
+  integrity sha512-lJUL9imLTNi1ZfXT+DU6rBBdbiKGBuay9B6xGSPVjUeQwaH1RIGqef8RZkUtHioLmSNpPR5M4HVKJGm1j8FWVQ==
 
 ipaddr.js@1.9.1:
   version "1.9.1"
