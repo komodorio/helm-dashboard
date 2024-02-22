@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 	"helm.sh/helm/v3/pkg/action"
@@ -27,7 +28,7 @@ var inMemStorage *storage.Storage
 var repoFile string
 
 func TestMain(m *testing.M) { // fixture to set logging level via env variable
-	if os.Getenv("DEBUG") != "" {
+	if utils.EnvAsBool("DEBUG", false) {
 		log.SetLevel(log.DebugLevel)
 		log.Debugf("Set logging level")
 	}
