@@ -241,6 +241,11 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 	if len(res) > 0 {
 		c.IndentedJSON(http.StatusOK, res[:1])
 	} else {
+		if utils.EnvAsBool("HD_NO_ARTIFACT_HUB_QUERY", false) {
+			c.Status(http.StatusNoContent)
+			return
+		}
+
 		// caching it to avoid too many requests
 		found, err := h.Data.Cache.String("chart-artifacthub-query/"+qp.Name, nil, func() (string, error) {
 			return h.repoFromArtifactHub(qp.Name)
