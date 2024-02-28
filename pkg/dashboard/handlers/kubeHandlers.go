@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
@@ -8,7 +10,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	v12 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/utils/strings/slices"
-	"net/http"
 )
 
 const Unknown = "Unknown"
@@ -56,7 +57,7 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 		return
 	}
 
-	EnhanceStatus(res, nil)
+	res.Status = *EnhanceStatus(res, nil)
 
 	c.IndentedJSON(http.StatusOK, res)
 }
