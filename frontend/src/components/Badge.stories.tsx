@@ -1,7 +1,7 @@
 /*
  * @file Badge.stories.tsx
  * @description Badge stories, using Storybook.
- * We create a story for the componenet badge,
+ * We create a story for the component badge,
  * and we can use it to test the component in Storybook.
  * There, we can see the component in different states, and
  * play with the props to see how it behaves.
