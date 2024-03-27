@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func ChartAndVersion(x string) (string, string, error) {
 }
 
 func TempFile(txt string) (string, func(), error) {
-	file, err := os.CreateTemp("", "helm_dahsboard_*.yaml")
+	file, err := os.CreateTemp("", "helm_dashboard_*.yaml")
 	if err != nil {
 		return "", nil, err
 	}
@@ -115,4 +116,14 @@ func GetQueryProps(c *gin.Context) (*QueryProps, error) {
 	}
 
 	return &qp, nil
+}
+
+func EnvAsBool(envKey string, envDef bool) bool {
+	validSettableValues := []string{"false", "true", "0", "1"}
+	envValue := os.Getenv(envKey)
+	if slices.Contains(validSettableValues, envValue) {
+		return envValue == "true" || envValue == "1"
+	} else {
+		return envDef
+	}
 }

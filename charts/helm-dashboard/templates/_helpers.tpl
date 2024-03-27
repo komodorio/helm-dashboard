@@ -60,3 +60,31 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Return the proper image Registry Secret Names
+*/}}
+{{- define "helm-dashboard.imagePullSecrets" -}}
+{{ include "common.images.pullSecrets" (dict "images" (list .Values.image) "global" .Values.global) }}
+{{- end -}}
+
+
+{{/*
+Return the proper image name
+*/}}
+{{- define "helm-dashboard.image" -}}
+{{- $image := .Values.image -}}
+{{- $tag := .Chart.AppVersion -}}
+{{- if $image.tag -}}
+{{- $tag = $image.tag -}}
+{{- end -}}
+{{- $_ := set $image "tag" $tag -}}
+{{ include "common.images.image" (dict "imageRoot" $_ "global" .Values.global) }}
+{{- end -}}
+
+{{/*
+Return the proper image name
+*/}}
+{{- define "test.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.testImage "global" .Values.global) }}
+{{- end -}}

@@ -3,7 +3,6 @@ package objects
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -11,7 +10,7 @@ import (
 	"io"
 
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/subproc"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
@@ -25,7 +24,6 @@ import (
 
 type DataLayer struct {
 	KubeContext string
-	Scanners    []subproc.Scanner
 	StatusInfo  *StatusInfo
 	Namespaces  []string
 	Cache       *Cache
@@ -195,14 +193,10 @@ func (d *DataLayer) nsForCtx(ctx string) string {
 }
 
 func (d *DataLayer) PeriodicTasks(ctx context.Context) {
-	// TODO: separate scanning setup for in-cluster?
-
-	if os.Getenv("HD_NO_AUTOUPDATE") == "" {
+	if !utils.EnvAsBool("HD_NO_AUTOUPDATE", false) {
 		// auto-update repos
 		go d.loopUpdateRepos(ctx, 10*time.Minute) // TODO: parameterize interval?
 	}
-
-	// auto-scan
 }
 
 func (d *DataLayer) loopUpdateRepos(ctx context.Context, interval time.Duration) {

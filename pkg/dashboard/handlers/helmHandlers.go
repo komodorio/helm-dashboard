@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"net/http"
 	"sort"
 	"strconv"
@@ -18,12 +16,14 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	"github.com/rogpeppe/go-internal/semver"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
 	helmtime "helm.sh/helm/v3/pkg/time"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
 	"k8s.io/utils/strings/slices"
 )
 
@@ -241,6 +241,11 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 	if len(res) > 0 {
 		c.IndentedJSON(http.StatusOK, res[:1])
 	} else {
+		if utils.EnvAsBool("HD_NO_ARTIFACT_HUB_QUERY", false) {
+			c.Status(http.StatusNoContent)
+			return
+		}
+
 		// caching it to avoid too many requests
 		found, err := h.Data.Cache.String("chart-artifacthub-query/"+qp.Name, nil, func() (string, error) {
 			return h.repoFromArtifactHub(qp.Name)

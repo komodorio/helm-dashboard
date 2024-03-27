@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 	"helm.sh/helm/v3/pkg/action"
@@ -27,7 +28,7 @@ var inMemStorage *storage.Storage
 var repoFile string
 
 func TestMain(m *testing.M) { // fixture to set logging level via env variable
-	if os.Getenv("DEBUG") != "" {
+	if utils.EnvAsBool("DEBUG", false) {
 		log.SetLevel(log.DebugLevel)
 		log.Debugf("Set logging level")
 	}
@@ -109,7 +110,7 @@ func TestConfigureRoutes(t *testing.T) {
 	// Create a API Engine
 	api := gin.Default()
 
-	// Required arguements for route configuration
+	// Required arguments for route configuration
 	abortWeb := func() {}
 	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
@@ -130,7 +131,7 @@ func TestContextSetter(t *testing.T) {
 	w := httptest.NewRecorder()
 	con := GetTestGinContext(w)
 
-	// Required arguements
+	// Required arguments
 	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
 
 	if err != nil {
@@ -171,29 +172,6 @@ func TestNewRouter(t *testing.T) {
 	newRouter := NewRouter(abortWeb, data, false)
 
 	newRouter.ServeHTTP(w, req)
-
-	assert.Equal(t, w.Code, http.StatusOK)
-}
-
-func TestConfigureScanners(t *testing.T) {
-	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/api/scanners", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Required arguemnets
-	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	apiEngine := gin.Default()
-
-	configureScanners(apiEngine.Group("/api/scanners"), data)
-
-	apiEngine.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
 }
@@ -320,8 +298,8 @@ func TestE2E(t *testing.T) {
 	form.Add("values", "dashboard:\n  allowWriteActions: true\n")
 	req, err = http.NewRequest("POST", "/api/helm/releases/test1/release1", strings.NewReader(form.Encode()))
 	assert.NilError(t, err)
-	newRouter.ServeHTTP(w, req)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	newRouter.ServeHTTP(w, req)
 	assert.Equal(t, w.Code, http.StatusAccepted)
 
 	// get history of revisions for release

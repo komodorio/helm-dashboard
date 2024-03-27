@@ -21,10 +21,7 @@ spec:
       labels:
         {{- include "helm-dashboard.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "helm-dashboard.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "helm-dashboard.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -38,7 +35,7 @@ spec:
           {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ include "helm-dashboard.image" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: HELM_CACHE_HOME
@@ -48,7 +45,7 @@ spec:
             - name: HELM_DATA_HOME
               value: /opt/dashboard/helm/data
             - name: DEBUG
-              value: {{- ternary " 1" "" .Values.debug }}
+              value: {{- ternary " '1'" "" .Values.debug }}
             {{- if .Values.dashboard.namespace }}
             - name: HELM_NAMESPACE
               value: {{ .Values.dashboard.namespace }}
@@ -60,11 +57,11 @@ spec:
           livenessProbe:
             httpGet:
               path: /status
-              port: http
+              port: 8080
           readinessProbe:
             httpGet:
               path: /status
-              port: http
+              port: 8080
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

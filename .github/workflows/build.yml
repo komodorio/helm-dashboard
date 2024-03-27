@@ -3,10 +3,10 @@ name: Build
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - "*"
+      - "*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -18,10 +18,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
+
+      # Node part
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.5.2
         with:
-          go-version: "1.20"
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: NPM install
+        run: npm i
+        working-directory: ./frontend
+      - name: NPM build
+        run: npm run build
+        working-directory: ./frontend
+
+      # Golang part
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
       - name: Unit tests
         run: |
           go test -v -race ./... -covermode=atomic -coverprofile=coverage.out # Run all the tests with the race detector enabled
@@ -46,14 +61,6 @@ jobs:
           name: binaries
           path: dist/
           retention-days: 1
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3.3.1
-        with:
-          # version: latest
-          # skip-go-installation: true
-          skip-pkg-cache: true
-          skip-build-cache: true
-          # args: --timeout=15m
 
   image:
     runs-on: ubuntu-latest
@@ -90,13 +97,40 @@ jobs:
           build-args: VER=0.0.0-dev
           platforms: linux/amd64,linux/arm64
 
-  helm_check:
+  static_and_lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: make dir for frontend results # don't delete this step, it will break goreleaser
+        run: mkdir pkg/frontend/dist && touch pkg/frontend/dist/.gitkeep
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          # version: latest
+          skip-pkg-cache: true
+          skip-build-cache: true
+          args: --timeout=5m
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: ./frontend/package-lock.json
+      - name: NPM install
+        run: npm i
+        working-directory: ./frontend
+      - name: NPM lint
+        run: npm run lint
+        working-directory: ./frontend
+
       - name: Helm Template Check For Sanity
         uses: igabaydulin/helm-check-action@0.1.4
         env:

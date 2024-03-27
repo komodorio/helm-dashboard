@@ -26,6 +26,8 @@ go.work
 /bin
 /.idea/
 
+/node_modules
 .DS_Store
 .vscode/
 /pkg/dashboard/objects/testdata/hello-world-0.1.0.tgz
+/pkg/frontend/dist/*

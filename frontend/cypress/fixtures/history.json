@@ -1,0 +1,13 @@
+[
+  {
+      "revision": 1,
+      "updated": "2024-01-17T22:39:07.2371554+02:00",
+      "status": "deployed",
+      "chart": "helm-dashboard-0.1.10",
+      "app_version": "1.3.3",
+      "description": "Install complete",
+      "chart_name": "helm-dashboard",
+      "chart_ver": "0.1.10",
+      "has_tests": true
+  }
+]

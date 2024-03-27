@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="pkg/dashboard/static/logo-header-inverted.svg">
-    <source media="(prefers-color-scheme: light)" srcset="pkg/dashboard/static/logo-header.svg#gh-light-mode-only">
-    <img alt="Helm Dashboard" src="pkg/dashboard/static/logo-header.svg#gh-light-mode-only">
+    <source media="(prefers-color-scheme: dark)" srcset="images/logo-header-inverted.svg">
+    <source media="(prefers-color-scheme: light)" srcset="images/logo-header.svg#gh-light-mode-only">
+    <img alt="Helm Dashboard" src="images/logo-header.svg#gh-light-mode-only">
   </picture>
 </p>
 
@@ -17,10 +17,10 @@
 ## Description
 
 _Helm Dashboard_ is an **open-source project** which offers a UI-driven way to view the installed Helm charts, see their revision history and
-corresponding k8s resources. Also, you can perform simple actions like roll back to a revision or upgrade to newer
-version.
-This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision of
-helping Kubernetes users to navigate and troubleshoot their clusters, the project is **NOT** an official project by the [helm team](https://helm.sh/).
+corresponding k8s resources. It also allows users to perform simple actions such as rolling back to a 
+revision or upgrading to a newer version.
+This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision to
+help Kubernetes users to navigate and troubleshoot their clusters. It is important to note that Helm Dashboard is **NOT** an official project by the [helm team](https://helm.sh/).
 
 Key capabilities of the tool:
 
@@ -33,13 +33,15 @@ Key capabilities of the tool:
 - Can be used locally, or installed into Kubernetes cluster
 - Does not require Helm or Kubectl installed
 
-## Setup
+All the features of the tool can be discovered via our [features overview page](FEATURES.md).
+
+## Installation
 
 ### Standalone Binary
 
 Since version 1.0, the recommended install method is to just use standalone binary. It does not require Helm or kubectl to be installed. 
 
-Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it.
+Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it. See below section for some more CLI parameters to use.
 
 ### Using Helm plugin manager
 
@@ -94,45 +96,6 @@ If you want to increase the logging verbosity and see all the debug info, use th
 
 The official helm chart is [available here](https://github.com/komodorio/helm-charts/blob/master/charts/helm-dashboard)
 
-## Selected Features
-
-### Support for Local Charts
-
-Local Helm chart is a directory with specially named files and a `Chart.yaml` file, which you can install via Helm, without the need to publish the chart into Helm repository. Chart developers might want to experiment with the chart locally, before uploading into public repository. Also, a proprietary application might only use non-published chart as an approach to deploy the software.
-
-For all the above use-cases, you may use Helm Dashboard UI, specifying the location of your local chart folders via special `--local-chart` command-line parameter. The parameter might be specified multiple times, for example:
-
-```shell
-helm-dashboard --local-chart=/opt/charts/my-private-app --local-chart=/home/dev/sources/app/chart
-```
-
-When _valid_ local chart sources specified, the repository list would contain a surrogate `[local]` entry, with those charts listed inside. All the chart operations are normal: installing, reconfiguring and upgrading. 
-
-![](images/screenshot_local_charts.png)
-
-### Execute Helm tests
-
-For all the release(s) (installed helm charts), you can execute helm tests for that release. For the tests to execute successfully, you need to have existing tests for that helm chart.
-
-You can execute `helm test` for the specific release as below:
-![](images/screenshot_run_test.png)
-
-The result of executed `helm test` for the release will be displayed as below:
-![](images/screenshot_run_test_result.png)
-
-### Scanner Integrations
-
-Upon startup, Helm Dashboard detects the presence of [Trivy](https://github.com/aquasecurity/trivy)
-and [Checkov](https://github.com/bridgecrewio/checkov) scanners. When available, these scanners are offered on k8s
-resources page, as well as install/upgrade preview page.
-
-You can request scanning of the specific k8s resource in your cluster:
-![](images/screenshot_scan_resource.png)
-
-If you want to validate the k8s manifest prior to installing/reconfiguring a Helm chart, look for "Scan for Problems"
-button at the bottom of the dialog:
-![](images/screenshot_scan_manifest.png)
-
 ## Support Channels
 
 We have two main channels for supporting the Helm Dashboard
@@ -153,23 +116,30 @@ Kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand ab
 
 Prerequisites, binaries installed and operational:
 
-- [Go](https://go.dev/doc/install)
+- [Golang](https://go.dev/doc/install)
+- NodeJS 
 
-There is a need to build binary for plugin to function, run:
+There is a need to build frontend and then backend as series of commands, run:
 
 ### Linux
 
 ```shell
+cd frontend && npm run build && cd ..
 go build -o bin/dashboard .
 ```
+
+or just `make build` that will do everything inside.
+
+Then, you can run `npm run dev` from `frontend` directory to work on frontend with Vite hot reload.
 
 ### Windows
 
 ```bat
+cd frontend && npm run build && cd ..
 go build -o bin\dashboard.exe .
 ```
 
-You can just run the `dashboard` or `dashboard.exe` binary directly, it will just work.
+You can just run the `dashboard` or `dashboard.exe` binary directly.
 
 To install, checkout the source code and run from source dir:
 
@@ -188,3 +158,15 @@ helm dashboard
 ```
 
 Then, use the web UI.
+
+
+## Development Snapshots
+
+In our GitHub actions, we attach the built binaries as build artifacts, you can download and test it fully assembled.
+
+Also, we upload `unstable` tag for Docker image upon every build of `main` branch, you can make our Helm chart to use that image by providing values:
+```yaml
+image:
+  pullPolicy: Always
+  tag: unstable
+```
