@@ -3,6 +3,8 @@ package objects
 import (
 	"context"
 	"encoding/json"
+	"sort"
+
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -23,7 +25,6 @@ import (
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/describe"
 	"k8s.io/utils/strings/slices"
-	"sort"
 )
 
 type KubeContext struct {
