@@ -8,23 +8,21 @@
 
 <p align="center">A simplified way of working with Helm.</p>
 
-
 ![GitHub contributors](https://img.shields.io/github/contributors/komodorio/helm-dashboard) [![GitHub issues](https://img.shields.io/github/issues-raw/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard/issues) ![GitHub stars](https://img.shields.io/github/stars/komodorio/helm-dashboard?style=social) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/komodorio/helm-dashboard) ![GitHub pull requests](https://img.shields.io/github/issues-pr/komodorio/helm-dashboard) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard/releases) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/komodorio/helm-dashboard) [![GitHub license](https://img.shields.io/github/license/komodorio/helm-dashboard)](https://github.com/komodorio/helm-dashboard) [![codecov](https://codecov.io/gh/komodorio/helm-dashboard/branch/main/graph/badge.svg?token=PXPSNVHI2T)](https://codecov.io/gh/komodorio/helm-dashboard)
 
 <kbd>[<img src="images/screenshot.png" style="width: 100%; border: 1px solid silver;" border="1" alt="Screenshot">](images/screenshot.png)</kbd>
 
-
 ## Description
 
 _Helm Dashboard_ is an **open-source project** which offers a UI-driven way to view the installed Helm charts, see their revision history and
-corresponding k8s resources. It also allows users to perform simple actions such as rolling back to a 
+corresponding k8s resources. It also allows users to perform simple actions such as rolling back to a
 revision or upgrading to a newer version.
 This project is part of [Komodor's](https://komodor.com/?utm_campaign=Helm-Dash&utm_source=helm-dash-gh) vision to
 help Kubernetes users to navigate and troubleshoot their clusters. It is important to note that Helm Dashboard is **NOT** an official project by the [helm team](https://helm.sh/).
 
 Key capabilities of the tool:
 
-- See all installed charts and their revision history 
+- See all installed charts and their revision history
 - See manifest diff of the past revisions
 - Browse k8s resources resulting from the chart
 - Easy rollback or upgrade version with a clear and easy manifest diff
@@ -39,7 +37,7 @@ All the features of the tool can be discovered via our [features overview page](
 
 ### Standalone Binary
 
-Since version 1.0, the recommended install method is to just use standalone binary. It does not require Helm or kubectl to be installed. 
+Since version 1.0, the recommended install method is to just use standalone binary. It does not require Helm or kubectl to be installed.
 
 Download the appropriate [release package](https://github.com/komodorio/helm-dashboard/releases) for your platform, unpack it and just run `dashboard` binary from it. See below section for some more CLI parameters to use.
 
@@ -71,7 +69,7 @@ After installing, start the UI by running:
 helm dashboard
 ```
 
-The command above will launch the local Web server and will open the UI in new browser tab. The command will hang
+The command above will launch the local Web server and will open the UI in a new browser tab. The command will hang
 waiting for you to terminate it in command-line or web UI.
 
 You can see the list of available command-line flags by running `helm dashboard --help`.
@@ -86,7 +84,7 @@ If your port 8080 is busy, you can specify a different port to use via `--port <
 
 If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line. You can specify multiple namespaces, separated by commas.
 
-If you don't want browser tab to automatically open, add `--no-browser` flag in your command line.
+If you don't want the browser tab to automatically open, add `--no-browser` flag in your command line.
 
 If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
 
@@ -117,9 +115,9 @@ Kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand ab
 Prerequisites, binaries installed and operational:
 
 - [Golang](https://go.dev/doc/install)
-- NodeJS 
+- Node.js
 
-There is a need to build frontend and then backend as series of commands, run:
+There is a need to build frontend and then backend as a series of commands, run:
 
 ### Linux
 
@@ -128,7 +126,7 @@ cd frontend && npm run build && cd ..
 go build -o bin/dashboard .
 ```
 
-or just `make build` that will do everything inside.
+Or just `make build` that will do everything inside.
 
 Then, you can run `npm run dev` from `frontend` directory to work on frontend with Vite hot reload.
 
@@ -147,7 +145,7 @@ To install, checkout the source code and run from source dir:
 helm plugin install .
 ```
 
-Local installation of plugin just creates a symlink, so making the changes and rebuilding the binary would not require
+A local installation of the plugin just creates a symlink, so making the changes and rebuilding the binary would not require
 to
 reinstall a plugin.
 
@@ -159,12 +157,12 @@ helm dashboard
 
 Then, use the web UI.
 
-
 ## Development Snapshots
 
 In our GitHub actions, we attach the built binaries as build artifacts, you can download and test it fully assembled.
 
 Also, we upload `unstable` tag for Docker image upon every build of `main` branch, you can make our Helm chart to use that image by providing values:
+
 ```yaml
 image:
   pullPolicy: Always
