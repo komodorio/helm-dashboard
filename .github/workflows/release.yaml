@@ -1,4 +1,4 @@
-name: release
+name: Release
 
 on:
   push:
@@ -30,8 +30,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      # Node part
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.5.2
         with:
-          fetch-depth: 0
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: NPM install
+        run: npm i
+        working-directory: ./frontend
+      - name: NPM build
+        run: npm run build
+        working-directory: ./frontend
+
+      # Golang part
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -42,7 +55,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: "1.18.2"
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Binary Versions
