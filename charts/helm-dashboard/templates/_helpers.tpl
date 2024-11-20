@@ -74,10 +74,7 @@ Return the proper image name
 */}}
 {{- define "helm-dashboard.image" -}}
 {{- $image := .Values.image -}}
-{{- $tag := .Chart.AppVersion -}}
-{{- if $image.tag -}}
-{{- $tag = $image.tag -}}
-{{- end -}}
+{{- $tag := default .Chart.AppVersion $image.tag -}}
 {{- $_ := set $image "tag" $tag -}}
 {{ include "common.images.image" (dict "imageRoot" $_ "global" .Values.global) }}
 {{- end -}}
