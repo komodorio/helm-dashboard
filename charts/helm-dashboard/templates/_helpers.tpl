@@ -54,11 +54,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "helm-dashboard.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "helm-dashboard.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- default (.Values.serviceAccount.create | ternary (include "helm-dashboard.fullname" .) "default") .Values.serviceAccount.name }}
 {{- end }}
 
 {{/*
