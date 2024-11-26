@@ -21,7 +21,7 @@ function Installed() {
 
   const handleClusterChange = (clusterName: string) => {
     navigate({
-      pathname: `/${clusterName}/installed`,
+      pathname: `/${encodeURIComponent(clusterName)}/installed`,
     });
   };
 

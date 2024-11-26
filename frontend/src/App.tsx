@@ -35,7 +35,7 @@ const PageLayout = () => {
 const SyncContext: React.FC = () => {
   const { context } = useParams();
   if (context) {
-    apiService.setCluster(context);
+    apiService.setCluster(decodeURIComponent(context));
   }
 
   return <Outlet />;
