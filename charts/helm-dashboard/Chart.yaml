@@ -5,5 +5,5 @@ name: helm-dashboard
 description: A GUI Dashboard for Helm by Komodor
 icon: "https://raw.githubusercontent.com/komodorio/helm-dashboard/refs/heads/main/images/logo.svg"
 
-version: 2.0.2
-appVersion: "2.0.2" 
+version: 2.0.3
+appVersion: "2.0.3" 
