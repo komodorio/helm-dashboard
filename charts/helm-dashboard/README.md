@@ -75,7 +75,8 @@ The following table lists the configurable parameters of the chart and their def
 | `dashboard.persistence.accessModes`   | Persistent Volume access modes                                                                 | `["ReadWriteOnce"]`              |
 | `dashboard.persistence.storageClass`  | Persistent Volume storage class                                                                | `""`                             |
 | `dashboard.persistence.size`          | Persistent Volume size                                                                         | `100M`                           |
-| `dashboard.persistence.hostPath`      | Set path in case you want to use local host path volumes (not recommended in production)       | `""`                             |
+| `dashboard.persistence.finalizers`    | Finalizers for the Persistent Volume Claim                                                     | `[kubernetes.io/pvc-protection]`                             |
+| `dashboard.persistence.lookupVolumeName` | Lookup volume name for the Persistent Volume Claim                                             | `true`                             |
 | `updateStrategy.type`                 | Set up update strategy for helm-dashboard installation.                                        | `RollingUpdate`                  |             
 | `extraArgs`                           | Set the arguments to be supplied to the helm-dashboard binary                                  | `[--no-browser, --bind=0.0.0.0]` |
 | `testImage.repository`                | Test image registry/name                                                                       | `busybox`                        |
