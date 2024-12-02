@@ -74,12 +74,14 @@
 
               },
               "enabled":true,
-              "hostPath":"",
               "labels":{
 
               },
               "size":"100M",
-              "storageClass":null
+              "finalizers":[
+                "kubernetes.io/pvc-protection"
+              ],
+              "lookupVolumeName": true
            }
         },
         "debug":false,

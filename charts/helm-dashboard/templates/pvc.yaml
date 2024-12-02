@@ -10,47 +10,22 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-spec:
-  {{- if .Values.dashboard.persistence.hostPath }}
-  storageClassName: ""
-  {{- else }}
-  {{- if kindIs "string" .Values.dashboard.persistence.storageClass }}
-  storageClassName: "{{ .Values.dashboard.persistence.storageClass }}"
-  {{- end }}
-  {{- end }}
-  accessModes:
-  {{- if not (empty .Values.dashboard.persistence.accessModes) }}
-  {{- range .Values.dashboard.persistence.accessModes }}
-    - {{ . | quote }}
-  {{- end }}
-  {{- end }}
-  resources:
-    requests:
-      storage: {{ .Values.dashboard.persistence.size | quote }}
-{{- end }}
-
----
-{{- if and .Values.dashboard.persistence.enabled .Values.dashboard.persistence.hostPath -}}
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: {{ include "helm-dashboard.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
-  labels:
-    {{- include "helm-dashboard.labels" . | nindent 4 }}
-  {{- with .Values.dashboard.persistence.annotations }}
-  annotations:
+  {{- with .Values.dashboard.persistence.finalizers }}
+  finalizers:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   accessModes:
-  {{- if not (empty .Values.dashboard.persistence.accessModes) }}
   {{- range .Values.dashboard.persistence.accessModes }}
     - {{ . | quote }}
   {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.dashboard.persistence.size | quote }}
+  {{- if and (.Values.dashboard.persistence.lookupVolumeName) (lookup "v1" "PersistentVolumeClaim" .Release.Namespace (include "helm-dashboard.fullname" .)) }}
+  volumeName: {{ (lookup "v1" "PersistentVolumeClaim" .Release.Namespace (include "helm-dashboard.fullname" .)).spec.volumeName }}
   {{- end }}
-  capacity:
-    storage: {{ .Values.dashboard.persistence.size | quote }}
-  hostPath:
-    path: {{ .Values.dashboard.persistence.hostPath | quote }}
-{{- end -}}
+  {{- with .Values.dashboard.persistence.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+{{- end }}
