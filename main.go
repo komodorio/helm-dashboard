@@ -12,8 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/utils"
 	"github.com/pkg/browser"
 	log "github.com/sirupsen/logrus"
 )

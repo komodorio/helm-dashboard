@@ -10,14 +10,14 @@ import (
 	"time"
 
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/objects"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-version"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 )
 
