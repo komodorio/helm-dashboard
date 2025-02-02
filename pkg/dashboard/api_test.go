@@ -10,9 +10,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/utils"
 	log "github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 	"helm.sh/helm/v3/pkg/action"
