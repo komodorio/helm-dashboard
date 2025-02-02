@@ -1,4 +1,4 @@
-module github.com/komodorio/helm-dashboard
+module github.com/komodorio/helm-dashboard/v2
 
 go 1.22
 
