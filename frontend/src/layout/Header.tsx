@@ -124,7 +124,7 @@ export default function Header() {
                 ]}
               />
             </li>
-            {statusData?.LatestVer ? (
+            {statusData?.CurVer !== statusData?.LatestVer  ? (
               <li className="min-w-[130px]">
                 <a
                   href="https://github.com/komodorio/helm-dashboard/releases"
