@@ -1,6 +1,6 @@
 module github.com/komodorio/helm-dashboard/v2
 
-go 1.22
+go 1.24
 
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
