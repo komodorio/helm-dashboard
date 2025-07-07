@@ -15,7 +15,7 @@ import { useGetLatestVersion } from "../../API/releases";
 import { isNewerVersion } from "../../utils";
 import { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
-import {useInView} from "react-intersection-observer";
+import { useInView } from "react-intersection-observer";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -27,7 +27,7 @@ export default function InstalledPackageCard({
   const navigate = useNavigateWithSearchParams();
 
   const [isMouseOver, setIsMouseOver] = useState(false);
-  const {ref, inView} = useInView({
+  const { ref, inView } = useInView({
     threshold: 0.3,
     triggerOnce: true,
   });

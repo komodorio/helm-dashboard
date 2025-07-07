@@ -17,9 +17,12 @@ export const GeneralDetails = ({
   onReleaseNameInput: (chartName: string) => void;
 }) => {
   const [namespaceInputValue, setNamespaceInputValue] = useState(namespace);
-  const namespaceInputValueDebounced = useDebounce<string>(namespaceInputValue, 500);
+  const namespaceInputValueDebounced = useDebounce<string>(
+    namespaceInputValue,
+    500
+  );
   useEffect(() => {
-      onNamespaceInput(namespaceInputValueDebounced);
+    onNamespaceInput(namespaceInputValueDebounced);
   }, [namespaceInputValueDebounced, onNamespaceInput]);
   const { context } = useParams();
   const inputClassName = ` text-lg py-1 px-2 border border-1 border-gray-300 ${

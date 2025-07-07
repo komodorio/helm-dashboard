@@ -39,7 +39,8 @@ export default function ErrorModal({
         and support.{" "}
         <a
           href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&utm_source=helm-dash&utm_medium=cta&utm_content=helm-dash"
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
         >
           <span className="text-link-color underline">Sign up for free.</span>
         </a>
