@@ -91,12 +91,6 @@ export default function Header() {
               <DropDown
                 items={[
                   {
-                    id: "1",
-                    text: "Support chat",
-                    icon: <BsSlack />,
-                    onClick: openSupportChat,
-                  },
-                  {
                     id: "2",
                     text: "Project Page",
                     icon: <BsGithub />,
@@ -124,7 +118,7 @@ export default function Header() {
                 ]}
               />
             </li>
-            {statusData?.CurVer !== statusData?.LatestVer  ? (
+            {"v"+statusData?.CurVer !== statusData?.LatestVer  ? (
               <li className="min-w-[130px]">
                 <a
                   href="https://github.com/komodorio/helm-dashboard/releases"
