@@ -52,7 +52,14 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 	api := NewRouter(cancel, data, s.Debug)
 	done := s.startBackgroundServer(api, ctx)
 
-	return "http://" + s.Address, done, nil
+	basePath := strings.TrimSpace(os.Getenv("HD_BASE_PATH"))
+	if basePath == "/" {
+		basePath = ""
+	}
+	if basePath != "" && !strings.HasPrefix(basePath, "/") {
+		basePath = "/" + basePath
+	}
+	return "http://" + s.Address + basePath + "/", done, nil
 }
 
 func (s *Server) detectClusterMode(data *objects.DataLayer) error {
