@@ -4,6 +4,7 @@ FROM node:latest as frontend
 WORKDIR /build
 
 COPY frontend ./
+ARG VITE_BASE_PATH
 
 RUN npm i && npm run build
 
