@@ -8,18 +8,13 @@ interface Props {
 }
 
 const HealthStatus = ({ statusData }: Props) => {
-  const statuses = statusData.map((item) => {
-    for (let i = 0; i < item.status.conditions.length; i++) {
-      const cond = item.status.conditions[i];
-
-      if (cond.type !== HD_RESOURCE_CONDITION_TYPE) {
-        continue;
-      }
-
-      return (
+  const statuses = statusData.flatMap((item) => {
+    return item.status?.conditions
+      ?.filter((cond) => cond.type === HD_RESOURCE_CONDITION_TYPE)
+      .map((cond) => (
         <Tooltip
-          key={uuidv4()} // this is not a good practice, we need to fetch some unique id from the backend
-          content={`${cond.status} ${item.kind} ${item.metadata.name}`}
+          key={item.metadata?.name}  // Use unique property as the key
+          content={`${cond.status} ${item.kind} ${item.metadata?.name}`}
         >
           <span
             className={`inline-block ${
@@ -31,9 +26,12 @@ const HealthStatus = ({ statusData }: Props) => {
             } w-2.5 h-2.5 rounded-sm`}
           ></span>
         </Tooltip>
-      );
-    }
+      ));
   });
+
+  if (statuses.length === 0) {
+    return <div>No health statuses available</div>;
+  }
 
   return <div className="flex flex-wrap gap-1">{statuses}</div>;
 };
