@@ -53,10 +53,9 @@ export type ReleaseHealthStatus = {
   metadata: {
     name: string;
     namespace: string;
-    creationTimestamp?: string;
-    labels: {
-      [key: string]: string;
-    };
+    uid?: string; // added: Kubernetes UID for stable identification
+    creationTimestamp: Date;
+    labels: string[];
   };
   spec: unknown;
   status: {
