@@ -1,4 +1,4 @@
-import { StoryFn, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import RepositoriesList from "./RepositoriesList";
 
 const meta = {
@@ -17,7 +17,7 @@ const Template: StoryFn<typeof RepositoriesList> = () => (
   <RepositoriesList
     selectedRepository={undefined}
     // in this case we allow Unexpected empty method
-    //eslint-disable-next-line @typescript-eslint/no-empty-function
+     
     onRepositoryChanged={() => {}}
     repositories={[]}
   />

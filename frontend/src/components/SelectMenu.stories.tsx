@@ -6,7 +6,7 @@
  * The default story renders the component with the default props.
  */
 
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { action } from "@storybook/addon-actions";
 import SelectMenu, { SelectMenuItem } from "./SelectMenu";
 

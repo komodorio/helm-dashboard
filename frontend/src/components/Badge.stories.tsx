@@ -14,7 +14,7 @@
  * @see https://storybook.js.org/docs/react/writing-stories/introduction
  */
 
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import Badge from "./Badge";
 
 // We set the metadata for the story.

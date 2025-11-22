@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import StatusLabel, { DeploymentStatus } from "./StatusLabel";
 
 const meta = {

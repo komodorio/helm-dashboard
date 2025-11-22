@@ -1,5 +1,5 @@
 import { action } from "@storybook/addon-actions";
-import { StoryObj, StoryFn, Meta } from "@storybook/react";
+import { StoryObj, StoryFn, Meta } from "@storybook/react-vite";
 import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
 
 const meta = {
