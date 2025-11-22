@@ -11,10 +11,9 @@ const HealthStatus = ({ statusData }: Props) => {
     return item.status?.conditions
       ?.filter((cond) => cond.type === HD_RESOURCE_CONDITION_TYPE)
       .map((cond) => {
-        const stableKey =
-          item.metadata?.uid
-            ? `${item.metadata.uid}-${item.metadata.namespace ?? "default"}`
-            : `${item.kind}-${item.metadata?.namespace ?? "default"}-${item.metadata?.name}`;
+        const stableKey = item.metadata?.uid
+          ? `${item.metadata.uid}-${item.metadata.namespace ?? "default"}`
+          : `${item.kind}-${item.metadata?.namespace ?? "default"}-${item.metadata?.name}`;
 
         return (
           <Tooltip
@@ -26,19 +25,19 @@ const HealthStatus = ({ statusData }: Props) => {
                 cond.status === "Healthy"
                   ? "bg-success"
                   : cond.status === "Progressing"
-                  ? "bg-warning"
-                  : "bg-danger"
+                    ? "bg-warning"
+                    : "bg-danger"
               } w-2.5 h-2.5 rounded-sm`}
             ></span>
           </Tooltip>
         );
       });
   });
-  
+
   if (statuses.length === 0) {
     return <div>No health statuses available</div>;
   }
-  
+
   return <div className="flex flex-wrap gap-1">{statuses}</div>;
 };
 

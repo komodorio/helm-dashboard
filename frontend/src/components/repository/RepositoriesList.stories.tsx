@@ -17,7 +17,6 @@ const Template: StoryFn<typeof RepositoriesList> = () => (
   <RepositoriesList
     selectedRepository={undefined}
     // in this case we allow Unexpected empty method
-     
     onRepositoryChanged={() => {}}
     repositories={[]}
   />
