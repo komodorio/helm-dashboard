@@ -143,7 +143,7 @@ class ApiService {
   }: {
     queryKey: [
       string,
-      { namespace: string; chart: { name: string }; version: number }
+      { namespace: string; chart: { name: string }; version: number },
     ];
   }) => {
     const [, params] = queryKey;

@@ -66,7 +66,7 @@ export type ReleaseHealthStatus = {
         lastProbeTime: string;
         lastTransitionTime?: string;
         reason: string;
-      }
+      },
     ];
   };
 };

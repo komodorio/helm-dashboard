@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { action } from "@storybook/addon-actions";
 import DropDown from "./DropDown";
 import { BsSlack, BsGithub } from "react-icons/bs";
