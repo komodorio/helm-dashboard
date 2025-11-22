@@ -89,9 +89,10 @@ func TestConfigureStatic(t *testing.T) {
 
 	// Create an API Engine
 	api := gin.Default()
+	root := api.Group("/")
 
 	// Configure static routes
-	configureStatic(api)
+	configureStatic(root)
 
 	// Start the server
 	api.ServeHTTP(w, req)
@@ -109,6 +110,7 @@ func TestConfigureRoutes(t *testing.T) {
 
 	// Create a API Engine
 	api := gin.Default()
+	root := api.Group("/")
 
 	// Required arguments for route configuration
 	abortWeb := func() {}
@@ -119,7 +121,7 @@ func TestConfigureRoutes(t *testing.T) {
 	}
 
 	// Configure routes to API engine
-	configureRoutes(abortWeb, data, api)
+	configureRoutes(abortWeb, data, root)
 
 	// Start the server
 	api.ServeHTTP(w, req)

@@ -14,14 +14,14 @@ pull: ; $(info $(M) Pulling source...) @
 	@git pull
 
 .PHONY: build_go
-build_go: $(BIN) ; $(info $(M) Building GO...) @ ## Build program binary
+build_go: $(BIN) ; $(info $(M) Building GO...) @  ## Build program binary
 	go build \
 		-ldflags '-X main.version=$(VERSION) -X main.buildDate=$(DATE)' \
-		-o bin/dashboard .
+		-o bin/dashboard . ;
 
 .PHONY: build_ui
 build_ui: $(BIN) ; $(info $(M) Building UI...) @ ## Build program binary
-	cd frontend && npm i && npm run build && cd ..
+	cd frontend && npm i && npm run build && cd .. ;
 
 .PHONY: build
 build: build_ui build_go ; $(info $(M) Building executable...) @ ## Build program binary

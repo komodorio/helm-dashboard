@@ -64,6 +64,9 @@ Return the proper image name
 {{- define "helm-dashboard.image" -}}
 {{- $image := .Values.image -}}
 {{- $tag := default .Chart.AppVersion $image.tag -}}
+{{- if .Values.image.basePath }}
+  {{- $tag = printf "%s%s" $tag "-basepath" -}}
+{{- end -}}
 {{- $_ := set $image "tag" $tag -}}
 {{ include "common.images.image" (dict "imageRoot" $_ "global" .Values.global) }}
 {{- end -}}
