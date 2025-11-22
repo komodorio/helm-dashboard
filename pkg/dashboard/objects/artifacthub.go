@@ -3,11 +3,12 @@ package objects
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	neturl "net/url"
 	"os"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var mxArtifactHub sync.Mutex

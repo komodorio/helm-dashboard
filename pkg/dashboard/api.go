@@ -7,10 +7,10 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/handlers"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/objects"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
-	"github.com/komodorio/helm-dashboard/pkg/frontend"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/handlers"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/objects"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/utils"
+	"github.com/komodorio/helm-dashboard/v2/pkg/frontend"
 	log "github.com/sirupsen/logrus"
 )
 

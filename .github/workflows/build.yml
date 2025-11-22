@@ -17,11 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Node part
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.5.2
+        uses: actions/setup-node@v4
         with:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
@@ -36,7 +36,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.24"
       - name: Unit tests
         run: |
           go test -v -race ./... -covermode=atomic -coverprofile=coverage.out # Run all the tests with the race detector enabled
@@ -53,10 +53,10 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: "1.18.2"
-          args: release --snapshot --rm-dist
+          args: release --snapshot --clean
       - name: Test if the Binary is Runnable
         run: "dist/helm-dashboard_linux_amd64_v1/helm-dashboard --help"
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries
           path: dist/
@@ -67,7 +67,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Docker meta
         uses: docker/metadata-action@v3
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -110,7 +110,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.24"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
@@ -120,7 +120,7 @@ jobs:
           args: --timeout=5m
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           cache: 'npm'
           cache-dependency-path: ./frontend/package-lock.json
@@ -132,7 +132,7 @@ jobs:
         working-directory: ./frontend
 
       - name: Helm Template Check For Sanity
-        uses: igabaydulin/helm-check-action@0.1.4
+        uses: igabaydulin/helm-check-action@0.2.1
         env:
           CHART_LOCATION: ./charts/helm-dashboard
           CHART_VALUES: ./charts/helm-dashboard/values.yaml

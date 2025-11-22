@@ -10,7 +10,7 @@ import (
 	"io"
 
 	"github.com/joomcode/errorx"
-	"github.com/komodorio/helm-dashboard/pkg/dashboard/utils"
+	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"

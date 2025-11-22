@@ -4,11 +4,10 @@ import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
 import ShutDownButton from "../components/ShutDownButton";
 import {
-  BsSlack,
-  BsGithub,
   BsArrowRepeat,
-  BsBraces,
   BsBoxArrowUpRight,
+  BsBraces,
+  BsGithub,
 } from "react-icons/bs";
 import { useGetApplicationStatus } from "../API/other";
 import LinkWithSearchParams from "../components/LinkWithSearchParams";
@@ -24,10 +23,6 @@ export default function Header() {
   });
 
   const location = useLocation();
-
-  const openSupportChat = () => {
-    window.open("https://app.slack.com/client/T03Q4H8PCRW", "_blank");
-  };
 
   const openProjectPage = () => {
     window.open("https://github.com/komodorio/helm-dashboard", "_blank");
@@ -91,12 +86,6 @@ export default function Header() {
               <DropDown
                 items={[
                   {
-                    id: "1",
-                    text: "Support chat",
-                    icon: <BsSlack />,
-                    onClick: openSupportChat,
-                  },
-                  {
                     id: "2",
                     text: "Project Page",
                     icon: <BsGithub />,
@@ -124,7 +113,7 @@ export default function Header() {
                 ]}
               />
             </li>
-            {statusData?.LatestVer ? (
+            {"v" + statusData?.CurVer !== statusData?.LatestVer ? (
               <li className="min-w-[130px]">
                 <a
                   href="https://github.com/komodorio/helm-dashboard/releases"

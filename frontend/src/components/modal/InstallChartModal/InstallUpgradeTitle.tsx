@@ -17,7 +17,7 @@ export const InstallUpgradeTitle: FC<InstallUpgradeProps> = ({
     <div className="font-bold">
       {`${text}`}
       {(isUpgrade || releaseValues) && (
-        <span className="text-green-700">{chartName}</span>
+        <span className="text-green-700 ml-1">{chartName}</span>
       )}
     </div>
   );

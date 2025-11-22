@@ -15,6 +15,7 @@ import { useGetLatestVersion } from "../../API/releases";
 import { isNewerVersion } from "../../utils";
 import { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
+import { useInView } from "react-intersection-observer";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -26,7 +27,10 @@ export default function InstalledPackageCard({
   const navigate = useNavigateWithSearchParams();
 
   const [isMouseOver, setIsMouseOver] = useState(false);
-
+  const { ref, inView } = useInView({
+    threshold: 0.3,
+    triggerOnce: true,
+  });
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
     queryKey: ["chartName", release.chartName],
     cacheTime: 0,
@@ -34,6 +38,7 @@ export default function InstalledPackageCard({
 
   const { data: statusData } = useQuery<unknown>({
     queryKey: ["resourceStatus", release],
+    enabled: inView,
     queryFn: () => apiService.getResourceStatus({ release }),
   });
 
@@ -73,6 +78,7 @@ export default function InstalledPackageCard({
 
   return (
     <div
+      ref={ref}
       className={`${
         borderLeftColor[release.status]
       } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-2 custom-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
