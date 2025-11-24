@@ -7,7 +7,7 @@
  */
 
 import { Meta, StoryObj } from "@storybook/react-vite";
-import { action } from "@storybook/addon-actions";
+import { action } from "storybook/actions";
 import SelectMenu, { SelectMenuItem } from "./SelectMenu";
 
 const meta = {

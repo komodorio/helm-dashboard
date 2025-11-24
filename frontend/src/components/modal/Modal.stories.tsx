@@ -1,4 +1,4 @@
-import { action } from "@storybook/addon-actions";
+import { action } from "storybook/actions";
 import { StoryObj, StoryFn, Meta } from "@storybook/react-vite";
 import Modal, { ModalAction, ModalButtonStyle } from "./Modal";
 
