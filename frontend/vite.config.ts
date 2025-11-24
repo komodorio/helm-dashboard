@@ -29,6 +29,17 @@ export default defineConfig(({ mode }) => {
       assetsDir: "./assets/",
       outDir: "../pkg/frontend/dist",
       emptyOutDir: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    react: ['react', 'react-dom', 'react-router-dom'],
+                    vendors: ['luxon','highlight.js','diff2html','swagger-ui-react']
+                }
+            }
+        }
+    },
+    css: {
+      postcss: './postcss.config.cjs'
     },
     server: {
       proxy: {
