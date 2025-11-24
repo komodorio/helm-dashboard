@@ -31,6 +31,39 @@
     --color-gray-100: #f3f4f6;
     --color-gray-200: #e5e7eb;
     --color-gray-300: #d1d5db;
+    --color-cluster-list: #3d4048;
+    --color-dark: #3d4048;
+    --color-tab-color: #3B3D45;
+    --color-primary: #1347FF;
+    --color-secondary: #ECEFF2;
+    --color-muted: #707583;
+    --color-error-border: #DC3545;
+    --color-error-background: #F9D7DA;
+    --color-error-color: #842029;
+    --color-failed: #FC1683;
+    --color-deployed: #1FA470;
+    --color-superseded: #9195A1;
+    --color-pending: #5AB0FF;
+    --color-danger: #ff0072;
+    --color-text-danger: #FC1683;
+    --color-text-warning: #ffc107;
+    --color-text-success: #A4F8D7;
+    --color-upgradable: #0d6efd;
+    --color-warning: #ffa800;
+    --color-success: #00c2ab;
+    --color-border-deployed: #1BE99A;
+    --color-revision-light: #DCDDDF;
+    --color-revision-dark: #007bff;
+    --color-installed-charts-filter: #dad8ce;
+    --color-dropdown: #E9ECEF;
+    --color-chart-values: #ECEFF2;
+    --color-add-repo: #0b5ed7;
+    --color-link-color: #0D6EFD;
+    --color-body-background: #F4F7FA;
+    --color-repository: #D6EFFE;
+    --color-revision: #D6EFFE;
+    --color-header-install: #EBEFFF;
+    --color-upgrade-color: #FC1683;
 }
 
 /* 4. Base layer */
