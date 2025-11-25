@@ -50,9 +50,7 @@ export default function ErrorModal({
 
   return (
     <Modal
-      containerClassNames={
-        "border-2 border-error-border-color bg-error-background w-2/3"
-      }
+      containerClassNames={"error-dialog w-2/3"}
       title={ErrorTitle}
       isOpen={isOpen}
       onClose={onClose}

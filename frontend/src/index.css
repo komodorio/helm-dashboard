@@ -7,13 +7,13 @@
 @tailwind utilities;
 
 /* 3. Theme variables (CSS-first approach) */
-@theme {
+:root {
     /* Fonts */
     --font-roboto: "Roboto", serif;
     --font-roboto-slab: "Roboto Slab", serif;
     --font-inter: "Inter", serif;
     --font-poppins: "Poppins", sans-serif;
-    --font-sf-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", Courier New, monospace;
+    --font-sf-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Font weights */
     --font-weight-thin: 100;
@@ -64,6 +64,7 @@
     --color-revision: #D6EFFE;
     --color-header-install: #EBEFFF;
     --color-upgrade-color: #FC1683;
+
 }
 
 /* 4. Base layer */
@@ -86,9 +87,8 @@
         background-color: var(--color-white);
         border-radius: theme("borderRadius.lg");
         border: 1px solid var(--color-gray-200);
-        padding: theme("spacing.6");
         box-shadow: theme("boxShadow.xl");
-        padding-top: theme("spacing.12");
+        padding: theme("spacing.12") theme("spacing.6") theme("spacing.6");
     }
 
     .card-hover {
@@ -116,6 +116,12 @@
         position: relative;
         box-sizing: border-box;
         box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+    }
+
+    .error-dialog {
+        border:  var(--color-error-border);
+        background-color: var(--color-error-background);
+        color: var(--color-error-color);
     }
 }
 
