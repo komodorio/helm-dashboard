@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@tanstack/react-query": "^4.35.3",
+    "@tanstack/react-query": "^5.90.11",
     "compare-versions": "^6.1.1",
     "diff2html": "^3.4.46",
     "flowbite-react": "^0.12.10",
@@ -18,7 +18,7 @@
     "react-intersection-observer": "^10.0.0",
     "react-modern-drawer": "^1.4.0",
     "react-router-dom": "^6.9.0",
-    "react-select": "^5.7.4",
+    "react-select": "^5.10.2",
     "swagger-ui-react": "^5.30.3",
     "uuid": "^13.0.0"
   },
