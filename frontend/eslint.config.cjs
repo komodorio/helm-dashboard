@@ -41,6 +41,7 @@ module.exports = defineConfig([{
         "enpitech",
         "plugin:@typescript-eslint/recommended",
         "plugin:react-hooks/recommended",
+        // "plugin:@typescript-eslint/recommended-requiring-type-checking", TODO enable and fix the types
     ),
 
     plugins: {

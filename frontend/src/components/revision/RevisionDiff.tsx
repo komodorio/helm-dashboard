@@ -108,7 +108,7 @@ function RevisionDiff({
       !isLoading
     ) {
       const diff2htmlUi = new Diff2HtmlUI(
-        diffElement!.current!,
+        diffElement.current,
         data,
         diffConfiguration
       );

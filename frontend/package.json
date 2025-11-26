@@ -66,6 +66,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified. Please use 'cypress:run' or 'cypress:open' commands\" && exit 1",
+    "tsc:check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "lint": "npx eslint src/",
