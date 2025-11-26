@@ -1,5 +1,5 @@
 import { PropsWithChildren, ReactNode } from "react";
-import ReactDom from "react-dom";
+import { createPortal } from "react-dom";
 import Spinner from "../Spinner";
 
 export enum ModalButtonStyle {
@@ -75,7 +75,7 @@ const Modal = ({
     else return title;
   };
 
-  return ReactDom.createPortal(
+  return createPortal(
     <>
       {isOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ">
