@@ -1,4 +1,4 @@
-import { action } from "@storybook/addon-actions";
+import { action } from "storybook/actions";
 import { Meta } from "@storybook/react-vite";
 import ErrorModal from "./ErrorModal";
 

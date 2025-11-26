@@ -104,7 +104,7 @@ const ResourceRow = ({
         <td className="font-bold text-sm w-56">{name}</td>
         <td>{reason ? <Badge type={badgeType}>{reason}</Badge> : null}</td>
         <td className="rounded text-gray-100">
-          <div className="flex flex-col space-y-1 justify-start items-start ">
+          <div className="flex flex-col space-y-1 flex-start">
             {message && (
               <div className="text-gray-500 font-thin">{message}</div>
             )}

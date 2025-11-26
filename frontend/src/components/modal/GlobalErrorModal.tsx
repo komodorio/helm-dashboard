@@ -34,9 +34,7 @@ export default function GlobalErrorModal({
 
   return (
     <Modal
-      containerClassNames={
-        "border-2 border-error-border-color bg-error-background w-3/5 "
-      }
+      containerClassNames={"error-dialog w-3/5"}
       title={ErrorTitle}
       isOpen={isOpen}
       onClose={onClose}
