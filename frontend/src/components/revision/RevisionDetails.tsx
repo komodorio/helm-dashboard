@@ -380,7 +380,7 @@ const Rollback = ({
             id: "1",
             callback: () => {
               rollbackRelease({
-                ns: namespace as string,
+                ns: namespace,
                 name: String(chart),
                 revision: release.revision,
               });

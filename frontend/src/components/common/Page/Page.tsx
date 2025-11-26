@@ -1,4 +1,4 @@
-import React from "react";
+import { VFC, useState } from "react";
 
 import { Header } from "../Header/Header";
 import "./page.css";
@@ -7,8 +7,8 @@ type User = {
   name: string;
 };
 
-export const Page: React.VFC = () => {
-  const [user, setUser] = React.useState<User>();
+export const Page: VFC = () => {
+  const [user, setUser] = useState<User>();
 
   return (
     <article>
