@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import hljs from "highlight.js";
 import { RiExternalLinkLine } from "react-icons/ri";
@@ -162,14 +162,11 @@ const DescribeResource = ({
     namespace,
     chart
   );
-  const [yamlFormattedData, setYamlFormattedData] = useState("");
 
-  useEffect(() => {
-    if (data) {
-      const val = hljs.highlight(data, { language: "yaml" }).value;
-      setYamlFormattedData(val);
-    }
-  }, [data]);
+  const yamlFormattedData = useMemo(
+    () => hljs.highlight(data ?? "", { language: "yaml" })?.value,
+    [data]
+  );
 
   const badgeType = getBadgeType(status);
   return (

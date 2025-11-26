@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Modal from "./Modal";
 import Spinner from "../Spinner";
 import useAlertError from "../../hooks/useAlertError";
@@ -21,19 +21,20 @@ type AddRepositoryModalProps = {
 };
 
 function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
-  const [formData, setFormData] = useState<FormKeys>({} as FormKeys);
+  const {
+    searchParamsObject: { repo_url, repo_name },
+  } = useCustomSearchParams();
+  const [formData, setFormData] = useState<FormKeys>({
+    name: repo_name ?? "",
+    url: repo_url ?? "",
+    username: "",
+    password: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const alertError = useAlertError();
-  const { searchParamsObject } = useCustomSearchParams();
-  const { repo_url, repo_name } = searchParamsObject;
   const { setSelectedRepo } = useAppContext();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!repo_url || !repo_name) return;
-    setFormData({ ...formData, name: repo_name, url: repo_url });
-  }, [repo_url, repo_name, formData]);
 
   const addRepository = () => {
     const body = new FormData();

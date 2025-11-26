@@ -1,4 +1,4 @@
-import {VFC, useState} from "react";
+import { VFC, useState } from "react";
 
 import { Header } from "../Header/Header";
 import "./page.css";

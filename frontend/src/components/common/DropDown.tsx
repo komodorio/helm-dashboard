@@ -29,6 +29,15 @@ function DropDown({ items }: DropDownProps) {
 
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      setPopupState((prev) => ({
+        ...prev,
+        isOpen: false,
+      }));
+    }
+  };
+
   useEffect(() => {
     if (popupState.isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -40,15 +49,6 @@ function DropDown({ items }: DropDownProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [popupState.isOpen]);
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      setPopupState((prev) => ({
-        ...prev,
-        isOpen: false,
-      }));
-    }
-  };
 
   return (
     <>
