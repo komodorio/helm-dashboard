@@ -11,12 +11,12 @@ import apiService from "./apiService";
 export function useShutdownHelmDashboard(
   options?: UseMutationOptions<void, Error>
 ) {
-  return useMutation<void, Error>(
-    () =>
+  return useMutation<void, Error>({
+    mutationFn:() =>
       apiService.fetchWithDefaults("/", {
         method: "DELETE",
       }),
-    options
+...(options ?? {})}
   );
 }
 
@@ -24,11 +24,9 @@ export function useShutdownHelmDashboard(
 export function useGetApplicationStatus(
   options?: UseQueryOptions<ApplicationStatus>
 ) {
-  return useQuery<ApplicationStatus>(
-    ["status"],
-    () => apiService.fetchWithDefaults<ApplicationStatus>("/status"),
-    {
-      ...options,
-    }
-  );
+  return useQuery<ApplicationStatus>({
+    queryKey: ["status"],
+    queryFn: () => apiService.fetchWithDefaults<ApplicationStatus>("/status"),
+      ...(options ?? {}),
+  });
 }

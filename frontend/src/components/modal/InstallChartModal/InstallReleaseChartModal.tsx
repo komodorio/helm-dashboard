@@ -131,7 +131,7 @@ export const InstallReleaseChartModal = ({
 
   // Confirm method (install)
   const setReleaseVersionMutation = useMutation(
-    [
+    {mutationKey:[
       "setVersion",
       namespace,
       releaseName,
@@ -140,7 +140,7 @@ export const InstallReleaseChartModal = ({
       selectedCluster,
       chartAddress,
     ],
-    async () => {
+    mutationFn:async () => {
       setInstallError("");
       const formData = new FormData();
       formData.append("preview", "false");
@@ -161,7 +161,6 @@ export const InstallReleaseChartModal = ({
       );
       return data;
     },
-    {
       onSuccess: async (response) => {
         onClose();
         setSelectedVersionData({ version: "", urls: [] }); //cleanup
