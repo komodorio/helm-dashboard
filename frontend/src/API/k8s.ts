@@ -5,8 +5,11 @@ import apiService from "./apiService";
 
 // Get list of kubectl contexts configured locally
 function useGetKubectlContexts(options?: UseQueryOptions<KubectlContexts>) {
-  return useQuery<KubectlContexts >({ queryKey: ["k8s", "contexts"],queryFn:() =>apiService.fetchWithDefaults<KubectlContexts>("/api/k8s/contexts"),
-    ...(options ??{}),
+  return useQuery<KubectlContexts>({
+    queryKey: ["k8s", "contexts"],
+    queryFn: () =>
+      apiService.fetchWithDefaults<KubectlContexts>("/api/k8s/contexts"),
+    ...(options ?? {}),
   });
 }
 
