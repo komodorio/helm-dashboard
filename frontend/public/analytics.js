@@ -13,8 +13,24 @@ const BASE_ANALYTIC_MSG = {
   referrerPolicy: "no-referrer"
 };
 xhr.onload = function() {
-  if (xhr.readyState === XMLHttpRequest.DONE) {
-    const status = JSON.parse(xhr.responseText);
+  if (xhr.readyState !== XMLHttpRequest.DONE) {
+    return;
+    }
+
+    const responseTxt = xhr.responseText?.trim();
+    if (!responseTxt) {
+      console.warn("Analytics response is empty");
+      return;
+    }
+
+    let status;
+    try {
+      status = JSON.parse(responseTxt);
+    } catch (e) {
+      console.error("Failed to parse JSON: ", xhr.responseText, e);
+      return;
+    }
+
     const version = status.CurVer;
     if (status.Analytics) {
       enableDD(version);
@@ -23,7 +39,6 @@ xhr.onload = function() {
     } else {
       console.log("Analytics is disabled in this session");
     }
-  }
 };
 xhr.open("GET", "/status", true);
 xhr.send(null);
