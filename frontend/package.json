@@ -48,7 +48,7 @@
     "eslint-plugin-storybook": "^10.0.8",
     "flowbite": "^4.0.1",
     "globals": "^16.5.0",
-    "lint-staged": "^13.2.3",
+    "lint-staged": "^16.2.7",
     "postcss": "^8.4.24",
     "prettier": "^3.6.2",
     "storybook": "10.0.8",
@@ -59,7 +59,7 @@
     "vite-plugin-static-copy": "^3.1.4"
   },
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+    "*": "prettier --write --ignore-unknown"
   },
   "scripts": {
     "dev": "vite",
