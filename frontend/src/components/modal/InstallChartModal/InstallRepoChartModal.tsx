@@ -112,8 +112,8 @@ export const InstallRepoChartModal = ({
   });
 
   // Confirm method (install)
-  const setReleaseVersionMutation = useMutation(
-    {mutationKey:[
+  const setReleaseVersionMutation = useMutation({
+    mutationKey: [
       "setVersion",
       namespace,
       releaseName,
@@ -122,7 +122,7 @@ export const InstallRepoChartModal = ({
       selectedCluster,
       chartAddress,
     ],
-    mutationFn:async () => {
+    mutationFn: async () => {
       setInstallError("");
       const formData = new FormData();
       formData.append("preview", "false");
@@ -140,17 +140,14 @@ export const InstallRepoChartModal = ({
       return data;
     },
 
-      onSuccess: async (response) => {
-        onClose();
-        navigate(
-          `/${response.namespace}/${response.name}/installed/revision/1`
-        );
-      },
-      onError: (error) => {
-        setInstallError((error as Error)?.message || "Failed to update");
-      },
-    }
-  );
+    onSuccess: async (response) => {
+      onClose();
+      navigate(`/${response.namespace}/${response.name}/installed/revision/1`);
+    },
+    onError: (error) => {
+      setInstallError((error as Error)?.message || "Failed to update");
+    },
+  });
 
   return (
     <Modal

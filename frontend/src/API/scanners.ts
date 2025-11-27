@@ -14,9 +14,9 @@ import apiService from "./apiService";
 function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
   return useQuery<ScannersList>({
     queryKey: ["scanners"],
-    queryFn:() => apiService.fetchWithDefaults<ScannersList>("/api/scanners"),
-    ...(options ?? {})}
-  );
+    queryFn: () => apiService.fetchWithDefaults<ScannersList>("/api/scanners"),
+    ...(options ?? {}),
+  });
 }
 
 // Scan manifests using all applicable scanners
@@ -27,13 +27,13 @@ function useScanManifests(
   const formData = new FormData();
   formData.append("manifest", manifest);
   return useMutation<ScanResults, Error, string>({
-    mutationFn:() =>
+    mutationFn: () =>
       apiService.fetchWithDefaults<ScanResults>("/api/scanners/manifests", {
         method: "POST",
         body: formData,
       }),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 // Scan specified k8s resource in cluster
@@ -43,12 +43,12 @@ function useScanK8sResource(
   name: string,
   options?: UseQueryOptions<ScanResults>
 ) {
-  return useQuery<ScanResults>({queryKey:
-    ["scanners", "resource", kind, namespace, name],
-    queryFn:() =>
+  return useQuery<ScanResults>({
+    queryKey: ["scanners", "resource", kind, namespace, name],
+    queryFn: () =>
       apiService.fetchWithDefaults<ScanResults>(
         `/api/scanners/resource/${kind}?namespace=${namespace}&name=${name}`
       ),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }

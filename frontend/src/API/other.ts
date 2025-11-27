@@ -12,12 +12,12 @@ export function useShutdownHelmDashboard(
   options?: UseMutationOptions<void, Error>
 ) {
   return useMutation<void, Error>({
-    mutationFn:() =>
+    mutationFn: () =>
       apiService.fetchWithDefaults("/", {
         method: "DELETE",
       }),
-...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 // Gets application status
@@ -27,6 +27,6 @@ export function useGetApplicationStatus(
   return useQuery<ApplicationStatus>({
     queryKey: ["status"],
     queryFn: () => apiService.fetchWithDefaults<ApplicationStatus>("/status"),
-      ...(options ?? {}),
+    ...(options ?? {}),
   });
 }

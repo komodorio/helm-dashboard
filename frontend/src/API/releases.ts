@@ -15,10 +15,11 @@ export function useGetInstalledReleases(
   options?: UseQueryOptions<Release[]>
 ) {
   return useQuery<Release[]>({
-    queryKey:["installedReleases", context],
-    queryFn: () => apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
-    ...(options ?? {})}
-  );
+    queryKey: ["installedReleases", context],
+    queryFn: () =>
+      apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
+    ...(options ?? {}),
+  });
 }
 
 export interface ReleaseManifest {
@@ -63,13 +64,13 @@ export function useGetReleaseManifest({
   options?: UseQueryOptions<ReleaseManifest[]>;
 }) {
   return useQuery<ReleaseManifest[]>({
-    queryKey:["manifest", namespace, chartName],
-    queryFn:() =>
+    queryKey: ["manifest", namespace, chartName],
+    queryFn: () =>
       apiService.fetchWithDefaults<ReleaseManifest[]>(
         `/api/helm/releases/${namespace}/${chartName}/manifests`
       ),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 // List of installed k8s resources for this release
@@ -79,13 +80,13 @@ export function useGetResources(
   options?: UseQueryOptions<StructuredResources[]>
 ) {
   const { data, ...rest } = useQuery<StructuredResources[]>({
-    queryKey:["resources", ns, name],
-    queryFn:() =>
+    queryKey: ["resources", ns, name],
+    queryFn: () =>
       apiService.fetchWithDefaults<StructuredResources[]>(
         `/api/helm/releases/${ns}/${name}/resources?health=true`
       ),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 
   return {
     data: data
@@ -116,29 +117,29 @@ export function useGetResourceDescription(
   options?: UseQueryOptions<string>
 ) {
   return useQuery<string>({
-    queryKey:["describe", type, ns, name],
-    queryFn:() =>
+    queryKey: ["describe", type, ns, name],
+    queryFn: () =>
       apiService.fetchWithDefaults<string>(
         `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 export function useGetLatestVersion(
   chartName: string,
   options?: UseQueryOptions<ChartVersion[]>
 ) {
   return useQuery<ChartVersion[]>({
-    queryKey:["latestver", chartName],
-    queryFn:() =>
+    queryKey: ["latestver", chartName],
+    queryFn: () =>
       apiService.fetchWithDefaults<ChartVersion[]>(
         `/api/helm/repositories/latestver?name=${chartName}`
       ),
-...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 export function useGetVersions(
   chartName: string,
@@ -150,8 +151,8 @@ export function useGetVersions(
       apiService.fetchWithDefaults<LatestChartVersion[]>(
         `/api/helm/repositories/versions?name=${chartName}`
       ),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 export function useGetReleaseInfoByType(
@@ -161,16 +162,16 @@ export function useGetReleaseInfoByType(
 ) {
   const { chart, namespace, tab, revision } = params;
   return useQuery<string>({
-    queryKey:[tab, namespace, chart, revision, additionalParams],
-    queryFn:() =>
+    queryKey: [tab, namespace, chart, revision, additionalParams],
+    queryFn: () =>
       apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 export function useGetDiff(
@@ -178,16 +179,16 @@ export function useGetDiff(
   options?: UseQueryOptions<string>
 ) {
   return useQuery<string>({
-    queryKey:["diff", formData],
-    queryFn:() => {
+    queryKey: ["diff", formData],
+    queryFn: () => {
       return apiService.fetchWithDefaults<string>("/diff", {
         body: formData,
 
         method: "POST",
       });
     },
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 // Rollback the release to a previous revision
@@ -202,18 +203,21 @@ export function useRollbackRelease(
     void,
     unknown,
     { ns: string; name: string; revision: number }
-  >({mutationFn:({ ns, name, revision }) => {
-    const formData = new FormData();
-    formData.append("revision", revision.toString());
+  >({
+    mutationFn: ({ ns, name, revision }) => {
+      const formData = new FormData();
+      formData.append("revision", revision.toString());
 
-    return apiService.fetchWithDefaults<void>(
-      `/api/helm/releases/${ns}/${name}/rollback`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-  }, ...(options ?? {})});
+      return apiService.fetchWithDefaults<void>(
+        `/api/helm/releases/${ns}/${name}/rollback`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+    },
+    ...(options ?? {}),
+  });
 }
 
 // Run the tests on a release
@@ -221,7 +225,7 @@ export function useTestRelease(
   options?: UseMutationOptions<void, unknown, { ns: string; name: string }>
 ) {
   return useMutation<void, unknown, { ns: string; name: string }>({
-    mutationFn:({ ns, name }) => {
+    mutationFn: ({ ns, name }) => {
       return apiService.fetchWithDefaults<void>(
         `/api/helm/releases/${ns}/${name}/test`,
         {
@@ -229,8 +233,8 @@ export function useTestRelease(
         }
       );
     },
-...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 export function useChartReleaseValues({
@@ -249,8 +253,8 @@ export function useChartReleaseValues({
   options?: UseQueryOptions<unknown>;
 }) {
   return useQuery<unknown>({
-    queryKey:["values", namespace, release, userDefinedValue, version],
-    queryFn:() =>
+    queryKey: ["values", namespace, release, userDefinedValue, version],
+    queryFn: () =>
       apiService.fetchWithDefaults<unknown>(
         `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
           revision ? `&revision=${revision}` : ""
@@ -259,8 +263,8 @@ export function useChartReleaseValues({
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    ...(options ?? {})}
-  );
+    ...(options ?? {}),
+  });
 }
 
 export const useVersionData = ({
@@ -315,7 +319,7 @@ export const useVersionData = ({
       return data;
     },
 
-    ...(options ?? {})
+    ...(options ?? {}),
   });
 };
 
