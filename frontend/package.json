@@ -23,7 +23,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.0",
+    "@babel/core": "^7.28.5",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.1",
     "@storybook/addon-docs": "^10.0.8",
@@ -78,7 +78,7 @@
     "lint": "npx eslint src/",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier src/ --check",
-    "prettier:fix": "npm run prettier -- --write",
+    "prettier:fix": "npm run prettier '*.{js,ts,tsx,json,css,md,mdx}' -- --write",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
   },
