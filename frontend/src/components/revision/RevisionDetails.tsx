@@ -458,20 +458,19 @@ const Uninstall = () => {
     enabled: isOpen,
   });
 
-  const uninstallMutation = useMutation(
-    {mutationKey:["uninstall", namespace, chart],
-    mutationFn:() =>
+  const uninstallMutation = useMutation({
+    mutationKey: ["uninstall", namespace, chart],
+    mutationFn: () =>
       apiService.fetchWithDefaults(
         "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "delete",
         }
       ),
-      onSuccess: () => {
-        window.location.href = "/";
-      },
-    }
-  );
+    onSuccess: () => {
+      window.location.href = "/";
+    },
+  });
   const uninstallTitle = (
     <div className="font-semibold text-lg">
       Uninstall <span className="text-red-500">{chart}</span> from namespace{" "}

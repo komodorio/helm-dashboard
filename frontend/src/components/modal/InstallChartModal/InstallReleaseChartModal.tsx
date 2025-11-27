@@ -130,8 +130,8 @@ export const InstallReleaseChartModal = ({
   });
 
   // Confirm method (install)
-  const setReleaseVersionMutation = useMutation(
-    {mutationKey:[
+  const setReleaseVersionMutation = useMutation({
+    mutationKey: [
       "setVersion",
       namespace,
       releaseName,
@@ -140,7 +140,7 @@ export const InstallReleaseChartModal = ({
       selectedCluster,
       chartAddress,
     ],
-    mutationFn:async () => {
+    mutationFn: async () => {
       setInstallError("");
       const formData = new FormData();
       formData.append("preview", "false");
@@ -161,21 +161,20 @@ export const InstallReleaseChartModal = ({
       );
       return data;
     },
-      onSuccess: async (response) => {
-        onClose();
-        setSelectedVersionData({ version: "", urls: [] }); //cleanup
-        navigate(
-          `/${
-            namespace ? namespace : "default"
-          }/${releaseName}/installed/revision/${response.version}`
-        );
-        window.location.reload();
-      },
-      onError: (error) => {
-        setInstallError((error as Error)?.message || "Failed to update");
-      },
-    }
-  );
+    onSuccess: async (response) => {
+      onClose();
+      setSelectedVersionData({ version: "", urls: [] }); //cleanup
+      navigate(
+        `/${
+          namespace ? namespace : "default"
+        }/${releaseName}/installed/revision/${response.version}`
+      );
+      window.location.reload();
+    },
+    onError: (error) => {
+      setInstallError((error as Error)?.message || "Failed to update");
+    },
+  });
 
   return (
     <Modal
