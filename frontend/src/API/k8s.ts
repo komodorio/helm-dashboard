@@ -8,8 +8,7 @@ function useGetKubectlContexts(options?: UseQueryOptions<KubectlContexts>) {
   return useQuery<KubectlContexts>({
     queryKey:["k8s", "contexts"],
     queryFn:() =>
-      apiService.fetchWithDefaults<KubectlContexts>("/api/k8s/contexts"),
-    ...(options ?? {}),
+      apiService.fetchWithDefaults<KubectlContexts>("/api/k8s/contexts"), ...(options ?? {}),
   });
 }
 
