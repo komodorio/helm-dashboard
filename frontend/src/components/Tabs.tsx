@@ -25,7 +25,7 @@ export default function Tabs({ tabs, selectedTab }: TabsProps) {
         {tabs.map((tab) => (
           <button
             key={tab.label}
-            className={`cursor-pointer px-4 py-2 text-sm font-normal text-tab-color focus:outline-none"
+            className={`cursor-pointer px-4 py-2 text-sm font-normal text-tab-color focus:outline-hidden"
               ${
                 selectedTab.value === tab.value &&
                 "border-b-[3px] border-tab-color"

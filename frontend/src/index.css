@@ -1,74 +1,117 @@
-/* 1. Google Fonts */
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500&family=Poppins:wght@500;600&family=Roboto+Slab:wght@400;700");
+/* Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500&family=Poppins:wght@500;600&family=Roboto+Slab:wght@400;700")
+layer(base);
 
-/* 2. Tailwind directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind directives */
+@import "tailwindcss";
 
-/* 3. Theme variables (CSS-first approach) */
-:root {
-  /* Fonts */
-  --font-roboto: "Roboto", serif;
-  --font-roboto-slab: "Roboto Slab", serif;
-  --font-inter: "Inter", serif;
-  --font-poppins: "Poppins", sans-serif;
-  --font-sf-mono:
-    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
-    monospace;
+@plugin 'flowbite/plugin';
 
-  /* Font weights */
-  --font-weight-thin: 100;
-  --font-weight-hairline: 100;
-  --font-weight-extralight: 200;
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-semibold: 500;
-  --font-weight-extrabold: 600;
-  --font-weight-bold: 700;
+@source '../node_modules/flowbite/**/*.js';
+@config "../tailwind.config.cjs";
 
-  /* Colors */
-  --color-body: #3d4048;
-  --color-white: #ffffff;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-cluster-list: #3d4048;
-  --color-dark: #3d4048;
-  --color-tab-color: #3b3d45;
-  --color-primary: #1347ff;
-  --color-secondary: #eceff2;
-  --color-muted: #707583;
-  --color-error-border: #dc3545;
-  --color-error-background: #f9d7da;
-  --color-error-color: #842029;
-  --color-failed: #fc1683;
-  --color-deployed: #1fa470;
-  --color-superseded: #9195a1;
-  --color-pending: #5ab0ff;
-  --color-danger: #ff0072;
-  --color-text-danger: #fc1683;
-  --color-text-warning: #ffc107;
-  --color-text-success: #a4f8d7;
-  --color-upgradable: #0d6efd;
-  --color-warning: #ffa800;
-  --color-success: #00c2ab;
-  --color-border-deployed: #1be99a;
-  --color-revision-light: #dcdddf;
-  --color-revision-dark: #007bff;
-  --color-installed-charts-filter: #dad8ce;
-  --color-dropdown: #e9ecef;
-  --color-chart-values: #eceff2;
-  --color-add-repo: #0b5ed7;
-  --color-link-color: #0d6efd;
-  --color-body-background: #f4f7fa;
-  --color-repository: #d6effe;
-  --color-revision: #d6effe;
-  --color-header-install: #ebefff;
-  --color-upgrade-color: #fc1683;
+/* Components layer */
+@utility card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-xl);
+  padding: --spacing(12) --spacing(6) --spacing(6);
+}
+@utility card-hover {
+  background-color: var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  padding: --spacing(6);
+  box-shadow: var(--shadow-xl);
+}
+@utility card-active {
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  padding: --spacing(6);
+  box-shadow: var(--shadow-xl);
+}
+@utility card-disabled {
+  background-color: var(--color-gray-300);
+  border-radius: var(--radius-lg);
+  padding: --spacing(6);
+  box-shadow: var(--shadow-xl);
+}
+@utility custom-shadow {
+  position: relative;
+  box-sizing: border-box;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+}
+@utility error-dialog {
+  border: var(--color-error-border);
+  background-color: var(--color-error-background);
+  color: var(--color-error-color);
 }
 
-/* 4. Base layer */
+@layer utilities {
+  /* Theme variables (CSS-first approach) */
+  :root {
+    /* Fonts */
+    --font-roboto: "Roboto", serif;
+    --font-roboto-slab: "Roboto Slab", serif;
+    --font-inter: "Inter", serif;
+    --font-poppins: "Poppins", sans-serif;
+    --font-sf-mono:
+      SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+      monospace;
+
+    /* Font weights */
+    --font-weight-thin: 100;
+    --font-weight-hairline: 100;
+    --font-weight-extralight: 200;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-semibold: 500;
+    --font-weight-extrabold: 600;
+    --font-weight-bold: 700;
+
+    /* Colors */
+    --color-body: #3d4048;
+    --color-white: #ffffff;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-cluster-list: #3d4048;
+    --color-dark: #3d4048;
+    --color-tab-color: #3b3d45;
+    --color-primary: #1347ff;
+    --color-secondary: #eceff2;
+    --color-muted: #707583;
+    --color-error-border: #dc3545;
+    --color-error-background: #f9d7da;
+    --color-error-color: #842029;
+    --color-failed: #fc1683;
+    --color-deployed: #1fa470;
+    --color-superseded: #9195a1;
+    --color-pending: #5ab0ff;
+    --color-danger: #ff0072;
+    --color-text-danger: #fc1683;
+    --color-text-warning: #ffc107;
+    --color-text-success: #a4f8d7;
+    --color-upgradable: #0d6efd;
+    --color-warning: #ffa800;
+    --color-success: #00c2ab;
+    --color-border-deployed: #1be99a;
+    --color-revision-light: #dcdddf;
+    --color-revision-dark: #007bff;
+    --color-installed-charts-filter: #dad8ce;
+    --color-dropdown: #e9ecef;
+    --color-chart-values: #eceff2;
+    --color-add-repo: #0b5ed7;
+    --color-link-color: #0d6efd;
+    --color-body-background: #f4f7fa;
+    --color-repository: #d6effe;
+    --color-revision: #d6effe;
+    --color-header-install: #ebefff;
+    --color-upgrade-color: #fc1683;
+  }
+}
+
+/* Base layer */
 @layer base {
   body {
     color: var(--color-body);
@@ -82,58 +125,14 @@
   }
 }
 
-/* 5. Components layer */
-@layer components {
-  .card {
-    background-color: var(--color-white);
-    border-radius: theme("borderRadius.lg");
-    border: 1px solid var(--color-gray-200);
-    box-shadow: theme("boxShadow.xl");
-    padding: theme("spacing.12") theme("spacing.6") theme("spacing.6");
-  }
-
-  .card-hover {
-    background-color: var(--color-gray-100);
-    border-radius: theme("borderRadius.lg");
-    padding: theme("spacing.6");
-    box-shadow: theme("boxShadow.xl");
-  }
-
-  .card-active {
-    background-color: var(--color-gray-200);
-    border-radius: theme("borderRadius.lg");
-    padding: theme("spacing.6");
-    box-shadow: theme("boxShadow.xl");
-  }
-
-  .card-disabled {
-    background-color: var(--color-gray-300);
-    border-radius: theme("borderRadius.lg");
-    padding: theme("spacing.6");
-    box-shadow: theme("boxShadow.xl");
-  }
-
-  .custom-shadow {
-    position: relative;
-    box-sizing: border-box;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
-  }
-
-  .error-dialog {
-    border: var(--color-error-border);
-    background-color: var(--color-error-background);
-    color: var(--color-error-color);
-  }
-}
-
-/* 6. Code & pre fonts */
+/* Code & pre fonts */
 pre,
 code {
   font-family: var(--font-sf-mono);
   font-size: 12.5px;
 }
 
-/* 7. Portal positioning */
+/* Portal positioning */
 #portal {
   top: 0;
   width: 40%;
@@ -141,13 +140,13 @@ code {
   position: absolute;
 }
 
-/* 8. Required fields */
+/* Required fields */
 .require:after {
   content: " *";
   color: red;
 }
 
-/* 9. Input focus shadow */
+/* Input focus shadow */
 .input-box-shadow:focus {
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }

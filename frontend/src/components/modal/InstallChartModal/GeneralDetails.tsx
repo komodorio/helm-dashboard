@@ -27,7 +27,7 @@ export const GeneralDetails = ({
   const { context } = useParams();
   const inputClassName = ` text-lg py-1 px-2 border border-1 border-gray-300 ${
     disabled ? "bg-gray-200" : "bg-white "
-  } rounded`;
+  } rounded-sm`;
   return (
     <div className="flex gap-8">
       <div>

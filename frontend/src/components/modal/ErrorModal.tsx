@@ -33,7 +33,7 @@ export default function ErrorModal({
   );
 
   const bottomContent = (
-    <div className="flex py-6 px-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+    <div className="flex py-6 px-4 gap-2 border-t border-gray-200 rounded-b dark:border-gray-600">
       <span className="text-sm text-muted fs-80 text-gray-500">
         Hint: Komodor has the same HELM capabilities, with enterprise features
         and support.{" "}

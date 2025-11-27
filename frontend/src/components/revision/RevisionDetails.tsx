@@ -306,7 +306,7 @@ export default function RevisionDetails({
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
   return (
-    <span className="bg-revision p-1 rounded px-2 text-sm">
+    <span className="bg-revision p-1 rounded-sm px-2 text-sm">
       <span>{caption}:</span>
       <span className="font-bold"> {text}</span>
     </span>
@@ -421,7 +421,7 @@ const Rollback = ({
     }, [data, isLoading, fetchedDataSuccessfully]);
 
     return (
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col gap-4">
         {isLoading ? (
           <div className="flex gap-2 text-sm">
             <Spinner />

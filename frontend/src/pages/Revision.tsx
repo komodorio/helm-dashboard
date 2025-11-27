@@ -88,12 +88,12 @@ function Revision() {
 const RevisionSidebarSkeleton = () => {
   return (
     <>
-      <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
+      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
+      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
+      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
+      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
+      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
+      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
     </>
   );
 };

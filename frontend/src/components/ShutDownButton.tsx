@@ -22,7 +22,7 @@ function ShutDownButton() {
       <button
         onClick={handleClick}
         title="Shut down the Helm Dashboard application"
-        className="flex justify-center w-full mr-5 py-3 border border-transparent hover:border hover:border-gray-500 rounded hover:rounded-lg"
+        className="flex justify-center w-full mr-5 py-3 border border-transparent hover:border hover:border-gray-500 rounded-sm hover:rounded-lg"
       >
         <BsPower className="w-6" />
       </button>

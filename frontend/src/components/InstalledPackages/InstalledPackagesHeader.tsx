@@ -32,7 +32,7 @@ export default function InstalledPackagesHeader({
 
         <div className="w-1/3">
           <input
-            className="border-installed-charts-filter  rounded p-1 text-sm w-11/12"
+            className="border-installed-charts-filter  rounded-sm p-1 text-sm w-11/12"
             placeholder="Filter..."
             type="text"
             onChange={(ev) => setFilterKey(ev.target.value)}
@@ -41,7 +41,7 @@ export default function InstalledPackagesHeader({
       </div>
 
       {showNoPackageAlert && (
-        <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+        <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
           Looks like you don&apos;t have any charts installed.
           &quot;Repository&quot; section may be a good place to start.
         </div>

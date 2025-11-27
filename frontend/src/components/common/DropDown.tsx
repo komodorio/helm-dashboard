@@ -71,7 +71,7 @@ function DropDown({ items }: DropDownProps) {
       {popupState.isOpen && (
         <div
           ref={modalRef}
-          className={`z-10 flex flex-col py-1 gap-1 bg-white mt-3 absolute rounded border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
+          className={`z-10 flex flex-col py-1 gap-1 bg-white mt-3 absolute rounded-sm border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
         >
           {items.map((item) => (
             <>

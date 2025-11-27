@@ -46,7 +46,7 @@ export default function Header() {
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
       location.pathname.includes(`/${identifier}`)
-        ? " text-primary rounded-sm bg-header-install"
+        ? " text-primary rounded-xs bg-header-install"
         : ""
     }`;
 
@@ -129,7 +129,7 @@ export default function Header() {
         </div>
       </div>
       <div className="h-16 flex items-center text-sm ">
-        <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-max">
+        <div className="flex p-1 gap-2 border bottom-gray-200 rounded-sm min-w-max">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
             <a
