@@ -1468,6 +1468,15 @@
     postcss "^8.4.41"
     tailwindcss "4.1.17"
 
+"@tailwindcss/vite@^4.1.17":
+  version "4.1.17"
+  resolved "https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.1.17.tgz"
+  integrity sha512-4+9w8ZHOiGnpcGI6z1TVVfWaX/koK7fKeSYF3qlYg2xpBtbteP2ddBxiarL+HVgfSJGeK5RIxRQmKm4rTJJAwA==
+  dependencies:
+    "@tailwindcss/node" "4.1.17"
+    "@tailwindcss/oxide" "4.1.17"
+    tailwindcss "4.1.17"
+
 "@tanstack/query-core@5.90.11":
   version "5.90.11"
   resolved "https://registry.npmjs.org/@tanstack/query-core/-/query-core-5.90.11.tgz"

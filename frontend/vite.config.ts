@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { viteStaticCopy } from "vite-plugin-static-copy";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -8,38 +9,36 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      tailwindcss(),
       viteStaticCopy({
         targets: [
           {
-            src: 'public/analytics.js',
+            src: "public/analytics.js",
             dest: "assets/",
           },
           {
-            src: 'public/openapi.json',
+            src: "public/openapi.json",
             dest: "assets/",
           },
           {
-            src: 'public/logo.svg',
+            src: "public/logo.svg",
             dest: "assets/",
           },
-        ]
-      })
+        ],
+      }),
     ],
     build: {
       assetsDir: "./assets/",
       outDir: "../pkg/frontend/dist",
       emptyOutDir: true,
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    react: ['react', 'react-dom', 'react-router-dom'],
-                    vendors: ['luxon','highlight.js','diff2html','swagger-ui-react']
-                }
-            }
-        }
-    },
-    css: {
-      postcss: './postcss.config.cjs'
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ["react", "react-dom", "react-router-dom"],
+            vendors: ["luxon", "highlight.js", "diff2html", "swagger-ui-react"],
+          },
+        },
+      },
     },
     server: {
       proxy: {
