@@ -459,15 +459,14 @@ const Uninstall = () => {
   });
 
   const uninstallMutation = useMutation(
-    ["uninstall", namespace, chart],
-    () =>
+    {mutationKey:["uninstall", namespace, chart],
+    mutationFn:() =>
       apiService.fetchWithDefaults(
         "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "delete",
         }
       ),
-    {
       onSuccess: () => {
         window.location.href = "/";
       },

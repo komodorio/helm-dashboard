@@ -14,10 +14,10 @@ export function useGetInstalledReleases(
   context: string,
   options?: UseQueryOptions<Release[]>
 ) {
-  return useQuery<Release[]>(
-    ["installedReleases", context],
-    () => apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
-    options
+  return useQuery<Release[]>({
+    queryKey:["installedReleases", context],
+    queryFn: () => apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
+    ...(options ?? {})}
   );
 }
 
@@ -62,13 +62,13 @@ export function useGetReleaseManifest({
   chartName: string;
   options?: UseQueryOptions<ReleaseManifest[]>;
 }) {
-  return useQuery<ReleaseManifest[]>(
-    ["manifest", namespace, chartName],
-    () =>
+  return useQuery<ReleaseManifest[]>({
+    queryKey:["manifest", namespace, chartName],
+    queryFn:() =>
       apiService.fetchWithDefaults<ReleaseManifest[]>(
         `/api/helm/releases/${namespace}/${chartName}/manifests`
       ),
-    options
+    ...(options ?? {})}
   );
 }
 
@@ -78,13 +78,13 @@ export function useGetResources(
   name: string,
   options?: UseQueryOptions<StructuredResources[]>
 ) {
-  const { data, ...rest } = useQuery<StructuredResources[]>(
-    ["resources", ns, name],
-    () =>
+  const { data, ...rest } = useQuery<StructuredResources[]>({
+    queryKey:["resources", ns, name],
+    queryFn:() =>
       apiService.fetchWithDefaults<StructuredResources[]>(
         `/api/helm/releases/${ns}/${name}/resources?health=true`
       ),
-    options
+    ...(options ?? {})}
   );
 
   return {
@@ -115,42 +115,42 @@ export function useGetResourceDescription(
   name: string,
   options?: UseQueryOptions<string>
 ) {
-  return useQuery<string>(
-    ["describe", type, ns, name],
-    () =>
+  return useQuery<string>({
+    queryKey:["describe", type, ns, name],
+    queryFn:() =>
       apiService.fetchWithDefaults<string>(
         `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    options
+    ...(options ?? {})}
   );
 }
 export function useGetLatestVersion(
   chartName: string,
   options?: UseQueryOptions<ChartVersion[]>
 ) {
-  return useQuery<ChartVersion[]>(
-    ["latestver", chartName],
-    () =>
+  return useQuery<ChartVersion[]>({
+    queryKey:["latestver", chartName],
+    queryFn:() =>
       apiService.fetchWithDefaults<ChartVersion[]>(
         `/api/helm/repositories/latestver?name=${chartName}`
       ),
-    options
+...(options ?? {})}
   );
 }
 export function useGetVersions(
   chartName: string,
   options?: UseQueryOptions<LatestChartVersion[]>
 ) {
-  return useQuery<LatestChartVersion[]>(
-    ["versions", chartName],
-    () =>
+  return useQuery<LatestChartVersion[]>({
+    queryKey: ["versions", chartName],
+    queryFn: () =>
       apiService.fetchWithDefaults<LatestChartVersion[]>(
         `/api/helm/repositories/versions?name=${chartName}`
       ),
-    options
+    ...(options ?? {})}
   );
 }
 
@@ -160,16 +160,16 @@ export function useGetReleaseInfoByType(
   options?: UseQueryOptions<string>
 ) {
   const { chart, namespace, tab, revision } = params;
-  return useQuery<string>(
-    [tab, namespace, chart, revision, additionalParams],
-    () =>
+  return useQuery<string>({
+    queryKey:[tab, namespace, chart, revision, additionalParams],
+    queryFn:() =>
       apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    options
+    ...(options ?? {})}
   );
 }
 
@@ -177,16 +177,16 @@ export function useGetDiff(
   formData: FormData,
   options?: UseQueryOptions<string>
 ) {
-  return useQuery<string>(
-    ["diff", formData],
-    () => {
+  return useQuery<string>({
+    queryKey:["diff", formData],
+    queryFn:() => {
       return apiService.fetchWithDefaults<string>("/diff", {
         body: formData,
 
         method: "POST",
       });
     },
-    options
+    ...(options ?? {})}
   );
 }
 
@@ -202,7 +202,7 @@ export function useRollbackRelease(
     void,
     unknown,
     { ns: string; name: string; revision: number }
-  >(({ ns, name, revision }) => {
+  >({mutationFn:({ ns, name, revision }) => {
     const formData = new FormData();
     formData.append("revision", revision.toString());
 
@@ -213,15 +213,15 @@ export function useRollbackRelease(
         body: formData,
       }
     );
-  }, options);
+  }, ...(options ?? {})});
 }
 
 // Run the tests on a release
 export function useTestRelease(
   options?: UseMutationOptions<void, unknown, { ns: string; name: string }>
 ) {
-  return useMutation<void, unknown, { ns: string; name: string }>(
-    ({ ns, name }) => {
+  return useMutation<void, unknown, { ns: string; name: string }>({
+    mutationFn:({ ns, name }) => {
       return apiService.fetchWithDefaults<void>(
         `/api/helm/releases/${ns}/${name}/test`,
         {
@@ -229,7 +229,7 @@ export function useTestRelease(
         }
       );
     },
-    options
+...(options ?? {})}
   );
 }
 
@@ -248,9 +248,9 @@ export function useChartReleaseValues({
   version?: string;
   options?: UseQueryOptions<unknown>;
 }) {
-  return useQuery<unknown>(
-    ["values", namespace, release, userDefinedValue, version],
-    () =>
+  return useQuery<unknown>({
+    queryKey:["values", namespace, release, userDefinedValue, version],
+    queryFn:() =>
       apiService.fetchWithDefaults<unknown>(
         `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
           revision ? `&revision=${revision}` : ""
@@ -259,7 +259,7 @@ export function useChartReleaseValues({
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    options
+    ...(options ?? {})}
   );
 }
 
@@ -282,8 +282,8 @@ export const useVersionData = ({
   isInstallRepoChart?: boolean;
   options?: UseQueryOptions;
 }) => {
-  return useQuery(
-    [
+  return useQuery({
+    queryKey: [
       version,
       userValues,
       chartAddress,
@@ -292,7 +292,7 @@ export const useVersionData = ({
       releaseName,
       isInstallRepoChart,
     ],
-    async () => {
+    queryFn: async () => {
       const formData = getVersionManifestFormData({
         version,
         userValues,
@@ -314,9 +314,9 @@ export const useVersionData = ({
 
       return data;
     },
-    // @ts-ignore
-    options
-  );
+
+    ...(options ?? {})
+  });
 };
 
 // Request objects

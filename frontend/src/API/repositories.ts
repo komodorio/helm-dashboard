@@ -11,12 +11,12 @@ import apiService from "./apiService";
 export function useGetRepositories(
   options?: UseQueryOptions<HelmRepositories>
 ) {
-  return useQuery<HelmRepositories>(
-    ["helm", "repositories"],
-    () =>
+  return useQuery<HelmRepositories>({
+    queryKey:["helm", "repositories"],
+    queryFn: () =>
       apiService.fetchWithDefaults<HelmRepositories>("/api/helm/repositories"),
-    options
-  );
+    ...(options ?? {})
+  });
 }
 
 // Update repository from remote
@@ -24,14 +24,14 @@ export function useUpdateRepo(
   repo: string,
   options?: UseMutationOptions<void, unknown, void>
 ) {
-  return useMutation<void, unknown, void>(() => {
+  return useMutation<void, unknown, void>({ mutationFn:() => {
     return apiService.fetchWithDefaults<void>(
       `/api/helm/repositories/${repo}`,
       {
         method: "POST",
       }
     );
-  }, options);
+  }, ...(options ?? {})});
 }
 
 // Remove repository
@@ -39,14 +39,14 @@ export function useDeleteRepo(
   repo: string,
   options?: UseMutationOptions<void, unknown, void>
 ) {
-  return useMutation<void, unknown, void>(() => {
+  return useMutation<void, unknown, void>({mutationFn:() => {
     return apiService.fetchWithDefaults<void>(
       `/api/helm/repositories/${repo}`,
       {
         method: "DELETE",
       }
     );
-  }, options);
+  }, ...(options ?? {})});
 }
 
 export function useChartRepoValues({
@@ -56,16 +56,15 @@ export function useChartRepoValues({
   version: string;
   chart: string;
 }) {
-  return useQuery<string>(
-    ["helm", "repositories", "values", chart, version],
-    () =>
+  return useQuery<string>({
+    queryKey:["helm", "repositories", "values", chart, version],
+    queryFn:() =>
       apiService.fetchWithDefaults<string>(
         `/api/helm/repositories/values?chart=${chart}&version=${version}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    {
       enabled: Boolean(version) && Boolean(chart),
     }
   );

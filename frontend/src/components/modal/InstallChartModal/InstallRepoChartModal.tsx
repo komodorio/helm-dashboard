@@ -113,7 +113,7 @@ export const InstallRepoChartModal = ({
 
   // Confirm method (install)
   const setReleaseVersionMutation = useMutation(
-    [
+    {mutationKey:[
       "setVersion",
       namespace,
       releaseName,
@@ -122,7 +122,7 @@ export const InstallRepoChartModal = ({
       selectedCluster,
       chartAddress,
     ],
-    async () => {
+    mutationFn:async () => {
       setInstallError("");
       const formData = new FormData();
       formData.append("preview", "false");
@@ -139,7 +139,7 @@ export const InstallRepoChartModal = ({
       );
       return data;
     },
-    {
+
       onSuccess: async (response) => {
         onClose();
         navigate(
