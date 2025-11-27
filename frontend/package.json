@@ -48,6 +48,7 @@
     "eslint-plugin-storybook": "^10.0.8",
     "flowbite": "^4.0.1",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "postcss": "^8.4.24",
     "prettier": "^3.6.2",
@@ -59,12 +60,13 @@
     "vite-plugin-static-copy": "^3.1.4"
   },
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+    "*": "prettier --write --ignore-unknown"
   },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "prepare": "husky",
     "test": "echo \"Error: no test specified. Please use 'cypress:run' or 'cypress:open' commands\" && exit 1",
     "tsc:check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
