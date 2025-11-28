@@ -1,4 +1,10 @@
-import { Chart, ChartVersion, Release, ReleaseHealthStatus, ReleaseRevision,  } from "../data/types";
+import {
+  Chart,
+  ChartVersion,
+  Release,
+  ReleaseHealthStatus,
+  ReleaseRevision,
+} from "../data/types";
 import { type QueryFunctionContext } from "@tanstack/react-query";
 
 interface ClustersResponse {

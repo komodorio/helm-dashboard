@@ -13,7 +13,7 @@ import { useGetApplicationStatus } from "../API/other";
 import LinkWithSearchParams from "../components/LinkWithSearchParams";
 import apiService from "../API/apiService";
 import { useAppContext } from "../context/AppContext";
-import {  useEffect, useEffectEvent } from "react";
+import { useEffect, useEffectEvent } from "react";
 
 export default function Header() {
   const { clusterMode, setClusterMode } = useAppContext();
