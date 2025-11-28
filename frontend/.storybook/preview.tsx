@@ -1,4 +1,3 @@
-import "tailwindcss/tailwind.css";
 import "../src/index.css";
 
 import { BrowserRouter } from "react-router";
