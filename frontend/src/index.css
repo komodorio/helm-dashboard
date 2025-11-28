@@ -7,9 +7,6 @@ layer(base);
 
 @plugin 'flowbite/plugin';
 
-@source '../node_modules/flowbite/**/*.js';
-@config "../tailwind.config.cjs";
-
 /* Components layer */
 @utility card {
   background-color: var(--color-white);

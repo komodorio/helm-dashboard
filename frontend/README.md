@@ -2,6 +2,7 @@
 
 Welcome to the frontend of the helm dashboard.
 We care most about keeping the project:
+
 1. Maintainable
 2. Extendable
 3. Contributor friendly
@@ -28,12 +29,11 @@ Please follow through the file structure to understand how things are structured
 
 1. Make sure you cloned the project correctly. This is explained in this [stage](https://github.com/komodorio/helm-dashboard/blob/helm-dashboard-v2/dashboard/README.md#setting-up-your-development-environment).
 2. run the backend server. This is also explained in the above link.
-2. go to `frontend` in your local project.
-3. in order to install dependencies and start the development server
+3. go to `frontend` in your local project.
+4. in order to install dependencies and start the development server
    - `npm i`
    - `npm run dev`
-4. with the default integration the dashboard should run on http://localhost:5173/
-
+5. with the default integration the dashboard should run on http://localhost:5173/
 
 # Component library
 
