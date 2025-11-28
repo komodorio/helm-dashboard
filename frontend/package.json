@@ -23,8 +23,6 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.39.1",
     "@storybook/addon-docs": "^10.0.8",
     "@storybook/addon-links": "^10.0.8",
     "@storybook/mdx2-csf": "^1.1.0",
