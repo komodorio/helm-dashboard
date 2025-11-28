@@ -62,7 +62,7 @@ function DropDown({ items }: DropDownProps) {
               Y: e.pageY,
             }));
           }}
-          className="flex items-center justify-between"
+          className="flex items-center justify-between cursor-pointer"
         >
           Help
           <img src={ArrowDownIcon} className="ml-2 w-[10px] h-[10px]" />
