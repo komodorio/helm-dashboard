@@ -7,3 +7,4 @@ coverage
 .prettierignore
 yarn.lock
 package-lock.json
+.flowbite-react/*
