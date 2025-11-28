@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
 import { ReleaseRevision } from "../data/types";

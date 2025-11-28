@@ -1,6 +1,6 @@
 import { AppContextProvider } from "../context/AppContext";
 import ClustersList from "./ClustersList";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Release } from "../data/types";
 

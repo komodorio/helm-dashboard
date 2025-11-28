@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";

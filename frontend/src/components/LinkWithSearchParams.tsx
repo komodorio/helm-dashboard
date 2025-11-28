@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useParams } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router";
 import { useAppContext } from "../context/AppContext";
 
 const LinkWithSearchParams = ({

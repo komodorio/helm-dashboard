@@ -5,7 +5,7 @@ import RepositoryViewer from "../components/repository/RepositoryViewer";
 import { Repository } from "../data/types";
 import { useGetRepositories } from "../API/repositories";
 import { HelmRepositories } from "../API/interfaces";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useAppContext } from "../context/AppContext";
 import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 

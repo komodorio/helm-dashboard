@@ -5,7 +5,7 @@ import { useGetInstalledReleases } from "../API/releases";
 import { useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { Release } from "../data/types";
 

@@ -6,7 +6,7 @@ import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
 import { useUpdateRepo } from "../../API/repositories";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useAppContext } from "../../context/AppContext";
 
 type RepositoryViewerProps = {

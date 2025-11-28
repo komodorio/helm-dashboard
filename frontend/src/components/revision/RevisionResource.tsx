@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import hljs from "highlight.js";
 import { RiExternalLinkLine } from "react-icons/ri";
 

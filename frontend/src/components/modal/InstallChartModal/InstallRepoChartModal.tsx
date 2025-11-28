@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useMemo, useState } from "react";
 import { useGetVersions, useVersionData } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";

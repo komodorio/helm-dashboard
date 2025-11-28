@@ -694,11 +694,6 @@
   resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
-"@remix-run/router@1.5.0":
-  version "1.5.0"
-  resolved "https://registry.npmjs.org/@remix-run/router/-/router-1.5.0.tgz"
-  integrity sha512-bkUDCp8o1MvFO+qxkODcbhSqRa6P2GXgrGZVpt0dCXNW2HCSCqYI0ZoAqEOSAjRWmmlKcYgFvN4B4S+zo/f8kg==
-
 "@rolldown/pluginutils@1.0.0-beta.47":
   version "1.0.0-beta.47"
   resolved "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.47.tgz"
@@ -2675,6 +2670,11 @@ convert-source-map@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/convert-source-map/-/convert-source-map-2.0.0.tgz"
   integrity sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==
+
+cookie@^1.0.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz"
+  integrity sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==
 
 copy-to-clipboard@^3.3.1:
   version "3.3.3"
@@ -5487,20 +5487,13 @@ react-refresh@^0.18.0:
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.18.0.tgz"
   integrity sha512-QgT5//D3jfjJb6Gsjxv0Slpj23ip+HtOpnNgnb2S5zU3CB26G/IDPGoy4RJB42wzFE46DRsstbW6tKHoKbhAxw==
 
-react-router-dom@^6.9.0:
-  version "6.10.0"
-  resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.10.0.tgz"
-  integrity sha512-E5dfxRPuXKJqzwSe/qGcqdwa18QiWC6f3H3cWXM24qj4N0/beCIf/CWTipop2xm7mR0RCS99NnaqPNjHtrAzCg==
+react-router@^7.9.6:
+  version "7.9.6"
+  resolved "https://registry.npmjs.org/react-router/-/react-router-7.9.6.tgz"
+  integrity sha512-Y1tUp8clYRXpfPITyuifmSoE2vncSME18uVLgaqyxh9H35JWpIfzHo+9y3Fzh5odk/jxPW29IgLgzcdwxGqyNA==
   dependencies:
-    "@remix-run/router" "1.5.0"
-    react-router "6.10.0"
-
-react-router@6.10.0:
-  version "6.10.0"
-  resolved "https://registry.npmjs.org/react-router/-/react-router-6.10.0.tgz"
-  integrity sha512-Nrg0BWpQqrC3ZFFkyewrflCud9dio9ME3ojHCF/WLsprJVzkq3q3UeEhMCAW1dobjeGbWgjNn/PVF6m46ANxXQ==
-  dependencies:
-    "@remix-run/router" "1.5.0"
+    cookie "^1.0.1"
+    set-cookie-parser "^2.6.0"
 
 react-select@^5.10.2:
   version "5.10.2"
@@ -5831,6 +5824,11 @@ serialize-error@^8.1.0:
   integrity sha512-3NnuWfM6vBYoy5gZFvHiYsVbafvI9vZv/+jlIigFn4oP4zjNPK3LhcY0xSCgeb1a5L8jO71Mit9LlNoi2UfDDQ==
   dependencies:
     type-fest "^0.20.2"
+
+set-cookie-parser@^2.6.0:
+  version "2.7.2"
+  resolved "https://registry.npmjs.org/set-cookie-parser/-/set-cookie-parser-2.7.2.tgz"
+  integrity sha512-oeM1lpU/UvhTxw+g3cIfxXHyJRc/uidd3yK1P242gzHds0udQBYzs3y8j4gCCW+ZJ7ad0yctld8RYO+bdurlvw==
 
 set-function-length@^1.2.2:
   version "1.2.2"

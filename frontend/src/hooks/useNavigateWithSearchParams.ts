@@ -3,7 +3,7 @@ import {
   useLocation,
   useNavigate,
   useParams,
-} from "react-router-dom";
+} from "react-router";
 import { useAppContext } from "../context/AppContext";
 
 const useNavigateWithSearchParams = () => {

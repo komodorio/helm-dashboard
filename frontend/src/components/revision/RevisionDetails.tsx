@@ -11,7 +11,7 @@ import {
 } from "react-icons/bs";
 import { Release, ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import {
   useGetReleaseInfoByType,
   useGetLatestVersion,

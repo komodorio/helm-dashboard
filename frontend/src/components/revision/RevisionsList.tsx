@@ -1,5 +1,5 @@
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { compare } from "compare-versions";
 
 import { ReleaseRevision } from "../../data/types";
