@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from "react";
-import Select, { components } from "react-select";
+import Select, { components, GroupBase, SingleValueProps } from "react-select";
 import { BsCheck2 } from "react-icons/bs";
 import { NonEmptyArray } from "../../../data/types";
 
@@ -9,6 +9,18 @@ interface Version {
   isChartVersion: boolean;
   urls: string[];
 }
+
+type VersionOptionType = {
+  value: Omit<Version, "isChartVersion">;
+  label: string;
+  check: boolean;
+};
+
+type SpecificSingleValueProps = SingleValueProps<
+  VersionOptionType,
+  false, // IsMulti
+  GroupBase<VersionOptionType>
+>;
 
 export const VersionToInstall: FC<{
   versions: NonEmptyArray<Version>;
@@ -78,14 +90,19 @@ export const VersionToInstall: FC<{
             }}
             value={selectedOption ?? initOpt}
             components={{
-              SingleValue: ({ children, ...props }) => (
-                <components.SingleValue {...props}>
-                  <span className="text-green-700 font-bold">{children}</span>
-                  {props.data.check && showCurrentVersion && (
-                    <BsCheck2 className="inline-block ml-2 text-green-700 font-bold" />
-                  )}
-                </components.SingleValue>
-              ),
+              SingleValue: ({ children, ...props }) => {
+                const OriginalSingleValue =
+                  components.SingleValue as FC<SpecificSingleValueProps>;
+
+                return (
+                  <OriginalSingleValue {...props}>
+                    <span className="text-green-700 font-bold">{children}</span>
+                    {props.data.check && showCurrentVersion && (
+                      <BsCheck2 className="inline-block ml-2 text-green-700 font-bold" />
+                    )}
+                  </OriginalSingleValue>
+                );
+              },
               Option: ({ children, innerProps, data }) => (
                 <div
                   className={
