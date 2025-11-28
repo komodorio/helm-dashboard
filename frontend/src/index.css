@@ -6,6 +6,9 @@ layer(base);
 @import "tailwindcss";
 
 @plugin 'flowbite/plugin';
+@source "../node_modules/flowbite";
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
 
 /* Components layer */
 @utility card {
