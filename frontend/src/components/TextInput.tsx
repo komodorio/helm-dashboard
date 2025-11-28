@@ -12,6 +12,7 @@
  * @return JSX.Element
  *
  */
+import { JSX } from "react";
 
 export interface TextInputProps {
   label: string;

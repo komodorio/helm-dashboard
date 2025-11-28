@@ -2,7 +2,7 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
 import { useParams, useNavigate } from "react-router";
@@ -27,18 +27,21 @@ function Installed() {
 
   const [filterKey, setFilterKey] = useState<string>("");
   const alertError = useAlertError();
-  const { data, isLoading, isRefetching } = useGetInstalledReleases(
-    context ?? "",
-    {
-      retry: false,
-      onError: (e) => {
-        alertError.setShowErrorModal({
-          title: "Failed to get list of charts",
-          msg: (e as Error).message,
-        });
-      },
+  const { data, isLoading, isRefetching, isError, error } =
+    useGetInstalledReleases(context ?? "");
+
+  const onError = useEffectEvent(() => {
+    alertError.setShowErrorModal({
+      title: "Failed to get list of charts",
+      msg: error?.message ?? "",
+    });
+  });
+
+  useEffect(() => {
+    if (isError) {
+      onError();
     }
-  );
+  }, [isError]);
 
   const filteredReleases = useMemo(() => {
     return (

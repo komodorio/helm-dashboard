@@ -13,14 +13,21 @@ import { useGetApplicationStatus } from "../API/other";
 import LinkWithSearchParams from "../components/LinkWithSearchParams";
 import apiService from "../API/apiService";
 import { useAppContext } from "../context/AppContext";
+import {  useEffect, useEffectEvent } from "react";
 
 export default function Header() {
   const { clusterMode, setClusterMode } = useAppContext();
-  const { data: statusData } = useGetApplicationStatus({
-    onSuccess: (data) => {
-      setClusterMode(data.ClusterMode);
-    },
+  const { data: statusData, isSuccess } = useGetApplicationStatus();
+
+  const onSuccess = useEffectEvent(() => {
+    setClusterMode(!!statusData?.ClusterMode);
   });
+
+  useEffect(() => {
+    if (isSuccess && statusData) {
+      onSuccess();
+    }
+  }, [isSuccess, statusData]);
 
   const location = useLocation();
 

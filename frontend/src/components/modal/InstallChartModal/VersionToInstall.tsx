@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import Select, { components } from "react-select";
 import { BsCheck2 } from "react-icons/bs";
 import { NonEmptyArray } from "../../../data/types";
@@ -10,7 +10,7 @@ interface Version {
   urls: string[];
 }
 
-export const VersionToInstall: React.FC<{
+export const VersionToInstall: FC<{
   versions: NonEmptyArray<Version>;
   initialVersion?: {
     repository?: string;

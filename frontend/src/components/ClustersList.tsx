@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { Cluster, Release } from "../data/types";
 import apiService from "../API/apiService";
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { useQuery,  } from "@tanstack/react-query";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import { useAppContext } from "../context/AppContext";
 import { v4 as uuidv4 } from "uuid";

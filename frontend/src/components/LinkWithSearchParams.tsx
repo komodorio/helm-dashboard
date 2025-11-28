@@ -12,7 +12,7 @@ const LinkWithSearchParams = ({
   children: React.ReactNode;
 }) => {
   const { search } = useLocation();
-  const { context } = useParams();
+  const { context = "" } = useParams();
   const { clusterMode } = useAppContext();
 
   const params = new URLSearchParams(search);
