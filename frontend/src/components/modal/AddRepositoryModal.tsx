@@ -83,7 +83,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
         <div className="flex justify-end p-6 gap-2 border-t border-gray-200 rounded-b dark:border-gray-600">
           <button
             data-cy="add-chart-repository-button"
-            className="flex items-center text-white font-medium px-3 py-1.5 bg-primary hover:bg-add-repo focus:ring-4 focus:outline-hidden focus:ring-blue-300 disabled:bg-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="flex items-center text-white font-medium px-3 py-1.5 bg-primary hover:bg-add-repo focus:ring-4 focus:outline-hidden focus:ring-blue-300 disabled:bg-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer"
             onClick={addRepository}
             disabled={isLoading}
           >
