@@ -34,7 +34,7 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            react: ["react", "react-dom", "react-router-dom"],
+            react: ["react", "react-dom", "react-router"],
             vendors: ["luxon", "highlight.js", "diff2html", "swagger-ui-react"],
           },
         },
