@@ -6663,11 +6663,6 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vite-plugin-html-config@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/vite-plugin-html-config/-/vite-plugin-html-config-2.0.2.tgz"
-  integrity sha512-g09u0XsmgKyMUIp1RZSyNSkJWvIusaXxw3KylyxU3vkCq7/G8hyemLctT+4IvO42fCPlNySmrNC9g0qSoKmvpw==
-
 vite-plugin-static-copy@^3.1.4:
   version "3.1.4"
   resolved "https://registry.npmjs.org/vite-plugin-static-copy/-/vite-plugin-static-copy-3.1.4.tgz"
