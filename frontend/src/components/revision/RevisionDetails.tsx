@@ -91,7 +91,7 @@ export default function RevisionDetails({
     refetch: refetchLatestVersion,
     isLoading: isLoadingLatestVersion,
     isRefetching: isRefetchingLatestVersion,
-  } = useGetLatestVersion(release.chart_name, { cacheTime: 0 });
+  } = useGetLatestVersion(release.chart_name);
 
   const [showTestsResults, setShowTestResults] = useState(false);
 

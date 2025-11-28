@@ -33,7 +33,7 @@ export default function InstalledPackageCard({
   });
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
     queryKey: ["chartName", release.chartName],
-    cacheTime: 0,
+
   });
 
   const { data: statusData } = useQuery<unknown>({

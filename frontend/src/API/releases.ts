@@ -138,6 +138,7 @@ export function useGetLatestVersion(
       apiService.fetchWithDefaults<ChartVersion[]>(
         `/api/helm/repositories/latestver?name=${chartName}`
       ),
+    gcTime: 0,
     ...(options ?? {}),
   });
 }
