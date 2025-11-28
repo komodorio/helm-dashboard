@@ -32,8 +32,7 @@ export default function InstalledPackageCard({
     triggerOnce: true,
   });
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
-      queryKey: ["chartName", release.chartName],
-
+    queryKey: ["chartName", release.chartName],
   });
 
   const { data: statusData } = useQuery<unknown>({
