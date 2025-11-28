@@ -1,10 +1,9 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useEffectEvent } from "react";
 
 import RepositoriesList from "../components/repository/RepositoriesList";
 import RepositoryViewer from "../components/repository/RepositoryViewer";
 import { Repository } from "../data/types";
 import { useGetRepositories } from "../API/repositories";
-import { HelmRepositories } from "../API/interfaces";
 import { useParams } from "react-router";
 import { useAppContext } from "../context/AppContext";
 import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
@@ -34,15 +33,24 @@ function RepositoryPage() {
     }
   }, [selectedRepo, repoFromParams, context, navigate]);
 
-  const { data: repositories = [] } = useGetRepositories({
-    onSuccess: (data: HelmRepositories) => {
-      const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
+  const { data: repositories = [], isSuccess } = useGetRepositories();
 
-      if (sortedData && sortedData.length > 0 && !repoFromParams) {
-        handleRepositoryChanged(sortedData[0]);
-      }
-    },
+  const onSuccess = useEffectEvent(() => {
+    // TODO should we passe sorted to RepositoriesList as in ClustersList?
+    const sortedData = [...repositories]?.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    if (sortedData && sortedData.length > 0 && !repoFromParams) {
+      handleRepositoryChanged(sortedData[0]);
+    }
   });
+
+  useEffect(() => {
+    if (repositories.length && isSuccess) {
+      onSuccess();
+    }
+  }, [repositories, isSuccess]);
 
   const selectedRepository = useMemo(() => {
     if (repoFromParams) {
