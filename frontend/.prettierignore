@@ -1,3 +1,10 @@
 # Ignore artifacts:
 build
 coverage
+.env
+.gitignore
+.npmrc
+.prettierignore
+yarn.lock
+package-lock.json
+.flowbite-react/*

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
 import ArrowDownIcon from "../../assets/arrow-down-icon.svg";
 
 export type DropDownItem = {
@@ -62,7 +62,7 @@ function DropDown({ items }: DropDownProps) {
               Y: e.pageY,
             }));
           }}
-          className="flex items-center justify-between"
+          className="flex items-center justify-between cursor-pointer"
         >
           Help
           <img src={ArrowDownIcon} className="ml-2 w-[10px] h-[10px]" />
@@ -71,10 +71,10 @@ function DropDown({ items }: DropDownProps) {
       {popupState.isOpen && (
         <div
           ref={modalRef}
-          className={`z-10 flex flex-col py-1 gap-1 bg-white mt-3 absolute rounded border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
+          className={`z-10 flex flex-col py-1 gap-1 bg-white mt-3 absolute rounded-sm border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
         >
           {items.map((item) => (
-            <>
+            <Fragment key={item.id}>
               {item.isSeparator ? (
                 <div className="bg-gray-300 h-[1px]" />
               ) : (
@@ -96,7 +96,7 @@ function DropDown({ items }: DropDownProps) {
                   <span>{item.text}</span>
                 </div>
               )}
-            </>
+            </Fragment>
           ))}
         </div>
       )}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Release } from "../../data/types";
+import { Release, ReleaseHealthStatus } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { getAge } from "../../timeUtils";
 import StatusLabel, {
@@ -33,13 +33,12 @@ export default function InstalledPackageCard({
   });
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
     queryKey: ["chartName", release.chartName],
-    cacheTime: 0,
   });
 
-  const { data: statusData } = useQuery<unknown>({
+  const { data: statusData } = useQuery<ReleaseHealthStatus[] | null>({
     queryKey: ["resourceStatus", release],
-    enabled: inView,
     queryFn: () => apiService.getResourceStatus({ release }),
+    enabled: inView,
   });
 
   const latestVersionData: LatestChartVersion | undefined =

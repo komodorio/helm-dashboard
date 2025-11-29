@@ -1,5 +1,5 @@
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { compare } from "compare-versions";
 
 import { ReleaseRevision } from "../../data/types";
@@ -40,7 +40,7 @@ export default function RevisionsList({
             }
             onClick={() => changeRelease(release.revision)}
             key={release.revision}
-            className={`flex flex-col border rounded-md mx-5 p-2 gap-4 cursor-pointer ${
+            className={`flex flex-col border border-gray-200 rounded-md mx-5 p-2 gap-4 cursor-pointer ${
               release.revision === selectedRevision
                 ? "border-revision-dark bg-white"
                 : "border-revision-light bg-body-background"

@@ -30,7 +30,7 @@ function RepositoriesList({
 
   return (
     <>
-      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded custom-shadow text-dark gap-3">
+      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded-sm custom-shadow text-dark gap-3">
         <label className="font-bold">Repositories</label>
         <div className="flex flex-col gap-1">
           {repositories?.map((repository) => (
@@ -60,7 +60,7 @@ function RepositoriesList({
           data-cy="install-repository-button"
           type="button"
           style={{ marginTop: "10px" }}
-          className="h-8 w-fit flex items-center gap-2 border rounded text-muted border-gray-300 px-3 py-1 text-sm font-semibold"
+          className="h-8 w-fit flex items-center gap-2 border rounded-sm text-muted border-gray-300 px-3 py-1 text-sm font-semibold cursor-pointer"
           onClick={() => setShowAddRepositoryModal(true)}
         >
           + Add Repository

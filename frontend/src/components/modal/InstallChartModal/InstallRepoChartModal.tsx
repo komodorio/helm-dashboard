@@ -1,5 +1,5 @@
-import { useParams } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useParams } from "react-router";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { useGetVersions, useVersionData } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
@@ -8,19 +8,19 @@ import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
-import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
+import { isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
 import { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
 import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
+import { LatestChartVersion } from "../../../API/interfaces";
 
 export const InstallRepoChartModal = ({
   isOpen,
   onClose,
   chartName,
   currentlyInstalledChartVersion,
-  latestVersion,
 }: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
   const [userValues, setUserValues] = useState("");
@@ -31,42 +31,46 @@ export const InstallRepoChartModal = ({
   const [namespace, setNamespace] = useState("");
   const [releaseName, setReleaseName] = useState(chartName);
 
-  const { error: versionsError, data: _versions } = useGetVersions(chartName, {
-    select: (data) => {
-      return data?.sort((a, b) =>
-        isNewerVersion(a.version, b.version) ? 1 : -1
-      );
-    },
-    onSuccess: (data) => {
-      const empty = { version: "", repository: "", urls: [] };
-      const versionsToRepo = data.filter(
-        (v) => v.repository === currentRepoCtx
-      );
+  const {
+    error: versionsError,
+    data: _versions = [],
+    isSuccess,
+  } = useGetVersions(chartName);
 
-      return setSelectedVersionData(versionsToRepo[0] ?? empty);
-    },
-  });
+  const [versions, setVersions] = useState<
+    Array<LatestChartVersion & { isChartVersion: boolean }>
+  >([]);
 
-  const versions = _versions?.map((v) => ({
-    ...v,
-    isChartVersion: v.version === currentlyInstalledChartVersion,
-  }));
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  latestVersion = latestVersion ?? currentlyInstalledChartVersion; // a guard for typescript, latestVersion is always defined
   const [selectedVersionData, setSelectedVersionData] = useState<{
     version: string;
     repository?: string;
     urls: string[];
   }>();
 
-  const selectedVersion = useMemo(() => {
-    return selectedVersionData?.version;
-  }, [selectedVersionData]);
+  const onSuccess = useEffectEvent(() => {
+    const empty = { version: "", repository: "", urls: [] };
+    const versionsToRepo = _versions.filter(
+      (v) => v.repository === currentRepoCtx
+    );
 
-  const selectedRepo = useMemo(() => {
-    return selectedVersionData?.repository;
-  }, [selectedVersionData]);
+    setSelectedVersionData(versionsToRepo[0] ?? empty);
+    setVersions(
+      _versions?.map((v) => ({
+        ...v,
+        isChartVersion: v.version === currentlyInstalledChartVersion,
+      }))
+    );
+  });
+
+  useEffect(() => {
+    if (isSuccess && _versions.length) {
+      onSuccess();
+    }
+  }, [isSuccess, _versions]);
+
+  const selectedVersion = selectedVersionData?.version;
+
+  const selectedRepo = selectedVersionData?.repository;
 
   const chartAddress = useMemo(() => {
     if (!selectedVersionData || !selectedVersionData?.repository) {
@@ -77,15 +81,15 @@ export const InstallRepoChartModal = ({
       : `${selectedVersionData?.repository}/${chartName}`;
   }, [selectedVersionData, chartName]);
 
-  const { data: chartValues, isLoading: loadingChartValues } =
+  const { data: chartValues = "", isLoading: loadingChartValues } =
     useChartRepoValues({
       version: selectedVersion || "",
       chart: chartAddress,
     });
 
   // This hold the selected version manifest, we use it for the diff
-  const { data: selectedVerData, error: selectedVerDataError } = useVersionData(
-    {
+  const { data: selectedVerData = {}, error: selectedVerDataError } =
+    useVersionData({
       version: selectedVersion || "",
       userValues,
       chartAddress,
@@ -93,11 +97,8 @@ export const InstallRepoChartModal = ({
       namespace,
       releaseName,
       isInstallRepoChart: true,
-      options: {
-        enabled: Boolean(chartAddress),
-      },
-    }
-  );
+      enabled: Boolean(chartAddress),
+    });
 
   const {
     data: diffData,
@@ -105,14 +106,17 @@ export const InstallRepoChartModal = ({
     error: diffError,
   } = useDiffData({
     selectedRepo: selectedRepo || "",
-    versionsError: versionsError as string,
+    versionsError: versionsError as unknown as string, // TODO fix it
     currentVerManifest: "", // current version manifest should always be empty since its a fresh install
     selectedVerData,
     chart: chartAddress,
   });
 
   // Confirm method (install)
-  const setReleaseVersionMutation = useMutation({
+  const setReleaseVersionMutation = useMutation<{
+    namespace: string;
+    name: string;
+  }>({
     mutationKey: [
       "setVersion",
       namespace,
@@ -130,17 +134,17 @@ export const InstallRepoChartModal = ({
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues);
       formData.append("name", releaseName || "");
-      const data = await apiService.fetchWithDefaults(
+
+      return await apiService.fetchWithDefaults(
         `/api/helm/releases/${namespace ? namespace : "default"}`,
         {
           method: "post",
           body: formData,
         }
       );
-      return data;
     },
 
-    onSuccess: async (response) => {
+    onSuccess: async (response: { namespace: string; name: string }) => {
       onClose();
       navigate(`/${response.namespace}/${response.name}/installed/revision/1`);
     },
@@ -169,11 +173,11 @@ export const InstallRepoChartModal = ({
           id: "1",
           callback: setReleaseVersionMutation.mutate,
           variant: ModalButtonStyle.info,
-          isLoading: setReleaseVersionMutation.isLoading,
+          isLoading: setReleaseVersionMutation.isPending,
           disabled:
             loadingChartValues ||
             isLoadingDiff ||
-            setReleaseVersionMutation.isLoading,
+            setReleaseVersionMutation.isPending,
         },
       ]}
     >
@@ -205,10 +209,10 @@ export const InstallRepoChartModal = ({
         diff={diffData as string}
         isLoading={isLoadingDiff}
         error={
-          (selectedVerDataError as string) ||
-          (diffError as string) ||
+          (selectedVerDataError as unknown as string) || // TODO fix it
+          (diffError as unknown as string) ||
           installError ||
-          (versionsError as string)
+          (versionsError as unknown as string)
         }
       />
     </Modal>

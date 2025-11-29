@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { Cluster, Release } from "../data/types";
 import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
@@ -43,29 +43,38 @@ function ClustersList({
 }: ClustersListProps) {
   const { upsertSearchParams, removeSearchParam } = useCustomSearchParams();
   const { clusterMode } = useAppContext();
+  const [sortedClusters, setSortedClusters] = useState<Cluster[]>([]);
 
-  const { data: clusters } = useQuery<Cluster[]>({
+  const { data: clusters, isSuccess } = useQuery<Cluster[]>({
     queryKey: ["clusters", selectedCluster],
     queryFn: apiService.getClusters,
-    onSuccess(data) {
-      const sortedData = data?.sort((a, b) =>
-        getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
-      );
-
-      if (sortedData && sortedData.length > 0 && !selectedCluster) {
-        onClusterChange(sortedData[0].Name);
-      }
-
-      if (selectedCluster) {
-        const cluster = data.find(
-          (cluster) => getCleanClusterName(cluster.Name) === selectedCluster
-        );
-        if (!filteredNamespaces && cluster?.Namespace) {
-          upsertSearchParams("filteredNamespace", cluster.Namespace);
-        }
-      }
-    },
   });
+
+  const onSuccess = useEffectEvent((clusters: Cluster[]) => {
+    const sortedData = [...clusters].sort((a, b) =>
+      getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
+    );
+    setSortedClusters(sortedData);
+
+    if (sortedData && sortedData.length > 0 && !selectedCluster) {
+      onClusterChange(sortedData[0].Name);
+    }
+
+    if (selectedCluster) {
+      const cluster = clusters.find(
+        (cluster) => getCleanClusterName(cluster.Name) === selectedCluster
+      );
+      if (!filteredNamespaces && cluster?.Namespace) {
+        upsertSearchParams("filteredNamespace", cluster.Namespace);
+      }
+    }
+  });
+
+  useEffect(() => {
+    if (clusters && isSuccess) {
+      onSuccess(clusters);
+    }
+  }, [clusters, isSuccess]);
 
   const namespaces = useMemo(() => {
     const mapNamespaces = new Map<string, number>();
@@ -98,39 +107,33 @@ function ClustersList({
   };
 
   return (
-    <div className="bg-white flex flex-col p-2 rounded custom-shadow text-cluster-list w-48 m-5 h-fit pb-4 custom-">
+    <div className="bg-white flex flex-col p-2 rounded-sm custom-shadow text-cluster-list w-48 m-5 h-fit pb-4 custom-">
       {!clusterMode ? (
         <>
           <label className="font-bold">Clusters</label>
-          {clusters
-            ?.sort((a, b) =>
-              getCleanClusterName(a.Name).localeCompare(
-                getCleanClusterName(b.Name)
-              )
-            )
-            ?.map((cluster) => {
-              return (
-                <span
-                  key={cluster.Name}
-                  className="data-cy-clusterName flex items-center mt-2 text-xs"
-                >
-                  <input
-                    className="cursor-pointer data-cy-clustersInput"
-                    onChange={(e) => {
-                      onClusterChange(e.target.value);
-                    }}
-                    type="radio"
-                    id={cluster.Name}
-                    value={cluster.Name}
-                    checked={cluster.Name === selectedCluster}
-                    name="clusters"
-                  />
-                  <label htmlFor={cluster.Name} className="ml-1 ">
-                    {getCleanClusterName(cluster.Name)}
-                  </label>
-                </span>
-              );
-            })}
+          {sortedClusters?.map((cluster) => {
+            return (
+              <span
+                key={cluster.Name}
+                className="data-cy-clusterName flex items-center mt-2 text-xs"
+              >
+                <input
+                  className="cursor-pointer data-cy-clustersInput"
+                  onChange={(e) => {
+                    onClusterChange(e.target.value);
+                  }}
+                  type="radio"
+                  id={cluster.Name}
+                  value={cluster.Name}
+                  checked={cluster.Name === selectedCluster}
+                  name="clusters"
+                />
+                <label htmlFor={cluster.Name} className="ml-1 ">
+                  {getCleanClusterName(cluster.Name)}
+                </label>
+              </span>
+            );
+          })}
         </>
       ) : null}
 

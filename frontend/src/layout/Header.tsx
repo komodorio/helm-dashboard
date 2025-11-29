@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -13,14 +13,21 @@ import { useGetApplicationStatus } from "../API/other";
 import LinkWithSearchParams from "../components/LinkWithSearchParams";
 import apiService from "../API/apiService";
 import { useAppContext } from "../context/AppContext";
+import { useEffect, useEffectEvent } from "react";
 
 export default function Header() {
   const { clusterMode, setClusterMode } = useAppContext();
-  const { data: statusData } = useGetApplicationStatus({
-    onSuccess: (data) => {
-      setClusterMode(data.ClusterMode);
-    },
+  const { data: statusData, isSuccess } = useGetApplicationStatus();
+
+  const onSuccess = useEffectEvent(() => {
+    setClusterMode(!!statusData?.ClusterMode);
   });
+
+  useEffect(() => {
+    if (isSuccess && statusData) {
+      onSuccess();
+    }
+  }, [isSuccess, statusData]);
 
   const location = useLocation();
 
@@ -46,7 +53,7 @@ export default function Header() {
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
       location.pathname.includes(`/${identifier}`)
-        ? " text-primary rounded-sm bg-header-install"
+        ? " text-primary rounded-xs bg-header-install"
         : ""
     }`;
 
@@ -129,7 +136,7 @@ export default function Header() {
         </div>
       </div>
       <div className="h-16 flex items-center text-sm ">
-        <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-max">
+        <div className="flex p-1 gap-2 border bottom-gray-200 rounded-sm min-w-max">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
             <a

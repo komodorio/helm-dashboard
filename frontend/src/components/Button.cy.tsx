@@ -5,7 +5,7 @@ describe("Button component tests", () => {
   const buttonText = "buttonText";
 
   it("renders", () => {
-    mount(<Button onClick={() => {}}></Button>);
+    mount(<Button onClick={() => {}} label=""></Button>);
     cy.get("button").should("exist");
   });
 
@@ -17,14 +17,14 @@ describe("Button component tests", () => {
   it("calls onClick when clicked", () => {
     const onClickStub = cy.stub().as("onClick");
 
-    mount(<Button onClick={onClickStub}></Button>);
+    mount(<Button onClick={onClickStub} label={""}></Button>);
 
     cy.get("button").click();
     cy.get("@onClick").should("have.been.calledOnce");
   });
 
   it("should be disabled", () => {
-    mount(<Button onClick={() => {}} disabled></Button>);
+    mount(<Button onClick={() => {}} disabled label={""}></Button>);
 
     cy.get("button").should("be.disabled");
   });

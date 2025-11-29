@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
 import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 import { useGetReleaseInfoByType } from "../../API/releases";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
 import parse from "html-react-parser";
@@ -134,7 +134,7 @@ function RevisionDiff({
 
   return (
     <div>
-      <div className="flex mb-3 p-2 border border-revision flex-row items-center justify-between w-full bg-white rounded">
+      <div className="flex mb-3 p-2 border border-gray-200 border-revision flex-row items-center justify-between w-full bg-white rounded-sm">
         <div className="flex items-center">
           <input
             checked={viewMode === "view"}
@@ -186,7 +186,7 @@ function RevisionDiff({
             <div>
               Diff with specific revision:
               <input
-                className="border ml-2 border-gray-500 w-10 p-1 rounded-sm"
+                className="border ml-2 border-gray-500 w-10 p-1 rounded-xs"
                 type="text"
                 value={specificVersion}
                 onChange={(e) => setSpecificVersion(Number(e.target.value))}
@@ -201,7 +201,7 @@ function RevisionDiff({
               type="checkbox"
               onChange={handleUserDefinedCheckbox}
               checked={!!userDefinedValue}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
             <label
               htmlFor="user-define-only-checkbox"
@@ -215,7 +215,9 @@ function RevisionDiff({
       {isLoading ? <Spinner /> : ""}
       {viewMode === VIEW_MODE_VIEW_ONLY && content ? (
         <div className="bg-white overflow-x-auto w-full p-3 relative">
-          <pre className="bg-white rounded font-sf-mono">{parse(content)}</pre>
+          <pre className="bg-white rounded-sm font-sf-mono">
+            {parse(content)}
+          </pre>
         </div>
       ) : (
         ""

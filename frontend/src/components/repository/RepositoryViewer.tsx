@@ -6,7 +6,7 @@ import apiService from "../../API/apiService";
 import Spinner from "../Spinner";
 import { useUpdateRepo } from "../../API/repositories";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useAppContext } from "../../context/AppContext";
 
 type RepositoryViewerProps = {
@@ -22,7 +22,6 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const navigate = useNavigate();
 
   const { data: charts, isLoading } = useQuery<Chart[]>({
-    //@ts-ignore
     queryKey: ["charts", repository?.name || ""],
     queryFn: apiService.getRepositoryCharts,
     refetchOnWindowFocus: false,
@@ -76,7 +75,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
   if (repository === undefined) {
     return (
-      <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+      <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
         Looks like you don&apos;t have any repositories installed. You can add
         one with the &quot;Add Repository&quot; button on the left side bar.
       </div>
@@ -98,8 +97,8 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
                 update.mutate();
               }}
             >
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded">
-                {update.isLoading ? <Spinner size={4} /> : <BsArrowRepeat />}
+              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded-sm">
+                {update.isPending ? <Spinner size={4} /> : <BsArrowRepeat />}
                 Update
               </span>
             </button>
@@ -108,7 +107,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
                 removeRepository();
               }}
             >
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded">
+              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded-sm">
                 {isRemoveLoading ? <Spinner size={4} /> : <BsTrash3 />}
                 Remove
               </span>
@@ -119,7 +118,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             value={searchValue}
             type="text"
             placeholder="Filter..."
-            className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow rounded"
+            className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-hidden focus:border-sky-500 input-box-shadow rounded-sm"
           />
         </div>
       </div>
@@ -142,7 +141,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
       )}
 
       {showNoChartsAlert && (
-        <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+        <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
           Looks like you don&apos;t have any repositories installed. You can add
           one with the &quot;Add Repository&quot; button on the left side bar.
         </div>

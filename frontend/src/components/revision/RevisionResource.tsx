@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import hljs from "highlight.js";
 import { RiExternalLinkLine } from "react-icons/ri";
 
@@ -32,19 +32,19 @@ export default function RevisionResource({ isLatest }: Props) {
       cellPadding={6}
       className="border-spacing-y-2 font-semibold border-separate w-full text-xs "
     >
-      <thead className="bg-zinc-200 font-bold h-8 rounded">
+      <thead className="bg-zinc-200 font-bold h-8 rounded-sm">
         <tr>
-          <td className="pl-6 rounded">RESOURCE TYPE</td>
+          <td className="pl-6 rounded-sm">RESOURCE TYPE</td>
           <td>NAME</td>
           <td>STATUS</td>
           <td>STATUS MESSAGE</td>
-          <td className="rounded"></td>
+          <td className="rounded-sm"></td>
         </tr>
       </thead>
       {isLoading ? (
         <Spinner />
       ) : (
-        <tbody className="bg-white mt-4 h-8 rounded w-full">
+        <tbody className="bg-white mt-4 h-8 rounded-sm w-full">
           {resources?.length ? (
             resources
               .sort(function (a, b) {
@@ -65,7 +65,7 @@ export default function RevisionResource({ isLatest }: Props) {
               ))
           ) : (
             <tr>
-              <div className="bg-white rounded shadow display-none no-charts mt-3 text-sm p-4">
+              <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
                 Looks like you don&apos;t have any resources.{" "}
                 <RiExternalLinkLine className="ml-2 text-lg" />
               </div>
@@ -100,11 +100,11 @@ const ResourceRow = ({
   return (
     <>
       <tr className="min-w-[100%] min-h[70px] text-sm py-2">
-        <td className="pl-6 rounded text-sm font-normal w-48">{kind}</td>
+        <td className="pl-6 rounded-sm text-sm font-normal w-48">{kind}</td>
         <td className="font-bold text-sm w-56">{name}</td>
         <td>{reason ? <Badge type={badgeType}>{reason}</Badge> : null}</td>
-        <td className="rounded text-gray-100">
-          <div className="flex flex-col space-y-1 flex-start">
+        <td className="rounded-sm text-gray-100">
+          <div className="flex flex-col gap-1 flex-start">
             {message && (
               <div className="text-gray-500 font-thin">{message}</div>
             )}
@@ -113,7 +113,7 @@ const ResourceRow = ({
             )}
           </div>
         </td>
-        <td className="rounded">
+        <td className="rounded-sm">
           {isLatest && reason !== "NotFound" ? (
             <div className="flex justify-end items-center mr-36">
               <Button className="px-1 text-xs" onClick={toggleDrawer}>
@@ -183,7 +183,7 @@ const DescribeResource = ({
         <div className="flex  items-center gap-4 pr-4">
           <a
             href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&amp;utm_source=helm-dash&amp;utm_medium=cta&amp;utm_content=helm-dash"
-            className="bg-primary text-white p-1.5 text-sm flex items-center rounded"
+            className="bg-primary text-white p-1.5 text-sm flex items-center rounded-sm"
             target="_blank"
             rel="noreferrer"
           >
@@ -207,7 +207,7 @@ const DescribeResource = ({
       ) : (
         <div className="h-full overflow-y-auto ">
           <pre
-            className="bg-white rounded p-4 font-medium text-base font-sf-mono"
+            className="bg-white rounded-sm p-4 font-medium text-base font-sf-mono"
             style={{ overflow: "unset" }}
             dangerouslySetInnerHTML={{
               __html: yamlFormattedData,

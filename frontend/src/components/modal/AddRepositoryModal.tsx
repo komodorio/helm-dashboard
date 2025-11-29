@@ -5,7 +5,7 @@ import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { useAppContext } from "../../context/AppContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import apiService from "../../API/apiService";
 
 interface FormKeys {
@@ -80,10 +80,10 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
       isOpen={isOpen}
       onClose={onClose}
       bottomContent={
-        <div className="flex justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+        <div className="flex justify-end p-6 gap-2 border-t border-gray-200 rounded-b dark:border-gray-600">
           <button
             data-cy="add-chart-repository-button"
-            className="flex items-center text-white font-medium px-3 py-1.5 bg-primary hover:bg-add-repo focus:ring-4 focus:outline-none focus:ring-blue-300 disabled:bg-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="flex items-center text-white font-medium px-3 py-1.5 bg-primary hover:bg-add-repo focus:ring-4 focus:outline-hidden focus:ring-blue-300 disabled:bg-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer"
             onClick={addRepository}
             disabled={isLoading}
           >
@@ -109,7 +109,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             data-cy="add-chart-name"
             type="text"
             placeholder="Komodorio"
-            className="rounded-lg p-2 w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
+            className="rounded-lg p-2 w-full border border-gray-300 focus:outline-hidden focus:border-sky-500 input-box-shadow"
           />
         </label>
         <label className="flex-1" htmlFor="url">
@@ -127,7 +127,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             data-cy="add-chart-url"
             type="text"
             placeholder="https://helm-charts.komodor.io"
-            className="rounded-lg p-2 w-full border border-gray-300  focus:outline-none focus:border-sky-500 input-box-shadow"
+            className="rounded-lg p-2 w-full border border-gray-300  focus:outline-hidden focus:border-sky-500 input-box-shadow"
           />
         </label>
       </div>
@@ -144,7 +144,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             required
             id="username"
             type="text"
-            className="rounded-lg p-2 w-full border border-gray-300  focus:outline-none focus:border-sky-500 input-box-shadow"
+            className="rounded-lg p-2 w-full border border-gray-300  focus:outline-hidden focus:border-sky-500 input-box-shadow"
           />
         </label>
         <label className="flex-1" htmlFor="password">
@@ -159,7 +159,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             required
             id="password"
             type="text"
-            className="rounded-lg p-2 w-full border border-gray-300 focus:outline-none focus:border-sky-500 input-box-shadow"
+            className="rounded-lg p-2 w-full border border-gray-300 focus:outline-hidden focus:border-sky-500 input-box-shadow"
           />
         </label>
       </div>

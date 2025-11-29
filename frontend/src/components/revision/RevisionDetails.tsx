@@ -11,7 +11,7 @@ import {
 } from "react-icons/bs";
 import { Release, ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import {
   useGetReleaseInfoByType,
   useGetLatestVersion,
@@ -91,14 +91,14 @@ export default function RevisionDetails({
     refetch: refetchLatestVersion,
     isLoading: isLoadingLatestVersion,
     isRefetching: isRefetchingLatestVersion,
-  } = useGetLatestVersion(release.chart_name, { cacheTime: 0 });
+  } = useGetLatestVersion(release.chart_name);
 
   const [showTestsResults, setShowTestResults] = useState(false);
 
   const { setShowErrorModal } = useAlertError();
   const {
     mutate: runTests,
-    isLoading: isRunningTests,
+    isPending: isRunningTests,
     data: testResults,
   } = useTestRelease({
     onError: (error) => {
@@ -306,7 +306,7 @@ export default function RevisionDetails({
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
   return (
-    <span className="bg-revision p-1 rounded px-2 text-sm">
+    <span className="bg-revision p-1 rounded-sm px-2 text-sm">
       <span>{caption}:</span>
       <span className="font-bold"> {text}</span>
     </span>
@@ -326,7 +326,7 @@ const Rollback = ({
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
   const revisionInt = parseInt(revision || "", 10);
 
-  const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
+  const { mutate: rollbackRelease, isPending: isRollingBackRelease } =
     useRollbackRelease({
       onSuccess: () => {
         navigate(
@@ -421,7 +421,7 @@ const Rollback = ({
     }, [data, isLoading, fetchedDataSuccessfully]);
 
     return (
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col gap-4">
         {isLoading ? (
           <div className="flex gap-2 text-sm">
             <Spinner />
@@ -454,9 +454,7 @@ const Rollback = ({
 const Uninstall = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { namespace = "", chart = "" } = useParams();
-  const { data: resources } = useGetResources(namespace, chart, {
-    enabled: isOpen,
-  });
+  const { data: resources } = useGetResources(namespace, chart, isOpen);
 
   const uninstallMutation = useMutation({
     mutationKey: ["uninstall", namespace, chart],
@@ -497,7 +495,7 @@ const Uninstall = () => {
               id: "1",
               callback: uninstallMutation.mutate,
               variant: ModalButtonStyle.info,
-              isLoading: uninstallMutation.isLoading,
+              isLoading: uninstallMutation.isPending,
             },
           ]}
           containerClassNames="w-[800px]"

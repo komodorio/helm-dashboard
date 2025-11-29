@@ -39,6 +39,8 @@ module.exports = defineConfig([{
 
     extends: compat.extends(
         "enpitech",
+        "eslint:recommended",
+        "plugin:prettier/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:react-hooks/recommended",
         // "plugin:@typescript-eslint/recommended-requiring-type-checking", TODO enable and fix the types
