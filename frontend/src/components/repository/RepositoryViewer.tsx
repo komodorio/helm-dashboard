@@ -22,7 +22,6 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const navigate = useNavigate();
 
   const { data: charts, isLoading } = useQuery<Chart[]>({
-    //@ts-ignore
     queryKey: ["charts", repository?.name || ""],
     queryFn: apiService.getRepositoryCharts,
     refetchOnWindowFocus: false,
@@ -99,7 +98,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
               }}
             >
               <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded-sm">
-                {update.isLoading ? <Spinner size={4} /> : <BsArrowRepeat />}
+                {update.isPending ? <Spinner size={4} /> : <BsArrowRepeat />}
                 Update
               </span>
             </button>

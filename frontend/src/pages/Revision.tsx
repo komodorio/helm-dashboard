@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useParams } from "react-router";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
-import { ReleaseRevision } from "../data/types";
+import { Release, ReleaseRevision } from "../data/types";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../API/apiService";
 import Spinner from "../components/Spinner";
@@ -15,18 +15,15 @@ function Revision() {
 
   const selectedRevision = revision ? parseInt(revision, 10) : 0;
 
-  const { data: releaseRevisions, isLoading: isLoadingHistory } = useQuery<
-    ReleaseRevision[]
-  >({
-    //eslint-ignore
-    //@ts-ignore
-    queryKey: ["releasesHistory", restParams],
-    queryFn: apiService.getReleasesHistory,
-  });
+  const { data: releaseRevisions = [], isLoading: isLoadingHistory } = useQuery(
+    {
+      queryKey: ["releasesHistory", restParams],
+      queryFn: apiService.getReleasesHistory,
+    }
+  );
 
   const latestRevision = useMemo(
     () =>
-      Array.isArray(releaseRevisions) &&
       releaseRevisions.reduce((max, revisionData) => {
         return Math.max(max, revisionData.revision);
       }, Number.MIN_SAFE_INTEGER),
@@ -40,7 +37,7 @@ function Revision() {
 
   const selectedRelease = useMemo(() => {
     if (selectedRevision && releaseRevisions) {
-      return (releaseRevisions as ReleaseRevision[]).find(
+      return releaseRevisions.find(
         (r: ReleaseRevision) => r.revision === selectedRevision
       );
     }
@@ -70,14 +67,10 @@ function Revision() {
           </div>
         ) : selectedRelease ? (
           <RevisionDetails
-            //@ts-ignore
-            release={selectedRelease}
-            installedRevision={
-              //@ts-ignore
-              releaseRevisions?.[0] as ReleaseRevision
-            }
+            release={selectedRelease as Release} // TODO fix it
+            installedRevision={releaseRevisions?.[0]}
             isLatest={selectedRelease.revision === latestRevision}
-            latestRevision={latestRevision.revision}
+            latestRevision={latestRevision}
           />
         ) : null}
       </div>

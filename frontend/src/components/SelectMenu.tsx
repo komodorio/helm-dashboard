@@ -24,6 +24,7 @@
  *
  *
  */
+import { JSX } from "react";
 
 // define the SelectMenuItem type:
 // This is an object with a label and id.

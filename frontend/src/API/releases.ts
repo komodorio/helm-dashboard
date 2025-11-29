@@ -1,24 +1,23 @@
 import {
-  useQuery,
-  type UseQueryOptions,
   useMutation,
   type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
 import { ChartVersion, Release } from "../data/types";
 import { LatestChartVersion } from "./interfaces";
 import apiService from "./apiService";
 import { getVersionManifestFormData } from "./shared";
+import { isNewerVersion } from "../utils";
+
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
-export function useGetInstalledReleases(
-  context: string,
-  options?: UseQueryOptions<Release[]>
-) {
+export function useGetInstalledReleases(context: string) {
   return useQuery<Release[]>({
     queryKey: ["installedReleases", context],
     queryFn: () =>
       apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
-    ...(options ?? {}),
+    retry: false,
   });
 }
 
@@ -74,18 +73,14 @@ export function useGetReleaseManifest({
 }
 
 // List of installed k8s resources for this release
-export function useGetResources(
-  ns: string,
-  name: string,
-  options?: UseQueryOptions<StructuredResources[]>
-) {
+export function useGetResources(ns: string, name: string, enabled?: boolean) {
   const { data, ...rest } = useQuery<StructuredResources[]>({
     queryKey: ["resources", ns, name],
     queryFn: () =>
       apiService.fetchWithDefaults<StructuredResources[]>(
         `/api/helm/releases/${ns}/${name}/resources?health=true`
       ),
-    ...(options ?? {}),
+    enabled,
   });
 
   return {
@@ -152,6 +147,8 @@ export function useGetVersions(
       apiService.fetchWithDefaults<LatestChartVersion[]>(
         `/api/helm/repositories/versions?name=${chartName}`
       ),
+    select: (data) =>
+      data?.sort((a, b) => (isNewerVersion(a.version, b.version) ? 1 : -1)),
     ...(options ?? {}),
   });
 }
@@ -251,12 +248,12 @@ export function useChartReleaseValues({
   userDefinedValue?: string;
   revision?: number;
   version?: string;
-  options?: UseQueryOptions<unknown>;
+  options?: UseQueryOptions<string>;
 }) {
-  return useQuery<unknown>({
+  return useQuery<string>({
     queryKey: ["values", namespace, release, userDefinedValue, version],
     queryFn: () =>
-      apiService.fetchWithDefaults<unknown>(
+      apiService.fetchWithDefaults(
         `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
           revision ? `&revision=${revision}` : ""
         }`,
@@ -268,6 +265,12 @@ export function useChartReleaseValues({
   });
 }
 
+export type VersionData = {
+  version: string;
+  repository?: string;
+  urls: string[];
+};
+
 export const useVersionData = ({
   version,
   userValues,
@@ -276,7 +279,7 @@ export const useVersionData = ({
   namespace,
   releaseName,
   isInstallRepoChart = false,
-  options,
+  enabled = true,
 }: {
   version: string;
   userValues: string;
@@ -285,9 +288,9 @@ export const useVersionData = ({
   namespace: string;
   releaseName: string;
   isInstallRepoChart?: boolean;
-  options?: UseQueryOptions;
+  enabled?: boolean;
 }) => {
-  return useQuery({
+  return useQuery<{ [key: string]: string }>({
     queryKey: [
       version,
       userValues,
@@ -312,15 +315,16 @@ export const useVersionData = ({
             namespace ? namespace : "[empty]"
           }${`/${releaseName}`}`;
 
-      const data = await apiService.fetchWithDefaults(fetchUrl, {
-        method: "post",
-        body: formData,
-      });
-
-      return data;
+      return await apiService.fetchWithDefaults<{ [key: string]: string }>(
+        fetchUrl,
+        {
+          method: "post",
+          body: formData,
+        }
+      );
     },
 
-    ...(options ?? {}),
+    enabled,
   });
 };
 

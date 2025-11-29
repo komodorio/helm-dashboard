@@ -17,6 +17,7 @@
  *
  *
  */
+import { JSX, ReactNode } from "react";
 
 export type BadgeCode = "success" | "warning" | "error" | "unknown";
 
@@ -29,7 +30,7 @@ export const BadgeCodes = Object.freeze({
 
 export interface BadgeProps {
   type: BadgeCode;
-  children: React.ReactNode;
+  children: ReactNode;
   additionalClassNames?: string;
 }
 export default function Badge(props: BadgeProps): JSX.Element {

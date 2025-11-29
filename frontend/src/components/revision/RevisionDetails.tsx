@@ -98,7 +98,7 @@ export default function RevisionDetails({
   const { setShowErrorModal } = useAlertError();
   const {
     mutate: runTests,
-    isLoading: isRunningTests,
+    isPending: isRunningTests,
     data: testResults,
   } = useTestRelease({
     onError: (error) => {
@@ -326,7 +326,7 @@ const Rollback = ({
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
   const revisionInt = parseInt(revision || "", 10);
 
-  const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
+  const { mutate: rollbackRelease, isPending: isRollingBackRelease } =
     useRollbackRelease({
       onSuccess: () => {
         navigate(
@@ -454,9 +454,7 @@ const Rollback = ({
 const Uninstall = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { namespace = "", chart = "" } = useParams();
-  const { data: resources } = useGetResources(namespace, chart, {
-    enabled: isOpen,
-  });
+  const { data: resources } = useGetResources(namespace, chart, isOpen);
 
   const uninstallMutation = useMutation({
     mutationKey: ["uninstall", namespace, chart],
@@ -497,7 +495,7 @@ const Uninstall = () => {
               id: "1",
               callback: uninstallMutation.mutate,
               variant: ModalButtonStyle.info,
-              isLoading: uninstallMutation.isLoading,
+              isLoading: uninstallMutation.isPending,
             },
           ]}
           containerClassNames="w-[800px]"

@@ -19,7 +19,7 @@ const useNavigateWithSearchParams = () => {
     let prefixedUrl = url;
 
     if (!clusterMode) {
-      prefixedUrl = `/${encodeURIComponent(context)}${url}`;
+      prefixedUrl = `/${encodeURIComponent(context ?? "")}${url}`;
     }
     navigate(`${prefixedUrl}${search}`, ...restArgs);
   };
