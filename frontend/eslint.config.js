@@ -84,7 +84,7 @@ export default defineConfig([{
         },
 
         sourceType: "script",
-        parserOptions: {},
+        parserOptions: { project: "./tsconfig.json" },
     },
 
     files: ["**/.eslintrc.{js,cjs}"],
