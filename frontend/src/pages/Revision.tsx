@@ -46,8 +46,8 @@ function Revision() {
 
   return (
     <div className="flex">
-      <div className="flex flex-col gap-2 w-1/6 min-h-screen bg-[#E8EDF2] pb-4">
-        <label className="mt-5 mx-5 text-sm text-dark font-semibold">
+      <div className="flex min-h-screen w-1/6 flex-col gap-2 bg-[#E8EDF2] pb-4">
+        <label className="mx-5 mt-5 text-sm font-semibold text-dark">
           Revisions
         </label>
         {isLoadingHistory ? (
@@ -60,9 +60,9 @@ function Revision() {
         )}
       </div>
 
-      <div className="w-5/6 min-h-screen bg-body-background pb-4">
+      <div className="min-h-screen w-5/6 bg-body-background pb-4">
         {isLoadingHistory ? (
-          <div className=" p-4">
+          <div className="p-4">
             <Spinner />
           </div>
         ) : selectedRelease ? (
@@ -81,12 +81,12 @@ function Revision() {
 const RevisionSidebarSkeleton = () => {
   return (
     <>
-      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
-      <div className="border border-gray-200 rounded-md mx-5 p-2 gap-4 animate-pulse  h-[74px] w-[88%] bg-gray-100" />
+      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
+      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
+      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
+      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
+      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
+      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
     </>
   );
 };

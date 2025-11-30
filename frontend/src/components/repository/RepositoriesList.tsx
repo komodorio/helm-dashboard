@@ -30,7 +30,7 @@ function RepositoriesList({
 
   return (
     <>
-      <div className="h-fit bg-white w-72 flex flex-col p-3 rounded-sm custom-shadow text-dark gap-3">
+      <div className="custom-shadow flex h-fit w-72 flex-col gap-3 rounded-sm bg-white p-3 text-dark">
         <label className="font-bold">Repositories</label>
         <div className="flex flex-col gap-1">
           {repositories?.map((repository) => (
@@ -60,7 +60,7 @@ function RepositoriesList({
           data-cy="install-repository-button"
           type="button"
           style={{ marginTop: "10px" }}
-          className="h-8 w-fit flex items-center gap-2 border rounded-sm text-muted border-gray-300 px-3 py-1 text-sm font-semibold cursor-pointer"
+          className="flex h-8 w-fit cursor-pointer items-center gap-2 rounded-sm border border-gray-300 px-3 py-1 text-sm font-semibold text-muted"
           onClick={() => setShowAddRepositoryModal(true)}
         >
           + Add Repository
@@ -68,7 +68,7 @@ function RepositoriesList({
         <p className="text-xs">
           Charts developers: you can also add local directories as chart source.
           Use{" "}
-          <span className="text-green-600 font-monospace">--local-chart</span>{" "}
+          <span className="font-monospace text-green-600">--local-chart</span>{" "}
           CLI switch to specify it.
         </p>
       </div>

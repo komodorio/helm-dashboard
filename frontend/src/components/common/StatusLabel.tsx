@@ -31,7 +31,7 @@ function StatusLabel({ status, isRollback }: StatusLabelProps) {
         justifyContent: "space-between",
       }}
     >
-      <span className={`${statusColor} font-bold text-xs`}>
+      <span className={`${statusColor} text-xs font-bold`}>
         ● {status.toUpperCase()}
       </span>
       {isRollback && <AiOutlineReload size={14} />}

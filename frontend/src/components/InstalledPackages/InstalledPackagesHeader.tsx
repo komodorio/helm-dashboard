@@ -17,22 +17,22 @@ export default function InstalledPackagesHeader({
     !isLoading && (numOfPackages === undefined || numOfPackages === 0)
   );
   return (
-    <div className="custom-shadow rounded-t-md  ">
-      <div className="flex items-center justify-between bg-white px-2 py-0.5 font-inter rounded-t-md ">
+    <div className="custom-shadow rounded-t-md">
+      <div className="flex items-center justify-between rounded-t-md bg-white px-2 py-0.5 font-inter">
         <div className="flex items-center">
           <img
             src={HeaderLogo}
             alt="Helm-DashBoard"
-            className="display-inline h-12 ml-3 mr-3 w-[28px] "
+            className="display-inline mr-3 ml-3 h-12 w-[28px]"
           />
-          <h2 className="display-inline font-bold text-base ">{`Installed Charts (${
+          <h2 className="display-inline text-base font-bold">{`Installed Charts (${
             numOfPackages || "0"
           })`}</h2>
         </div>
 
         <div className="w-1/3">
           <input
-            className="border border-installed-charts-filter  rounded-sm p-1 text-sm w-11/12"
+            className="w-11/12 rounded-sm border border-installed-charts-filter p-1 text-sm"
             placeholder="Filter..."
             type="text"
             onChange={(ev) => setFilterKey(ev.target.value)}
@@ -41,7 +41,7 @@ export default function InstalledPackagesHeader({
       </div>
 
       {showNoPackageAlert && (
-        <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
+        <div className="display-none no-charts mt-3 rounded-sm bg-white p-4 text-sm shadow-sm">
           Looks like you don&apos;t have any charts installed.
           &quot;Repository&quot; section may be a good place to start.
         </div>

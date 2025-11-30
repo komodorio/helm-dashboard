@@ -15,7 +15,7 @@ export const DefinedValues = ({
   loading,
 }: DefinedValuesProps) => {
   return (
-    <div className="flex w-full gap-6 mt-4">
+    <div className="mt-4 flex w-full gap-6">
       <UserDefinedValues
         initialValue={initialValue}
         onValuesChange={onUserValuesChange}

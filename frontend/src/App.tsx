@@ -22,9 +22,9 @@ const queryClient = new QueryClient({
 
 const PageLayout = () => {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex h-screen flex-col">
       <Header />
-      <div className="bg-body-background bg-no-repeat bg-[url('./assets/body-background.svg')] flex-1">
+      <div className="flex-1 bg-body-background bg-[url('./assets/body-background.svg')] bg-no-repeat">
         <Outlet />
       </div>
     </div>

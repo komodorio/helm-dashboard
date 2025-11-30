@@ -80,10 +80,10 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
       isOpen={isOpen}
       onClose={onClose}
       bottomContent={
-        <div className="flex justify-end p-6 gap-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+        <div className="flex justify-end gap-2 rounded-b border-t border-gray-200 p-6 dark:border-gray-600">
           <button
             data-cy="add-chart-repository-button"
-            className="flex items-center text-white font-medium px-3 py-1.5 bg-primary hover:bg-add-repo focus:ring-4 focus:outline-hidden focus:ring-blue-300 disabled:bg-blue-300 rounded-lg text-base text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer"
+            className="flex cursor-pointer items-center rounded-lg bg-primary px-3 py-1.5 text-center text-base font-medium text-white hover:bg-add-repo focus:ring-4 focus:ring-blue-300 focus:outline-hidden disabled:bg-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             onClick={addRepository}
             disabled={isLoading}
           >
@@ -95,7 +95,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
     >
       <div className="flex gap-x-3">
         <label className="flex-1" htmlFor="name">
-          <div className="mb-2 text-sm require">Name</div>
+          <div className="require mb-2 text-sm">Name</div>
           <input
             value={formData.name}
             onChange={(e) =>
@@ -109,11 +109,11 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             data-cy="add-chart-name"
             type="text"
             placeholder="Komodorio"
-            className="rounded-lg p-2 w-full border border-gray-300 focus:outline-hidden focus:border-sky-500 input-box-shadow"
+            className="input-box-shadow w-full rounded-lg border border-gray-300 p-2 focus:border-sky-500 focus:outline-hidden"
           />
         </label>
         <label className="flex-1" htmlFor="url">
-          <div className="mb-2 text-sm require">URL</div>
+          <div className="require mb-2 text-sm">URL</div>
           <input
             value={formData.url}
             onChange={(e) =>
@@ -127,12 +127,12 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             data-cy="add-chart-url"
             type="text"
             placeholder="https://helm-charts.komodor.io"
-            className="rounded-lg p-2 w-full border border-gray-300  focus:outline-hidden focus:border-sky-500 input-box-shadow"
+            className="input-box-shadow w-full rounded-lg border border-gray-300 p-2 focus:border-sky-500 focus:outline-hidden"
           />
         </label>
       </div>
       <div className="flex gap-x-3">
-        <label className="flex-1 " htmlFor="username">
+        <label className="flex-1" htmlFor="username">
           <div className="mb-2 text-sm">Username</div>
           <input
             onChange={(e) =>
@@ -144,7 +144,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             required
             id="username"
             type="text"
-            className="rounded-lg p-2 w-full border border-gray-300  focus:outline-hidden focus:border-sky-500 input-box-shadow"
+            className="input-box-shadow w-full rounded-lg border border-gray-300 p-2 focus:border-sky-500 focus:outline-hidden"
           />
         </label>
         <label className="flex-1" htmlFor="password">
@@ -159,7 +159,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
             required
             id="password"
             type="text"
-            className="rounded-lg p-2 w-full border border-gray-300 focus:outline-hidden focus:border-sky-500 input-box-shadow"
+            className="input-box-shadow w-full rounded-lg border border-gray-300 p-2 focus:border-sky-500 focus:outline-hidden"
           />
         </label>
       </div>

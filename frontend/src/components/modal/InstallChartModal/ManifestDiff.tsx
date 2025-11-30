@@ -35,7 +35,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
 
   if (isLoading && !error) {
     return (
-      <div className="flex text-lg items-end">
+      <div className="flex items-end text-lg">
         <Spinner />
         Calculating diff...
       </div>
@@ -47,7 +47,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
       <h4 className="text-xl">Manifest changes:</h4>
 
       {error ? (
-        <p className="text-red-600 text-lg">
+        <p className="text-lg text-red-600">
           Failed to get upgrade info: {error.toString()}
         </p>
       ) : diff ? (

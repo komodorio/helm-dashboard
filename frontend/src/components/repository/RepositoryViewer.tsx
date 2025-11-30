@@ -75,7 +75,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
   if (repository === undefined) {
     return (
-      <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
+      <div className="display-none no-charts mt-3 rounded-sm bg-white p-4 text-sm shadow-sm">
         Looks like you don&apos;t have any repositories installed. You can add
         one with the &quot;Add Repository&quot; button on the left side bar.
       </div>
@@ -83,10 +83,10 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   }
 
   return (
-    <div className="flex flex-col p-6 gap-3 bg-white custom-shadow border rounded-md">
-      <span className="text-muted font-bold text-xs">REPOSITORY</span>
+    <div className="custom-shadow flex flex-col gap-3 rounded-md border bg-white p-6">
+      <span className="text-xs font-bold text-muted">REPOSITORY</span>
       <div className="flex justify-between">
-        <span className="text-dark text-3xl font-semibold">
+        <span className="text-3xl font-semibold text-dark">
           {repository?.name}
         </span>
 
@@ -97,7 +97,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
                 update.mutate();
               }}
             >
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded-sm">
+              <span className="flex h-8 items-center gap-2 rounded-sm border border-gray-300 bg-white px-5 py-1 text-sm font-semibold">
                 {update.isPending ? <Spinner size={4} /> : <BsArrowRepeat />}
                 Update
               </span>
@@ -107,7 +107,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
                 removeRepository();
               }}
             >
-              <span className="h-8 flex items-center gap-2 bg-white border border-gray-300 px-5 py-1 text-sm font-semibold rounded-sm">
+              <span className="flex h-8 items-center gap-2 rounded-sm border border-gray-300 bg-white px-5 py-1 text-sm font-semibold">
                 {isRemoveLoading ? <Spinner size={4} /> : <BsTrash3 />}
                 Remove
               </span>
@@ -118,15 +118,15 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             value={searchValue}
             type="text"
             placeholder="Filter..."
-            className="mt-2  h-8 p-2 text-sm w-full border border-gray-300 focus:outline-hidden focus:border-sky-500 input-box-shadow rounded-sm"
+            className="input-box-shadow mt-2 h-8 w-full rounded-sm border border-gray-300 p-2 text-sm focus:border-sky-500 focus:outline-hidden"
           />
         </div>
       </div>
-      <span className="text-dark text-sm bg-repository px-3 py-1 rounded-md self-start -mt-10">
+      <span className="-mt-10 self-start rounded-md bg-repository px-3 py-1 text-sm text-dark">
         URL: <span className="font-bold">{repository?.url}</span>
       </span>
 
-      <div className="bg-secondary grid grid-cols-10 text-xs font-bold p-2 px-4 mt-4 rounded-md">
+      <div className="mt-4 grid grid-cols-10 rounded-md bg-secondary p-2 px-4 text-xs font-bold">
         <span className="col-span-2">CHART NAME</span>
         <span className="col-span-6">DESCRIPTION</span>
         <span className="col-span-1 text-center">VERSION</span>
@@ -141,7 +141,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
       )}
 
       {showNoChartsAlert && (
-        <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
+        <div className="display-none no-charts mt-3 rounded-sm bg-white p-4 text-sm shadow-sm">
           Looks like you don&apos;t have any repositories installed. You can add
           one with the &quot;Add Repository&quot; button on the left side bar.
         </div>

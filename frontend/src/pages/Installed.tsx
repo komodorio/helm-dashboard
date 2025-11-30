@@ -74,7 +74,7 @@ function Installed() {
   }, [data, filterKey, selectedNamespaces]);
 
   return (
-    <div className="flex flex-row w-full">
+    <div className="flex w-full flex-row">
       <ClustersList
         selectedCluster={context ?? ""}
         filteredNamespaces={selectedNamespaces}
@@ -82,7 +82,7 @@ function Installed() {
         installedReleases={data}
       />
 
-      <div className="p-5 w-[calc(100%-17rem)]">
+      <div className="w-[calc(100%-17rem)] p-5">
         <InstalledPackagesHeader
           isLoading={isLoading || isRefetching}
           filteredReleases={filteredReleases}

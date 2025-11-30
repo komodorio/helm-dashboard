@@ -71,21 +71,21 @@ const Modal = ({
 
   const getTitle = (title: string | ReactNode) => {
     if (typeof title === "string")
-      return <h3 className="text-xl font-medium text-grey">{title}</h3>;
+      return <h3 className="text-grey text-xl font-medium">{title}</h3>;
     else return title;
   };
 
   return createPortal(
     <>
       {isOpen && (
-        <div className="fixed inset-0 bg-black/75 transition-opacity ">
+        <div className="fixed inset-0 bg-black/75 transition-opacity">
           <div className="flex justify-center">
             <div
               style={{
                 maxHeight: "95vh",
                 overflow: "hidden",
               }}
-              className={`relative rounded-lg shadow-sm  m-7 w-2/5 max-w-[1300px] ${
+              className={`relative m-7 w-2/5 max-w-[1300px] rounded-lg shadow-sm ${
                 !containerClassNames ||
                 (containerClassNames && !containerClassNames.includes("bg-"))
                   ? "bg-white"
@@ -93,17 +93,17 @@ const Modal = ({
               } ${containerClassNames ?? ""}`}
             >
               {title && (
-                <div className="flex items-start justify-between p-4 border-b rounded-t ">
+                <div className="flex items-start justify-between rounded-t border-b p-4">
                   {getTitle(title)}
                   {onClose ? (
                     <button
                       type="button"
-                      className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
+                      className="ml-auto inline-flex cursor-pointer items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                       data-modal-hide="staticModal"
                       onClick={() => onClose()}
                     >
                       <svg
-                        className="w-5 h-5"
+                        className="h-5 w-5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"
@@ -118,20 +118,20 @@ const Modal = ({
                   ) : null}
                 </div>
               )}
-              <div className="p-4 gap-6 overflow-y-auto max-h-[calc(100vh_-_200px)]">
+              <div className="max-h-[calc(100vh_-_200px)] gap-6 overflow-y-auto p-4">
                 {children}
               </div>
               {bottomContent ? (
                 <div className="p-5 text-sm">{bottomContent}</div>
               ) : (
-                <div className="flex justify-end p-6 gap-2 border-t border-gray-200 rounded-b ">
+                <div className="flex justify-end gap-2 rounded-b border-t border-gray-200 p-6">
                   {actions?.map((action) => (
                     <button
                       key={action.id}
                       type="button"
                       className={
                         action.isLoading
-                          ? `flex items-center font-bold justify-around gap-1 ${getClassName(
+                          ? `flex items-center justify-around gap-1 font-bold ${getClassName(
                               action
                             )}`
                           : `${getClassName(action)} `

@@ -80,7 +80,7 @@ export default function InstalledPackageCard({
       ref={ref}
       className={`${
         borderLeftColor[release.status]
-      } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-2 custom-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
+      } custom-shadow my-2 grid grid-cols-12 items-center rounded-md border-l-4 bg-white p-2 py-6 text-xs border-l-[${statusColor}] cursor-pointer ${
         isMouseOver && "custom-shadow-lg"
       }`}
       onMouseOver={handleMouseOver}
@@ -90,31 +90,31 @@ export default function InstalledPackageCard({
       <img
         src={release.icon || HelmGrayIcon}
         alt="helm release icon"
-        className="w-[45px] mx-4 col-span-1 min-w-[45px]"
+        className="col-span-1 mx-4 w-[45px] min-w-[45px]"
       />
 
       <div className="col-span-11 -mb-5">
         <div className="grid grid-cols-11">
-          <div className="col-span-3 font-bold text-xl mr-0.5 font-roboto-slab">
+          <div className="col-span-3 mr-0.5 font-roboto-slab text-xl font-bold">
             {release.name}
           </div>
           <div className="col-span-3">
             <StatusLabel status={release.status} />
           </div>
           <div className="col-span-2 font-bold">{release.chart}</div>
-          <div className="col-span-1 font-bold text-xs">
+          <div className="col-span-1 text-xs font-bold">
             #{release.revision}
           </div>
-          <div className="col-span-1 font-bold text-xs">
+          <div className="col-span-1 text-xs font-bold">
             {release.namespace}
           </div>
-          <div className="col-span-1 font-bold text-xs">{getAge(release)}</div>
+          <div className="col-span-1 text-xs font-bold">{getAge(release)}</div>
         </div>
         <div
-          className="grid grid-cols-11 text-xs mt-3"
+          className="mt-3 grid grid-cols-11 text-xs"
           style={{ marginBottom: "12px" }}
         >
-          <div className="col-span-3 h-12 line-clamp-3 mr-1">
+          <div className="col-span-3 mr-1 line-clamp-3 h-12">
             {release.description}
           </div>
           <div className="col-span-3 mr-2">
@@ -124,11 +124,11 @@ export default function InstalledPackageCard({
               <Spinner size={4} />
             )}
           </div>
-          <div className="col-span-2 text-muted flex flex-col items">
+          <div className="items col-span-2 flex flex-col text-muted">
             <span>CHART VERSION</span>
             {(canUpgrade || installRepoSuggestion) && (
               <div
-                className="text-upgradable flex flex-row items-center gap-1 font-bold"
+                className="flex flex-row items-center gap-1 font-bold text-upgradable"
                 title={`upgrade available: ${latestVersionData?.version} from ${latestVersionData?.repository}`}
               >
                 {canUpgrade && !installRepoSuggestion ? (
