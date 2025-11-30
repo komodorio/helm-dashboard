@@ -78,7 +78,7 @@ const Modal = ({
   return createPortal(
     <>
       {isOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-black/75 transition-opacity ">
+        <div className="fixed inset-0 bg-black/75 transition-opacity ">
           <div className="flex justify-center">
             <div
               style={{
