@@ -61,7 +61,8 @@
       "npm run lint:fix",
       "npm run prettier:fix"
     ],
-    "*.{json,css,md,mdx}": "npm run prettier:fix"
+    "*.{json,css,md,mdx}": "npm run prettier:fix",
+    "src/*.{ts,tsx}": "npm run tsc:check"
   },
   "scripts": {
     "dev": "vite",

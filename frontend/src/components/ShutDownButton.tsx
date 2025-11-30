@@ -6,7 +6,7 @@ import { useShutdownHelmDashboard } from "../API/other";
 function ShutDownButton() {
   const { mutate: signOut, status } = useShutdownHelmDashboard();
 
-  const handleClick = async () => {
+  const handleClick = () => {
     signOut();
   };
 

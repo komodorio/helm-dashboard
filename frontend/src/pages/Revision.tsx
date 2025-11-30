@@ -31,7 +31,7 @@ function Revision() {
   );
 
   const sortedReleases = useMemo(
-    () => (releaseRevisions as ReleaseRevision[])?.sort(descendingSort),
+    () => releaseRevisions?.sort(descendingSort),
     [releaseRevisions]
   );
 
