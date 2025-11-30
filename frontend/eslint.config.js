@@ -33,6 +33,7 @@ export default defineConfig([{
             sourceType: "module",
             ecmaFeatures: { jsx: true },
             project: "./tsconfig.json",
+            tsconfigRootDir: __dirname,
         },
     },
 
@@ -84,7 +85,10 @@ export default defineConfig([{
         },
 
         sourceType: "script",
-        parserOptions: { project: "./tsconfig.json" },
+        parserOptions: {
+          project: "./tsconfig.json",
+          tsconfigRootDir: __dirname,
+        },
     },
 
     files: ["**/.eslintrc.{js,cjs}"],
