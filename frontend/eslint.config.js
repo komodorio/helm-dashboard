@@ -1,16 +1,12 @@
-const {
-    defineConfig,
-} = require("eslint/config");
+import { defineConfig } from "eslint/config";
 
-const globals = require("globals");
-const tsParser = require("@typescript-eslint/parser");
-const typescriptEslint = require("@typescript-eslint/eslint-plugin");
-const react = require("eslint-plugin-react");
-const js = require("@eslint/js");
+import globals from "globals";
+import tsParser from "@typescript-eslint/parser";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import react from "eslint-plugin-react";
+import js from "@eslint/js";
 
-const {
-    FlatCompat,
-} = require("@eslint/eslintrc");
+import { FlatCompat } from "@eslint/eslintrc";
 
 const compat = new FlatCompat({
     baseDirectory: __dirname,
@@ -43,7 +39,7 @@ module.exports = defineConfig([{
         "plugin:prettier/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:react-hooks/recommended",
-        // "plugin:@typescript-eslint/recommended-requiring-type-checking", TODO enable and fix the types
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
     ),
 
     plugins: {
