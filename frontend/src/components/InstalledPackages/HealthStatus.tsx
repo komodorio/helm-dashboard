@@ -27,7 +27,7 @@ const HealthStatus = ({ statusData }: Props) => {
                   : cond.status === "Progressing"
                     ? "bg-warning"
                     : "bg-danger"
-              } w-2.5 h-2.5 rounded-xs`}
+              } h-2.5 w-2.5 rounded-xs`}
             ></span>
           </Tooltip>
         );

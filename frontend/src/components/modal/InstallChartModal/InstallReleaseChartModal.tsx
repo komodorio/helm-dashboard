@@ -169,7 +169,7 @@ export const InstallReleaseChartModal = ({
       window.location.reload();
     },
     onError: (error) => {
-      setInstallError((error as Error)?.message || "Failed to update");
+      setInstallError(error?.message || "Failed to update");
     },
   });
 

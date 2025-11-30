@@ -149,7 +149,7 @@ export const InstallRepoChartModal = ({
       navigate(`/${response.namespace}/${response.name}/installed/revision/1`);
     },
     onError: (error) => {
-      setInstallError((error as Error)?.message || "Failed to update");
+      setInstallError(error?.message || "Failed to update");
     },
   });
 

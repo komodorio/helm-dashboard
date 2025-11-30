@@ -30,11 +30,11 @@ export default function RevisionResource({ isLatest }: Props) {
   return (
     <table
       cellPadding={6}
-      className="border-spacing-y-2 font-semibold border-separate w-full text-xs "
+      className="w-full border-separate border-spacing-y-2 text-xs font-semibold"
     >
-      <thead className="bg-zinc-200 font-bold h-8 rounded-sm">
+      <thead className="h-8 rounded-sm bg-zinc-200 font-bold">
         <tr>
-          <td className="pl-6 rounded-sm">RESOURCE TYPE</td>
+          <td className="rounded-sm pl-6">RESOURCE TYPE</td>
           <td>NAME</td>
           <td>STATUS</td>
           <td>STATUS MESSAGE</td>
@@ -44,7 +44,7 @@ export default function RevisionResource({ isLatest }: Props) {
       {isLoading ? (
         <Spinner />
       ) : (
-        <tbody className="bg-white mt-4 h-8 rounded-sm w-full">
+        <tbody className="mt-4 h-8 w-full rounded-sm bg-white">
           {resources?.length ? (
             resources
               .sort(function (a, b) {
@@ -65,7 +65,7 @@ export default function RevisionResource({ isLatest }: Props) {
               ))
           ) : (
             <tr>
-              <div className="bg-white rounded-sm shadow-sm display-none no-charts mt-3 text-sm p-4">
+              <div className="display-none no-charts mt-3 rounded-sm bg-white p-4 text-sm shadow-sm">
                 Looks like you don&apos;t have any resources.{" "}
                 <RiExternalLinkLine className="ml-2 text-lg" />
               </div>
@@ -99,14 +99,14 @@ const ResourceRow = ({
 
   return (
     <>
-      <tr className="min-w-[100%] min-h[70px] text-sm py-2">
-        <td className="pl-6 rounded-sm text-sm font-normal w-48">{kind}</td>
-        <td className="font-bold text-sm w-56">{name}</td>
+      <tr className="min-h[70px] min-w-[100%] py-2 text-sm">
+        <td className="w-48 rounded-sm pl-6 text-sm font-normal">{kind}</td>
+        <td className="w-56 text-sm font-bold">{name}</td>
         <td>{reason ? <Badge type={badgeType}>{reason}</Badge> : null}</td>
         <td className="rounded-sm text-gray-100">
-          <div className="flex flex-col gap-1 flex-start">
+          <div className="flex-start flex flex-col gap-1">
             {message && (
-              <div className="text-gray-500 font-thin">{message}</div>
+              <div className="font-thin text-gray-500">{message}</div>
             )}
             {(badgeType === "error" || badgeType === "warning") && (
               <Troubleshoot />
@@ -115,7 +115,7 @@ const ResourceRow = ({
         </td>
         <td className="rounded-sm">
           {isLatest && reason !== "NotFound" ? (
-            <div className="flex justify-end items-center mr-36">
+            <div className="mr-36 flex items-center justify-end">
               <Button className="px-1 text-xs" onClick={toggleDrawer}>
                 Describe
               </Button>
@@ -127,7 +127,7 @@ const ResourceRow = ({
         open={isOpen}
         onClose={toggleDrawer}
         direction="right"
-        className="min-w-[85%] "
+        className="min-w-[85%]"
       >
         {isOpen ? (
           <DescribeResource
@@ -171,19 +171,19 @@ const DescribeResource = ({
   const badgeType = getBadgeType(status);
   return (
     <>
-      <div className="flex justify-between px-3 py-4 border-b ">
+      <div className="flex justify-between border-b px-3 py-4">
         <div>
           <div className="flex gap-3">
-            <h3 className="font-medium text-xl font-poppins">{name}</h3>
+            <h3 className="font-poppins text-xl font-medium">{name}</h3>
             <Badge type={badgeType}>{reason}</Badge>
           </div>
           <p className="m-0 mt-4 font-inter text-sm font-normal">{kind}</p>
         </div>
 
-        <div className="flex  items-center gap-4 pr-4">
+        <div className="flex items-center gap-4 pr-4">
           <a
             href="https://www.komodor.com/helm-dash/?utm_campaign=Helm%20Dashboard%20%7C%20CTA&amp;utm_source=helm-dash&amp;utm_medium=cta&amp;utm_content=helm-dash"
-            className="bg-primary text-white p-1.5 text-sm flex items-center rounded-sm"
+            className="flex items-center rounded-sm bg-primary p-1.5 text-sm text-white"
             target="_blank"
             rel="noreferrer"
           >
@@ -197,7 +197,7 @@ const DescribeResource = ({
             aria-label="Close"
             onClick={closeDrawer}
           >
-            <img src={closeIcon} alt="close" className="w-[16px] h-[16px]" />
+            <img src={closeIcon} alt="close" className="h-[16px] w-[16px]" />
           </button>
         </div>
       </div>
@@ -205,9 +205,9 @@ const DescribeResource = ({
       {isLoading ? (
         <Spinner />
       ) : (
-        <div className="h-full overflow-y-auto ">
+        <div className="h-full overflow-y-auto">
           <pre
-            className="bg-white rounded-sm p-4 font-medium text-base font-sf-mono"
+            className="rounded-sm bg-white p-4 font-sf-mono text-base font-medium"
             style={{ overflow: "unset" }}
             dangerouslySetInnerHTML={{
               __html: yamlFormattedData,

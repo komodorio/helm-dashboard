@@ -17,15 +17,15 @@ export const Default = {
     tabs: [
       {
         name: "tab1",
-        component: <div className="w-250 h-250 bg-green-400">tab1</div>,
+        component: <div className="h-250 w-250 bg-green-400">tab1</div>,
       },
       {
         name: "tab2",
-        component: <div className="w-250 h-250 bg-red-400">tab2</div>,
+        component: <div className="h-250 w-250 bg-red-400">tab2</div>,
       },
       {
         name: "tab3",
-        component: <div className="w-250 h-250 bg-blue-400">tab3</div>,
+        component: <div className="h-250 w-250 bg-blue-400">tab3</div>,
       },
     ],
     activeTab: "tab1",

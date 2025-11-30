@@ -49,6 +49,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.1",
+    "prettier-plugin-tailwindcss": "^0.7.1",
     "storybook": "10.0.8",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
@@ -60,7 +61,8 @@
       "npm run lint:fix",
       "npm run prettier:fix"
     ],
-    "*.{json,css,md,mdx}": "npm run prettier:fix"
+    "*.{json,css,md,mdx}": "npm run prettier:fix",
+    "src/*.{ts,tsx}": "npm run tsc:check"
   },
   "scripts": {
     "dev": "vite",

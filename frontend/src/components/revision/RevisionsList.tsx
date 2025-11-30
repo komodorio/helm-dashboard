@@ -40,18 +40,18 @@ export default function RevisionsList({
             }
             onClick={() => changeRelease(release.revision)}
             key={release.revision}
-            className={`flex flex-col border border-gray-200 rounded-md mx-5 p-2 gap-4 cursor-pointer ${
+            className={`mx-5 flex cursor-pointer flex-col gap-4 rounded-md border border-gray-200 p-2 ${
               release.revision === selectedRevision
                 ? "border-revision-dark bg-white"
                 : "border-revision-light bg-body-background"
             }`}
           >
-            <div className="flex flex-wrap row justify-between">
+            <div className="row flex flex-wrap justify-between">
               <StatusLabel status={release.status} isRollback={isRollback} />
               <span className="font-bold">#{release.revision}</span>
             </div>
             <div
-              className="self-end text-muted text-xs flex flex-wrap gap-1"
+              className="flex flex-wrap gap-1 self-end text-xs text-muted"
               style={{
                 width: "100%",
                 display: "flex",

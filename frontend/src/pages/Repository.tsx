@@ -59,7 +59,7 @@ function RepositoryPage() {
   }, [repositories, repoFromParams]);
 
   return (
-    <div className="flex flex-row p-5 gap-4">
+    <div className="flex flex-row gap-4 p-5">
       <RepositoriesList
         repositories={repositories}
         onRepositoryChanged={handleRepositoryChanged}

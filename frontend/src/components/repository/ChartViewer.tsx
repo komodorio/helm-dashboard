@@ -21,11 +21,11 @@ function ChartViewer({ chart }: ChartViewerProps) {
     <>
       <div
         data-cy="chart-viewer-install-button"
-        className="grid grid-cols-10 gap-3 hover:bg-body-background p-4 text-sm"
+        className="grid grid-cols-10 gap-3 p-4 text-sm hover:bg-body-background"
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
-        <span className="col-span-2 font-semibold flex flex-row items-center gap-1 text-base">
+        <span className="col-span-2 flex flex-row items-center gap-1 text-base font-semibold">
           <img src={chart.icon} className="h-4" />
           {chart.name}
         </span>
@@ -33,7 +33,7 @@ function ChartViewer({ chart }: ChartViewerProps) {
         <span className="col-span-1 text-center">{chart.version}</span>
         <span className="col-span-1 text-center">
           <button
-            className={`bg-white border border-gray-300 px-2 p-1 rounded-md font-semibold ${
+            className={`rounded-md border border-gray-300 bg-white p-1 px-2 font-semibold ${
               showInstallButton ? "visible" : "invisible"
             }`}
             onClick={() => setShowInstallModal(true)}

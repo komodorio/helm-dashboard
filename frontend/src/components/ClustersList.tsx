@@ -107,7 +107,7 @@ function ClustersList({
   };
 
   return (
-    <div className="bg-white flex flex-col p-2 rounded-sm custom-shadow text-cluster-list w-48 m-5 h-fit pb-4 custom-">
+    <div className="custom- custom-shadow m-5 flex h-fit w-48 flex-col rounded-sm bg-white p-2 pb-4 text-cluster-list">
       {!clusterMode ? (
         <>
           <label className="font-bold">Clusters</label>
@@ -115,10 +115,10 @@ function ClustersList({
             return (
               <span
                 key={cluster.Name}
-                className="data-cy-clusterName flex items-center mt-2 text-xs"
+                className="data-cy-clusterName mt-2 flex items-center text-xs"
               >
                 <input
-                  className="cursor-pointer data-cy-clustersInput"
+                  className="data-cy-clustersInput cursor-pointer"
                   onChange={(e) => {
                     onClusterChange(e.target.value);
                   }}
@@ -128,7 +128,7 @@ function ClustersList({
                   checked={cluster.Name === selectedCluster}
                   name="clusters"
                 />
-                <label htmlFor={cluster.Name} className="ml-1 ">
+                <label htmlFor={cluster.Name} className="ml-1">
                   {getCleanClusterName(cluster.Name)}
                 </label>
               </span>
@@ -137,11 +137,11 @@ function ClustersList({
         </>
       ) : null}
 
-      <label className="font-bold mt-4">Namespaces</label>
+      <label className="mt-4 font-bold">Namespaces</label>
       {namespaces
         ?.sort((a, b) => a.name.localeCompare(b.name))
         ?.map((namespace) => (
-          <span key={namespace.name} className="flex items-center mt-2 text-xs">
+          <span key={namespace.name} className="mt-2 flex items-center text-xs">
             <input
               type="checkbox"
               id={namespace.name}

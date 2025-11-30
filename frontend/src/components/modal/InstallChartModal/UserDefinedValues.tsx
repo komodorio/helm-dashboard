@@ -20,9 +20,9 @@ export const UserDefinedValues = ({
   }, [debouncedValue, onValuesChange, initialValue]);
 
   return (
-    <div className="w-1/2 ">
+    <div className="w-1/2">
       <label
-        className="block tracking-wide text-gray-700 text-xl font-medium mb-2"
+        className="mb-2 block text-xl font-medium tracking-wide text-gray-700"
         htmlFor="grid-user-defined-values"
       >
         User-Defined Values:
@@ -32,7 +32,7 @@ export const UserDefinedValues = ({
         defaultValue={initialValue}
         onChange={(e) => setUserDefinedValues(e.target.value)}
         rows={14}
-        className="block p-2.5 w-full text-md text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none font-monospace"
+        className="text-md font-monospace block w-full resize-none rounded-lg border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
       ></textarea>
     </div>
   );

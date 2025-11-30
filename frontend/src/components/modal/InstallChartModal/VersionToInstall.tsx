@@ -42,7 +42,7 @@ export const VersionToInstall: FC<{
 
   const currentVersion =
     chartVersion && showCurrentVersion ? (
-      <p className="text-xl text-muted ml-2">
+      <p className="ml-2 text-xl text-muted">
         {"(current version is "}
         <span className="text-green-700">{`${chartVersion}`}</span>
         {")"}
@@ -71,12 +71,12 @@ export const VersionToInstall: FC<{
     [options, initialVersion]
   );
   return (
-    <div className="flex gap-2 text-xl items-center">
+    <div className="flex items-center gap-2 text-xl">
       {versions?.length && (selectedOption || initOpt) ? (
         <>
           Version to install:{" "}
           <Select
-            className="basic-single cursor-pointer min-w-[272px]"
+            className="basic-single min-w-[272px] cursor-pointer"
             classNamePrefix="select"
             isClearable={false}
             isSearchable={false}
@@ -96,9 +96,9 @@ export const VersionToInstall: FC<{
 
                 return (
                   <OriginalSingleValue {...props}>
-                    <span className="text-green-700 font-bold">{children}</span>
+                    <span className="font-bold text-green-700">{children}</span>
                     {props.data.check && showCurrentVersion && (
-                      <BsCheck2 className="inline-block ml-2 text-green-700 font-bold" />
+                      <BsCheck2 className="ml-2 inline-block font-bold text-green-700" />
                     )}
                   </OriginalSingleValue>
                 );
@@ -106,7 +106,7 @@ export const VersionToInstall: FC<{
               Option: ({ children, innerProps, data }) => (
                 <div
                   className={
-                    "flex items-center py-2 pl-4 pr-2 text-green-700 hover:bg-blue-100"
+                    "flex items-center py-2 pr-2 pl-4 text-green-700 hover:bg-blue-100"
                   }
                   {...innerProps}
                 >
@@ -114,7 +114,7 @@ export const VersionToInstall: FC<{
                   {data.check && showCurrentVersion && (
                     <BsCheck2
                       fontWeight={"bold"}
-                      className="inline-block ml-2 text-green-700 font-bold"
+                      className="ml-2 inline-block font-bold text-green-700"
                     />
                   )}
                 </div>
