@@ -43,7 +43,7 @@ class ApiService {
       throw new Error(error);
     }
 
-    let data = null;
+    let data;
     if (!response.headers.get("Content-Type")) {
       return {} as T;
     } else if (response.headers.get("Content-Type")?.includes("text/plain")) {

@@ -76,7 +76,7 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "lint": "npx eslint src/",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix --max-warnings=0",
     "prettier": "npx prettier src/ --check",
     "prettier:fix": "npm run prettier -- --write",
     "cypress:open": "cypress open",
