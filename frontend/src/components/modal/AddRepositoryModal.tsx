@@ -80,7 +80,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
       isOpen={isOpen}
       onClose={onClose}
       bottomContent={
-        <div className="flex justify-end gap-2 rounded-b border-t border-gray-200 p-6 dark:border-gray-600">
+        <div className="flex justify-end gap-2 rounded-b border-t border-gray-200 p-6">
           <button
             data-cy="add-chart-repository-button"
             className="flex cursor-pointer items-center rounded-lg bg-primary px-3 py-1.5 text-center text-base font-medium text-white hover:bg-add-repo focus:ring-4 focus:ring-blue-300 focus:outline-hidden disabled:bg-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -131,7 +131,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
           />
         </label>
       </div>
-      <div className="flex gap-x-3">
+      <div className="mt-6 flex gap-x-3">
         <label className="flex-1" htmlFor="username">
           <div className="mb-2 text-sm">Username</div>
           <input
