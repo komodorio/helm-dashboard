@@ -93,7 +93,7 @@ const Modal = ({
               } ${containerClassNames ?? ""}`}
             >
               {title && (
-                <div className="flex items-start justify-between rounded-t border-b p-4">
+                <div className="flex items-start justify-between rounded-t border-b border-gray-200 p-4">
                   {getTitle(title)}
                   {onClose ? (
                     <button
