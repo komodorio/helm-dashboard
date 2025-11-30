@@ -1,6 +1,5 @@
 import Header from "./layout/Header";
 import { HashRouter, Outlet, Route, Routes, useParams } from "react-router";
-import "./index.css";
 import Installed from "./pages/Installed";
 import RepositoryPage from "./pages/Repository";
 import Revision from "./pages/Revision";

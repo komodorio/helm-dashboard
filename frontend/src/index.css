@@ -2,11 +2,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500&family=Poppins:wght@500;600&family=Roboto+Slab:wght@400;700")
 layer(base);
 
-/* Tailwind directives */
 @import "tailwindcss";
 
-@plugin 'flowbite/plugin';
-@source "../node_modules/flowbite";
 @plugin "flowbite-react/plugin/tailwindcss";
 @source "../.flowbite-react/class-list.json";
 
@@ -42,73 +39,65 @@ layer(base);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
 }
 @utility error-dialog {
-  border: var(--color-error-border);
+  border: 1px solid var(--color-error-border);
   background-color: var(--color-error-background);
   color: var(--color-error-color);
 }
 
-@layer utilities {
-  /* Theme variables (CSS-first approach) */
-  :root {
-    /* Fonts */
-    --font-roboto: "Roboto", serif;
-    --font-roboto-slab: "Roboto Slab", serif;
-    --font-inter: "Inter", serif;
-    --font-poppins: "Poppins", sans-serif;
-    --font-sf-mono:
-      SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
-      monospace;
+@theme {
+  --font-roboto: "Roboto", serif;
+  --font-roboto-slab: "Roboto Slab", serif;
+  --font-sans: "Roboto", "Graphik", "sans-serif";
+  --font-serif: "Merriweather", "serif";
+  --font-inter: "Inter", serif;
+  --font-poppins: "Poppins", sans-serif;
+  --font-sf-mono:
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
 
-    /* Font weights */
-    --font-weight-thin: 100;
-    --font-weight-hairline: 100;
-    --font-weight-extralight: 200;
-    --font-weight-light: 300;
-    --font-weight-normal: 400;
-    --font-weight-semibold: 500;
-    --font-weight-extrabold: 600;
-    --font-weight-bold: 700;
+  --font-weight-thin: 100;
+  --font-weight-hairline: 100;
+  --font-weight-extralight: 200;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 500;
+  --font-weight-extrabold: 600;
+  --font-weight-bold: 700;
 
-    /* Colors */
-    --color-body: #3d4048;
-    --color-white: #ffffff;
-    --color-gray-100: #f3f4f6;
-    --color-gray-200: #e5e7eb;
-    --color-gray-300: #d1d5db;
-    --color-cluster-list: #3d4048;
-    --color-dark: #3d4048;
-    --color-tab-color: #3b3d45;
-    --color-primary: #1347ff;
-    --color-secondary: #eceff2;
-    --color-muted: #707583;
-    --color-error-border: #dc3545;
-    --color-error-background: #f9d7da;
-    --color-error-color: #842029;
-    --color-failed: #fc1683;
-    --color-deployed: #1fa470;
-    --color-superseded: #9195a1;
-    --color-pending: #5ab0ff;
-    --color-danger: #ff0072;
-    --color-text-danger: #fc1683;
-    --color-text-warning: #ffc107;
-    --color-text-success: #a4f8d7;
-    --color-upgradable: #0d6efd;
-    --color-warning: #ffa800;
-    --color-success: #00c2ab;
-    --color-border-deployed: #1be99a;
-    --color-revision-light: #dcdddf;
-    --color-revision-dark: #007bff;
-    --color-installed-charts-filter: #dad8ce;
-    --color-dropdown: #e9ecef;
-    --color-chart-values: #eceff2;
-    --color-add-repo: #0b5ed7;
-    --color-link-color: #0d6efd;
-    --color-body-background: #f4f7fa;
-    --color-repository: #d6effe;
-    --color-revision: #d6effe;
-    --color-header-install: #ebefff;
-    --color-upgrade-color: #fc1683;
-  }
+  --color-body: #3d4048;
+  --color-cluster-list: #3d4048;
+  --color-dark: #3d4048;
+  --color-tab-color: #3b3d45;
+  --color-primary: #1347ff;
+  --color-secondary: #eceff2;
+  --color-muted: #707583;
+  --color-error-border: #dc3545;
+  --color-error-background: #f9d7da;
+  --color-error-color: #842029;
+  --color-failed: #fc1683;
+  --color-deployed: #1fa470;
+  --color-superseded: #9195a1;
+  --color-pending: #5ab0ff;
+  --color-danger: #ff0072;
+  --color-text-danger: #fc1683;
+  --color-text-warning: #ffc107;
+  --color-text-success: #a4f8d7;
+  --color-upgradable: #0d6efd;
+  --color-warning: #ffa800;
+  --color-success: #00c2ab;
+  --color-border-deployed: #1be99a;
+  --color-revision-light: #dcdddf;
+  --color-revision-dark: #007bff;
+  --color-installed-charts-filter: #dad8ce;
+  --color-dropdown: #e9ecef;
+  --color-chart-values: #eceff2;
+  --color-add-repo: #0b5ed7;
+  --color-link-color: #0d6efd;
+  --color-body-background: #f4f7fa;
+  --color-repository: #d6effe;
+  --color-revision: #d6effe;
+  --color-header-install: #ebefff;
+  --color-upgrade-color: #fc1683;
 }
 
 /* Base layer */
