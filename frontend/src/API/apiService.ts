@@ -16,7 +16,18 @@ interface ClustersResponse {
 }
 class ApiService {
   currentCluster = "";
-  constructor(protected readonly isMockMode: boolean = false) {}
+  private readonly basePath: string;
+  constructor(protected readonly isMockMode: boolean = false) {
+    const fromEnv = (import.meta as any).env?.VITE_BASE_PATH as string | undefined;
+    // In production, Vite injects import.meta.env.BASE_URL. Prefer explicit VITE_BASE_PATH if provided.
+    const viteBase = (import.meta as any).env?.BASE_URL as string | undefined;
+    const computed = (fromEnv ?? viteBase ?? "/").trim();
+    // Normalize to leading slash, no trailing slash (except root)
+    let normalized = computed;
+    if (!normalized.startsWith("/")) normalized = "/" + normalized;
+    if (normalized !== "/") normalized = normalized.replace(/\/+$/g, "");
+    this.basePath = normalized;
+  }
 
   setCluster = (cluster: string) => {
     this.currentCluster = cluster;
@@ -28,14 +39,20 @@ class ApiService {
   ): Promise<T> {
     let response;
 
+    const isAbsolute = /^https?:\/\//.test(url);
+    const fullUrl = isAbsolute
+      ? url
+      : this.basePath === "/"
+      ? url
+      : `${this.basePath}${url.startsWith("/") ? url : `/${url}`}`;
     if (this.currentCluster) {
       const headers = new Headers(options?.headers);
       if (!headers.has("X-Kubecontext")) {
         headers.set("X-Kubecontext", this.currentCluster);
       }
-      response = await fetch(url, { ...options, headers });
+      response = await fetch(fullUrl, { ...options, headers });
     } else {
-      response = await fetch(url, options);
+      response = await fetch(fullUrl, options);
     }
 
     if (!response.ok) {
@@ -55,7 +72,7 @@ class ApiService {
   }
 
   getToolVersion = async () => {
-    const response = await fetch("/status");
+    const response = await this.fetchWithDefaults("/status");
     const data = await response.json();
     return data;
   };
@@ -73,8 +90,9 @@ class ApiService {
   };
 
   getClusters = async () => {
-    const response = await fetch("/api/k8s/contexts");
-    const data = (await response.json()) as ClustersResponse[];
+    const data = await this.fetchWithDefaults<ClustersResponse[]>(
+      "/api/k8s/contexts"
+    );
     return data;
   };
 

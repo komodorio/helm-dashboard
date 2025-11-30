@@ -20,6 +20,8 @@ image:
   # Specifies the exact image digest to pull.
   digest: ""
   imagePullSecrets: []
+  # Flag for using an image with fixed base path /helm-dashboard
+  basePath: false
 
 nameOverride: ""
 fullnameOverride: ""
