@@ -7,7 +7,7 @@ import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
 import { useParams, useNavigate } from "react-router";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
-import { Release } from "../data/types";
+import type { Release } from "../data/types";
 
 function Installed() {
   const { searchParamsObject } = useCustomSearchParams();
@@ -19,10 +19,14 @@ function Installed() {
   );
   const navigate = useNavigate();
 
-  const handleClusterChange = (clusterName: string) => {
-    navigate({
+  const clusterChange = async (clusterName: string) => {
+    await navigate({
       pathname: `/${encodeURIComponent(clusterName)}/installed`,
     });
+  };
+
+  const handleClusterChange = (clusterName: string) => {
+    void clusterChange(clusterName);
   };
 
   const [filterKey, setFilterKey] = useState<string>("");

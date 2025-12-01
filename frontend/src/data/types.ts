@@ -1,3 +1,5 @@
+import type { DeploymentStatus } from "../components/common/StatusLabel";
+
 export type Chart = {
   id: string;
   name: string;
@@ -35,7 +37,7 @@ export type Release = {
   namespace: string;
   revision: number;
   updated: string;
-  status: string;
+  status: DeploymentStatus;
   chart: string;
   chart_name: string;
   chart_ver: string;
@@ -79,7 +81,7 @@ export type Repository = {
 export type ReleaseRevision = {
   revision: number;
   updated: string;
-  status: string;
+  status: DeploymentStatus;
   chart: string;
   app_version: string;
   description: string;

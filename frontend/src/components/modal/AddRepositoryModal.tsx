@@ -36,7 +36,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const addRepository = () => {
+  const addRepository = async () => {
     const body = new FormData();
     body.append("name", formData.name ?? "");
     body.append("url", formData.url ?? "");
@@ -45,32 +45,34 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
 
     setIsLoading(true);
 
-    apiService
-      .fetchWithDefaults<void>("/api/helm/repositories", {
+    try {
+      await apiService.fetchWithDefaults<void>("/api/helm/repositories", {
         method: "POST",
         body,
-      })
-      .then(() => {
-        setIsLoading(false);
-        onClose();
-
-        queryClient.invalidateQueries({
-          queryKey: ["helm", "repositories"],
-        });
-        setSelectedRepo(formData.name || "");
-        navigate(`/repository/${formData.name}`, {
-          replace: true,
-        });
-      })
-      .catch((error) => {
-        alertError.setShowErrorModal({
-          title: "Failed to add repo",
-          msg: error.message,
-        });
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
+
+      setIsLoading(false);
+      onClose();
+
+      await queryClient.invalidateQueries({
+        queryKey: ["helm", "repositories"],
+      });
+      setSelectedRepo(formData.name || "");
+      await navigate(`/repository/${formData.name}`, {
+        replace: true,
+      });
+    } catch (err) {
+      alertError.setShowErrorModal({
+        title: "Failed to add repo",
+        msg: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddRepository = () => {
+    void addRepository();
   };
 
   return (
@@ -84,7 +86,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
           <button
             data-cy="add-chart-repository-button"
             className="flex cursor-pointer items-center rounded-lg bg-primary px-3 py-1.5 text-center text-base font-medium text-white hover:bg-add-repo focus:ring-4 focus:ring-blue-300 focus:outline-hidden disabled:bg-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            onClick={addRepository}
+            onClick={handleAddRepository}
             disabled={isLoading}
           >
             {isLoading && <Spinner size={4} />}

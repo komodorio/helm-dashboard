@@ -4,7 +4,7 @@
  * the first story simply renders the component with the default props.
  */
 
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import TextInput from "./TextInput";
 
 const meta = {

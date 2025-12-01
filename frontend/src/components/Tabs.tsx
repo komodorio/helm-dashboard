@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
 
 export interface Tab {

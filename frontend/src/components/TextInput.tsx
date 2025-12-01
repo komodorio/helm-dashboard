@@ -12,13 +12,13 @@
  * @return JSX.Element
  *
  */
-import { JSX } from "react";
+import type { ChangeEvent, JSX } from "react";
 
 export interface TextInputProps {
   label: string;
   placeholder: string;
   isMandatory?: boolean;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function TextInput(props: TextInputProps): JSX.Element {

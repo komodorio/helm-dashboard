@@ -23,6 +23,8 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.1",
     "@storybook/addon-docs": "^10.0.8",
     "@storybook/addon-links": "^10.0.8",
     "@storybook/mdx2-csf": "^1.1.0",
@@ -44,6 +46,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-storybook": "^10.0.8",
+    "eslint-plugin-tsc": "^2.0.0",
     "flowbite": "^4.0.1",
     "globals": "^16.5.0",
     "husky": "^9.1.7",
@@ -57,12 +60,8 @@
     "vite-plugin-static-copy": "^3.1.4"
   },
   "lint-staged": {
-    "src/*.{js,jsx,ts,tsx}": [
-      "npm run lint:fix",
-      "npm run prettier:fix"
-    ],
-    "*.{json,css,md,mdx}": "npm run prettier:fix",
-    "src/*.{ts,tsx}": "npm run tsc:check"
+    "*.{js,jsx,ts,tsx}": "npm run lint:fix",
+    "*.{js,jsx,ts,tsx,json,css,md,mdx}": "npm run prettier:fix"
   },
   "scripts": {
     "dev": "vite",
@@ -75,7 +74,7 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "lint": "npx eslint src/",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix --max-warnings=0",
     "prettier": "npx prettier src/ --check",
     "prettier:fix": "npm run prettier -- --write",
     "cypress:open": "cypress open",

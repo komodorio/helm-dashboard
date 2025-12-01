@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
-import { K8sResource, K8sResourceList, KubectlContexts } from "./interfaces";
+import type {
+  K8sResource,
+  K8sResourceList,
+  KubectlContexts,
+} from "./interfaces";
 import apiService from "./apiService";
 
 // Get list of kubectl contexts configured locally
@@ -8,7 +12,10 @@ function useGetKubectlContexts(options?: UseQueryOptions<KubectlContexts>) {
   return useQuery<KubectlContexts>({
     queryKey: ["k8s", "contexts"],
     queryFn: () =>
-      apiService.fetchWithDefaults<KubectlContexts>("/api/k8s/contexts"),
+      apiService.fetchWithSafeDefaults<KubectlContexts>({
+        url: "/api/k8s/contexts",
+        fallback: { contexts: [] },
+      }),
     ...(options ?? {}),
   });
 }
@@ -23,9 +30,10 @@ function useGetK8sResource(
   return useQuery<K8sResource>({
     queryKey: ["k8s", kind, "get", name, namespace],
     queryFn: () =>
-      apiService.fetchWithDefaults<K8sResource>(
-        `/api/k8s/${kind}/get?name=${name}&namespace=${namespace}`
-      ),
+      apiService.fetchWithSafeDefaults<K8sResource>({
+        url: `/api/k8s/${kind}/get?name=${name}&namespace=${namespace}`,
+        fallback: { kind: "", name: "", namespace: "" },
+      }),
     ...(options ?? {}),
   });
 }
@@ -38,7 +46,10 @@ function useGetK8sResourceList(
   return useQuery<K8sResourceList>({
     queryKey: ["k8s", kind, "list"],
     queryFn: () =>
-      apiService.fetchWithDefaults<K8sResourceList>(`/api/k8s/${kind}/list`),
+      apiService.fetchWithSafeDefaults<K8sResourceList>({
+        url: `/api/k8s/${kind}/list`,
+        fallback: { items: [] },
+      }),
     ...(options ?? {}),
   });
 }

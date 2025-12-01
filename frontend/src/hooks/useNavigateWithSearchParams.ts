@@ -12,19 +12,14 @@ const useNavigateWithSearchParams = () => {
   const { context } = useParams();
 
   const { search } = useLocation();
-  const navigateWithSearchParams = (
-    url: string,
-    ...restArgs: NavigateOptions[]
-  ) => {
+  return async (url: string, ...restArgs: NavigateOptions[]) => {
     let prefixedUrl = url;
 
     if (!clusterMode) {
       prefixedUrl = `/${encodeURIComponent(context ?? "")}${url}`;
     }
-    navigate(`${prefixedUrl}${search}`, ...restArgs);
+    await navigate(`${prefixedUrl}${search}`, ...restArgs);
   };
-
-  return navigateWithSearchParams;
 };
 
 export default useNavigateWithSearchParams;

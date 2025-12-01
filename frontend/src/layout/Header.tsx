@@ -46,6 +46,10 @@ export default function Header() {
     }
   };
 
+  const handleResetCache = () => {
+    void resetCache();
+  };
+
   const openAPI = () => {
     window.open("/#/docs", "_blank");
   };
@@ -72,7 +76,7 @@ export default function Header() {
           <ul className="flex w-full items-center md:mt-0 md:flex-row md:justify-between md:border-0 md:text-sm md:font-normal">
             <li>
               <LinkWithSearchParams
-                to={"/installed"}
+                to={"installed"}
                 exclude={["tab"]}
                 className={getBtnStyle("installed")}
               >
@@ -81,7 +85,7 @@ export default function Header() {
             </li>
             <li>
               <LinkWithSearchParams
-                to={"/repository"}
+                to={"repository"}
                 exclude={["tab"]}
                 end={false}
                 className={getBtnStyle("repository")}
@@ -103,7 +107,7 @@ export default function Header() {
                     id: "4",
                     text: "Reset Cache",
                     icon: <BsArrowRepeat />,
-                    onClick: resetCache,
+                    onClick: handleResetCache,
                   },
                   {
                     id: "5",

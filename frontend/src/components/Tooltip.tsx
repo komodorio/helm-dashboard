@@ -1,4 +1,5 @@
-import { type ReactElement, cloneElement, HTMLAttributes } from "react";
+import type { HTMLAttributes } from "react";
+import { type ReactElement, cloneElement } from "react";
 
 export default function Tooltip({
   id,
@@ -15,7 +16,7 @@ export default function Tooltip({
         element as ReactElement<HTMLAttributes<HTMLElement>>,
         {
           "data-tooltip-target": id,
-        } as HTMLAttributes<HTMLElement>
+        } as unknown as HTMLAttributes<HTMLElement>
       )}
       <div
         id={id}

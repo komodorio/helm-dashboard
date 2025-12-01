@@ -1,11 +1,11 @@
 import { useParams } from "react-router";
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import type { VersionData } from "../../../API/releases";
 import {
   useChartReleaseValues,
   useGetReleaseManifest,
   useGetVersions,
   useVersionData,
-  VersionData,
 } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
@@ -17,11 +17,11 @@ import { isNoneEmptyArray } from "../../../utils";
 import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
-import { InstallChartModalProps } from "../../../data/types";
+import type { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
 import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
-import { LatestChartVersion } from "../../../API/interfaces";
+import type { LatestChartVersion } from "../../../API/interfaces";
 
 export const InstallReleaseChartModal = ({
   isOpen,
@@ -129,7 +129,7 @@ export const InstallReleaseChartModal = ({
   });
 
   // Confirm method (install)
-  const setReleaseVersionMutation = useMutation<VersionData>({
+  const setReleaseVersionMutation = useMutation<VersionData, Error>({
     mutationKey: [
       "setVersion",
       namespace,
@@ -148,20 +148,23 @@ export const InstallReleaseChartModal = ({
       }
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues || releaseValues || ""); // if userValues is empty, we use the release values
-      return await apiService.fetchWithDefaults(
-        `/api/helm/releases/${
-          namespace ? namespace : "default"
-        }${`/${releaseName}`}`,
-        {
+      const url = `/api/helm/releases/${
+        namespace ? namespace : "default"
+      }/${releaseName}`;
+
+      return await apiService.fetchWithSafeDefaults<VersionData>({
+        url,
+        options: {
           method: "post",
           body: formData,
-        }
-      );
+        },
+        fallback: { version: "", urls: [""] },
+      });
     },
     onSuccess: async (response) => {
       onClose();
       setSelectedVersionData({ version: "", urls: [] }); //cleanup
-      navigate(
+      await navigate(
         `/${
           namespace ? namespace : "default"
         }/${releaseName}/installed/revision/${response.version}`

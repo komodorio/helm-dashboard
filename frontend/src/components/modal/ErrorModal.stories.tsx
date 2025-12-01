@@ -1,5 +1,5 @@
 import { action } from "storybook/actions";
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import ErrorModal from "./ErrorModal";
 
 const meta = {

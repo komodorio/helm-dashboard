@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Chart } from "../../data/types";
+import type { Chart } from "../../data/types";
 import { InstallRepoChartModal } from "../modal/InstallChartModal/InstallRepoChartModal";
 
 type ChartViewerProps = {

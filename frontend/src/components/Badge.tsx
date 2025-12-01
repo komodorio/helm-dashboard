@@ -17,7 +17,7 @@
  *
  *
  */
-import { JSX, ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 
 export type BadgeCode = "success" | "warning" | "error" | "unknown";
 

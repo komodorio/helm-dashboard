@@ -14,7 +14,7 @@
  *
  *
  */
-import { JSX } from "react";
+import type { JSX } from "react";
 
 interface TabsBarProps {
   tabs: Array<{ name: string; component: JSX.Element }>;
