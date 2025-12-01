@@ -15,7 +15,7 @@ export default function Tooltip({
         element as ReactElement<HTMLAttributes<HTMLElement>>,
         {
           "data-tooltip-target": id,
-        } as HTMLAttributes<HTMLElement>
+        } as unknown as HTMLAttributes<HTMLElement>
       )}
       <div
         id={id}

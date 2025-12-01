@@ -3333,6 +3333,13 @@ eslint-plugin-storybook@^10.0.8:
   dependencies:
     "@typescript-eslint/utils" "^8.8.1"
 
+eslint-plugin-tsc@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/eslint-plugin-tsc/-/eslint-plugin-tsc-2.0.0.tgz"
+  integrity sha512-we7n063HSoWDpXjuqgplrYxfWnlVgq7GXteEjxtc/Ve6C0BjGQyoNGjApSVspyru1cckAM9ASwPnSU8Y0OTwTA==
+  dependencies:
+    typescript-service "^2.0.3"
+
 eslint-scope@^5.1.1:
   version "5.1.1"
   resolved "https://registry.npmjs.org/eslint-scope/-/eslint-scope-5.1.1.tgz"
@@ -6454,6 +6461,11 @@ tslib@^1.8.1:
   resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
+tslib@^1.9.3:
+  version "1.14.1"
+  resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
+  integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
+
 tslib@^2.0.1, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.4.0:
   version "2.5.0"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.5.0.tgz"
@@ -6546,6 +6558,13 @@ types-ramda@^0.30.1:
   integrity sha512-1HTsf5/QVRmLzcGfldPFvkVsAdi1db1BBKzi7iW3KBUlOICg/nKnFS+jGqDJS3YD8VsWbAh7JiHeBvbsw8RPxA==
   dependencies:
     ts-toolbelt "^9.6.0"
+
+typescript-service@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.npmjs.org/typescript-service/-/typescript-service-2.0.3.tgz"
+  integrity sha512-FzRlqRp965UBzGvGwc6rbeko84jLILZrHf++I4cN8usZUB7F8Lh8/WDiCOUvy2l5os+jBWEz4fbYkkj1DhYJcw==
+  dependencies:
+    tslib "^1.9.3"
 
 typescript@^5.9.3:
   version "5.9.3"

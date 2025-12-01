@@ -10,7 +10,7 @@ const meta = {
    */
   title: "DropDown",
   component: DropDown,
-} as Meta<typeof DropDown>;
+} as unknown as Meta<typeof DropDown>;
 
 export default meta;
 

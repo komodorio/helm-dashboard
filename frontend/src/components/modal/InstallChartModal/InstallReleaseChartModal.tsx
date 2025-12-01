@@ -158,7 +158,7 @@ export const InstallReleaseChartModal = ({
       });
       if (!data || typeof data === "string") {
         console.error(url, " response is empty or string");
-        return {} as VersionData;
+        return {} as unknown as VersionData;
       }
       return data;
     },

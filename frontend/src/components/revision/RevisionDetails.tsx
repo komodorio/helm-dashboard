@@ -135,7 +135,7 @@ export default function RevisionDetails({
   };
 
   const displayTestResults = () => {
-    if (!testResults || (testResults as []).length === 0) {
+    if (!testResults || !testResults.length) {
       return (
         <div>
           Tests executed successfully

@@ -45,7 +45,7 @@ class ApiService {
 
     const contentType = response.headers.get("Content-Type") || "";
     if (!contentType) {
-      return {} as T;
+      return {} as unknown as T;
     } else if (contentType.includes("text/plain")) {
       return await response.text();
     } else {

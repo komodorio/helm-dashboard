@@ -3,6 +3,7 @@ import ClustersList from "./ClustersList";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Release } from "../data/types";
+import { DeploymentStatus } from "./common/StatusLabel";
 
 type ClustersListProps = {
   onClusterChange: (clusterName: string) => void;
@@ -17,7 +18,7 @@ const generateTestReleaseData = (): Release => ({
   namespace: "default",
   revision: 1,
   updated: "2024-01-23T15:37:35.0992836+02:00",
-  status: "deployed",
+  status: DeploymentStatus.DEPLOYED,
   chart: "helm-dashboard-0.1.10",
   chart_name: "helm-dashboard",
   chart_ver: "0.1.10",
