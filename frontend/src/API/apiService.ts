@@ -63,8 +63,13 @@ class ApiService {
     fallback: T;
   }): Promise<T> {
     const data = await this.fetchWithDefaults<T>(url, options);
-    if (!data || typeof data === "string") {
-      console.error(url, " response is empty or string");
+    if (!data) {
+      console.error(url, " response is empty");
+      return fallback;
+    }
+
+    if (typeof data === "string") {
+      console.error(url, " response is string");
       return fallback;
     }
 
