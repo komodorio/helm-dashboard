@@ -9,9 +9,9 @@ import apiService from "./apiService";
 
 // Shuts down the Helm Dashboard application
 export function useShutdownHelmDashboard(
-  options?: UseMutationOptions<void, Error>
+  options?: UseMutationOptions<string, Error>
 ) {
-  return useMutation<void, Error>({
+  return useMutation<string, Error>({
     mutationFn: () =>
       apiService.fetchWithDefaults("/", {
         method: "DELETE",
@@ -22,11 +22,16 @@ export function useShutdownHelmDashboard(
 
 // Gets application status
 export function useGetApplicationStatus(
-  options?: UseQueryOptions<ApplicationStatus>
+  options?: UseQueryOptions<ApplicationStatus | null>
 ) {
-  return useQuery<ApplicationStatus>({
+  return useQuery<ApplicationStatus | null>({
     queryKey: ["status"],
-    queryFn: () => apiService.fetchWithDefaults<ApplicationStatus>("/status"),
+    queryFn: async () =>
+      await apiService.fetchWithSafeDefaults<ApplicationStatus | null>({
+        url: "/status",
+        fallback: null,
+      }),
+
     ...(options ?? {}),
   });
 }

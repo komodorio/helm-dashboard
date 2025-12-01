@@ -46,6 +46,10 @@ export default function Header() {
     }
   };
 
+  const handleResetCache = () => {
+    void resetCache();
+  };
+
   const openAPI = () => {
     window.open("/#/docs", "_blank");
   };
@@ -103,7 +107,7 @@ export default function Header() {
                     id: "4",
                     text: "Reset Cache",
                     icon: <BsArrowRepeat />,
-                    onClick: resetCache,
+                    onClick: handleResetCache,
                   },
                   {
                     id: "5",

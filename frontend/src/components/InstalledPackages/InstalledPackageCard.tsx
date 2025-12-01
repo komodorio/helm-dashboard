@@ -35,7 +35,7 @@ export default function InstalledPackageCard({
     queryKey: ["chartName", release.chartName],
   });
 
-  const { data: statusData } = useQuery<ReleaseHealthStatus[] | null>({
+  const { data: statusData = [], isLoading } = useQuery<ReleaseHealthStatus[]>({
     queryKey: ["resourceStatus", release],
     queryFn: () => apiService.getResourceStatus({ release }),
     enabled: inView,
@@ -61,14 +61,21 @@ export default function InstalledPackageCard({
     setIsMouseOver(false);
   };
 
-  const handleOnClick = () => {
+  const onClick = async () => {
     const { name, namespace } = release;
-    navigate(`/${namespace}/${name}/installed/revision/${release.revision}`, {
-      state: release,
-    });
+    await navigate(
+      `/${namespace}/${name}/installed/revision/${release.revision}`,
+      {
+        state: release,
+      }
+    );
   };
 
-  const statusColor = getStatusColor(release.status as DeploymentStatus);
+  const handleClick = () => {
+    void onClick();
+  };
+
+  const statusColor = getStatusColor(release.status);
   const borderLeftColor: { [key: string]: string } = {
     [DeploymentStatus.DEPLOYED]: "border-l-border-deployed",
     [DeploymentStatus.FAILED]: "border-l-text-danger",
@@ -85,7 +92,7 @@ export default function InstalledPackageCard({
       }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
-      onClick={handleOnClick}
+      onClick={handleClick}
     >
       <img
         src={release.icon || HelmGrayIcon}
@@ -118,10 +125,10 @@ export default function InstalledPackageCard({
             {release.description}
           </div>
           <div className="col-span-3 mr-2">
-            {statusData ? (
-              <HealthStatus statusData={statusData} />
-            ) : (
+            {isLoading ? (
               <Spinner size={4} />
+            ) : (
+              <HealthStatus statusData={statusData} />
             )}
           </div>
           <div className="items col-span-2 flex flex-col text-muted">

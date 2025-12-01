@@ -1,16 +1,16 @@
 import { AiOutlineReload } from "react-icons/ai";
 
-type StatusLabelProps = {
-  status: string;
-  isRollback?: boolean;
-};
-
 export enum DeploymentStatus {
   DEPLOYED = "deployed",
   FAILED = "failed",
   PENDING = "pending-install",
   SUPERSEDED = "superseded",
 }
+
+type StatusLabelProps = {
+  status: DeploymentStatus;
+  isRollback?: boolean;
+};
 
 export function getStatusColor(status: DeploymentStatus) {
   if (status === DeploymentStatus.DEPLOYED) return "text-deployed";
@@ -20,7 +20,7 @@ export function getStatusColor(status: DeploymentStatus) {
 }
 
 function StatusLabel({ status, isRollback }: StatusLabelProps) {
-  const statusColor = getStatusColor(status as DeploymentStatus);
+  const statusColor = getStatusColor(status);
 
   return (
     <div

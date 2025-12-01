@@ -25,7 +25,7 @@ class ApiService {
   public async fetchWithDefaults<T>(
     url: string,
     options?: RequestInit
-  ): Promise<T> {
+  ): Promise<T | string> {
     let response;
 
     if (this.currentCluster) {
@@ -43,49 +43,66 @@ class ApiService {
       throw new Error(error);
     }
 
-    let data;
-    if (!response.headers.get("Content-Type")) {
+    const contentType = response.headers.get("Content-Type") || "";
+    if (!contentType) {
       return {} as T;
-    } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
-      data = await response.text();
+    } else if (contentType.includes("text/plain")) {
+      return await response.text();
     } else {
-      data = await response.json();
+      return (await response.json()) as T;
     }
+  }
+
+  public async fetchWithSafeDefaults<T>({
+    url,
+    options,
+    fallback,
+  }: {
+    url: string;
+    options?: RequestInit;
+    fallback: T;
+  }): Promise<T> {
+    const data = await this.fetchWithDefaults<T>(url, options);
+    if (!data || typeof data === "string") {
+      console.error(url, " response is empty or string");
+      return fallback;
+    }
+
     return data;
   }
 
   getToolVersion = async () => {
-    const response = await fetch("/status");
-    const data = await response.json();
-    return data;
+    return await this.fetchWithDefaults("/status");
   };
 
   getRepositoryLatestVersion = async (repositoryName: string) => {
-    const data = await this.fetchWithDefaults(
+    return await this.fetchWithDefaults(
       `/api/helm/repositories/latestver?name=${repositoryName}`
     );
-    return data;
   };
 
   getInstalledReleases = async () => {
-    const data = await this.fetchWithDefaults("/api/helm/releases");
-    return data;
+    return await this.fetchWithDefaults("/api/helm/releases");
   };
 
-  getClusters = async () => {
-    const response = await fetch("/api/k8s/contexts");
-    const data = (await response.json()) as ClustersResponse[];
+  getClusters = async (): Promise<ClustersResponse[]> => {
+    const data =
+      await this.fetchWithDefaults<ClustersResponse[]>("/api/k8s/contexts");
+
+    if (!data || typeof data === "string") {
+      console.error("/api/k8s/contexts response is empty or string");
+      return [];
+    }
+
     return data;
   };
 
   getNamespaces = async () => {
-    const data = await this.fetchWithDefaults("/api/k8s/namespaces/list");
-    return data;
+    return await this.fetchWithDefaults("/api/k8s/namespaces/list");
   };
 
   getRepositories = async () => {
-    const data = await this.fetchWithDefaults("/api/helm/repositories");
-    return data;
+    return await this.fetchWithDefaults("/api/helm/repositories");
   };
 
   getRepositoryCharts = async ({
@@ -94,13 +111,18 @@ class ApiService {
     queryKey: readonly unknown[];
   }): Promise<Chart[]> => {
     const [, repository] = queryKey;
-    if (!repository) {
+    if (!repository || typeof repository !== "string") {
       return [];
     }
 
-    return await this.fetchWithDefaults<Chart[]>(
-      `/api/helm/repositories/${repository}`
-    );
+    const url = `/api/helm/repositories/${repository}`;
+    const data = await this.fetchWithDefaults<Chart[]>(url);
+
+    if (!data || typeof data === "string") {
+      console.error(url, " response is empty or string");
+      return [];
+    }
+    return data;
   };
 
   getChartVersions = async ({
@@ -118,15 +140,13 @@ class ApiService {
     release,
   }: {
     release: Release;
-  }): Promise<ReleaseHealthStatus[] | null> => {
-    if (!release) return null;
+  }): Promise<ReleaseHealthStatus[]> => {
+    if (!release) return [];
 
-    const data = await this.fetchWithDefaults<
-      Promise<ReleaseHealthStatus[] | null>
-    >(
-      `/api/helm/releases/${release.namespace}/${release.name}/resources?health=true`
-    );
-    return data;
+    return await this.fetchWithSafeDefaults<ReleaseHealthStatus[]>({
+      url: `/api/helm/releases/${release.namespace}/${release.name}/resources?health=true`,
+      fallback: [],
+    });
   };
 
   getReleasesHistory = async ({
@@ -138,9 +158,10 @@ class ApiService {
 
     if (!params.namespace || !params.chart) return [];
 
-    return await this.fetchWithDefaults<ReleaseRevision[]>(
-      `/api/helm/releases/${params.namespace}/${params.chart}/history`
-    );
+    return await this.fetchWithSafeDefaults<ReleaseRevision[]>({
+      url: `/api/helm/releases/${params.namespace}/${params.chart}/history`,
+      fallback: [],
+    });
   };
 
   getValues = async ({

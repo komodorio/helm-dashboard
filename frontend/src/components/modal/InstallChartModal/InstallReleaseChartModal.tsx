@@ -148,20 +148,24 @@ export const InstallReleaseChartModal = ({
       }
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues || releaseValues || ""); // if userValues is empty, we use the release values
-      return await apiService.fetchWithDefaults(
-        `/api/helm/releases/${
-          namespace ? namespace : "default"
-        }${`/${releaseName}`}`,
-        {
-          method: "post",
-          body: formData,
-        }
-      );
+      const url = `/api/helm/releases/${
+        namespace ? namespace : "default"
+      }/${releaseName}`;
+
+      const data = await apiService.fetchWithDefaults<VersionData>(url, {
+        method: "post",
+        body: formData,
+      });
+      if (!data || typeof data === "string") {
+        console.error(url, " response is empty or string");
+        return {} as VersionData;
+      }
+      return data;
     },
     onSuccess: async (response) => {
       onClose();
       setSelectedVersionData({ version: "", urls: [] }); //cleanup
-      navigate(
+      await navigate(
         `/${
           namespace ? namespace : "default"
         }/${releaseName}/installed/revision/${response.version}`

@@ -16,7 +16,10 @@ export function useGetInstalledReleases(context: string) {
   return useQuery<Release[]>({
     queryKey: ["installedReleases", context],
     queryFn: () =>
-      apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
+      apiService.fetchWithSafeDefaults<Release[]>({
+        url: "/api/helm/releases",
+        fallback: [],
+      }),
     retry: false,
   });
 }
@@ -65,9 +68,10 @@ export function useGetReleaseManifest({
   return useQuery<ReleaseManifest[]>({
     queryKey: ["manifest", namespace, chartName],
     queryFn: () =>
-      apiService.fetchWithDefaults<ReleaseManifest[]>(
-        `/api/helm/releases/${namespace}/${chartName}/manifests`
-      ),
+      apiService.fetchWithSafeDefaults<ReleaseManifest[]>({
+        url: `/api/helm/releases/${namespace}/${chartName}/manifests`,
+        fallback: [],
+      }),
     ...(options ?? {}),
   });
 }
@@ -77,9 +81,10 @@ export function useGetResources(ns: string, name: string, enabled?: boolean) {
   const { data, ...rest } = useQuery<StructuredResources[]>({
     queryKey: ["resources", ns, name],
     queryFn: () =>
-      apiService.fetchWithDefaults<StructuredResources[]>(
-        `/api/helm/releases/${ns}/${name}/resources?health=true`
-      ),
+      apiService.fetchWithSafeDefaults<StructuredResources[]>({
+        url: `/api/helm/releases/${ns}/${name}/resources?health=true`,
+        fallback: [],
+      }),
     enabled,
   });
 
@@ -130,9 +135,10 @@ export function useGetLatestVersion(
   return useQuery<ChartVersion[]>({
     queryKey: ["latestver", chartName],
     queryFn: () =>
-      apiService.fetchWithDefaults<ChartVersion[]>(
-        `/api/helm/repositories/latestver?name=${chartName}`
-      ),
+      apiService.fetchWithSafeDefaults<ChartVersion[]>({
+        url: `/api/helm/repositories/latestver?name=${chartName}`,
+        fallback: [],
+      }),
     gcTime: 0,
     ...(options ?? {}),
   });
@@ -143,10 +149,17 @@ export function useGetVersions(
 ) {
   return useQuery<LatestChartVersion[]>({
     queryKey: ["versions", chartName],
-    queryFn: () =>
-      apiService.fetchWithDefaults<LatestChartVersion[]>(
-        `/api/helm/repositories/versions?name=${chartName}`
-      ),
+    queryFn: async () => {
+      const url = `/api/helm/repositories/versions?name=${chartName}`;
+      const data =
+        await apiService.fetchWithDefaults<LatestChartVersion[]>(url);
+
+      if (!data || typeof data === "string") {
+        console.error(url, " response is empty or string");
+        return [];
+      }
+      return data;
+    },
     select: (data) =>
       data?.sort((a, b) => (isNewerVersion(a.version, b.version) ? 1 : -1)),
     ...(options ?? {}),
@@ -192,21 +205,21 @@ export function useGetDiff(
 // Rollback the release to a previous revision
 export function useRollbackRelease(
   options?: UseMutationOptions<
-    void,
-    unknown,
+    string,
+    Error,
     { ns: string; name: string; revision: number }
   >
 ) {
   return useMutation<
-    void,
-    unknown,
+    string,
+    Error,
     { ns: string; name: string; revision: number }
   >({
     mutationFn: ({ ns, name, revision }) => {
       const formData = new FormData();
       formData.append("revision", revision.toString());
 
-      return apiService.fetchWithDefaults<void>(
+      return apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${ns}/${name}/rollback`,
         {
           method: "POST",
@@ -220,11 +233,11 @@ export function useRollbackRelease(
 
 // Run the tests on a release
 export function useTestRelease(
-  options?: UseMutationOptions<void, unknown, { ns: string; name: string }>
+  options?: UseMutationOptions<string, Error, { ns: string; name: string }>
 ) {
-  return useMutation<void, unknown, { ns: string; name: string }>({
+  return useMutation<string, Error, { ns: string; name: string }>({
     mutationFn: ({ ns, name }) => {
-      return apiService.fetchWithDefaults<void>(
+      return apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${ns}/${name}/test`,
         {
           method: "POST",
@@ -315,13 +328,19 @@ export const useVersionData = ({
             namespace ? namespace : "[empty]"
           }${`/${releaseName}`}`;
 
-      return await apiService.fetchWithDefaults<{ [key: string]: string }>(
-        fetchUrl,
-        {
-          method: "post",
-          body: formData,
-        }
-      );
+      const data = await apiService.fetchWithDefaults<{
+        [key: string]: string;
+      }>(fetchUrl, {
+        method: "post",
+        body: formData,
+      });
+
+      if (!data || typeof data === "string") {
+        console.error(fetchUrl, " response is empty or string");
+        return {};
+      }
+
+      return data;
     },
 
     enabled,

@@ -1,10 +1,10 @@
-import { useMemo, useEffect, useEffectEvent } from "react";
+import { useMemo, useEffect, useEffectEvent, useCallback } from "react";
 
 import RepositoriesList from "../components/repository/RepositoriesList";
 import RepositoryViewer from "../components/repository/RepositoryViewer";
 import { Repository } from "../data/types";
 import { useGetRepositories } from "../API/repositories";
-import { useParams } from "react-router";
+import { type NavigateOptions, useParams } from "react-router";
 import { useAppContext } from "../context/AppContext";
 import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 
@@ -13,8 +13,15 @@ function RepositoryPage() {
   const navigate = useNavigateWithSearchParams();
   const { setSelectedRepo, selectedRepo } = useAppContext();
 
+  const navigateTo = useCallback(
+    async (url: string, ...restArgs: NavigateOptions[]) => {
+      await navigate(url, ...restArgs);
+    },
+    [navigate]
+  );
+
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/repository/${selectedRepository.name}`, {
+    void navigateTo(`/repository/${selectedRepository.name}`, {
       replace: true,
     });
   };
@@ -27,22 +34,17 @@ function RepositoryPage() {
 
   useEffect(() => {
     if (selectedRepo && !repoFromParams) {
-      navigate(`/repository/${selectedRepo}`, {
+      void navigateTo(`/repository/${selectedRepo}`, {
         replace: true,
       });
     }
-  }, [selectedRepo, repoFromParams, context, navigate]);
+  }, [selectedRepo, repoFromParams, context, navigateTo]);
 
   const { data: repositories = [], isSuccess } = useGetRepositories();
 
   const onSuccess = useEffectEvent(() => {
-    // TODO should we passe sorted to RepositoriesList as in ClustersList?
-    const sortedData = [...repositories]?.sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-
-    if (sortedData && sortedData.length > 0 && !repoFromParams) {
-      handleRepositoryChanged(sortedData[0]);
+    if (repositories && repositories.length && !repoFromParams) {
+      handleRepositoryChanged(repositories[0]);
     }
   });
 

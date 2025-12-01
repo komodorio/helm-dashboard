@@ -135,18 +135,21 @@ export const InstallRepoChartModal = ({
       formData.append("values", userValues);
       formData.append("name", releaseName || "");
 
-      return await apiService.fetchWithDefaults(
-        `/api/helm/releases/${namespace ? namespace : "default"}`,
-        {
+      return await apiService.fetchWithSafeDefaults({
+        url: `/api/helm/releases/${namespace ? namespace : "default"}`,
+        options: {
           method: "post",
           body: formData,
-        }
-      );
+        },
+        fallback: { namespace: "", name: "" },
+      });
     },
 
     onSuccess: async (response: { namespace: string; name: string }) => {
       onClose();
-      navigate(`/${response.namespace}/${response.name}/installed/revision/1`);
+      await navigate(
+        `/${response.namespace}/${response.name}/installed/revision/1`
+      );
     },
     onError: (error) => {
       setInstallError(error?.message || "Failed to update");

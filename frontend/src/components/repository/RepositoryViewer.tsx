@@ -52,9 +52,9 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             method: "DELETE",
           }
         );
-        navigate("/repository", { replace: true });
+        await navigate("/repository", { replace: true });
         setSelectedRepo("");
-        queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           queryKey: ["helm", "repositories"],
         });
       } catch (error) {
@@ -104,7 +104,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
             </button>
             <button
               onClick={() => {
-                removeRepository();
+                void removeRepository();
               }}
             >
               <span className="flex h-8 items-center gap-2 rounded-sm border border-gray-300 bg-white px-5 py-1 text-sm font-semibold">

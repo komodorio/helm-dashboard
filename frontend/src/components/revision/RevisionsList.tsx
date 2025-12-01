@@ -20,8 +20,8 @@ export default function RevisionsList({
   const navigate = useNavigateWithSearchParams();
   const { namespace, chart } = useParams();
 
-  const changeRelease = (newRevision: number) => {
-    navigate(`/${namespace}/${chart}/installed/revision/${newRevision}`);
+  const changeRelease = async (newRevision: number) => {
+    await navigate(`/${namespace}/${chart}/installed/revision/${newRevision}`);
   };
 
   return (
@@ -38,7 +38,7 @@ export default function RevisionsList({
             title={
               isRollback ? `Rollback to ${Number(release.revision) - 1}` : ""
             }
-            onClick={() => changeRelease(release.revision)}
+            onClick={() => void changeRelease(release.revision)}
             key={release.revision}
             className={`mx-5 flex cursor-pointer flex-col gap-4 rounded-md border border-gray-200 p-2 ${
               release.revision === selectedRevision

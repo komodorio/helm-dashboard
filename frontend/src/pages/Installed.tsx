@@ -19,10 +19,14 @@ function Installed() {
   );
   const navigate = useNavigate();
 
-  const handleClusterChange = (clusterName: string) => {
-    navigate({
+  const clusterChange = async (clusterName: string) => {
+    await navigate({
       pathname: `/${encodeURIComponent(clusterName)}/installed`,
     });
+  };
+
+  const handleClusterChange = (clusterName: string) => {
+    void clusterChange(clusterName);
   };
 
   const [filterKey, setFilterKey] = useState<string>("");

@@ -105,7 +105,7 @@ export default function RevisionDetails({
       setShowTestResults(false);
       setShowErrorModal({
         title: "Failed to run tests for chart " + chart,
-        msg: (error as Error).message,
+        msg: error.message,
       });
       console.error("Failed to execute test for chart", error);
     },
@@ -147,7 +147,7 @@ export default function RevisionDetails({
     } else {
       return (
         <div>
-          {(testResults as string).split("\n").map((line, index) => (
+          {testResults.split("\n").map((line, index) => (
             <div key={index} className="mb-2">
               {line}
               <br />
@@ -160,6 +160,13 @@ export default function RevisionDetails({
 
   const Header = () => {
     const navigate = useNavigate();
+
+    const addRepo = async () => {
+      await navigate(
+        `/repository?add_repo=true&repo_url=${latestVerData?.[0]?.urls[0]}&repo_name=${latestVerData?.[0]?.repository}`
+      );
+    };
+
     return (
       <header className="flex flex-wrap justify-between">
         <h1 className="float-left mb-1 font-roboto-slab text-3xl font-semibold">
@@ -206,9 +213,7 @@ export default function RevisionDetails({
             {latestVerData?.[0]?.isSuggestedRepo ? (
               <span
                 onClick={() => {
-                  navigate(
-                    `/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
-                  );
+                  void addRepo();
                 }}
                 className="cursor-pointer text-sm text-blue-600 underline"
               >
@@ -216,7 +221,7 @@ export default function RevisionDetails({
               </span>
             ) : (
               <span
-                onClick={() => refetchLatestVersion()}
+                onClick={() => void refetchLatestVersion()}
                 className="cursor-pointer text-xs underline"
               >
                 Check for new version
@@ -328,8 +333,8 @@ const Rollback = ({
 
   const { mutate: rollbackRelease, isPending: isRollingBackRelease } =
     useRollbackRelease({
-      onSuccess: () => {
-        navigate(
+      onSuccess: async () => {
+        await navigate(
           `/${namespace}/${chart}/installed/revision/${revisionInt + 1}`
         );
         window.location.reload();
