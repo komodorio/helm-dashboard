@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useParams } from "react-router";
 import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
-import { Release, ReleaseRevision } from "../data/types";
+import { ReleaseRevision } from "../data/types";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../API/apiService";
 import Spinner from "../components/Spinner";
@@ -19,6 +19,7 @@ function Revision() {
     {
       queryKey: ["releasesHistory", restParams],
       queryFn: apiService.getReleasesHistory,
+      select: (data) => data?.sort(descendingSort),
     }
   );
 
@@ -27,11 +28,6 @@ function Revision() {
       releaseRevisions.reduce((max, revisionData) => {
         return Math.max(max, revisionData.revision);
       }, Number.MIN_SAFE_INTEGER),
-    [releaseRevisions]
-  );
-
-  const sortedReleases = useMemo(
-    () => releaseRevisions?.sort(descendingSort),
     [releaseRevisions]
   );
 
@@ -54,7 +50,7 @@ function Revision() {
           <RevisionSidebarSkeleton />
         ) : (
           <RevisionsList
-            releaseRevisions={sortedReleases}
+            releaseRevisions={releaseRevisions}
             selectedRevision={selectedRevision}
           />
         )}
@@ -67,7 +63,7 @@ function Revision() {
           </div>
         ) : selectedRelease ? (
           <RevisionDetails
-            release={selectedRelease as Release} // TODO fix it
+            release={selectedRelease} // TODO fix it
             installedRevision={releaseRevisions?.[0]}
             isLatest={selectedRelease.revision === latestRevision}
             latestRevision={latestRevision}
@@ -79,16 +75,12 @@ function Revision() {
 }
 
 const RevisionSidebarSkeleton = () => {
-  return (
-    <>
-      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
-      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
-      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
-      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
-      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
-      <div className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2" />
-    </>
-  );
+  return Array.from({ length: 6 }).map((_, i) => (
+    <div
+      key={i}
+      className="mx-5 h-[74px] w-[88%] animate-pulse gap-4 rounded-md border border-gray-200 bg-gray-100 p-2"
+    />
+  ));
 };
 
 export default Revision;

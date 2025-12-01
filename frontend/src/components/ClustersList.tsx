@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo } from "react";
 import { Cluster, Release } from "../data/types";
 import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
@@ -43,21 +43,19 @@ function ClustersList({
 }: ClustersListProps) {
   const { upsertSearchParams, removeSearchParam } = useCustomSearchParams();
   const { clusterMode } = useAppContext();
-  const [sortedClusters, setSortedClusters] = useState<Cluster[]>([]);
 
-  const { data: clusters, isSuccess } = useQuery<Cluster[]>({
+  const { data: clusters = [], isSuccess } = useQuery<Cluster[]>({
     queryKey: ["clusters", selectedCluster],
     queryFn: apiService.getClusters,
+    select: (data) =>
+      data?.sort((a, b) =>
+        getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
+      ),
   });
 
   const onSuccess = useEffectEvent((clusters: Cluster[]) => {
-    const sortedData = [...clusters].sort((a, b) =>
-      getCleanClusterName(a.Name).localeCompare(getCleanClusterName(b.Name))
-    );
-    setSortedClusters(sortedData);
-
-    if (sortedData && sortedData.length > 0 && !selectedCluster) {
-      onClusterChange(sortedData[0].Name);
+    if (clusters && clusters.length && !selectedCluster) {
+      onClusterChange(clusters[0].Name);
     }
 
     if (selectedCluster) {
@@ -111,10 +109,10 @@ function ClustersList({
       {!clusterMode ? (
         <>
           <label className="font-bold">Clusters</label>
-          {sortedClusters?.map((cluster) => {
+          {clusters?.map((cluster) => {
             return (
               <span
-                key={cluster.Name}
+                key={cluster.Name + cluster.Namespace}
                 className="data-cy-clusterName mt-2 flex items-center text-xs"
               >
                 <input

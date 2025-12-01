@@ -9,7 +9,7 @@ import {
   BsArrowUp,
   BsCheckCircle,
 } from "react-icons/bs";
-import { Release, ReleaseRevision } from "../../data/types";
+import { ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import {
@@ -39,7 +39,7 @@ type RevisionTagProps = {
 };
 
 type RevisionDetailsProps = {
-  release: Release;
+  release: ReleaseRevision;
   installedRevision: ReleaseRevision;
   isLatest: boolean;
   latestRevision: number;
@@ -322,7 +322,7 @@ const Rollback = ({
   release,
   installedRevision,
 }: {
-  release: Release;
+  release: ReleaseRevision;
   installedRevision: ReleaseRevision;
 }) => {
   const { chart, namespace, revision } = useParams();

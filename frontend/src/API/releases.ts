@@ -78,36 +78,37 @@ export function useGetReleaseManifest({
 
 // List of installed k8s resources for this release
 export function useGetResources(ns: string, name: string, enabled?: boolean) {
-  const { data, ...rest } = useQuery<StructuredResources[]>({
+  return useQuery<StructuredResources[]>({
     queryKey: ["resources", ns, name],
     queryFn: () =>
       apiService.fetchWithSafeDefaults<StructuredResources[]>({
         url: `/api/helm/releases/${ns}/${name}/resources?health=true`,
         fallback: [],
       }),
+    select: (data) =>
+      data
+        ?.map((resource) => ({
+          ...resource,
+          status: {
+            ...resource.status,
+            conditions: resource.status.conditions.filter(
+              (c) => c.type === HD_RESOURCE_CONDITION_TYPE
+            ),
+          },
+        }))
+        .sort((a, b) => {
+          const interestingResources = [
+            "STATEFULSET",
+            "DEAMONSET",
+            "DEPLOYMENT",
+          ];
+          return (
+            interestingResources.indexOf(b.kind.toUpperCase()) -
+            interestingResources.indexOf(a.kind.toUpperCase())
+          );
+        }),
     enabled,
   });
-
-  return {
-    data: data
-      ?.map((resource) => ({
-        ...resource,
-        status: {
-          ...resource.status,
-          conditions: resource.status.conditions.filter(
-            (c) => c.type === HD_RESOURCE_CONDITION_TYPE
-          ),
-        },
-      }))
-      .sort((a, b) => {
-        const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
-        return (
-          interestingResources.indexOf(b.kind.toUpperCase()) -
-          interestingResources.indexOf(a.kind.toUpperCase())
-        );
-      }),
-    ...rest,
-  };
 }
 
 export function useGetResourceDescription(

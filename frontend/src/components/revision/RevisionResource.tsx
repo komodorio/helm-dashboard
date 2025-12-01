@@ -25,7 +25,6 @@ interface Props {
 export default function RevisionResource({ isLatest }: Props) {
   const { namespace = "", chart = "" } = useParams();
   const { data: resources, isLoading } = useGetResources(namespace, chart);
-  const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
 
   return (
     <table
@@ -46,23 +45,15 @@ export default function RevisionResource({ isLatest }: Props) {
       ) : (
         <tbody className="mt-4 h-8 w-full rounded-sm bg-white">
           {resources?.length ? (
-            resources
-              .sort(function (a, b) {
-                return (
-                  interestingResources.indexOf(a.kind.toUpperCase()) -
-                  interestingResources.indexOf(b.kind.toUpperCase())
-                );
-              })
-              .reverse()
-              .map((resource: StructuredResources) => (
-                <ResourceRow
-                  key={
-                    resource.apiVersion + resource.kind + resource.metadata.name
-                  }
-                  resource={resource}
-                  isLatest={isLatest}
-                />
-              ))
+            resources?.map((resource: StructuredResources) => (
+              <ResourceRow
+                key={
+                  resource.apiVersion + resource.kind + resource.metadata.name
+                }
+                resource={resource}
+                isLatest={isLatest}
+              />
+            ))
           ) : (
             <tr>
               <div className="display-none no-charts mt-3 rounded-sm bg-white p-4 text-sm shadow-sm">
