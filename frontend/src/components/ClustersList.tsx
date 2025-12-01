@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useMemo } from "react";
-import { Cluster, Release } from "../data/types";
+import type { Cluster, Release } from "../data/types";
 import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";

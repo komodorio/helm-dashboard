@@ -1,5 +1,4 @@
 import { BsPower } from "react-icons/bs";
-
 import Modal from "./modal/Modal";
 import { useShutdownHelmDashboard } from "../API/other";
 

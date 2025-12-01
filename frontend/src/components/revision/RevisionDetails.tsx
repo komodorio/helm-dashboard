@@ -9,7 +9,7 @@ import {
   BsArrowUp,
   BsCheckCircle,
 } from "react-icons/bs";
-import { ReleaseRevision } from "../../data/types";
+import type { ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import {

@@ -1,7 +1,9 @@
-import { FC, useMemo, useState } from "react";
-import Select, { components, GroupBase, SingleValueProps } from "react-select";
+import type { FC } from "react";
+import { useMemo, useState } from "react";
+import type { GroupBase, SingleValueProps } from "react-select";
+import Select, { components } from "react-select";
 import { BsCheck2 } from "react-icons/bs";
-import { NonEmptyArray } from "../../../data/types";
+import type { NonEmptyArray } from "../../../data/types";
 
 interface Version {
   repository: string;

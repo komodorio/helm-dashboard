@@ -2,7 +2,7 @@ import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
 import { useParams } from "react-router";
 import { compare } from "compare-versions";
 
-import { ReleaseRevision } from "../../data/types";
+import type { ReleaseRevision } from "../../data/types";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";

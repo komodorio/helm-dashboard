@@ -1,4 +1,4 @@
-import { DeploymentStatus } from "../components/common/StatusLabel";
+import type { DeploymentStatus } from "../components/common/StatusLabel";
 
 export type Chart = {
   id: string;

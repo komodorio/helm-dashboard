@@ -24,7 +24,7 @@
  *
  *
  */
-import { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 
 // define the SelectMenuItem type:
 // This is an object with a label and id.
@@ -39,7 +39,7 @@ export interface SelectMenuItemProps {
 
 export interface SelectMenuProps {
   header: string;
-  children: React.ReactNode;
+  children: ReactNode;
   selected: number;
   onSelect: (id: number) => void;
 }

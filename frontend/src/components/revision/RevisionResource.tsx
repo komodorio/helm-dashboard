@@ -3,11 +3,8 @@ import { useParams } from "react-router";
 import hljs from "highlight.js";
 import { RiExternalLinkLine } from "react-icons/ri";
 
-import {
-  StructuredResources,
-  useGetResourceDescription,
-  useGetResources,
-} from "../../API/releases";
+import type { StructuredResources } from "../../API/releases";
+import { useGetResourceDescription, useGetResources } from "../../API/releases";
 import closeIcon from "../../assets/close.png";
 
 import Drawer from "react-modern-drawer";

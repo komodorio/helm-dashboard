@@ -1,5 +1,5 @@
 import "../App.css";
-import { JSX } from "react";
+import type { JSX } from "react";
 
 function Sidebar(): JSX.Element {
   return (

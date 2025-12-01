@@ -1,11 +1,11 @@
 import { useParams } from "react-router";
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import type { VersionData } from "../../../API/releases";
 import {
   useChartReleaseValues,
   useGetReleaseManifest,
   useGetVersions,
   useVersionData,
-  VersionData,
 } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
@@ -17,11 +17,11 @@ import { isNoneEmptyArray } from "../../../utils";
 import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
-import { InstallChartModalProps } from "../../../data/types";
+import type { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
 import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
-import { LatestChartVersion } from "../../../API/interfaces";
+import type { LatestChartVersion } from "../../../API/interfaces";
 
 export const InstallReleaseChartModal = ({
   isOpen,

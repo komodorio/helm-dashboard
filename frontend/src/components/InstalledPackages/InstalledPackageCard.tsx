@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Release, ReleaseHealthStatus } from "../../data/types";
+import type { Release, ReleaseHealthStatus } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { getAge } from "../../timeUtils";
 import StatusLabel, {
@@ -13,7 +13,7 @@ import HelmGrayIcon from "../../assets/helm-gray-50.svg";
 import Spinner from "../Spinner";
 import { useGetLatestVersion } from "../../API/releases";
 import { isNewerVersion } from "../../utils";
-import { LatestChartVersion } from "../../API/interfaces";
+import type { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import { useInView } from "react-intersection-observer";
 

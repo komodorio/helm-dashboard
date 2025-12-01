@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
-import { Repository } from "../../data/types";
+import type { Repository } from "../../data/types";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 
 type RepositoriesListProps = {

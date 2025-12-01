@@ -1,9 +1,10 @@
 import HeaderLogo from "../../assets/packges-header.svg";
-import { Release } from "../../data/types";
+import type { Release } from "../../data/types";
+import type { Dispatch, SetStateAction } from "react";
 
 type InstalledPackagesHeaderProps = {
   filteredReleases?: Release[];
-  setFilterKey: React.Dispatch<React.SetStateAction<string>>;
+  setFilterKey: Dispatch<SetStateAction<string>>;
   isLoading: boolean;
 };
 

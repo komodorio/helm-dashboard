@@ -4,7 +4,7 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { ApplicationStatus } from "./interfaces";
+import type { ApplicationStatus } from "./interfaces";
 import apiService from "./apiService";
 
 // Shuts down the Helm Dashboard application

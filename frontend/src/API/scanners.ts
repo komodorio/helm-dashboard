@@ -7,7 +7,8 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { ScanResult, ScanResults, ScannersList } from "./interfaces";
+import type { ScanResults, ScannersList } from "./interfaces";
+import { ScanResult } from "./interfaces";
 import apiService from "./apiService";
 
 // Get list of discovered scanners

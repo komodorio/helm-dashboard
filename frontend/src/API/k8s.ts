@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
-import { K8sResource, K8sResourceList, KubectlContexts } from "./interfaces";
+import type {
+  K8sResource,
+  K8sResourceList,
+  KubectlContexts,
+} from "./interfaces";
 import apiService from "./apiService";
 
 // Get list of kubectl contexts configured locally

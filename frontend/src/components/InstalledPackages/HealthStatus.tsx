@@ -1,6 +1,6 @@
 import { HD_RESOURCE_CONDITION_TYPE } from "../../API/releases";
 import { Tooltip } from "flowbite-react";
-import { ReleaseHealthStatus } from "../../data/types";
+import type { ReleaseHealthStatus } from "../../data/types";
 
 interface Props {
   statusData: ReleaseHealthStatus[];

@@ -4,8 +4,8 @@ import {
   useQuery,
   type UseQueryOptions,
 } from "@tanstack/react-query";
-import { ChartVersion, Release } from "../data/types";
-import { LatestChartVersion } from "./interfaces";
+import type { ChartVersion, Release } from "../data/types";
+import type { LatestChartVersion } from "./interfaces";
 import apiService from "./apiService";
 import { getVersionManifestFormData } from "./shared";
 import { isNewerVersion } from "../utils";

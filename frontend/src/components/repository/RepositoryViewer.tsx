@@ -1,5 +1,5 @@
 import { BsTrash3, BsArrowRepeat } from "react-icons/bs";
-import { Chart, Repository } from "../../data/types";
+import type { Chart, Repository } from "../../data/types";
 import ChartViewer from "./ChartViewer";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import apiService from "../../API/apiService";

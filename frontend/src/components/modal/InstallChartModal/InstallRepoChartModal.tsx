@@ -10,11 +10,11 @@ import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchPar
 import { VersionToInstall } from "./VersionToInstall";
 import { isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
-import { InstallChartModalProps } from "../../../data/types";
+import type { InstallChartModalProps } from "../../../data/types";
 import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
 import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
-import { LatestChartVersion } from "../../../API/interfaces";
+import type { LatestChartVersion } from "../../../API/interfaces";
 
 export const InstallRepoChartModal = ({
   isOpen,

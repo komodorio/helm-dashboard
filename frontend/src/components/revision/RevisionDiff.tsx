@@ -1,4 +1,5 @@
-import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
+import type { ChangeEvent } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 import { useGetReleaseInfoByType } from "../../API/releases";
 import { useParams } from "react-router";

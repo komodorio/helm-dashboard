@@ -83,9 +83,18 @@ export default defineConfig([
       ],
 
       "react/react-in-jsx-scope": "off",
+      "react/jsx-uses-react": "error",
       "linebreak-style": ["error", "unix"],
       quotes: ["error", "double"],
       semi: ["error", "always"],
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "React",
+          property: "*",
+          message: "Using React.* is prohibited.",
+        },
+      ],
 
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/strict-boolean-expressions": "off",
@@ -100,6 +109,39 @@ export default defineConfig([
           objectLiteralTypeAssertions: "never",
         },
       ],
+      "@typescript-eslint/no-restricted-types": [
+        "error",
+        {
+          types: {
+            "React.FC": {
+              message:
+                "Avoid using React.FC. Use import type { FC } from React instead",
+            },
+            "React.Node": {
+              message:
+                "Avoid using React.Node. Use import type { Node } from React instead",
+            },
+          },
+        },
+      ],
+      "no-restricted-imports": [
+        "error",
+        {
+          name: "react",
+          importNames: ["default", "*"],
+          message:
+            "Default and namespace React imports are prohibited. Use specific named imports only (e.g., import { useState, type ReactNode } from 'react').",
+          allowTypeImports: false,
+        },
+      ],
+
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          prefer: "type-imports",
+        },
+      ],
+
       "tsc/config": ["error", { configFile: "./tsconfig.json" }],
     },
   },
