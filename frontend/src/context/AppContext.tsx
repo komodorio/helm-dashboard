@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, ReactNode } from "react";
 
 export interface AppContextData {
   selectedRepo: string;
@@ -17,11 +17,7 @@ export const useAppContext = (): AppContextData => {
   return context;
 };
 
-export const AppContextProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [selectedRepo, setSelectedRepo] = useState("");
   const [clusterMode, setClusterMode] = useState(false);
 

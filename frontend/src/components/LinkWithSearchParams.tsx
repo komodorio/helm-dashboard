@@ -27,13 +27,9 @@ const LinkWithSearchParams = ({
     prefixedUrl = `/${encodeURIComponent(context)}${to}`;
   }
 
-  return (
-    <NavLink
-      data-cy="navigation-link"
-      to={`${prefixedUrl}/?${params.toString()}`}
-      {...props}
-    />
-  );
+  const url = `${prefixedUrl}/?${params.toString()}`;
+
+  return <NavLink data-cy="navigation-link" to={url} {...props} />;
 };
 
 export default LinkWithSearchParams;
