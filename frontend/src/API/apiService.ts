@@ -91,15 +91,10 @@ class ApiService {
   };
 
   getClusters = async (): Promise<ClustersResponse[]> => {
-    const data =
-      await this.fetchWithDefaults<ClustersResponse[]>("/api/k8s/contexts");
-
-    if (!data || typeof data === "string") {
-      console.error("/api/k8s/contexts response is empty or string");
-      return [];
-    }
-
-    return data;
+    return await this.fetchWithSafeDefaults<ClustersResponse[]>({
+      url: "/api/k8s/contexts",
+      fallback: [],
+    });
   };
 
   getNamespaces = async () => {
@@ -121,13 +116,7 @@ class ApiService {
     }
 
     const url = `/api/helm/repositories/${repository}`;
-    const data = await this.fetchWithDefaults<Chart[]>(url);
-
-    if (!data || typeof data === "string") {
-      console.error(url, " response is empty or string");
-      return [];
-    }
-    return data;
+    return await this.fetchWithSafeDefaults<Chart[]>({ url, fallback: [] });
   };
 
   getChartVersions = async ({
@@ -135,10 +124,9 @@ class ApiService {
   }: QueryFunctionContext<ChartVersion[], Chart>) => {
     const [, chart] = queryKey;
 
-    const data = await this.fetchWithDefaults(
+    return await this.fetchWithDefaults(
       `/api/helm/repositories/versions?name=${chart.name}`
     );
-    return data;
   };
 
   getResourceStatus = async ({
@@ -184,9 +172,7 @@ class ApiService {
       return Promise.reject(new Error("missing parameters"));
 
     const url = `/api/helm/repositories/values?chart=${namespace}/${chart.name}&version=${version}`;
-    const data = await this.fetchWithDefaults(url);
-
-    return data;
+    return await this.fetchWithDefaults(url);
   };
 }
 

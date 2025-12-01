@@ -129,7 +129,7 @@ export const InstallReleaseChartModal = ({
   });
 
   // Confirm method (install)
-  const setReleaseVersionMutation = useMutation<VersionData>({
+  const setReleaseVersionMutation = useMutation<VersionData, Error>({
     mutationKey: [
       "setVersion",
       namespace,
@@ -152,15 +152,14 @@ export const InstallReleaseChartModal = ({
         namespace ? namespace : "default"
       }/${releaseName}`;
 
-      const data = await apiService.fetchWithDefaults<VersionData>(url, {
-        method: "post",
-        body: formData,
+      return await apiService.fetchWithSafeDefaults<VersionData>({
+        url,
+        options: {
+          method: "post",
+          body: formData,
+        },
+        fallback: { version: "", urls: [""] },
       });
-      if (!data || typeof data === "string") {
-        console.error(url, " response is empty or string");
-        return {} as unknown as VersionData;
-      }
-      return data;
     },
     onSuccess: async (response) => {
       onClose();

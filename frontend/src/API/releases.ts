@@ -151,14 +151,10 @@ export function useGetVersions(
     queryKey: ["versions", chartName],
     queryFn: async () => {
       const url = `/api/helm/repositories/versions?name=${chartName}`;
-      const data =
-        await apiService.fetchWithDefaults<LatestChartVersion[]>(url);
-
-      if (!data || typeof data === "string") {
-        console.error(url, " response is empty or string");
-        return [];
-      }
-      return data;
+      return await apiService.fetchWithSafeDefaults<LatestChartVersion[]>({
+        url,
+        fallback: [],
+      });
     },
     select: (data) =>
       data?.sort((a, b) => (isNewerVersion(a.version, b.version) ? 1 : -1)),
@@ -322,25 +318,22 @@ export const useVersionData = ({
         releaseName,
       });
 
-      const fetchUrl = isInstallRepoChart
+      const url = isInstallRepoChart
         ? `/api/helm/releases/${namespace || "default"}`
         : `/api/helm/releases/${
             namespace ? namespace : "[empty]"
           }${`/${releaseName}`}`;
 
-      const data = await apiService.fetchWithDefaults<{
+      return await apiService.fetchWithSafeDefaults<{
         [key: string]: string;
-      }>(fetchUrl, {
-        method: "post",
-        body: formData,
+      }>({
+        url,
+        options: {
+          method: "post",
+          body: formData,
+        },
+        fallback: {},
       });
-
-      if (!data || typeof data === "string") {
-        console.error(fetchUrl, " response is empty or string");
-        return {};
-      }
-
-      return data;
     },
 
     enabled,
