@@ -38,6 +38,7 @@
     "@typescript-eslint/parser": "^8.48.0",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.22",
+    "babel-plugin-react-compiler": "^1.0.0",
     "cypress": "^13.3.0",
     "eslint": "^9.39.1",
     "eslint-config-enpitech": "^1.0.17",
