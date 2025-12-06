@@ -140,6 +140,15 @@ export default defineConfig([
     },
   },
   {
+    files: ["vite.config.ts"],
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.node.json", // point to the tiny tsconfig
+      },
+    },
+  },
+
+  {
     languageOptions: {
       globals: {
         ...globals.node,

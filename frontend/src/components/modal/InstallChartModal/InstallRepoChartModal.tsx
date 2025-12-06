@@ -1,9 +1,15 @@
 import { useParams } from "react-router";
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+} from "react";
 import { useGetVersions, useVersionData } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
-import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
@@ -11,10 +17,13 @@ import { VersionToInstall } from "./VersionToInstall";
 import { isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
 import type { InstallChartModalProps } from "../../../data/types";
-import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
 import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
 import type { LatestChartVersion } from "../../../API/interfaces";
+import Spinner from "../../Spinner";
+
+const DefinedValues = lazy(() => import("./DefinedValues"));
+const ManifestDiff = lazy(() => import("./ManifestDiff"));
 
 export const InstallRepoChartModal = ({
   isOpen,
@@ -107,7 +116,7 @@ export const InstallRepoChartModal = ({
   } = useDiffData({
     selectedRepo: selectedRepo || "",
     versionsError: versionsError as unknown as string, // TODO fix it
-    currentVerManifest: "", // current version manifest should always be empty since its a fresh install
+    currentVerManifest: "", // current version manifest should always be empty since it's a fresh install
     selectedVerData,
     chart: chartAddress,
   });
@@ -208,16 +217,18 @@ export const InstallRepoChartModal = ({
         loading={loadingChartValues}
       />
 
-      <ManifestDiff
-        diff={diffData as string}
-        isLoading={isLoadingDiff}
-        error={
-          (selectedVerDataError as unknown as string) || // TODO fix it
-          (diffError as unknown as string) ||
-          installError ||
-          (versionsError as unknown as string)
-        }
-      />
+      <Suspense fallback={<Spinner />}>
+        <ManifestDiff
+          diff={diffData as string}
+          isLoading={isLoadingDiff}
+          error={
+            (selectedVerDataError as unknown as string) || // TODO fix it
+            (diffError as unknown as string) ||
+            installError ||
+            (versionsError as unknown as string)
+          }
+        />
+      </Suspense>
     </Modal>
   );
 };

@@ -8,7 +8,7 @@ interface DefinedValuesProps {
   loading: boolean;
 }
 
-export const DefinedValues = ({
+const DefinedValues = ({
   initialValue,
   chartValues,
   onUserValuesChange,
@@ -24,3 +24,5 @@ export const DefinedValues = ({
     </div>
   );
 };
+
+export default DefinedValues;

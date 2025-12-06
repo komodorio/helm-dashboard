@@ -1,5 +1,8 @@
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
 import Spinner from "../../Spinner";
+import yaml from "highlight.js/lib/languages/yaml";
+
+hljs.registerLanguage("yaml", yaml);
 
 export const ChartValues = ({
   chartValues,

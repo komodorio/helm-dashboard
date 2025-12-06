@@ -45,12 +45,12 @@ type RevisionDetailsProps = {
   latestRevision: number;
 };
 
-export default function RevisionDetails({
+const RevisionDetails = ({
   release,
   installedRevision,
   isLatest,
   latestRevision,
-}: RevisionDetailsProps) {
+}: RevisionDetailsProps) => {
   const [searchParams] = useSearchParams();
 
   const revisionTabs = [
@@ -307,7 +307,7 @@ export default function RevisionDetails({
       <Tabs tabs={revisionTabs} selectedTab={selectedTab} />
     </div>
   );
-}
+};
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
   return (
@@ -534,3 +534,5 @@ const Uninstall = () => {
     </>
   );
 };
+
+export default RevisionDetails;

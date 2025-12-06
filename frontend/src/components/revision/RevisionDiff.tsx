@@ -4,12 +4,13 @@ import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 import { useGetReleaseInfoByType } from "../../API/releases";
 import { useParams } from "react-router";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
-
 import parse from "html-react-parser";
-
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
+import yaml from "highlight.js/lib/languages/yaml";
 import Spinner from "../Spinner";
 import { diffConfiguration } from "../../utils";
+
+hljs.registerLanguage("yaml", yaml);
 
 type RevisionDiffProps = {
   includeUserDefineOnly?: boolean;
