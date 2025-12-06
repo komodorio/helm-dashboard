@@ -29,14 +29,8 @@ export default defineConfig([
       },
 
       parser: tsParser,
-      ecmaVersion: "latest",
-      sourceType: "module",
       parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        ecmaFeatures: { jsx: true },
         projectService: true,
-        tsconfigRootDir: __dirname,
       },
     },
 
