@@ -36,7 +36,6 @@ export default defineConfig([
         sourceType: "module",
         ecmaFeatures: { jsx: true },
         projectService: true,
-        // project: "./tsconfig.json",
         tsconfigRootDir: __dirname,
       },
     },
