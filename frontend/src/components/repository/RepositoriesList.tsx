@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
 import type { Repository } from "../../data/types";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
@@ -16,10 +15,7 @@ function RepositoriesList({
 }: RepositoriesListProps) {
   const { searchParamsObject, upsertSearchParams, removeSearchParam } =
     useCustomSearchParams();
-  const showAddRepositoryModal = useMemo(
-    () => searchParamsObject["add_repo"] === "true",
-    [searchParamsObject]
-  );
+  const showAddRepositoryModal = searchParamsObject["add_repo"] === "true";
   const setShowAddRepositoryModal = (value: boolean) => {
     if (value) {
       upsertSearchParams("add_repo", "true");
