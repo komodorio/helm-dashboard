@@ -53,6 +53,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.1",
     "prettier-plugin-tailwindcss": "^0.7.1",
+    "rollup-plugin-visualizer": "^6.0.5",
     "storybook": "10.0.8",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",

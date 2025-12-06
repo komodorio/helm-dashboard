@@ -3,6 +3,7 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import flowbiteReact from "flowbite-react/plugin/vite";
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -12,6 +13,11 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       flowbiteReact(),
+      visualizer({
+        filename: "../pkg/frontend/dist/stats.html",
+        gzipSize: true,
+        brotliSize: true,
+      }),
       viteStaticCopy({
         targets: [
           {
@@ -36,8 +42,18 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            react: ["react", "react-dom", "react-router"],
-            vendors: ["luxon", "highlight.js", "diff2html", "swagger-ui-react"],
+            react: ["react", "react-dom", "react-router", "flowbite-react"],
+            swagger: [
+              "swagger-ui-react",
+              "swagger-client",
+              "@swagger-api/apidom-core",
+              "minim",
+              "lodash",
+            ],
+
+            diff: ["diff2html", "highlight.js", "html-react-parser"],
+            select: ["react-select"],
+            luxon: ["luxon"],
           },
         },
       },

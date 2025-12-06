@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useParams } from "react-router";
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
+import yaml from "highlight.js/lib/languages/yaml";
 import { RiExternalLinkLine } from "react-icons/ri";
 
 import type { StructuredResources } from "../../API/releases";
@@ -14,6 +15,8 @@ import Button from "../Button";
 import Badge, { getBadgeType } from "../Badge";
 import Spinner from "../Spinner";
 import { Troubleshoot } from "../Troubleshoot";
+
+hljs.registerLanguage("yaml", yaml);
 
 interface Props {
   isLatest: boolean;
