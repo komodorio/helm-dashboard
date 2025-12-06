@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   const port = env.VITE_SERVER_PORT || 8080;
   return {
     plugins: [
-      react(),
+      react({ babel: { plugins: ["babel-plugin-react-compiler"] } }),
       tailwindcss(),
       flowbiteReact(),
       viteStaticCopy({
