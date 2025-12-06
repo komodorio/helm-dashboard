@@ -5,13 +5,14 @@ import RepositoryPage from "./pages/Repository";
 import Revision from "./pages/Revision";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { FC } from "react";
-import { useState } from "react";
+import { useState, lazy } from "react";
 import type { ErrorAlert } from "./context/ErrorModalContext";
 import { ErrorModalContext } from "./context/ErrorModalContext";
 import GlobalErrorModal from "./components/modal/GlobalErrorModal";
 import { AppContextProvider } from "./context/AppContext";
 import apiService from "./API/apiService";
-import DocsPage from "./pages/DocsPage";
+
+const DocsPage = lazy(() => import("./pages/DocsPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

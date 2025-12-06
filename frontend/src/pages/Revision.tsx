@@ -1,11 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, Suspense, lazy } from "react";
 import { useParams } from "react-router";
-import RevisionDetails from "../components/revision/RevisionDetails";
 import RevisionsList from "../components/revision/RevisionsList";
 import type { ReleaseRevision } from "../data/types";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../API/apiService";
 import Spinner from "../components/Spinner";
+
+const RevisionDetails = lazy(
+  () => import("../components/revision/RevisionDetails")
+);
 
 const descendingSort = (r1: ReleaseRevision, r2: ReleaseRevision) =>
   r1.revision - r2.revision < 0 ? 1 : -1;
@@ -62,12 +65,14 @@ function Revision() {
             <Spinner />
           </div>
         ) : selectedRelease ? (
-          <RevisionDetails
-            release={selectedRelease} // TODO fix it
-            installedRevision={releaseRevisions?.[0]}
-            isLatest={selectedRelease.revision === latestRevision}
-            latestRevision={latestRevision}
-          />
+          <Suspense fallback={<Spinner />}>
+            <RevisionDetails
+              release={selectedRelease} // TODO fix it
+              installedRevision={releaseRevisions?.[0]}
+              isLatest={selectedRelease.revision === latestRevision}
+              latestRevision={latestRevision}
+            />
+          </Suspense>
         ) : null}
       </div>
     </div>

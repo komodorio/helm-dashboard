@@ -1,5 +1,12 @@
 import { useParams } from "react-router";
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+  lazy,
+  Suspense,
+} from "react";
 import type { VersionData } from "../../../API/releases";
 import {
   useChartReleaseValues,
@@ -9,7 +16,6 @@ import {
 } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
-import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
@@ -18,10 +24,13 @@ import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
 import type { InstallChartModalProps } from "../../../data/types";
-import { DefinedValues } from "./DefinedValues";
 import apiService from "../../../API/apiService";
 import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
 import type { LatestChartVersion } from "../../../API/interfaces";
+import Spinner from "../../Spinner";
+
+const DefinedValues = lazy(() => import("./DefinedValues"));
+const ManifestDiff = lazy(() => import("./ManifestDiff"));
 
 export const InstallReleaseChartModal = ({
   isOpen,
@@ -222,24 +231,28 @@ export const InstallReleaseChartModal = ({
         onNamespaceInput={setNamespace}
       />
 
-      <DefinedValues
-        initialValue={releaseValues}
-        onUserValuesChange={(values: string) => setUserValues(values)}
-        chartValues={chartValues}
-        loading={loadingReleaseValues}
-      />
+      <Suspense fallback={<Spinner />}>
+        <DefinedValues
+          initialValue={releaseValues}
+          onUserValuesChange={(values: string) => setUserValues(values)}
+          chartValues={chartValues}
+          loading={loadingReleaseValues}
+        />
+      </Suspense>
 
-      <ManifestDiff
-        diff={diffData as string}
-        isLoading={isLoadingDiff}
-        error={
-          (currentVerManifestError as unknown as string) || // TODO fix it
-          (selectedVerDataError as unknown as string) ||
-          (diffError as unknown as string) ||
-          installError ||
-          (versionsError as unknown as string)
-        }
-      />
+      <Suspense fallback={<Spinner />}>
+        <ManifestDiff
+          diff={diffData as string}
+          isLoading={isLoadingDiff}
+          error={
+            (currentVerManifestError as unknown as string) || // TODO fix it
+            (selectedVerDataError as unknown as string) ||
+            (diffError as unknown as string) ||
+            installError ||
+            (versionsError as unknown as string)
+          }
+        />
+      </Suspense>
     </Modal>
   );
 };

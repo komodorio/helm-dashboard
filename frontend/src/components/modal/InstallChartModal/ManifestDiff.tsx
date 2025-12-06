@@ -11,7 +11,7 @@ interface ManifestDiffProps {
   error: string;
 }
 
-export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
+const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
   const diffContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -63,3 +63,5 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
     </div>
   );
 };
+
+export default ManifestDiff;
