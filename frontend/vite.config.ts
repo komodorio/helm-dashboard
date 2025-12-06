@@ -43,17 +43,6 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: {
             react: ["react", "react-dom", "react-router", "flowbite-react"],
-            swagger: [
-              "swagger-ui-react",
-              "swagger-client",
-              "@swagger-api/apidom-core",
-              "minim",
-              "lodash",
-            ],
-
-            diff: ["diff2html", "highlight.js", "html-react-parser"],
-            select: ["react-select"],
-            luxon: ["luxon"],
           },
         },
       },
