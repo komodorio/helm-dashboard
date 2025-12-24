@@ -161,7 +161,7 @@ const DescribeResource = ({
 
   const badgeType = getBadgeType(status);
   return (
-    <>
+    <div className="flex h-full flex-col">
       <div className="flex justify-between border-b px-3 py-4">
         <div>
           <div className="flex gap-3">
@@ -196,9 +196,9 @@ const DescribeResource = ({
       {isLoading ? (
         <Spinner />
       ) : (
-        <div className="h-full overflow-y-auto">
+        <div className="flex-1 overflow-auto">
           <pre
-            className="rounded-sm bg-white p-4 font-sf-mono text-base font-medium"
+            className="rounded-sm bg-white p-4 font-sf-mono text-base font-medium whitespace-pre"
             style={{ overflow: "unset" }}
             dangerouslySetInnerHTML={{
               __html: yamlFormattedData,
@@ -206,6 +206,6 @@ const DescribeResource = ({
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
