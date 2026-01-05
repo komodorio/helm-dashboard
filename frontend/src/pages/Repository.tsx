@@ -21,9 +21,12 @@ function RepositoryPage() {
   );
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    void navigateTo(`/repository/${selectedRepository.name}`, {
-      replace: true,
-    });
+    void navigateTo(
+      context
+        ? `/${encodeURIComponent(context)}/repository/${selectedRepository.name}`
+        : `/repository/${selectedRepository.name}`,
+      { replace: true }
+    );
   };
 
   useEffect(() => {
@@ -34,9 +37,12 @@ function RepositoryPage() {
 
   useEffect(() => {
     if (selectedRepo && !repoFromParams) {
-      void navigateTo(`/repository/${selectedRepo}`, {
-        replace: true,
-      });
+      void navigateTo(
+        context
+          ? `/${encodeURIComponent(context)}/repository/${selectedRepo}`
+          : `/repository/${selectedRepo}`,
+        { replace: true }
+      );
     }
   }, [selectedRepo, repoFromParams, context, navigateTo]);
 
