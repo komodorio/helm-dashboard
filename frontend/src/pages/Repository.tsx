@@ -20,11 +20,14 @@ function RepositoryPage() {
     [navigate]
   );
 
-  const handleRepositoryChanged = (selectedRepository: Repository) => {
-    void navigateTo(`/repository/${selectedRepository.name}`, {
-      replace: true,
-    });
-  };
+ const handleRepositoryChanged = (selectedRepository: Repository) => {
+  void navigateTo(
+    context
+      ? `/${context}/repository/${selectedRepository.name}`
+      : `/repository/${selectedRepository.name}`,
+    { replace: true }
+  );
+};
 
   useEffect(() => {
     if (repoFromParams) {
@@ -32,13 +35,17 @@ function RepositoryPage() {
     }
   }, [setSelectedRepo, repoFromParams]);
 
-  useEffect(() => {
-    if (selectedRepo && !repoFromParams) {
-      void navigateTo(`/repository/${selectedRepo}`, {
-        replace: true,
-      });
-    }
-  }, [selectedRepo, repoFromParams, context, navigateTo]);
+useEffect(() => {
+  if (selectedRepo && !repoFromParams) {
+    void navigateTo(
+      context
+        ? `/${context}/repository/${selectedRepo}`
+        : `/repository/${selectedRepo}`,
+      { replace: true }
+    );
+  }
+}, [selectedRepo, repoFromParams, context, navigateTo]);
+
 
   const { data: repositories = [], isSuccess } = useGetRepositories();
 
