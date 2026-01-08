@@ -76,7 +76,7 @@ export default function Header() {
           <ul className="flex w-full items-center md:mt-0 md:flex-row md:justify-between md:border-0 md:text-sm md:font-normal">
             <li>
               <LinkWithSearchParams
-                to={"installed"}
+                to={"/installed"}
                 exclude={["tab"]}
                 className={getBtnStyle("installed")}
               >
@@ -85,7 +85,7 @@ export default function Header() {
             </li>
             <li>
               <LinkWithSearchParams
-                to={"repository"}
+                to={"/repository"}
                 exclude={["tab"]}
                 end={false}
                 className={getBtnStyle("repository")}
