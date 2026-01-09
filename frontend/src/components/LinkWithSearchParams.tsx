@@ -23,8 +23,10 @@ const LinkWithSearchParams = ({
 
   let prefixedUrl = to;
 
-  if (!clusterMode) {
+  if (!clusterMode && context) {
     prefixedUrl = `/${encodeURIComponent(context)}${to}`;
+  } else {
+    prefixedUrl = to;
   }
 
   const url = `${prefixedUrl}/?${params.toString()}`;

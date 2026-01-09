@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useEffectEvent, useCallback } from "react";
+import { useMemo, useEffect, useCallback } from "react";
 
 import RepositoriesList from "../components/repository/RepositoriesList";
 import RepositoryViewer from "../components/repository/RepositoryViewer";
@@ -11,7 +11,7 @@ import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 function RepositoryPage() {
   const { selectedRepo: repoFromParams, context } = useParams();
   const navigate = useNavigateWithSearchParams();
-  const { setSelectedRepo, selectedRepo } = useAppContext();
+  const { setSelectedRepo } = useAppContext();
 
   const navigateTo = useCallback(
     async (url: string, ...restArgs: NavigateOptions[]) => {
@@ -21,12 +21,9 @@ function RepositoryPage() {
   );
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    void navigateTo(
-      context
-        ? `/${encodeURIComponent(context)}/repository/${selectedRepository.name}`
-        : `/repository/${selectedRepository.name}`,
-      { replace: true }
-    );
+    void navigateTo(`/repository/${selectedRepository.name}`, {
+      replace: true,
+    });
   };
 
   useEffect(() => {
@@ -34,31 +31,14 @@ function RepositoryPage() {
       setSelectedRepo(repoFromParams);
     }
   }, [setSelectedRepo, repoFromParams]);
-
-  useEffect(() => {
-    if (selectedRepo && !repoFromParams) {
-      void navigateTo(
-        context
-          ? `/${encodeURIComponent(context)}/repository/${selectedRepo}`
-          : `/repository/${selectedRepo}`,
-        { replace: true }
-      );
-    }
-  }, [selectedRepo, repoFromParams, context, navigateTo]);
-
   const { data: repositories = [], isSuccess } = useGetRepositories();
 
-  const onSuccess = useEffectEvent(() => {
-    if (repositories && repositories.length && !repoFromParams) {
-      handleRepositoryChanged(repositories[0]);
-    }
-  });
-
   useEffect(() => {
-    if (repositories.length && isSuccess) {
-      onSuccess();
+    if (repositories.length && isSuccess && !repoFromParams) {
+      const firstRepo = repositories[0];
+      void navigateTo(`/repository/${firstRepo.name}`, { replace: true });
     }
-  }, [repositories, isSuccess]);
+  }, [repositories, isSuccess, repoFromParams, context, navigateTo]);
 
   const selectedRepository = useMemo(() => {
     if (repoFromParams) {

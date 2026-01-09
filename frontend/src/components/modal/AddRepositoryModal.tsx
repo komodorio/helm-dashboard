@@ -5,8 +5,8 @@ import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { useAppContext } from "../../context/AppContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
 import apiService from "../../API/apiService";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 
 interface FormKeys {
   name: string;
@@ -33,7 +33,7 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const alertError = useAlertError();
   const { setSelectedRepo } = useAppContext();
-  const navigate = useNavigate();
+  const navigate = useNavigateWithSearchParams();
   const queryClient = useQueryClient();
 
   const addRepository = async () => {
@@ -58,7 +58,8 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
         queryKey: ["helm", "repositories"],
       });
       setSelectedRepo(formData.name || "");
-      await navigate(`/repository/${formData.name}`, {
+      const path = `/repository/${formData.name}`;
+      await navigate(path, {
         replace: true,
       });
     } catch (err) {
@@ -68,6 +69,13 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
       });
     } finally {
       setIsLoading(false);
+      setFormData({
+        name: "",
+        url: "",
+        username: "",
+        password: "",
+      });
+      onClose();
     }
   };
 
