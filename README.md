@@ -84,7 +84,7 @@ If your port 8080 is busy, you can specify a different port to use via `--port <
 
 If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line. You can specify multiple namespaces, separated by commas.
 
-If you don't want the browser tab to automatically open, add `--no-browser` flag in your command line.
+If you don't want the browser tab to automatically open, add `--no-browser` flag in your command-line.
 
 If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
 
