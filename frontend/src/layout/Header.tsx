@@ -14,6 +14,7 @@ import LinkWithSearchParams from "../components/LinkWithSearchParams";
 import apiService from "../API/apiService";
 import { useAppContext } from "../context/AppContext";
 import { useEffect, useEffectEvent } from "react";
+import { isNewerVersion } from "../utils";
 
 export default function Header() {
   const { clusterMode, setClusterMode } = useAppContext();
@@ -124,7 +125,9 @@ export default function Header() {
                 ]}
               />
             </li>
-            {"v" + statusData?.CurVer !== statusData?.LatestVer ? (
+            {statusData?.CurVer &&
+            statusData?.LatestVer &&
+            isNewerVersion(statusData.CurVer, statusData.LatestVer) ? (
               <li className="min-w-[130px]">
                 <a
                   href="https://github.com/komodorio/helm-dashboard/releases"
