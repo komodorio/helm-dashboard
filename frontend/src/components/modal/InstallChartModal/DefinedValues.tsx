@@ -8,14 +8,14 @@ interface DefinedValuesProps {
   loading: boolean;
 }
 
-export const DefinedValues = ({
+const DefinedValues = ({
   initialValue,
   chartValues,
   onUserValuesChange,
   loading,
 }: DefinedValuesProps) => {
   return (
-    <div className="flex w-full gap-6 mt-4">
+    <div className="mt-4 flex w-full gap-6">
       <UserDefinedValues
         initialValue={initialValue}
         onValuesChange={onUserValuesChange}
@@ -24,3 +24,5 @@ export const DefinedValues = ({
     </div>
   );
 };
+
+export default DefinedValues;

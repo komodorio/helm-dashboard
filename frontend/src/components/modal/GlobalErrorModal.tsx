@@ -14,7 +14,7 @@ export default function GlobalErrorModal({
   contentText,
 }: ErrorModalProps) {
   const ErrorTitle = (
-    <div className="font-medium text-2xl text-error-color">
+    <div className="text-2xl font-medium text-error-color">
       <div className="flex gap-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -34,9 +34,7 @@ export default function GlobalErrorModal({
 
   return (
     <Modal
-      containerClassNames={
-        "border-2 border-error-border-color bg-error-background w-3/5 "
-      }
+      containerClassNames={"error-dialog w-3/5"}
       title={ErrorTitle}
       isOpen={isOpen}
       onClose={onClose}
@@ -57,7 +55,7 @@ export default function GlobalErrorModal({
     >
       <p
         style={{ minWidth: "500px" }}
-        className="text-error-color border-green-400 text-sm"
+        className="border-green-400 text-sm text-error-color"
       >
         {contentText}
       </p>

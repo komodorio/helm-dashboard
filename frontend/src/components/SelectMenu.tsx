@@ -24,6 +24,7 @@
  *
  *
  */
+import type { JSX, ReactNode } from "react";
 
 // define the SelectMenuItem type:
 // This is an object with a label and id.
@@ -38,7 +39,7 @@ export interface SelectMenuItemProps {
 
 export interface SelectMenuProps {
   header: string;
-  children: React.ReactNode;
+  children: ReactNode;
   selected: number;
   onSelect: (id: number) => void;
 }
@@ -74,7 +75,7 @@ export function SelectMenuItem({
 export default function SelectMenu(props: SelectMenuProps): JSX.Element {
   const { header, children } = props;
   return (
-    <div className="card flex flex-col">
+    <div className="flex flex-col card">
       <h2 className="text-xl font-bold">{header}</h2>
       <div className="flex flex-col">{children}</div>
     </div>

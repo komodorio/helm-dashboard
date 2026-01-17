@@ -1,9 +1,10 @@
+import type { DateTimeMaybeValid } from "luxon";
 import { DateTime, type DurationLikeObject } from "luxon";
-import { ReleaseRevision } from "./data/types";
+import type { ReleaseRevision } from "./data/types";
 
 export function getAge(obj1: ReleaseRevision, obj2?: ReleaseRevision) {
   const date = DateTime.fromISO(obj1.updated);
-  let dateNext = DateTime.now();
+  let dateNext: DateTimeMaybeValid = DateTime.now();
   if (obj2) {
     dateNext = DateTime.fromISO(obj2.updated);
   }

@@ -8,7 +8,7 @@ export const Troubleshoot = () => {
         target="_blank"
         rel="noreferrer"
       >
-        <button className="bg-primary text-white p-2 flex items-center rounded text-sm font-medium font-roboto">
+        <button className="flex items-center rounded-sm bg-primary p-2 font-roboto text-sm font-medium text-white">
           Troubleshoot in Komodor
           <RiExternalLinkLine className="ml-2 text-lg" />
         </button>

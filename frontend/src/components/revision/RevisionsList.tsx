@@ -1,8 +1,8 @@
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { compare } from "compare-versions";
 
-import { ReleaseRevision } from "../../data/types";
+import type { ReleaseRevision } from "../../data/types";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
@@ -20,8 +20,8 @@ export default function RevisionsList({
   const navigate = useNavigateWithSearchParams();
   const { namespace, chart } = useParams();
 
-  const changeRelease = (newRevision: number) => {
-    navigate(`/${namespace}/${chart}/installed/revision/${newRevision}`);
+  const changeRelease = async (newRevision: number) => {
+    await navigate(`/${namespace}/${chart}/installed/revision/${newRevision}`);
   };
 
   return (
@@ -38,20 +38,20 @@ export default function RevisionsList({
             title={
               isRollback ? `Rollback to ${Number(release.revision) - 1}` : ""
             }
-            onClick={() => changeRelease(release.revision)}
+            onClick={() => void changeRelease(release.revision)}
             key={release.revision}
-            className={`flex flex-col border rounded-md mx-5 p-2 gap-4 cursor-pointer ${
+            className={`mx-5 flex cursor-pointer flex-col gap-4 rounded-md border border-gray-200 p-2 ${
               release.revision === selectedRevision
                 ? "border-revision-dark bg-white"
                 : "border-revision-light bg-body-background"
             }`}
           >
-            <div className="flex flex-wrap row justify-between">
+            <div className="row flex flex-wrap justify-between">
               <StatusLabel status={release.status} isRollback={isRollback} />
               <span className="font-bold">#{release.revision}</span>
             </div>
             <div
-              className="self-end text-muted text-xs flex flex-wrap gap-1"
+              className="flex flex-wrap gap-1 self-end text-xs text-muted"
               style={{
                 width: "100%",
                 display: "flex",

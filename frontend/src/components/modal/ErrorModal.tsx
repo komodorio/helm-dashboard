@@ -14,7 +14,7 @@ export default function ErrorModal({
   contentText,
 }: ErrorModalProps) {
   const ErrorTitle = (
-    <div className="font-medium text-2xl text-error-color">
+    <div className="text-2xl font-medium text-error-color">
       <div className="flex gap-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -33,8 +33,8 @@ export default function ErrorModal({
   );
 
   const bottomContent = (
-    <div className="flex py-6 px-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-      <span className="text-sm text-muted fs-80 text-gray-500">
+    <div className="flex gap-2 rounded-b border-t border-gray-200 px-4 py-6 dark:border-gray-600">
+      <span className="fs-80 text-sm text-gray-500 text-muted">
         Hint: Komodor has the same HELM capabilities, with enterprise features
         and support.{" "}
         <a
@@ -50,15 +50,13 @@ export default function ErrorModal({
 
   return (
     <Modal
-      containerClassNames={
-        "border-2 border-error-border-color bg-error-background w-2/3"
-      }
+      containerClassNames={"error-dialog w-2/3"}
       title={ErrorTitle}
       isOpen={isOpen}
       onClose={onClose}
       bottomContent={bottomContent}
     >
-      <p className="text-error-color border-green-400">{contentText}</p>
+      <p className="border-green-400 text-error-color">{contentText}</p>
     </Modal>
   );
 }

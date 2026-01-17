@@ -17,6 +17,7 @@
  *
  *
  */
+import type { JSX, ReactNode } from "react";
 
 export type BadgeCode = "success" | "warning" | "error" | "unknown";
 
@@ -29,7 +30,7 @@ export const BadgeCodes = Object.freeze({
 
 export interface BadgeProps {
   type: BadgeCode;
-  children: React.ReactNode;
+  children: ReactNode;
   additionalClassNames?: string;
 }
 export default function Badge(props: BadgeProps): JSX.Element {
@@ -41,7 +42,7 @@ export default function Badge(props: BadgeProps): JSX.Element {
   };
 
   const badgeBase =
-    "inline-flex items-center px-1 py-1 rounded text-xs font-light";
+    "inline-flex items-center px-1 py-1 rounded-sm text-xs font-light";
 
   const badgeElem = (
     <span

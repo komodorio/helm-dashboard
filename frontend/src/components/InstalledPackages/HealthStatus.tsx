@@ -1,6 +1,6 @@
 import { HD_RESOURCE_CONDITION_TYPE } from "../../API/releases";
 import { Tooltip } from "flowbite-react";
-import { ReleaseHealthStatus } from "../../data/types";
+import type { ReleaseHealthStatus } from "../../data/types";
 
 interface Props {
   statusData: ReleaseHealthStatus[];
@@ -27,7 +27,7 @@ const HealthStatus = ({ statusData }: Props) => {
                   : cond.status === "Progressing"
                     ? "bg-warning"
                     : "bg-danger"
-              } w-2.5 h-2.5 rounded-sm`}
+              } h-2.5 w-2.5 rounded-xs`}
             ></span>
           </Tooltip>
         );

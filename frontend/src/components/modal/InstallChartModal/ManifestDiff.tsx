@@ -1,9 +1,12 @@
 import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-base";
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
+import yaml from "highlight.js/lib/languages/yaml";
 
 import { useEffect, useRef } from "react";
 import Spinner from "../../Spinner";
 import { diffConfiguration } from "../../../utils";
+
+hljs.registerLanguage("yaml", yaml);
 
 interface ManifestDiffProps {
   diff?: string;
@@ -11,7 +14,7 @@ interface ManifestDiffProps {
   error: string;
 }
 
-export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
+const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
   const diffContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -35,7 +38,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
 
   if (isLoading && !error) {
     return (
-      <div className="flex text-lg items-end">
+      <div className="flex items-end text-lg">
         <Spinner />
         Calculating diff...
       </div>
@@ -47,7 +50,7 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
       <h4 className="text-xl">Manifest changes:</h4>
 
       {error ? (
-        <p className="text-red-600 text-lg">
+        <p className="text-lg text-red-600">
           Failed to get upgrade info: {error.toString()}
         </p>
       ) : diff ? (
@@ -63,3 +66,5 @@ export const ManifestDiff = ({ diff, isLoading, error }: ManifestDiffProps) => {
     </div>
   );
 };
+
+export default ManifestDiff;

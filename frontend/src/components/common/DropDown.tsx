@@ -1,4 +1,5 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import ArrowDownIcon from "../../assets/arrow-down-icon.svg";
 
 export type DropDownItem = {
@@ -29,6 +30,15 @@ function DropDown({ items }: DropDownProps) {
 
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      setPopupState((prev) => ({
+        ...prev,
+        isOpen: false,
+      }));
+    }
+  };
+
   useEffect(() => {
     if (popupState.isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -40,15 +50,6 @@ function DropDown({ items }: DropDownProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [popupState.isOpen]);
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      setPopupState((prev) => ({
-        ...prev,
-        isOpen: false,
-      }));
-    }
-  };
 
   return (
     <>
@@ -62,21 +63,21 @@ function DropDown({ items }: DropDownProps) {
               Y: e.pageY,
             }));
           }}
-          className="flex items-center justify-between"
+          className="flex cursor-pointer items-center justify-between"
         >
           Help
-          <img src={ArrowDownIcon} className="ml-2 w-[10px] h-[10px]" />
+          <img src={ArrowDownIcon} className="ml-2 h-[10px] w-[10px]" />
         </button>
       </div>
       {popupState.isOpen && (
         <div
           ref={modalRef}
-          className={`z-10 flex flex-col py-1 gap-1 bg-white mt-3 absolute rounded border top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
+          className={`absolute z-10 mt-3 flex flex-col gap-1 rounded-sm border bg-white py-1 top-[${popupState.Y}] left-[${popupState.X}] border-gray-200`}
         >
           {items.map((item) => (
-            <>
+            <Fragment key={item.id}>
               {item.isSeparator ? (
-                <div className="bg-gray-300 h-[1px]" />
+                <div className="h-[1px] bg-gray-300" />
               ) : (
                 <div
                   onClick={() => {
@@ -86,9 +87,9 @@ function DropDown({ items }: DropDownProps) {
                       isOpen: false,
                     }));
                   }}
-                  className={`cursor-pointer font-normal flex items-center gap-2 py-1 pl-3 pr-7 hover:bg-dropdown ${
+                  className={`flex cursor-pointer items-center gap-2 py-1 pr-7 pl-3 font-normal hover:bg-dropdown ${
                     item.isDisabled
-                      ? "cursor-default hover:bg-transparent text-gray-400"
+                      ? "cursor-default text-gray-400 hover:bg-transparent"
                       : ""
                   }`}
                 >
@@ -96,7 +97,7 @@ function DropDown({ items }: DropDownProps) {
                   <span>{item.text}</span>
                 </div>
               )}
-            </>
+            </Fragment>
           ))}
         </div>
       )}

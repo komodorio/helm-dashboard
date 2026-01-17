@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Release } from "../../data/types";
+import type { Release, ReleaseHealthStatus } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
 import { getAge } from "../../timeUtils";
 import StatusLabel, {
@@ -13,7 +13,7 @@ import HelmGrayIcon from "../../assets/helm-gray-50.svg";
 import Spinner from "../Spinner";
 import { useGetLatestVersion } from "../../API/releases";
 import { isNewerVersion } from "../../utils";
-import { LatestChartVersion } from "../../API/interfaces";
+import type { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import { useInView } from "react-intersection-observer";
 
@@ -33,13 +33,12 @@ export default function InstalledPackageCard({
   });
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
     queryKey: ["chartName", release.chartName],
-    cacheTime: 0,
   });
 
-  const { data: statusData } = useQuery<unknown>({
+  const { data: statusData = [], isLoading } = useQuery<ReleaseHealthStatus[]>({
     queryKey: ["resourceStatus", release],
-    enabled: inView,
     queryFn: () => apiService.getResourceStatus({ release }),
+    enabled: inView,
   });
 
   const latestVersionData: LatestChartVersion | undefined =
@@ -62,14 +61,21 @@ export default function InstalledPackageCard({
     setIsMouseOver(false);
   };
 
-  const handleOnClick = () => {
+  const onClick = async () => {
     const { name, namespace } = release;
-    navigate(`/${namespace}/${name}/installed/revision/${release.revision}`, {
-      state: release,
-    });
+    await navigate(
+      `/${namespace}/${name}/installed/revision/${release.revision}`,
+      {
+        state: release,
+      }
+    );
   };
 
-  const statusColor = getStatusColor(release.status as DeploymentStatus);
+  const handleClick = () => {
+    void onClick();
+  };
+
+  const statusColor = getStatusColor(release.status);
   const borderLeftColor: { [key: string]: string } = {
     [DeploymentStatus.DEPLOYED]: "border-l-border-deployed",
     [DeploymentStatus.FAILED]: "border-l-text-danger",
@@ -81,55 +87,55 @@ export default function InstalledPackageCard({
       ref={ref}
       className={`${
         borderLeftColor[release.status]
-      } text-xs grid grid-cols-12 items-center bg-white rounded-md p-2 py-6 my-2 custom-shadow border-l-4 border-l-[${statusColor}] cursor-pointer ${
+      } custom-shadow my-2 grid grid-cols-12 items-center rounded-md border-l-4 bg-white p-2 py-6 text-xs border-l-[${statusColor}] cursor-pointer ${
         isMouseOver && "custom-shadow-lg"
       }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
-      onClick={handleOnClick}
+      onClick={handleClick}
     >
       <img
         src={release.icon || HelmGrayIcon}
         alt="helm release icon"
-        className="w-[45px] mx-4 col-span-1 min-w-[45px]"
+        className="col-span-1 mx-4 w-[45px] min-w-[45px]"
       />
 
       <div className="col-span-11 -mb-5">
         <div className="grid grid-cols-11">
-          <div className="col-span-3 font-bold text-xl mr-0.5 font-roboto-slab">
+          <div className="col-span-3 mr-0.5 font-roboto-slab text-xl font-bold">
             {release.name}
           </div>
           <div className="col-span-3">
             <StatusLabel status={release.status} />
           </div>
           <div className="col-span-2 font-bold">{release.chart}</div>
-          <div className="col-span-1 font-bold text-xs">
+          <div className="col-span-1 text-xs font-bold">
             #{release.revision}
           </div>
-          <div className="col-span-1 font-bold text-xs">
+          <div className="col-span-1 text-xs font-bold">
             {release.namespace}
           </div>
-          <div className="col-span-1 font-bold text-xs">{getAge(release)}</div>
+          <div className="col-span-1 text-xs font-bold">{getAge(release)}</div>
         </div>
         <div
-          className="grid grid-cols-11 text-xs mt-3"
+          className="mt-3 grid grid-cols-11 text-xs"
           style={{ marginBottom: "12px" }}
         >
-          <div className="col-span-3 h-12 line-clamp-3 mr-1">
+          <div className="col-span-3 mr-1 line-clamp-3 h-12">
             {release.description}
           </div>
           <div className="col-span-3 mr-2">
-            {statusData ? (
-              <HealthStatus statusData={statusData} />
-            ) : (
+            {isLoading ? (
               <Spinner size={4} />
+            ) : (
+              <HealthStatus statusData={statusData} />
             )}
           </div>
-          <div className="col-span-2 text-muted flex flex-col items">
+          <div className="items col-span-2 flex flex-col text-muted">
             <span>CHART VERSION</span>
             {(canUpgrade || installRepoSuggestion) && (
               <div
-                className="text-upgradable flex flex-row items-center gap-1 font-bold"
+                className="flex flex-row items-center gap-1 font-bold text-upgradable"
                 title={`upgrade available: ${latestVersionData?.version} from ${latestVersionData?.repository}`}
               >
                 {canUpgrade && !installRepoSuggestion ? (

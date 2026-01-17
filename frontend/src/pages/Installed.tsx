@@ -2,12 +2,12 @@ import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPa
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
 import ClustersList from "../components/ClustersList";
 import { useGetInstalledReleases } from "../API/releases";
-import { useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
 import useAlertError from "../hooks/useAlertError";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import useCustomSearchParams from "../hooks/useCustomSearchParams";
-import { Release } from "../data/types";
+import type { Release } from "../data/types";
 
 function Installed() {
   const { searchParamsObject } = useCustomSearchParams();
@@ -19,26 +19,33 @@ function Installed() {
   );
   const navigate = useNavigate();
 
-  const handleClusterChange = (clusterName: string) => {
-    navigate({
+  const clusterChange = async (clusterName: string) => {
+    await navigate({
       pathname: `/${encodeURIComponent(clusterName)}/installed`,
     });
   };
 
+  const handleClusterChange = (clusterName: string) => {
+    void clusterChange(clusterName);
+  };
+
   const [filterKey, setFilterKey] = useState<string>("");
   const alertError = useAlertError();
-  const { data, isLoading, isRefetching } = useGetInstalledReleases(
-    context ?? "",
-    {
-      retry: false,
-      onError: (e) => {
-        alertError.setShowErrorModal({
-          title: "Failed to get list of charts",
-          msg: (e as Error).message,
-        });
-      },
+  const { data, isLoading, isRefetching, isError, error } =
+    useGetInstalledReleases(context ?? "");
+
+  const onError = useEffectEvent(() => {
+    alertError.setShowErrorModal({
+      title: "Failed to get list of charts",
+      msg: error?.message ?? "",
+    });
+  });
+
+  useEffect(() => {
+    if (isError) {
+      onError();
     }
-  );
+  }, [isError]);
 
   const filteredReleases = useMemo(() => {
     return (
@@ -71,7 +78,7 @@ function Installed() {
   }, [data, filterKey, selectedNamespaces]);
 
   return (
-    <div className="flex flex-row w-full">
+    <div className="flex w-full flex-row">
       <ClustersList
         selectedCluster={context ?? ""}
         filteredNamespaces={selectedNamespaces}
@@ -79,7 +86,7 @@ function Installed() {
         installedReleases={data}
       />
 
-      <div className="p-5 w-[calc(100%-17rem)]">
+      <div className="w-[calc(100%-17rem)] p-5">
         <InstalledPackagesHeader
           isLoading={isLoading || isRefetching}
           filteredReleases={filteredReleases}

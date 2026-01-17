@@ -12,11 +12,12 @@
  *
  *
  */
+import type { HTMLAttributes, JSX, ReactNode } from "react";
 
 // this is a type declaration for the action prop.
 // it is a function that takes a string as an argument and returns void.
-export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+export interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
   disabled?: boolean;
   onClick: () => void;
   className?: string;
@@ -26,7 +27,7 @@ export default function Button(props: ButtonProps): JSX.Element {
     <>
       <button
         onClick={props.onClick}
-        className={`${props.className} bg-white border border-gray-300  hover:bg-gray-50 text-black  py-1 px-4 rounded `}
+        className={`${props.className} rounded-sm border border-gray-300 bg-white px-4 py-1 text-black hover:bg-gray-50`}
         disabled={props.disabled}
       >
         {props.children}

@@ -7,16 +7,21 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { ScanResult, ScanResults, ScannersList } from "./interfaces";
+import type { ScanResults, ScannersList } from "./interfaces";
+import { ScanResult } from "./interfaces";
 import apiService from "./apiService";
 
 // Get list of discovered scanners
 function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
-  return useQuery<ScannersList>(
-    ["scanners"],
-    () => apiService.fetchWithDefaults<ScannersList>("/api/scanners"),
-    options
-  );
+  return useQuery<ScannersList>({
+    queryKey: ["scanners"],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<ScannersList>({
+        url: "/api/scanners",
+        fallback: { scanners: [] },
+      }),
+    ...(options ?? {}),
+  });
 }
 
 // Scan manifests using all applicable scanners
@@ -26,14 +31,18 @@ function useScanManifests(
 ) {
   const formData = new FormData();
   formData.append("manifest", manifest);
-  return useMutation<ScanResults, Error, string>(
-    () =>
-      apiService.fetchWithDefaults<ScanResults>("/api/scanners/manifests", {
-        method: "POST",
-        body: formData,
+  return useMutation<ScanResults, Error, string>({
+    mutationFn: () =>
+      apiService.fetchWithSafeDefaults<ScanResults>({
+        url: "/api/scanners/manifests",
+        options: {
+          method: "POST",
+          body: formData,
+        },
+        fallback: {},
       }),
-    options
-  );
+    ...(options ?? {}),
+  });
 }
 
 // Scan specified k8s resource in cluster
@@ -43,12 +52,13 @@ function useScanK8sResource(
   name: string,
   options?: UseQueryOptions<ScanResults>
 ) {
-  return useQuery<ScanResults>(
-    ["scanners", "resource", kind, namespace, name],
-    () =>
-      apiService.fetchWithDefaults<ScanResults>(
-        `/api/scanners/resource/${kind}?namespace=${namespace}&name=${name}`
-      ),
-    options
-  );
+  return useQuery<ScanResults>({
+    queryKey: ["scanners", "resource", kind, namespace, name],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<ScanResults>({
+        url: `/api/scanners/resource/${kind}?namespace=${namespace}&name=${name}`,
+        fallback: {},
+      }),
+    ...(options ?? {}),
+  });
 }

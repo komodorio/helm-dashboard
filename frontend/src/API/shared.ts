@@ -43,9 +43,15 @@ export const useDiffData = ({
   selectedVerData: { [key: string]: string };
   chart: string;
 }) => {
-  return useQuery(
-    [selectedRepo, versionsError, chart, currentVerManifest, selectedVerData],
-    async () => {
+  return useQuery({
+    queryKey: [
+      selectedRepo,
+      versionsError,
+      chart,
+      currentVerManifest,
+      selectedVerData,
+    ],
+    queryFn: async () => {
       const formData = new FormData();
       formData.append("a", currentVerManifest);
       formData.append("b", selectedVerData.manifest);
@@ -57,8 +63,6 @@ export const useDiffData = ({
 
       return diff;
     },
-    {
-      enabled: Boolean(selectedVerData),
-    }
-  );
+    enabled: Boolean(selectedVerData),
+  });
 };

@@ -1,14 +1,16 @@
-import { ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
+import type { ChangeEvent } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
 import { useGetReleaseInfoByType } from "../../API/releases";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
-
 import parse from "html-react-parser";
-
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
+import yaml from "highlight.js/lib/languages/yaml";
 import Spinner from "../Spinner";
 import { diffConfiguration } from "../../utils";
+
+hljs.registerLanguage("yaml", yaml);
 
 type RevisionDiffProps = {
   includeUserDefineOnly?: boolean;
@@ -108,7 +110,7 @@ function RevisionDiff({
       !isLoading
     ) {
       const diff2htmlUi = new Diff2HtmlUI(
-        diffElement!.current!,
+        diffElement.current,
         data,
         diffConfiguration
       );
@@ -134,7 +136,7 @@ function RevisionDiff({
 
   return (
     <div>
-      <div className="flex mb-3 p-2 border border-revision flex-row items-center justify-between w-full bg-white rounded">
+      <div className="mb-3 flex w-full flex-row items-center justify-between rounded-sm border border-gray-200 border-revision bg-white p-2">
         <div className="flex items-center">
           <input
             checked={viewMode === "view"}
@@ -143,7 +145,7 @@ function RevisionDiff({
             type="radio"
             value="view"
             name="notes-view"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
+            className="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600"
           />
           <label
             htmlFor="view"
@@ -160,7 +162,7 @@ function RevisionDiff({
             type="radio"
             value="diff-with-previous"
             name="notes-view"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
+            className="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600"
           />
           <label
             htmlFor="diff-with-previous"
@@ -177,7 +179,7 @@ function RevisionDiff({
             type="radio"
             value="diff-with-specific-revision"
             name="notes-view"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
+            className="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600"
           />
           <label
             htmlFor="diff-with-specific-revision"
@@ -186,7 +188,7 @@ function RevisionDiff({
             <div>
               Diff with specific revision:
               <input
-                className="border ml-2 border-gray-500 w-10 p-1 rounded-sm"
+                className="ml-2 w-10 rounded-xs border border-gray-500 p-1"
                 type="text"
                 value={specificVersion}
                 onChange={(e) => setSpecificVersion(Number(e.target.value))}
@@ -201,7 +203,7 @@ function RevisionDiff({
               type="checkbox"
               onChange={handleUserDefinedCheckbox}
               checked={!!userDefinedValue}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              className="h-4 w-4 rounded-sm border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
             />
             <label
               htmlFor="user-define-only-checkbox"
@@ -214,14 +216,16 @@ function RevisionDiff({
       </div>
       {isLoading ? <Spinner /> : ""}
       {viewMode === VIEW_MODE_VIEW_ONLY && content ? (
-        <div className="bg-white overflow-x-auto w-full p-3 relative">
-          <pre className="bg-white rounded font-sf-mono">{parse(content)}</pre>
+        <div className="relative w-full overflow-x-auto bg-white p-3">
+          <pre className="rounded-sm bg-white font-sf-mono">
+            {parse(content)}
+          </pre>
         </div>
       ) : (
         ""
       )}
       <div
-        className="bg-white w-full relative leading-5 font-sf-mono"
+        className="relative w-full bg-white font-sf-mono leading-5"
         //@ts-ignore
         ref={diffElement}
       ></div>

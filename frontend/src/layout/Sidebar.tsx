@@ -1,4 +1,5 @@
 import "../App.css";
+import type { JSX } from "react";
 
 function Sidebar(): JSX.Element {
   return (

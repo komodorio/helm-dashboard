@@ -1,5 +1,13 @@
-import { useParams } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useParams } from "react-router";
+import {
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+  lazy,
+  Suspense,
+} from "react";
+import type { VersionData } from "../../../API/releases";
 import {
   useChartReleaseValues,
   useGetReleaseManifest,
@@ -8,30 +16,32 @@ import {
 } from "../../../API/releases";
 import Modal, { ModalButtonStyle } from "../Modal";
 import { GeneralDetails } from "./GeneralDetails";
-import { ManifestDiff } from "./ManifestDiff";
 import { useMutation } from "@tanstack/react-query";
 import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
 import { VersionToInstall } from "./VersionToInstall";
-import { isNewerVersion, isNoneEmptyArray } from "../../../utils";
+import { isNoneEmptyArray } from "../../../utils";
 import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
-import { InstallChartModalProps } from "../../../data/types";
-import { DefinedValues } from "./DefinedValues";
+import type { InstallChartModalProps } from "../../../data/types";
 import apiService from "../../../API/apiService";
 import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
+import type { LatestChartVersion } from "../../../API/interfaces";
+import Spinner from "../../Spinner";
+
+const DefinedValues = lazy(() => import("./DefinedValues"));
+const ManifestDiff = lazy(() => import("./ManifestDiff"));
 
 export const InstallReleaseChartModal = ({
   isOpen,
   onClose,
   chartName,
   currentlyInstalledChartVersion,
-  latestVersion,
   isUpgrade = false,
   latestRevision,
 }: InstallChartModalProps) => {
   const navigate = useNavigateWithSearchParams();
-  const [userValues, setUserValues] = useState<string>();
+  const [userValues, setUserValues] = useState<string>("");
   const [installError, setInstallError] = useState("");
 
   const {
@@ -44,38 +54,37 @@ export const InstallReleaseChartModal = ({
   const [namespace, setNamespace] = useState(queryNamespace || "");
   const [releaseName, setReleaseName] = useState(_releaseName || "");
 
-  const { error: versionsError, data: _versions } = useGetVersions(chartName, {
-    select: (data) => {
-      return data?.sort((a, b) =>
-        isNewerVersion(a.version, b.version) ? 1 : -1
-      );
-    },
-    onSuccess: (data) => {
-      const empty = { version: "", repository: "", urls: [] };
-      return setSelectedVersionData(data[0] ?? empty);
-    },
+  const {
+    error: versionsError,
+    data: _versions = [],
+    isSuccess,
+  } = useGetVersions(chartName);
+
+  const [selectedVersionData, setSelectedVersionData] = useState<VersionData>();
+
+  const [versions, setVersions] = useState<
+    Array<LatestChartVersion & { isChartVersion: boolean }>
+  >([]);
+
+  const onSuccess = useEffectEvent(() => {
+    const empty = { version: "", repository: "", urls: [] };
+    setSelectedVersionData(_versions[0] ?? empty);
+    setVersions(
+      _versions?.map((v) => ({
+        ...v,
+        isChartVersion: v.version === currentlyInstalledChartVersion,
+      }))
+    );
   });
 
-  const versions = _versions?.map((v) => ({
-    ...v,
-    isChartVersion: v.version === currentlyInstalledChartVersion,
-  }));
+  useEffect(() => {
+    if (isSuccess && _versions.length) {
+      onSuccess();
+    }
+  }, [isSuccess, _versions]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  latestVersion = latestVersion ?? currentlyInstalledChartVersion; // a guard for typescript, latestVersion is always defined
-  const [selectedVersionData, setSelectedVersionData] = useState<{
-    version: string;
-    repository?: string;
-    urls: string[];
-  }>();
-
-  const selectedVersion = useMemo(() => {
-    return selectedVersionData?.version;
-  }, [selectedVersionData]);
-
-  const selectedRepo = useMemo(() => {
-    return selectedVersionData?.repository || "";
-  }, [selectedVersionData]);
+  const selectedVersion = selectedVersionData?.version || "";
+  const selectedRepo = selectedVersionData?.repository || "";
 
   const chartAddress = useMemo(() => {
     if (!selectedVersionData || !selectedVersionData.repository) return "";
@@ -86,13 +95,13 @@ export const InstallReleaseChartModal = ({
   }, [selectedVersionData, chartName]);
 
   // the original chart values
-  const { data: chartValues } = useChartRepoValues({
-    version: selectedVersion || "",
+  const { data: chartValues = "" } = useChartRepoValues({
+    version: selectedVersion,
     chart: chartAddress,
   });
 
   // The user defined values (if any we're set)
-  const { data: releaseValues, isLoading: loadingReleaseValues } =
+  const { data: releaseValues = "", isLoading: loadingReleaseValues } =
     useChartReleaseValues({
       namespace,
       release: String(releaseName),
@@ -100,16 +109,15 @@ export const InstallReleaseChartModal = ({
     });
 
   // This hold the selected version manifest, we use it for the diff
-  const { data: selectedVerData, error: selectedVerDataError } = useVersionData(
-    {
-      version: selectedVersion || "",
-      userValues: userValues || "",
+  const { data: selectedVerData = {}, error: selectedVerDataError } =
+    useVersionData({
+      version: selectedVersion,
+      userValues,
       chartAddress,
       releaseValues,
       namespace,
       releaseName,
-    }
-  );
+    });
 
   const { data: currentVerManifest, error: currentVerManifestError } =
     useGetReleaseManifest({
@@ -123,15 +131,15 @@ export const InstallReleaseChartModal = ({
     error: diffError,
   } = useDiffData({
     selectedRepo,
-    versionsError: versionsError as string,
-    currentVerManifest,
+    versionsError: versionsError as unknown as string, // TODO fix it
+    currentVerManifest: currentVerManifest as unknown as string, // TODO fix it
     selectedVerData,
     chart: chartAddress,
   });
 
   // Confirm method (install)
-  const setReleaseVersionMutation = useMutation(
-    [
+  const setReleaseVersionMutation = useMutation<VersionData, Error>({
+    mutationKey: [
       "setVersion",
       namespace,
       releaseName,
@@ -140,7 +148,7 @@ export const InstallReleaseChartModal = ({
       selectedCluster,
       chartAddress,
     ],
-    async () => {
+    mutationFn: async () => {
       setInstallError("");
       const formData = new FormData();
       formData.append("preview", "false");
@@ -149,34 +157,33 @@ export const InstallReleaseChartModal = ({
       }
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues || releaseValues || ""); // if userValues is empty, we use the release values
+      const url = `/api/helm/releases/${
+        namespace ? namespace : "default"
+      }/${releaseName}`;
 
-      const data = await apiService.fetchWithDefaults(
-        `/api/helm/releases/${
-          namespace ? namespace : "default"
-        }${`/${releaseName}`}`,
-        {
+      return await apiService.fetchWithSafeDefaults<VersionData>({
+        url,
+        options: {
           method: "post",
           body: formData,
-        }
-      );
-      return data;
+        },
+        fallback: { version: "", urls: [""] },
+      });
     },
-    {
-      onSuccess: async (response) => {
-        onClose();
-        setSelectedVersionData({ version: "", urls: [] }); //cleanup
-        navigate(
-          `/${
-            namespace ? namespace : "default"
-          }/${releaseName}/installed/revision/${response.version}`
-        );
-        window.location.reload();
-      },
-      onError: (error) => {
-        setInstallError((error as Error)?.message || "Failed to update");
-      },
-    }
-  );
+    onSuccess: async (response) => {
+      onClose();
+      setSelectedVersionData({ version: "", urls: [] }); //cleanup
+      await navigate(
+        `/${
+          namespace ? namespace : "default"
+        }/${releaseName}/installed/revision/${response.version}`
+      );
+      window.location.reload();
+    },
+    onError: (error) => {
+      setInstallError(error?.message || "Failed to update");
+    },
+  });
 
   return (
     <Modal
@@ -189,7 +196,7 @@ export const InstallReleaseChartModal = ({
       title={
         <InstallUpgradeTitle
           isUpgrade={isUpgrade}
-          releaseValues={isUpgrade || releaseValues}
+          releaseValues={isUpgrade || !!releaseValues}
           chartName={chartName}
         />
       }
@@ -199,11 +206,11 @@ export const InstallReleaseChartModal = ({
           id: "1",
           callback: setReleaseVersionMutation.mutate,
           variant: ModalButtonStyle.info,
-          isLoading: setReleaseVersionMutation.isLoading,
+          isLoading: setReleaseVersionMutation.isPending,
           disabled:
             loadingReleaseValues ||
             isLoadingDiff ||
-            setReleaseVersionMutation.isLoading,
+            setReleaseVersionMutation.isPending,
         },
       ]}
     >
@@ -224,24 +231,28 @@ export const InstallReleaseChartModal = ({
         onNamespaceInput={setNamespace}
       />
 
-      <DefinedValues
-        initialValue={releaseValues}
-        onUserValuesChange={(values: string) => setUserValues(values)}
-        chartValues={chartValues}
-        loading={loadingReleaseValues}
-      />
+      <Suspense fallback={<Spinner />}>
+        <DefinedValues
+          initialValue={releaseValues}
+          onUserValuesChange={(values: string) => setUserValues(values)}
+          chartValues={chartValues}
+          loading={loadingReleaseValues}
+        />
+      </Suspense>
 
-      <ManifestDiff
-        diff={diffData as string}
-        isLoading={isLoadingDiff}
-        error={
-          (currentVerManifestError as string) ||
-          (selectedVerDataError as string) ||
-          (diffError as string) ||
-          installError ||
-          (versionsError as string)
-        }
-      />
+      <Suspense fallback={<Spinner />}>
+        <ManifestDiff
+          diff={diffData as string}
+          isLoading={isLoadingDiff}
+          error={
+            (currentVerManifestError as unknown as string) || // TODO fix it
+            (selectedVerDataError as unknown as string) ||
+            (diffError as unknown as string) ||
+            installError ||
+            (versionsError as unknown as string)
+          }
+        />
+      </Suspense>
     </Modal>
   );
 };

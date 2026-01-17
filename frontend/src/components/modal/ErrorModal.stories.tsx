@@ -1,5 +1,5 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react-vite";
+import { action } from "storybook/actions";
+import type { Meta } from "@storybook/react-vite";
 import ErrorModal from "./ErrorModal";
 
 const meta = {

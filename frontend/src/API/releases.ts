@@ -1,24 +1,27 @@
 import {
-  useQuery,
-  type UseQueryOptions,
   useMutation,
   type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
-import { ChartVersion, Release } from "../data/types";
-import { LatestChartVersion } from "./interfaces";
+import type { ChartVersion, Release } from "../data/types";
+import type { LatestChartVersion } from "./interfaces";
 import apiService from "./apiService";
 import { getVersionManifestFormData } from "./shared";
+import { isNewerVersion } from "../utils";
+
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
-export function useGetInstalledReleases(
-  context: string,
-  options?: UseQueryOptions<Release[]>
-) {
-  return useQuery<Release[]>(
-    ["installedReleases", context],
-    () => apiService.fetchWithDefaults<Release[]>("/api/helm/releases"),
-    options
-  );
+export function useGetInstalledReleases(context: string) {
+  return useQuery<Release[]>({
+    queryKey: ["installedReleases", context],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<Release[]>({
+        url: "/api/helm/releases",
+        fallback: [],
+      }),
+    retry: false,
+  });
 }
 
 export interface ReleaseManifest {
@@ -62,51 +65,50 @@ export function useGetReleaseManifest({
   chartName: string;
   options?: UseQueryOptions<ReleaseManifest[]>;
 }) {
-  return useQuery<ReleaseManifest[]>(
-    ["manifest", namespace, chartName],
-    () =>
-      apiService.fetchWithDefaults<ReleaseManifest[]>(
-        `/api/helm/releases/${namespace}/${chartName}/manifests`
-      ),
-    options
-  );
+  return useQuery<ReleaseManifest[]>({
+    queryKey: ["manifest", namespace, chartName],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<ReleaseManifest[]>({
+        url: `/api/helm/releases/${namespace}/${chartName}/manifests`,
+        fallback: [],
+      }),
+    ...(options ?? {}),
+  });
 }
 
 // List of installed k8s resources for this release
-export function useGetResources(
-  ns: string,
-  name: string,
-  options?: UseQueryOptions<StructuredResources[]>
-) {
-  const { data, ...rest } = useQuery<StructuredResources[]>(
-    ["resources", ns, name],
-    () =>
-      apiService.fetchWithDefaults<StructuredResources[]>(
-        `/api/helm/releases/${ns}/${name}/resources?health=true`
-      ),
-    options
-  );
-
-  return {
-    data: data
-      ?.map((resource) => ({
-        ...resource,
-        status: {
-          ...resource.status,
-          conditions: resource.status.conditions.filter(
-            (c) => c.type === HD_RESOURCE_CONDITION_TYPE
-          ),
-        },
-      }))
-      .sort((a, b) => {
-        const interestingResources = ["STATEFULSET", "DEAMONSET", "DEPLOYMENT"];
-        return (
-          interestingResources.indexOf(b.kind.toUpperCase()) -
-          interestingResources.indexOf(a.kind.toUpperCase())
-        );
+export function useGetResources(ns: string, name: string, enabled?: boolean) {
+  return useQuery<StructuredResources[]>({
+    queryKey: ["resources", ns, name],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<StructuredResources[]>({
+        url: `/api/helm/releases/${ns}/${name}/resources?health=true`,
+        fallback: [],
       }),
-    ...rest,
-  };
+    select: (data) =>
+      data
+        ?.map((resource) => ({
+          ...resource,
+          status: {
+            ...resource.status,
+            conditions: resource.status.conditions.filter(
+              (c) => c.type === HD_RESOURCE_CONDITION_TYPE
+            ),
+          },
+        }))
+        .sort((a, b) => {
+          const interestingResources = [
+            "STATEFULSET",
+            "DEAMONSET",
+            "DEPLOYMENT",
+          ];
+          return (
+            interestingResources.indexOf(b.kind.toUpperCase()) -
+            interestingResources.indexOf(a.kind.toUpperCase())
+          );
+        }),
+    enabled,
+  });
 }
 
 export function useGetResourceDescription(
@@ -115,43 +117,50 @@ export function useGetResourceDescription(
   name: string,
   options?: UseQueryOptions<string>
 ) {
-  return useQuery<string>(
-    ["describe", type, ns, name],
-    () =>
+  return useQuery<string>({
+    queryKey: ["describe", type, ns, name],
+    queryFn: () =>
       apiService.fetchWithDefaults<string>(
         `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    options
-  );
+    ...(options ?? {}),
+  });
 }
 export function useGetLatestVersion(
   chartName: string,
   options?: UseQueryOptions<ChartVersion[]>
 ) {
-  return useQuery<ChartVersion[]>(
-    ["latestver", chartName],
-    () =>
-      apiService.fetchWithDefaults<ChartVersion[]>(
-        `/api/helm/repositories/latestver?name=${chartName}`
-      ),
-    options
-  );
+  return useQuery<ChartVersion[]>({
+    queryKey: ["latestver", chartName],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<ChartVersion[]>({
+        url: `/api/helm/repositories/latestver?name=${chartName}`,
+        fallback: [],
+      }),
+    gcTime: 0,
+    ...(options ?? {}),
+  });
 }
 export function useGetVersions(
   chartName: string,
   options?: UseQueryOptions<LatestChartVersion[]>
 ) {
-  return useQuery<LatestChartVersion[]>(
-    ["versions", chartName],
-    () =>
-      apiService.fetchWithDefaults<LatestChartVersion[]>(
-        `/api/helm/repositories/versions?name=${chartName}`
-      ),
-    options
-  );
+  return useQuery<LatestChartVersion[]>({
+    queryKey: ["versions", chartName],
+    queryFn: async () => {
+      const url = `/api/helm/repositories/versions?name=${chartName}`;
+      return await apiService.fetchWithSafeDefaults<LatestChartVersion[]>({
+        url,
+        fallback: [],
+      });
+    },
+    select: (data) =>
+      data?.sort((a, b) => (isNewerVersion(a.version, b.version) ? 1 : -1)),
+    ...(options ?? {}),
+  });
 }
 
 export function useGetReleaseInfoByType(
@@ -160,77 +169,80 @@ export function useGetReleaseInfoByType(
   options?: UseQueryOptions<string>
 ) {
   const { chart, namespace, tab, revision } = params;
-  return useQuery<string>(
-    [tab, namespace, chart, revision, additionalParams],
-    () =>
+  return useQuery<string>({
+    queryKey: [tab, namespace, chart, revision, additionalParams],
+    queryFn: () =>
       apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    options
-  );
+    ...(options ?? {}),
+  });
 }
 
 export function useGetDiff(
   formData: FormData,
   options?: UseQueryOptions<string>
 ) {
-  return useQuery<string>(
-    ["diff", formData],
-    () => {
+  return useQuery<string>({
+    queryKey: ["diff", formData],
+    queryFn: () => {
       return apiService.fetchWithDefaults<string>("/diff", {
         body: formData,
 
         method: "POST",
       });
     },
-    options
-  );
+    ...(options ?? {}),
+  });
 }
 
 // Rollback the release to a previous revision
 export function useRollbackRelease(
   options?: UseMutationOptions<
-    void,
-    unknown,
+    string,
+    Error,
     { ns: string; name: string; revision: number }
   >
 ) {
   return useMutation<
-    void,
-    unknown,
+    string,
+    Error,
     { ns: string; name: string; revision: number }
-  >(({ ns, name, revision }) => {
-    const formData = new FormData();
-    formData.append("revision", revision.toString());
+  >({
+    mutationFn: ({ ns, name, revision }) => {
+      const formData = new FormData();
+      formData.append("revision", revision.toString());
 
-    return apiService.fetchWithDefaults<void>(
-      `/api/helm/releases/${ns}/${name}/rollback`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-  }, options);
+      return apiService.fetchWithDefaults<string>(
+        `/api/helm/releases/${ns}/${name}/rollback`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+    },
+    ...(options ?? {}),
+  });
 }
 
 // Run the tests on a release
 export function useTestRelease(
-  options?: UseMutationOptions<void, unknown, { ns: string; name: string }>
+  options?: UseMutationOptions<string, Error, { ns: string; name: string }>
 ) {
-  return useMutation<void, unknown, { ns: string; name: string }>(
-    ({ ns, name }) => {
-      return apiService.fetchWithDefaults<void>(
+  return useMutation<string, Error, { ns: string; name: string }>({
+    mutationFn: ({ ns, name }) => {
+      return apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${ns}/${name}/test`,
         {
           method: "POST",
         }
       );
     },
-    options
-  );
+    ...(options ?? {}),
+  });
 }
 
 export function useChartReleaseValues({
@@ -246,12 +258,12 @@ export function useChartReleaseValues({
   userDefinedValue?: string;
   revision?: number;
   version?: string;
-  options?: UseQueryOptions<unknown>;
+  options?: UseQueryOptions<string>;
 }) {
-  return useQuery<unknown>(
-    ["values", namespace, release, userDefinedValue, version],
-    () =>
-      apiService.fetchWithDefaults<unknown>(
+  return useQuery<string>({
+    queryKey: ["values", namespace, release, userDefinedValue, version],
+    queryFn: () =>
+      apiService.fetchWithDefaults(
         `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
           revision ? `&revision=${revision}` : ""
         }`,
@@ -259,9 +271,15 @@ export function useChartReleaseValues({
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       ),
-    options
-  );
+    ...(options ?? {}),
+  });
 }
+
+export type VersionData = {
+  version: string;
+  repository?: string;
+  urls: string[];
+};
 
 export const useVersionData = ({
   version,
@@ -271,7 +289,7 @@ export const useVersionData = ({
   namespace,
   releaseName,
   isInstallRepoChart = false,
-  options,
+  enabled = true,
 }: {
   version: string;
   userValues: string;
@@ -280,10 +298,10 @@ export const useVersionData = ({
   namespace: string;
   releaseName: string;
   isInstallRepoChart?: boolean;
-  options?: UseQueryOptions;
+  enabled?: boolean;
 }) => {
-  return useQuery(
-    [
+  return useQuery<{ [key: string]: string }>({
+    queryKey: [
       version,
       userValues,
       chartAddress,
@@ -292,7 +310,7 @@ export const useVersionData = ({
       releaseName,
       isInstallRepoChart,
     ],
-    async () => {
+    queryFn: async () => {
       const formData = getVersionManifestFormData({
         version,
         userValues,
@@ -301,22 +319,26 @@ export const useVersionData = ({
         releaseName,
       });
 
-      const fetchUrl = isInstallRepoChart
+      const url = isInstallRepoChart
         ? `/api/helm/releases/${namespace || "default"}`
         : `/api/helm/releases/${
             namespace ? namespace : "[empty]"
           }${`/${releaseName}`}`;
 
-      const data = await apiService.fetchWithDefaults(fetchUrl, {
-        method: "post",
-        body: formData,
+      return await apiService.fetchWithSafeDefaults<{
+        [key: string]: string;
+      }>({
+        url,
+        options: {
+          method: "post",
+          body: formData,
+        },
+        fallback: {},
       });
-
-      return data;
     },
-    // @ts-ignore
-    options
-  );
+
+    enabled,
+  });
 };
 
 // Request objects

@@ -1,21 +1,27 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useCallback } from "react";
 
 import RepositoriesList from "../components/repository/RepositoriesList";
 import RepositoryViewer from "../components/repository/RepositoryViewer";
-import { Repository } from "../data/types";
+import type { Repository } from "../data/types";
 import { useGetRepositories } from "../API/repositories";
-import { HelmRepositories } from "../API/interfaces";
-import { useParams } from "react-router-dom";
+import { type NavigateOptions, useParams } from "react-router";
 import { useAppContext } from "../context/AppContext";
 import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 
 function RepositoryPage() {
   const { selectedRepo: repoFromParams, context } = useParams();
   const navigate = useNavigateWithSearchParams();
-  const { setSelectedRepo, selectedRepo } = useAppContext();
+  const { setSelectedRepo } = useAppContext();
+
+  const navigateTo = useCallback(
+    async (url: string, ...restArgs: NavigateOptions[]) => {
+      await navigate(url, ...restArgs);
+    },
+    [navigate]
+  );
 
   const handleRepositoryChanged = (selectedRepository: Repository) => {
-    navigate(`/repository/${selectedRepository.name}`, {
+    void navigateTo(`/repository/${selectedRepository.name}`, {
       replace: true,
     });
   };
@@ -25,24 +31,14 @@ function RepositoryPage() {
       setSelectedRepo(repoFromParams);
     }
   }, [setSelectedRepo, repoFromParams]);
+  const { data: repositories = [], isSuccess } = useGetRepositories();
 
   useEffect(() => {
-    if (selectedRepo && !repoFromParams) {
-      navigate(`/repository/${selectedRepo}`, {
-        replace: true,
-      });
+    if (repositories.length && isSuccess && !repoFromParams) {
+      const firstRepo = repositories[0];
+      void navigateTo(`/repository/${firstRepo.name}`, { replace: true });
     }
-  }, [selectedRepo, repoFromParams, context, navigate]);
-
-  const { data: repositories = [] } = useGetRepositories({
-    onSuccess: (data: HelmRepositories) => {
-      const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
-
-      if (sortedData && sortedData.length > 0 && !repoFromParams) {
-        handleRepositoryChanged(sortedData[0]);
-      }
-    },
-  });
+  }, [repositories, isSuccess, repoFromParams, context, navigateTo]);
 
   const selectedRepository = useMemo(() => {
     if (repoFromParams) {
@@ -51,7 +47,7 @@ function RepositoryPage() {
   }, [repositories, repoFromParams]);
 
   return (
-    <div className="flex flex-row p-5 gap-4">
+    <div className="flex flex-row gap-4 p-5">
       <RepositoriesList
         repositories={repositories}
         onRepositoryChanged={handleRepositoryChanged}

@@ -1,4 +1,4 @@
-import { StoryFn, Meta } from "@storybook/react-vite";
+import type { StoryFn, Meta } from "@storybook/react-vite";
 import RepositoriesList from "./RepositoriesList";
 
 const meta = {

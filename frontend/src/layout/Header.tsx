@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import LogoHeader from "../assets/logo-header.svg";
 import DropDown from "../components/common/DropDown";
 import WatcherIcon from "../assets/k8s-watcher.svg";
@@ -13,14 +13,21 @@ import { useGetApplicationStatus } from "../API/other";
 import LinkWithSearchParams from "../components/LinkWithSearchParams";
 import apiService from "../API/apiService";
 import { useAppContext } from "../context/AppContext";
+import { useEffect, useEffectEvent } from "react";
 
 export default function Header() {
   const { clusterMode, setClusterMode } = useAppContext();
-  const { data: statusData } = useGetApplicationStatus({
-    onSuccess: (data) => {
-      setClusterMode(data.ClusterMode);
-    },
+  const { data: statusData, isSuccess } = useGetApplicationStatus();
+
+  const onSuccess = useEffectEvent(() => {
+    setClusterMode(!!statusData?.ClusterMode);
   });
+
+  useEffect(() => {
+    if (isSuccess && statusData) {
+      onSuccess();
+    }
+  }, [isSuccess, statusData]);
 
   const location = useLocation();
 
@@ -39,6 +46,10 @@ export default function Header() {
     }
   };
 
+  const handleResetCache = () => {
+    void resetCache();
+  };
+
   const openAPI = () => {
     window.open("/#/docs", "_blank");
   };
@@ -46,13 +57,13 @@ export default function Header() {
   const getBtnStyle = (identifier: string) =>
     `text-md py-2.5 px-5 ${
       location.pathname.includes(`/${identifier}`)
-        ? " text-primary rounded-sm bg-header-install"
+        ? " text-primary rounded-xs bg-header-install"
         : ""
     }`;
 
   return (
-    <div className="h-16 flex items-center justify-between bg-white custom-shadow">
-      <div className="h-16 flex items-center gap-6 min-w-fit ">
+    <div className="custom-shadow flex h-16 items-center justify-between bg-white">
+      <div className="flex h-16 min-w-fit items-center gap-6">
         <LinkWithSearchParams to={"/installed"} exclude={["tab"]}>
           <img
             src={LogoHeader}
@@ -60,9 +71,9 @@ export default function Header() {
             className="ml-3 w-48 min-w-[80px]"
           />
         </LinkWithSearchParams>
-        <span className="ml-3 w-px h-3/5 bg-gray-200" />
+        <span className="ml-3 h-3/5 w-px bg-gray-200" />
         <div className="inline-block w-full">
-          <ul className="w-full items-center flex md:flex-row md:justify-between md:mt-0 md:text-sm md:font-normal md:border-0 ">
+          <ul className="flex w-full items-center md:mt-0 md:flex-row md:justify-between md:border-0 md:text-sm md:font-normal">
             <li>
               <LinkWithSearchParams
                 to={"/installed"}
@@ -96,7 +107,7 @@ export default function Header() {
                     id: "4",
                     text: "Reset Cache",
                     icon: <BsArrowRepeat />,
-                    onClick: resetCache,
+                    onClick: handleResetCache,
                   },
                   {
                     id: "5",
@@ -128,19 +139,19 @@ export default function Header() {
           </ul>
         </div>
       </div>
-      <div className="h-16 flex items-center text-sm ">
-        <div className="flex p-1 gap-2 border bottom-gray-200 rounded min-w-max">
+      <div className="flex h-16 items-center text-sm">
+        <div className="bottom-gray-200 flex min-w-max gap-2 rounded-sm border p-1">
           <img src={WatcherIcon} width={40} height={40} />
           <div className="flex flex-col">
             <a
               href="https://komodor.com/helm-dash/"
-              className="text-link-color font-bold"
+              className="font-bold text-link-color"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="flex font-bold items-center gap-2 min-w-[25%] ">
+              <div className="flex min-w-[25%] items-center gap-2 font-bold">
                 Upgrade your HELM experience - Free
-                <BsBoxArrowUpRight className="w-[14px] h-[14px]" />
+                <BsBoxArrowUpRight className="h-[14px] w-[14px]" />
               </div>
             </a>
             <label className="text-muted">
@@ -149,7 +160,7 @@ export default function Header() {
           </div>
         </div>
 
-        <span className="w-px h-3/5 bg-gray-200 ml-3" />
+        <span className="ml-3 h-3/5 w-px bg-gray-200" />
         {!clusterMode ? <ShutDownButton /> : null}
       </div>
     </div>

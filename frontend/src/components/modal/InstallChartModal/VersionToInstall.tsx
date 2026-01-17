@@ -1,7 +1,9 @@
+import type { FC } from "react";
 import { useMemo, useState } from "react";
+import type { GroupBase, SingleValueProps } from "react-select";
 import Select, { components } from "react-select";
 import { BsCheck2 } from "react-icons/bs";
-import { NonEmptyArray } from "../../../data/types";
+import type { NonEmptyArray } from "../../../data/types";
 
 interface Version {
   repository: string;
@@ -10,7 +12,19 @@ interface Version {
   urls: string[];
 }
 
-export const VersionToInstall: React.FC<{
+type VersionOptionType = {
+  value: Omit<Version, "isChartVersion">;
+  label: string;
+  check: boolean;
+};
+
+type SpecificSingleValueProps = SingleValueProps<
+  VersionOptionType,
+  false, // IsMulti
+  GroupBase<VersionOptionType>
+>;
+
+export const VersionToInstall: FC<{
   versions: NonEmptyArray<Version>;
   initialVersion?: {
     repository?: string;
@@ -30,7 +44,7 @@ export const VersionToInstall: React.FC<{
 
   const currentVersion =
     chartVersion && showCurrentVersion ? (
-      <p className="text-xl text-muted ml-2">
+      <p className="ml-2 text-xl text-muted">
         {"(current version is "}
         <span className="text-green-700">{`${chartVersion}`}</span>
         {")"}
@@ -59,12 +73,12 @@ export const VersionToInstall: React.FC<{
     [options, initialVersion]
   );
   return (
-    <div className="flex gap-2 text-xl items-center">
+    <div className="flex items-center gap-2 text-xl">
       {versions?.length && (selectedOption || initOpt) ? (
         <>
           Version to install:{" "}
           <Select
-            className="basic-single cursor-pointer min-w-[272px]"
+            className="basic-single min-w-[272px] cursor-pointer"
             classNamePrefix="select"
             isClearable={false}
             isSearchable={false}
@@ -78,18 +92,23 @@ export const VersionToInstall: React.FC<{
             }}
             value={selectedOption ?? initOpt}
             components={{
-              SingleValue: ({ children, ...props }) => (
-                <components.SingleValue {...props}>
-                  <span className="text-green-700 font-bold">{children}</span>
-                  {props.data.check && showCurrentVersion && (
-                    <BsCheck2 className="inline-block ml-2 text-green-700 font-bold" />
-                  )}
-                </components.SingleValue>
-              ),
+              SingleValue: ({ children, ...props }) => {
+                const OriginalSingleValue =
+                  components.SingleValue as FC<SpecificSingleValueProps>;
+
+                return (
+                  <OriginalSingleValue {...props}>
+                    <span className="font-bold text-green-700">{children}</span>
+                    {props.data.check && showCurrentVersion && (
+                      <BsCheck2 className="ml-2 inline-block font-bold text-green-700" />
+                    )}
+                  </OriginalSingleValue>
+                );
+              },
               Option: ({ children, innerProps, data }) => (
                 <div
                   className={
-                    "flex items-center py-2 pl-4 pr-2 text-green-700 hover:bg-blue-100"
+                    "flex items-center py-2 pr-2 pl-4 text-green-700 hover:bg-blue-100"
                   }
                   {...innerProps}
                 >
@@ -97,7 +116,7 @@ export const VersionToInstall: React.FC<{
                   {data.check && showCurrentVersion && (
                     <BsCheck2
                       fontWeight={"bold"}
-                      className="inline-block ml-2 text-green-700 font-bold"
+                      className="ml-2 inline-block font-bold text-green-700"
                     />
                   )}
                 </div>

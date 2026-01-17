@@ -1,0 +1,2 @@
+cd frontend || exit 1
+npm run pre:commit

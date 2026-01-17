@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { action } from "@storybook/addon-actions";
+import type { Meta } from "@storybook/react-vite";
+import { action } from "storybook/actions";
 import DropDown from "./DropDown";
 import { BsSlack, BsGithub } from "react-icons/bs";
 
@@ -10,7 +10,7 @@ const meta = {
    */
   title: "DropDown",
   component: DropDown,
-} as Meta<typeof DropDown>;
+} as unknown as Meta<typeof DropDown>;
 
 export default meta;
 

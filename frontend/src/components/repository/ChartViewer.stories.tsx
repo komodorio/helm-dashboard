@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import ChartViewer from "./ChartViewer";
 
 //👇 This default export determines where your story goes in the story list

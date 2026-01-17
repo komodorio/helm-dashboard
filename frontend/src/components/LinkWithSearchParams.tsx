@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useParams } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router";
 import { useAppContext } from "../context/AppContext";
 
 const LinkWithSearchParams = ({
@@ -12,7 +12,7 @@ const LinkWithSearchParams = ({
   children: React.ReactNode;
 }) => {
   const { search } = useLocation();
-  const { context } = useParams();
+  const { context = "" } = useParams();
   const { clusterMode } = useAppContext();
 
   const params = new URLSearchParams(search);
@@ -23,17 +23,15 @@ const LinkWithSearchParams = ({
 
   let prefixedUrl = to;
 
-  if (!clusterMode) {
+  if (!clusterMode && context) {
     prefixedUrl = `/${encodeURIComponent(context)}${to}`;
+  } else {
+    prefixedUrl = to;
   }
 
-  return (
-    <NavLink
-      data-cy="navigation-link"
-      to={`${prefixedUrl}/?${params.toString()}`}
-      {...props}
-    />
-  );
+  const url = `${prefixedUrl}/?${params.toString()}`;
+
+  return <NavLink data-cy="navigation-link" to={url} {...props} />;
 };
 
 export default LinkWithSearchParams;

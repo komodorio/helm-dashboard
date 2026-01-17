@@ -1,4 +1,4 @@
-import { FC } from "react";
+import type { FC } from "react";
 
 interface InstallUpgradeProps {
   isUpgrade: boolean;
@@ -17,7 +17,7 @@ export const InstallUpgradeTitle: FC<InstallUpgradeProps> = ({
     <div className="font-bold">
       {`${text}`}
       {(isUpgrade || releaseValues) && (
-        <span className="text-green-700 ml-1">{chartName}</span>
+        <span className="ml-1 text-green-700">{chartName}</span>
       )}
     </div>
   );

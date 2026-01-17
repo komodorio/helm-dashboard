@@ -9,9 +9,9 @@ import {
   BsArrowUp,
   BsCheckCircle,
 } from "react-icons/bs";
-import { Release, ReleaseRevision } from "../../data/types";
+import type { ReleaseRevision } from "../../data/types";
 import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import {
   useGetReleaseInfoByType,
   useGetLatestVersion,
@@ -39,18 +39,18 @@ type RevisionTagProps = {
 };
 
 type RevisionDetailsProps = {
-  release: Release;
+  release: ReleaseRevision;
   installedRevision: ReleaseRevision;
   isLatest: boolean;
   latestRevision: number;
 };
 
-export default function RevisionDetails({
+const RevisionDetails = ({
   release,
   installedRevision,
   isLatest,
   latestRevision,
-}: RevisionDetailsProps) {
+}: RevisionDetailsProps) => {
   const [searchParams] = useSearchParams();
 
   const revisionTabs = [
@@ -91,21 +91,21 @@ export default function RevisionDetails({
     refetch: refetchLatestVersion,
     isLoading: isLoadingLatestVersion,
     isRefetching: isRefetchingLatestVersion,
-  } = useGetLatestVersion(release.chart_name, { cacheTime: 0 });
+  } = useGetLatestVersion(release.chart_name);
 
   const [showTestsResults, setShowTestResults] = useState(false);
 
   const { setShowErrorModal } = useAlertError();
   const {
     mutate: runTests,
-    isLoading: isRunningTests,
+    isPending: isRunningTests,
     data: testResults,
   } = useTestRelease({
     onError: (error) => {
       setShowTestResults(false);
       setShowErrorModal({
         title: "Failed to run tests for chart " + chart,
-        msg: (error as Error).message,
+        msg: error.message,
       });
       console.error("Failed to execute test for chart", error);
     },
@@ -135,7 +135,7 @@ export default function RevisionDetails({
   };
 
   const displayTestResults = () => {
-    if (!testResults || (testResults as []).length === 0) {
+    if (!testResults || !testResults.length) {
       return (
         <div>
           Tests executed successfully
@@ -147,7 +147,7 @@ export default function RevisionDetails({
     } else {
       return (
         <div>
-          {(testResults as string).split("\n").map((line, index) => (
+          {testResults.split("\n").map((line, index) => (
             <div key={index} className="mb-2">
               {line}
               <br />
@@ -160,15 +160,22 @@ export default function RevisionDetails({
 
   const Header = () => {
     const navigate = useNavigate();
+
+    const addRepo = async () => {
+      await navigate(
+        `/repository?add_repo=true&repo_url=${latestVerData?.[0]?.urls[0]}&repo_name=${latestVerData?.[0]?.repository}`
+      );
+    };
+
     return (
       <header className="flex flex-wrap justify-between">
-        <h1 className=" text-3xl font-semibold float-left mb-1 font-roboto-slab">
+        <h1 className="float-left mb-1 font-roboto-slab text-3xl font-semibold">
           {chart}
         </h1>
-        <div className="flex flex-row flex-wrap gap-3 float-right h-fit">
+        <div className="float-right flex h-fit flex-row flex-wrap gap-3">
           <div className="flex flex-col">
             <Button
-              className="flex justify-center items-center gap-2 min-w-[150px] text-sm font-semibold disabled:bg-gray-200"
+              className="flex min-w-[150px] items-center justify-center gap-2 text-sm font-semibold disabled:bg-gray-200"
               onClick={() => setIsReconfigureModalOpen(true)}
               disabled={isLoadingLatestVersion || isRefetchingLatestVersion}
             >
@@ -206,18 +213,16 @@ export default function RevisionDetails({
             {latestVerData?.[0]?.isSuggestedRepo ? (
               <span
                 onClick={() => {
-                  navigate(
-                    `/repository?add_repo=true&repo_url=${latestVerData[0].urls[0]}&repo_name=${latestVerData[0].repository}`
-                  );
+                  void addRepo();
                 }}
-                className="underline text-sm cursor-pointer text-blue-600"
+                className="cursor-pointer text-sm text-blue-600 underline"
               >
                 Add repository for it: {latestVerData[0].repository}
               </span>
             ) : (
               <span
-                onClick={() => refetchLatestVersion()}
-                className="underline cursor-pointer text-xs"
+                onClick={() => void refetchLatestVersion()}
+                className="cursor-pointer text-xs underline"
               >
                 Check for new version
               </span>
@@ -230,7 +235,7 @@ export default function RevisionDetails({
               {" "}
               <Button
                 onClick={handleRunTests}
-                className="flex items-center gap-2 h-1/2 text-sm font-semibold"
+                className="flex h-1/2 items-center gap-2 text-sm font-semibold"
               >
                 <BsCheckCircle />
                 Run tests
@@ -242,7 +247,7 @@ export default function RevisionDetails({
                 onClose={() => setShowTestResults(false)}
               >
                 {isRunningTests ? (
-                  <div className="flex mr-2 items-center">
+                  <div className="mr-2 flex items-center">
                     <Spinner /> Waiting for completion..
                   </div>
                 ) : (
@@ -263,10 +268,10 @@ export default function RevisionDetails({
     : isNewerVersion(installedRevision.chart_ver, latestVerData?.[0]?.version);
 
   return (
-    <div className="flex flex-col px-16 pt-5 gap-3">
+    <div className="flex flex-col gap-3 px-16 pt-5">
       <StatusLabel status={release.status} />
       <Header />
-      <div className="flex flex-row gap-6 text-sm -mt-4">
+      <div className="-mt-4 flex flex-row gap-6 text-sm">
         <span>
           Revision <span className="font-semibold">#{release.revision}</span>
         </span>
@@ -302,11 +307,11 @@ export default function RevisionDetails({
       <Tabs tabs={revisionTabs} selectedTab={selectedTab} />
     </div>
   );
-}
+};
 
 function RevisionTag({ caption, text }: RevisionTagProps) {
   return (
-    <span className="bg-revision p-1 rounded px-2 text-sm">
+    <span className="rounded-sm bg-revision p-1 px-2 text-sm">
       <span>{caption}:</span>
       <span className="font-bold"> {text}</span>
     </span>
@@ -317,7 +322,7 @@ const Rollback = ({
   release,
   installedRevision,
 }: {
-  release: Release;
+  release: ReleaseRevision;
   installedRevision: ReleaseRevision;
 }) => {
   const { chart, namespace, revision } = useParams();
@@ -326,10 +331,10 @@ const Rollback = ({
   const [showRollbackDiff, setShowRollbackDiff] = useState(false);
   const revisionInt = parseInt(revision || "", 10);
 
-  const { mutate: rollbackRelease, isLoading: isRollingBackRelease } =
+  const { mutate: rollbackRelease, isPending: isRollingBackRelease } =
     useRollbackRelease({
-      onSuccess: () => {
-        navigate(
+      onSuccess: async () => {
+        await navigate(
           `/${namespace}/${chart}/installed/revision/${revisionInt + 1}`
         );
         window.location.reload();
@@ -352,7 +357,7 @@ const Rollback = ({
       : revisionInt;
 
   const rollbackTitle = (
-    <div className="font-semibold text-lg">
+    <div className="text-lg font-semibold">
       Rollback <span className="text-red-500">{chart}</span> from revision{" "}
       {installedRevision.revision} to {rollbackRevision}
     </div>
@@ -380,7 +385,7 @@ const Rollback = ({
             id: "1",
             callback: () => {
               rollbackRelease({
-                ns: namespace as string,
+                ns: namespace,
                 name: String(chart),
                 revision: release.revision,
               });
@@ -421,7 +426,7 @@ const Rollback = ({
     }, [data, isLoading, fetchedDataSuccessfully]);
 
     return (
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col gap-4">
         {isLoading ? (
           <div className="flex gap-2 text-sm">
             <Spinner />
@@ -441,7 +446,7 @@ const Rollback = ({
     <>
       <Button
         onClick={handleRollback}
-        className="flex items-center gap-2 h-1/2 text-sm font-semibold"
+        className="flex h-1/2 items-center gap-2 text-sm font-semibold"
       >
         <BsArrowRepeat />
         Rollback to #{rollbackRevision}
@@ -454,27 +459,23 @@ const Rollback = ({
 const Uninstall = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { namespace = "", chart = "" } = useParams();
-  const { data: resources } = useGetResources(namespace, chart, {
-    enabled: isOpen,
-  });
+  const { data: resources } = useGetResources(namespace, chart, isOpen);
 
-  const uninstallMutation = useMutation(
-    ["uninstall", namespace, chart],
-    () =>
+  const uninstallMutation = useMutation({
+    mutationKey: ["uninstall", namespace, chart],
+    mutationFn: () =>
       apiService.fetchWithDefaults(
         "/api/helm/releases/" + namespace + "/" + chart,
         {
           method: "delete",
         }
       ),
-    {
-      onSuccess: () => {
-        window.location.href = "/";
-      },
-    }
-  );
+    onSuccess: () => {
+      window.location.href = "/";
+    },
+  });
   const uninstallTitle = (
-    <div className="font-semibold text-lg">
+    <div className="text-lg font-semibold">
       Uninstall <span className="text-red-500">{chart}</span> from namespace{" "}
       <span className="text-red-500">{namespace}</span>
     </div>
@@ -484,7 +485,7 @@ const Uninstall = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 hover:bg-red-200 h-1/2 text-sm font-semibold"
+        className="flex h-1/2 items-center gap-2 text-sm font-semibold hover:bg-red-200"
       >
         <BsTrash3 />
         Uninstall
@@ -499,7 +500,7 @@ const Uninstall = () => {
               id: "1",
               callback: uninstallMutation.mutate,
               variant: ModalButtonStyle.info,
-              isLoading: uninstallMutation.isLoading,
+              isLoading: uninstallMutation.isPending,
             },
           ]}
           containerClassNames="w-[800px]"
@@ -511,18 +512,18 @@ const Uninstall = () => {
                 key={
                   resource.apiVersion + resource.kind + resource.metadata.name
                 }
-                className="flex justify-start gap-1 w-full mb-3"
+                className="mb-3 flex w-full justify-start gap-1"
               >
                 <span
                   style={{
                     textAlign: "end",
                     paddingRight: "30px",
                   }}
-                  className=" w-3/5  italic"
+                  className="w-3/5 italic"
                 >
                   {resource.kind}
                 </span>
-                <span className=" w-4/5 font-semibold">
+                <span className="w-4/5 font-semibold">
                   {resource.metadata.name}
                 </span>
               </div>
@@ -533,3 +534,5 @@ const Uninstall = () => {
     </>
   );
 };
+
+export default RevisionDetails;
