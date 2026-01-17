@@ -148,7 +148,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 		//return
 	}
 
-	if c.Query("health") != "" { // we need  to query k8s for health status
+	if c.Query("health") != "" && !h.Data.StatusInfo.NoHealth { // we need  to query k8s for health status
 		app := h.GetApp(c)
 		if app == nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
@@ -214,6 +214,11 @@ func (h *HelmHandler) RepoLatestVer(c *gin.Context) {
 	app := h.GetApp(c)
 	if app == nil {
 		return // sets error inside
+	}
+
+	if h.Data.StatusInfo.NoLatest {
+		c.Status(http.StatusNoContent)
+		return
 	}
 
 	rep, err := app.Repositories.Containing(qp.Name)

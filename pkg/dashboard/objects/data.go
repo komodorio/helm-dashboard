@@ -41,6 +41,8 @@ type StatusInfo struct {
 	Analytics     bool
 	CacheHitRatio float64
 	ClusterMode   bool
+	NoHealth      bool
+	NoLatest      bool
 }
 
 func NewDataLayer(ns []string, ver string, cg HelmConfigGetter, devel bool) (*DataLayer, error) {
