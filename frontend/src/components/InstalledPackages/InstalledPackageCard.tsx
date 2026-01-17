@@ -89,9 +89,11 @@ export default function InstalledPackageCard({
   return (
     <div
       ref={ref}
-      className={`${borderLeftColor[release.status]
-        } custom-shadow my-2 grid grid-cols-12 items-center rounded-md border-l-4 bg-white p-2 py-6 text-xs border-l-[${statusColor}] cursor-pointer ${isMouseOver && "custom-shadow-lg"
-        }`}
+      className={`${
+        borderLeftColor[release.status]
+      } custom-shadow my-2 grid grid-cols-12 items-center rounded-md border-l-4 bg-white p-2 py-6 text-xs border-l-[${statusColor}] cursor-pointer ${
+        isMouseOver && "custom-shadow-lg"
+      }`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
       onClick={handleClick}
