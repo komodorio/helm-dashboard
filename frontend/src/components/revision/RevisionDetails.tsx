@@ -335,7 +335,9 @@ const Rollback = ({
     useRollbackRelease({
       onSuccess: async () => {
         await navigate(
-          `/${namespace}/${chart}/installed/revision/${revisionInt + 1}`
+          `/${namespace}/${chart}/installed/revision/${
+            installedRevision.revision + 1
+          }`
         );
         window.location.reload();
       },
@@ -387,7 +389,7 @@ const Rollback = ({
               rollbackRelease({
                 ns: namespace,
                 name: String(chart),
-                revision: release.revision,
+                revision: rollbackRevision,
               });
             },
             variant: ModalButtonStyle.info,
