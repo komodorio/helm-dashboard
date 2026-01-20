@@ -84,8 +84,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "Apache-2.0",
-  "resolutions": {
-    "diff": "^8.0.3"
-  }
+  "license": "Apache-2.0"
 }
