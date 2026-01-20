@@ -34,6 +34,8 @@ type options struct {
 	Namespace  string   `short:"n" long:"namespace" description:"Namespace for HELM operations"`
 	Devel      bool     `long:"devel" description:"Include development versions of charts"`
 	LocalChart []string `long:"local-chart" description:"Specify location of local chart to include into UI"`
+	NoHealth   bool     `long:"no-health" description:"Disable health checks for installed charts"`
+	NoLatest   bool     `long:"no-latest" description:"Disable latest version checks for installed charts"`
 }
 
 func main() {
@@ -62,6 +64,8 @@ func main() {
 		NoTracking:  opts.NoTracking,
 		Devel:       opts.Devel,
 		LocalCharts: opts.LocalChart,
+		NoHealth:    opts.NoHealth,
+		NoLatest:    opts.NoLatest,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

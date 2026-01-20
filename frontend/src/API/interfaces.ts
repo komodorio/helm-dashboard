@@ -43,6 +43,8 @@ export interface ApplicationStatus {
   ClusterMode: boolean;
   CurVer: string;
   LatestVer: string;
+  NoHealth: boolean;
+  NoLatest: boolean;
 }
 
 export interface KubectlContexts {

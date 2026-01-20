@@ -16,6 +16,7 @@ import { isNewerVersion } from "../../utils";
 import type { LatestChartVersion } from "../../API/interfaces";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import { useInView } from "react-intersection-observer";
+import { useGetApplicationStatus } from "../../API/other";
 
 type InstalledPackageCardProps = {
   release: Release;
@@ -31,14 +32,17 @@ export default function InstalledPackageCard({
     threshold: 0.3,
     triggerOnce: true,
   });
+  const { data: status } = useGetApplicationStatus();
+
   const { data: latestVersionResult } = useGetLatestVersion(release.chartName, {
     queryKey: ["chartName", release.chartName],
+    enabled: !status?.NoLatest,
   });
 
   const { data: statusData = [], isLoading } = useQuery<ReleaseHealthStatus[]>({
     queryKey: ["resourceStatus", release],
     queryFn: () => apiService.getResourceStatus({ release }),
-    enabled: inView,
+    enabled: inView && !status?.NoHealth,
   });
 
   const latestVersionData: LatestChartVersion | undefined =

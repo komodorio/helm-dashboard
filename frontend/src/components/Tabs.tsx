@@ -18,7 +18,6 @@ export default function Tabs({ tabs, selectedTab }: TabsProps) {
   const moveTab = (tab: Tab) => {
     upsertSearchParams("tab", tab.value);
   };
-
   return (
     <div className="flex flex-col">
       <div className="flex pb-2">

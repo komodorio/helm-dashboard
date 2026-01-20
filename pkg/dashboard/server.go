@@ -29,6 +29,8 @@ type Server struct {
 	NoTracking  bool
 	Devel       bool
 	LocalCharts []string
+	NoHealth    bool
+	NoLatest    bool
 }
 
 func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (string, utils.ControlChan, error) {
@@ -39,6 +41,9 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 
 	data.LocalCharts = s.LocalCharts
 	data.StatusInfo.Analytics = (!s.NoTracking && s.Version != "0.0.0") || utils.EnvAsBool("HD_DEV_ANALYTICS", false)
+
+	data.StatusInfo.NoHealth = s.NoHealth || utils.EnvAsBool("HD_NO_HEALTH", false)
+	data.StatusInfo.NoLatest = s.NoLatest || utils.EnvAsBool("HD_NO_LATEST", false)
 
 	err = s.detectClusterMode(data)
 	if err != nil {

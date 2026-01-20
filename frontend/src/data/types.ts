@@ -104,6 +104,8 @@ export type Status = {
   Analytics: boolean;
   CacheHitRatio: number;
   ClusterMode: boolean;
+  NoHealth: boolean;
+  NoLatest: boolean;
 };
 
 export type ChartVersion = {
