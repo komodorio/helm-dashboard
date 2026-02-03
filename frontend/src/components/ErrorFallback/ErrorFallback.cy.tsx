@@ -1,5 +1,7 @@
 import ErrorFallback from "./ErrorFallback";
 import { mount } from "cypress/react18";
+import { ErrorBoundary } from "react-error-boundary";
+import { useState } from "react";
 
 /**
  * Component tests for ErrorFallback
@@ -15,15 +17,22 @@ describe("ErrorFallback", () => {
     }
   });
 
-  it("should render error modal with error message", () => {
+  it("should render error modal with error message and hint", () => {
     const mockError = new Error("Test error message");
     const mockReset = cy.stub().as("resetErrorBoundary");
 
     mount(<ErrorFallback error={mockError} resetErrorBoundary={mockReset} />);
 
     // Verify modal is open (checking document directly because of portal)
+    cy.get("#portal").should("be.visible");
     cy.get("#portal").should("contain", "Application Error");
     cy.get("#portal").should("contain", "Test error message");
+
+    // Verify Komodor hint is present (from GlobalErrorModal)
+    cy.get("#portal").should("contain", "Sign up for free.");
+    cy.get("#portal a")
+      .should("have.attr", "href")
+      .and("include", "komodor.com");
   });
 
   it("should call resetErrorBoundary when modal is closed", () => {
@@ -63,7 +72,42 @@ describe("ErrorFallback", () => {
     mount(<ErrorFallback error={mockError} resetErrorBoundary={mockReset} />);
 
     // In dev mode, error should be logged
-    // Note: This test assumes DEV mode is enabled in test environment
     cy.get("@consoleError").should("have.been.called");
+  });
+
+  it("should catch errors from a real component and recover after reset (Integration)", () => {
+    const BuggyComponent = ({ shouldCrash }: { shouldCrash: boolean }) => {
+      if (shouldCrash) {
+        throw new Error("Integrated crash");
+      }
+      return <div data-cy="recovered">Recovered successfully!</div>;
+    };
+
+    const TestWrapper = () => {
+      const [shouldCrash, setShouldCrash] = useState(true);
+      return (
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onReset={() => setShouldCrash(false)}
+        >
+          <BuggyComponent shouldCrash={shouldCrash} />
+        </ErrorBoundary>
+      );
+    };
+
+    mount(<TestWrapper />);
+
+    // Verify modal caught the real throw
+    cy.get("#portal").should("be.visible").and("not.be.empty");
+    cy.get("#portal").should("contain", "Integrated crash");
+
+    // Click close to reset
+    cy.get("[data-modal-hide='staticModal']").click();
+
+    // Verify modal is gone (portal should be empty) and component recovered
+    cy.get("#portal").should("be.empty");
+    cy.get("[data-cy='recovered']")
+      .should("be.visible")
+      .and("contain", "Recovered successfully!");
   });
 });
