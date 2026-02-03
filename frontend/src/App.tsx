@@ -11,6 +11,8 @@ import { ErrorModalContext } from "./context/ErrorModalContext";
 import GlobalErrorModal from "./components/modal/GlobalErrorModal";
 import { AppContextProvider } from "./context/AppContext";
 import apiService from "./API/apiService";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "./components/ErrorFallback";
 
 const DocsPage = lazy(() => import("./pages/DocsPage"));
 
@@ -53,25 +55,27 @@ export default function App() {
     <AppContextProvider>
       <ErrorModalContext.Provider value={value}>
         <QueryClientProvider client={queryClient}>
-          <HashRouter>
-            <Routes>
-              <Route path="docs/*" element={<DocsPage />} />
-              <Route path="*" element={<PageLayout />}>
-                <Route path=":context?/*" element={<SyncContext />}>
-                  <Route
-                    path="repository/:selectedRepo?/*"
-                    element={<RepositoryPage />}
-                  />
-                  <Route path="installed/?" element={<Installed />} />
-                  <Route
-                    path=":namespace/:chart/installed/revision/:revision"
-                    element={<Revision />}
-                  />
-                  <Route path="*" element={<Installed />} />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <HashRouter>
+              <Routes>
+                <Route path="docs/*" element={<DocsPage />} />
+                <Route path="*" element={<PageLayout />}>
+                  <Route path=":context?/*" element={<SyncContext />}>
+                    <Route
+                      path="repository/:selectedRepo?/*"
+                      element={<RepositoryPage />}
+                    />
+                    <Route path="installed/?" element={<Installed />} />
+                    <Route
+                      path=":namespace/:chart/installed/revision/:revision"
+                      element={<Revision />}
+                    />
+                    <Route path="*" element={<Installed />} />
+                  </Route>
                 </Route>
-              </Route>
-            </Routes>
-          </HashRouter>
+              </Routes>
+            </HashRouter>
+          </ErrorBoundary>
           <GlobalErrorModal
             isOpen={!!shouldShowErrorModal}
             onClose={() => setShowErrorModal(undefined)}

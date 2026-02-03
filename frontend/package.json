@@ -14,6 +14,7 @@
     "luxon": "^3.7.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-error-boundary": "^6.1.0",
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^10.0.0",
     "react-modern-drawer": "^1.4.0",
