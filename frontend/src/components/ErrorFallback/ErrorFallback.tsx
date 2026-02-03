@@ -1,6 +1,6 @@
 import type { FallbackProps } from "react-error-boundary";
-import { useEffect } from "react";
 import GlobalErrorModal from "../modal/GlobalErrorModal";
+import { useDevLogger } from "../../hooks/useDevLogger";
 
 /**
  * Error fallback component for React Error Boundary
@@ -9,12 +9,7 @@ import GlobalErrorModal from "../modal/GlobalErrorModal";
  * @param resetErrorBoundary - Function to reset the error boundary state
  */
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
-  useEffect(() => {
-    // Log error to console in development
-    if (import.meta.env.DEV) {
-      console.error("Error caught by ErrorBoundary:", error);
-    }
-  }, [error]);
+  useDevLogger(error);
 
   const handleClose = () => {
     // Reset the error boundary to allow the component tree to re-render
