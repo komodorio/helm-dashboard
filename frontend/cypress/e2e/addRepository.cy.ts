@@ -4,17 +4,15 @@ describe("Adding repository flow", () => {
   const addChartRepositoryButton = "[data-cy='add-chart-repository-button']";
 
   it("Adding new chart repository", () => {
-    cy.intercept("GET", "http://localhost:5173/status", {
+    cy.intercept("GET", "/status", {
       fixture: "status.json",
     }).as("status");
 
-    cy.intercept("GET", "http://localhost:5173/api/helm/releases", {
+    cy.intercept("GET", "/api/helm/releases", {
       fixture: "releases.json",
     }).as("releases");
 
-    cy.visit(
-      "http://localhost:5173/#/minikube/installed?filteredNamespace=default"
-    );
+    cy.visit("/#/minikube/installed?filteredNamespace=default");
 
     cy.get("[data-cy='navigation-link']").contains("Repository").click();
     cy.get("[data-cy='install-repository-button']").click();
@@ -22,11 +20,12 @@ describe("Adding repository flow", () => {
     cy.get(addChartNameInput).type("Komodorio");
     cy.get(addChartUrlInput).type("https://helm-charts.komodor.io");
 
-    cy.intercept("GET", "http://localhost:5173/api/helm/repositories", {
+    cy.intercept("GET", "/api/helm/repositories", {
       fixture: "repositories.json",
     }).as("repositories");
 
     cy.get(addChartRepositoryButton).click();
+    cy.wait("@repositories");
 
     cy.contains("https://helm-charts.komodor.io");
 
@@ -36,15 +35,13 @@ describe("Adding repository flow", () => {
       .contains("Install")
       .click();
 
-    cy.intercept("POST", "http://localhost:5173/api/helm/releases/default", {
+    cy.intercept("POST", "/api/helm/releases/default", {
       fixture: "defaultReleases.json",
     }).as("defaultReleases");
 
-    cy.intercept(
-      "GET",
-      "http://localhost:5173/api/helm/releases/default/helm-dashboard/history",
-      { fixture: "history.json" }
-    ).as("history");
+    cy.intercept("GET", "/api/helm/releases/default/helm-dashboard/history", {
+      fixture: "history.json",
+    }).as("history");
 
     cy.contains("Confirm").click();
 

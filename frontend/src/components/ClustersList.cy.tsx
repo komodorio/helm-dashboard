@@ -45,6 +45,14 @@ const renderClustersList = (props: ClustersListProps) => {
 
 describe("ClustersList", () => {
   it("Got one cluster information", () => {
+    cy.intercept("GET", "/api/k8s/contexts", [
+      {
+        Name: "minikube",
+        Namespace: "default",
+        IsCurrent: true,
+      },
+    ]).as("getClusters");
+
     renderClustersList({
       selectedCluster: "minikube",
       filteredNamespaces: ["default"],
@@ -52,12 +60,21 @@ describe("ClustersList", () => {
       installedReleases: [generateTestReleaseData()],
     });
 
+    cy.wait("@getClusters");
     cy.get(".data-cy-clusterName").contains("minikube");
     cy.get(".data-cy-clusterList-namespace").contains("default");
     cy.get(".data-cy-clustersInput").should("be.checked");
   });
 
   it("Dont have a cluster chekced", () => {
+    cy.intercept("GET", "/api/k8s/contexts", [
+      {
+        Name: "minikube",
+        Namespace: "default",
+        IsCurrent: true,
+      },
+    ]).as("getClusters");
+
     renderClustersList({
       selectedCluster: "",
       filteredNamespaces: [""],
@@ -65,6 +82,7 @@ describe("ClustersList", () => {
       installedReleases: [generateTestReleaseData()],
     });
 
+    cy.wait("@getClusters");
     cy.get(".data-cy-clustersInput").should("not.be.checked");
   });
 });

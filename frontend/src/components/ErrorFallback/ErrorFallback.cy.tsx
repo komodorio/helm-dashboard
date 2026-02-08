@@ -1,5 +1,5 @@
 import ErrorFallback from "./ErrorFallback";
-import { mount } from "cypress/react18";
+import { mount } from "cypress/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 
