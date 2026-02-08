@@ -14,6 +14,7 @@
     "luxon": "^3.7.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-error-boundary": "^6.1.0",
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^10.0.0",
     "react-modern-drawer": "^1.4.0",
@@ -39,7 +40,7 @@
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.22",
     "babel-plugin-react-compiler": "^1.0.0",
-    "cypress": "^13.3.0",
+    "cypress": "15.10.0",
     "eslint": "^9.39.1",
     "eslint-config-enpitech": "^1.0.17",
     "eslint-config-prettier": "^10.1.8",
@@ -80,7 +81,9 @@
     "prettier": "npx prettier src/ --check",
     "prettier:fix": "npm run prettier -- --write",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "cypress:component": "cypress run --component",
+    "cypress:component:open": "cypress open --component"
   },
   "keywords": [],
   "author": "",
