@@ -8,6 +8,7 @@ import type {
 import apiService from "./apiService";
 
 // Get list of kubectl contexts configured locally
+// @ts-expect-error unused
 function useGetKubectlContexts(options?: UseQueryOptions<KubectlContexts>) {
   return useQuery<KubectlContexts>({
     queryKey: ["k8s", "contexts"],
@@ -21,6 +22,7 @@ function useGetKubectlContexts(options?: UseQueryOptions<KubectlContexts>) {
 }
 
 // Get resources information
+// @ts-expect-error unused
 function useGetK8sResource(
   kind: string,
   name: string,
@@ -39,6 +41,7 @@ function useGetK8sResource(
 }
 
 // Get list of resources
+// @ts-expect-error unused
 function useGetK8sResourceList(
   kind: string,
   options?: UseQueryOptions<K8sResourceList>
@@ -55,6 +58,7 @@ function useGetK8sResourceList(
 }
 
 // Get describe text for kubernetes resource
+// @ts-expect-error unused
 function useGetK8sResourceDescribe(
   kind: string,
   name: string,

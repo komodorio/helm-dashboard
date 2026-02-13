@@ -8,10 +8,12 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import type { ScanResults, ScannersList } from "./interfaces";
+// @ts-expect-error unused
 import { ScanResult } from "./interfaces";
 import apiService from "./apiService";
 
 // Get list of discovered scanners
+// @ts-expect-error unused
 function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
   return useQuery<ScannersList>({
     queryKey: ["scanners"],
@@ -25,6 +27,7 @@ function useGetDiscoveredScanners(options?: UseQueryOptions<ScannersList>) {
 }
 
 // Scan manifests using all applicable scanners
+// @ts-expect-error unused
 function useScanManifests(
   manifest: string,
   options?: UseMutationOptions<ScanResults, Error, string>
@@ -46,6 +49,7 @@ function useScanManifests(
 }
 
 // Scan specified k8s resource in cluster
+// @ts-expect-error unused
 function useScanK8sResource(
   kind: string,
   namespace: string,

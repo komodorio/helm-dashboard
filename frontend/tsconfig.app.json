@@ -1,12 +1,12 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
     "allowJs": false
   },
   "include": [
     "src",
     "public/static",
+    ".flowbite-react/**/*",
     ".storybook/**/*.ts",
     "public/analytics.js",
     "cypress"

@@ -39,7 +39,7 @@ function RevisionDiff({
     "user-defined": userDefinedValue,
   } = searchParams;
 
-  //@ts-ignore
+  //@ts-expect-error useRef need to find elegant way for it
   const diffElement = useRef<HTMLElement>({});
 
   const handleChanged = (e: ChangeEvent<HTMLInputElement>) => {
@@ -226,7 +226,7 @@ function RevisionDiff({
       )}
       <div
         className="relative w-full bg-white font-sf-mono leading-5"
-        //@ts-ignore
+        //@ts-expect-error ref
         ref={diffElement}
       ></div>
     </div>
