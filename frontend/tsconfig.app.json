@@ -1,16 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": false,
-    "esModuleInterop": false,
-    "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "noEmit": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "target": "ESNext",
-    "useDefineForClassFields": true
+    "allowJs": false
   },
   "include": [
     "src",
@@ -18,6 +10,5 @@
     ".storybook/**/*.ts",
     "public/analytics.js",
     "cypress"
-  ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  ]
 }
