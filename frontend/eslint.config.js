@@ -28,8 +28,6 @@ export default defineConfig(
       globals: {
         ...globals.browser,
         ...globals.node,
-        heap: "writable",
-        DD_RUM: "writable",
       },
       parserOptions: {
         projectService: {
