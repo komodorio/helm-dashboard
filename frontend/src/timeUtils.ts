@@ -1,5 +1,8 @@
-import type { DateTimeMaybeValid } from "luxon";
-import { DateTime, type DurationLikeObject } from "luxon";
+import {
+  DateTime,
+  type DurationLikeObject,
+  type DateTimeMaybeValid,
+} from "luxon";
 import type { ReleaseRevision } from "./data/types";
 
 export function getAge(obj1: ReleaseRevision, obj2?: ReleaseRevision) {

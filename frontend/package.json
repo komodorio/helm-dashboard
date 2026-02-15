@@ -42,7 +42,6 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "cypress": "15.10.0",
     "eslint": "^9.39.1",
-    "eslint-config-enpitech": "^1.0.17",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.4",

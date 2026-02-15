@@ -4,24 +4,23 @@ import globals from "globals";
 import tsEslint from "typescript-eslint";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
-import importPlugin from "eslint-plugin-import";
+// import importPlugin from "eslint-plugin-import";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
 import tscPlugin from "eslint-plugin-tsc";
 
 export default defineConfig(
-  {
-    ignores: ["dist", "node_modules"],
-  },
-
   js.configs.recommended,
   tsEslint.configs.recommendedTypeChecked,
   // tsEslint.configs.strictTypeChecked, // The project is not ready yet
   // tsEslint.configs.stylisticTypeChecked, // Added for better 2026 coding standards, however the project is not ready yet
+  // importPlugin.flatConfigs.recommended,
   react.configs.flat.recommended,
   react.configs.flat["jsx-runtime"],
   reactHooks.configs.flat.recommended,
+  prettierRecommended,
 
   {
+    ignores: ["dist", "node_modules"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -40,9 +39,9 @@ export default defineConfig(
       react: { version: "detect" },
     },
     plugins: {
+      // import: importPlugin,
       react,
       "react-hooks": reactHooks,
-      import: importPlugin,
       tsc: tscPlugin,
     },
     rules: {
@@ -51,6 +50,26 @@ export default defineConfig(
       "no-debugger": "error",
       quotes: ["error", "double"],
       semi: ["error", "always"],
+      //
+      // /* ───────── Import Precision ───────── */
+      // "import/no-unresolved": "error",
+      // "import/no-duplicates": "error",
+      // "import/newline-after-import": "error",
+      // "import/order": [
+      //   "error",
+      //   {
+      //     groups: [
+      //       "builtin",
+      //       "external",
+      //       "internal",
+      //       "parent",
+      //       "sibling",
+      //       "index",
+      //     ],
+      //     "newlines-between": "always",
+      //     alphabetize: { order: "asc", caseInsensitive: true },
+      //   },
+      // ],
 
       /* ───────── React Precision ───────── */
       "no-restricted-properties": [
@@ -97,6 +116,8 @@ export default defineConfig(
       ],
     },
   },
+
+  /* ───────── Other Config Precision ───────── */
   {
     files: ["src/**/*.ts", "src/**/*.tsx", "cypress/**/*.ts"],
     rules: {
@@ -118,7 +139,5 @@ export default defineConfig(
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-call": "off",
     },
-  },
-
-  prettierRecommended
+  }
 );
