@@ -6,7 +6,7 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import importPlugin from "eslint-plugin-import";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
-import tscPlugin from "eslint-plugin-tsc";
+// import tscPlugin from "eslint-plugin-tsc";
 
 export default defineConfig(
   { ignores: ["dist", "node_modules"] },
@@ -41,15 +41,16 @@ export default defineConfig(
     settings: {
       react: { version: "detect" },
       "import/resolver": {
+        node: true,
         typescript: {
           alwaysTryTypes: true,
           project: "./tsconfig.json",
         },
       },
     },
-    plugins: {
-      tsc: tscPlugin,
-    },
+    // plugins: {
+    //   tsc: tscPlugin,
+    // },
     rules: {
       /* ───────── Base Overrides ───────── */
       "no-console": ["error", { allow: ["error", "warn"] }],
@@ -92,7 +93,6 @@ export default defineConfig(
         { argsIgnorePattern: "^_" },
       ],
 
-      // Ban Specific Types
       "@typescript-eslint/no-restricted-types": [
         "error",
         {
@@ -105,22 +105,8 @@ export default defineConfig(
       ],
     },
   },
-
-  /* ───────── Other Config Precision ───────── */
-  // {
-  //   files: ["src/**/*.ts", "src/**/*.tsx", "cypress/**/*.ts"],
-  //   rules: {
-  //     "tsc/config": ["error", { configFile: "./tsconfig.app.json" }],
-  //   },
-  // },
-  // {
-  //   files: ["vite.config.ts", "cypress.config.ts"],
-  //   rules: {
-  //     "tsc/config": ["error", { configFile: "./tsconfig.node.json" }],
-  //   },
-  // },
   {
-    files: ["**/*.js", "**/*.mjs"],
+    files: ["**/*.{js,mjs}"],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: {
       globals: {
