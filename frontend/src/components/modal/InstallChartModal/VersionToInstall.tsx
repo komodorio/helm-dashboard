@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { useMemo, useState } from "react";
-import type { GroupBase, SingleValueProps } from "react-select";
+import type { GroupBase, SingleValueProps, OptionProps } from "react-select";
 import Select, { components } from "react-select";
 import { BsCheck2 } from "react-icons/bs";
 import type { NonEmptyArray } from "../../../data/types";
@@ -92,7 +92,10 @@ export const VersionToInstall: FC<{
             }}
             value={selectedOption ?? initOpt}
             components={{
-              SingleValue: ({ children, ...props }) => {
+              SingleValue: ({
+                children,
+                ...props
+              }: SpecificSingleValueProps) => {
                 const OriginalSingleValue =
                   components.SingleValue as FC<SpecificSingleValueProps>;
 
@@ -105,7 +108,15 @@ export const VersionToInstall: FC<{
                   </OriginalSingleValue>
                 );
               },
-              Option: ({ children, innerProps, data }) => (
+              Option: ({
+                children,
+                innerProps,
+                data,
+              }: OptionProps<
+                VersionOptionType,
+                false,
+                GroupBase<VersionOptionType>
+              >) => (
                 <div
                   className={
                     "flex items-center py-2 pr-2 pl-4 text-green-700 hover:bg-blue-100"

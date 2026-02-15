@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tsEslint from "typescript-eslint";
 import react from "eslint-plugin-react";
@@ -7,14 +8,18 @@ import importPlugin from "eslint-plugin-import";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
 import tscPlugin from "eslint-plugin-tsc";
 
-export default tsEslint.config(
+export default defineConfig(
   {
     ignores: ["dist", "node_modules"],
   },
 
   js.configs.recommended,
-  ...tsEslint.configs.recommendedTypeChecked,
-  // ...tsEslint.configs.stylisticTypeChecked, // Added for better 2026 coding standards however the project is not ready yet
+  tsEslint.configs.recommendedTypeChecked,
+  // tsEslint.configs.strictTypeChecked, // The project is not ready yet
+  // tsEslint.configs.stylisticTypeChecked, // Added for better 2026 coding standards, however the project is not ready yet
+  react.configs.flat.recommended,
+  react.configs.flat["jsx-runtime"],
+  reactHooks.configs.flat.recommended,
 
   {
     languageOptions: {
@@ -48,10 +53,6 @@ export default tsEslint.config(
       semi: ["error", "always"],
 
       /* ───────── React Precision ───────── */
-      "react/react-in-jsx-scope": "off",
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-
       "no-restricted-properties": [
         "error",
         {
