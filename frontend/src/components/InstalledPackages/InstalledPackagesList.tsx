@@ -1,5 +1,6 @@
-import InstalledPackageCard from "./InstalledPackageCard";
 import type { Release } from "../../data/types";
+
+import InstalledPackageCard from "./InstalledPackageCard";
 
 type InstalledPackagesListProps = {
   filteredReleases: Release[];

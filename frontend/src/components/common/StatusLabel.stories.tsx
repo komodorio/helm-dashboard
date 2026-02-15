@@ -1,4 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
+
 import StatusLabel, { DeploymentStatus } from "./StatusLabel";
 
 const meta = {

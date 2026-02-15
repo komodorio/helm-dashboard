@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import type { Chart } from "../../data/types";
 import { InstallRepoChartModal } from "../modal/InstallChartModal/InstallRepoChartModal";
 

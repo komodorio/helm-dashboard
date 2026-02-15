@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import {
   useEffect,
   useEffectEvent,
@@ -7,27 +7,29 @@ import {
   lazy,
   Suspense,
 } from "react";
-import type { VersionData } from "../../../API/releases";
+import { useParams } from "react-router";
+
+import apiService from "../../../API/apiService";
+import type { LatestChartVersion } from "../../../API/interfaces";
 import {
+  type VersionData,
   useChartReleaseValues,
   useGetReleaseManifest,
   useGetVersions,
   useVersionData,
 } from "../../../API/releases";
-import Modal, { ModalButtonStyle } from "../Modal";
-import { GeneralDetails } from "./GeneralDetails";
-import { useMutation } from "@tanstack/react-query";
-import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
-import { VersionToInstall } from "./VersionToInstall";
-import { isNoneEmptyArray } from "../../../utils";
-import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
 import { useChartRepoValues } from "../../../API/repositories";
 import { useDiffData } from "../../../API/shared";
 import type { InstallChartModalProps } from "../../../data/types";
-import apiService from "../../../API/apiService";
-import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
-import type { LatestChartVersion } from "../../../API/interfaces";
+import useCustomSearchParams from "../../../hooks/useCustomSearchParams";
+import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
+import { isNoneEmptyArray } from "../../../utils";
 import Spinner from "../../Spinner";
+import Modal, { ModalButtonStyle } from "../Modal";
+import { GeneralDetails } from "./GeneralDetails";
+import { VersionToInstall } from "./VersionToInstall";
+
+import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
 
 const DefinedValues = lazy(() => import("./DefinedValues"));
 const ManifestDiff = lazy(() => import("./ManifestDiff"));

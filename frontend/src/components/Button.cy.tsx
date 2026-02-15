@@ -1,4 +1,5 @@
 import { mount } from "cypress/react";
+
 import { Button } from "./common/Button/Button";
 
 describe("Button component tests", () => {

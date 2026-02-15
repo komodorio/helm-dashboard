@@ -1,8 +1,10 @@
-import { AppContextProvider } from "../context/AppContext";
-import ClustersList from "./ClustersList";
-import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router";
+
+import { AppContextProvider } from "../context/AppContext";
 import type { Release } from "../data/types";
+
+import ClustersList from "./ClustersList";
 import { DeploymentStatus } from "./common/StatusLabel";
 
 type ClustersListProps = {

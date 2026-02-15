@@ -1,6 +1,7 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import HeaderLogo from "../../assets/packges-header.svg";
 import type { Release } from "../../data/types";
-import type { Dispatch, SetStateAction } from "react";
 
 type InstalledPackagesHeaderProps = {
   filteredReleases?: Release[];

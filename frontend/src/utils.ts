@@ -1,5 +1,5 @@
-import type { Diff2HtmlUIConfig } from "diff2html/lib/ui/js/diff2html-ui-base";
-import type { NonEmptyArray } from "./data/types";
+import { type Diff2HtmlUIConfig } from "diff2html/lib/ui/js/diff2html-ui-base";
+import { type NonEmptyArray } from "./data/types";
 
 export const isNewerVersion = (oldVer: string, newVer: string) => {
   if (oldVer && oldVer[0] === "v") {

@@ -1,12 +1,14 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import Modal from "./Modal";
-import Spinner from "../Spinner";
+
+import apiService from "../../API/apiService";
+import { useAppContext } from "../../context/AppContext";
 import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
-import { useAppContext } from "../../context/AppContext";
-import { useQueryClient } from "@tanstack/react-query";
-import apiService from "../../API/apiService";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
+import Spinner from "../Spinner";
+
+import Modal from "./Modal";
 
 interface FormKeys {
   name: string;

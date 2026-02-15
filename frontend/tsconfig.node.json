@@ -1,11 +1,8 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
-    "strict": true
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
   },
   "include": ["vite.config.ts", "cypress.config.ts"]
 }

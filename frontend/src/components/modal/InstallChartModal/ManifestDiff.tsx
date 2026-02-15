@@ -1,10 +1,10 @@
 import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-base";
 import hljs from "highlight.js/lib/core";
 import yaml from "highlight.js/lib/languages/yaml";
-
 import { useEffect, useRef } from "react";
-import Spinner from "../../Spinner";
+
 import { diffConfiguration } from "../../../utils";
+import Spinner from "../../Spinner";
 
 hljs.registerLanguage("yaml", yaml);
 

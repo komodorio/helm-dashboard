@@ -1,163 +1,119 @@
+import js from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import tseslint from "typescript-eslint";
 import react from "eslint-plugin-react";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-import tscPlugin from "eslint-plugin-tsc";
-import { fileURLToPath } from "url";
-import path from "path";
+import reactHooks from "eslint-plugin-react-hooks";
+import importPlugin from "eslint-plugin-import";
+import prettierRecommended from "eslint-plugin-prettier/recommended";
+// import tscPlugin from "eslint-plugin-tsc";
 
-const __filename = fileURLToPath(new URL(import.meta.url));
-const __dirname = path.dirname(__filename);
+export default defineConfig(
+  { ignores: ["dist", "node_modules"] },
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
+  js.configs.recommended,
+  tseslint.configs.recommendedTypeChecked,
+  // tsEslint.configs.strictTypeChecked, // The project is not ready yet
+  // tsEslint.configs.stylisticTypeChecked, // Added for better 2026 coding standards, however the project is not ready yet
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
+  react.configs.flat.recommended,
+  react.configs.flat["jsx-runtime"],
+  reactHooks.configs.flat.recommended,
+  prettierRecommended,
 
-export default defineConfig([
   {
-    ignores: ["eslint.config.js"],
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
       globals: {
         ...globals.browser,
-        heap: "writable",
-        DD_RUM: "writable",
+        ...globals.node,
       },
-
-      parser: tsParser,
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ["eslint.config.js"],
+        },
+        tsconfigRootDir: import.meta.dirname,
       },
     },
-
-    extends: compat.extends(
-      "enpitech",
-      "eslint:recommended",
-      "plugin:prettier/recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:react-hooks/recommended",
-      "plugin:@typescript-eslint/recommended-requiring-type-checking"
-    ),
-
-    plugins: {
-      "@typescript-eslint": typescriptEslint,
-      tsc: tscPlugin,
-      react,
-    },
-
     settings: {
-      react: {
-        version: "detect",
+      react: { version: "detect" },
+      "import/resolver": {
+        node: true,
+        typescript: {
+          alwaysTryTypes: true,
+          project: "./tsconfig.json",
+        },
       },
     },
-
+    // plugins: {
+    //   tsc: tscPlugin,
+    // },
     rules: {
-      "no-console": [
-        "error",
-        {
-          allow: ["error"],
-        },
-      ],
-
-      "no-alert": "error",
+      /* ───────── Base Overrides ───────── */
+      "no-console": ["error", { allow: ["error", "warn"] }],
       "no-debugger": "error",
-      "@typescript-eslint/ban-ts-comment": "off",
-
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          vars: "all",
-          args: "after-used",
-          ignoreRestSiblings: true,
-        },
-      ],
-
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-uses-react": "error",
-      "linebreak-style": ["error", "unix"],
       quotes: ["error", "double"],
       semi: ["error", "always"],
+
+      /* ───────── Import Precision ───────── */
+      "import/no-duplicates": ["error", { "prefer-inline": true }],
+
+      /* ───────── React Precision ───────── */
       "no-restricted-properties": [
         "error",
         {
           object: "React",
-          property: "*",
-          message: "Using React.* is prohibited.",
-        },
-      ],
-
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/strict-boolean-expressions": "off",
-      "@typescript-eslint/no-unsafe-assignment": "error",
-      "@typescript-eslint/no-unsafe-member-access": "error",
-      "@typescript-eslint/no-unsafe-return": "error",
-      "@typescript-eslint/no-unnecessary-type-assertion": "error",
-      "@typescript-eslint/consistent-type-assertions": [
-        "error",
-        {
-          assertionStyle: "as",
-          objectLiteralTypeAssertions: "never",
-        },
-      ],
-      "@typescript-eslint/no-restricted-types": [
-        "error",
-        {
-          types: {
-            "React.FC": {
-              message:
-                "Avoid using React.FC. Use import type { FC } from React instead",
-            },
-            "React.Node": {
-              message:
-                "Avoid using React.Node. Use import type { Node } from React instead",
-            },
-          },
+          message:
+            "Use named imports instead (e.g. import { useState } from 'react')",
         },
       ],
       "no-restricted-imports": [
         "error",
         {
           name: "react",
-          importNames: ["default", "*"],
-          message:
-            "Default and namespace React imports are prohibited. Use specific named imports only (e.g., import { useState, type ReactNode } from 'react').",
-          allowTypeImports: false,
+          importNames: ["default"],
+          message: "Default React imports are prohibited. Use named imports.",
         },
       ],
 
+      /* ───────── TypeScript & Verbatim Syntax ───────── */
       "@typescript-eslint/consistent-type-imports": [
         "error",
         {
           prefer: "type-imports",
+          fixStyle: "inline-type-imports",
         },
       ],
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
 
-      "tsc/config": ["error", { configFile: "./tsconfig.json" }],
+      "@typescript-eslint/no-restricted-types": [
+        "error",
+        {
+          types: {
+            "React.FC": "Use 'import type { FC }' instead.",
+            "React.ReactNode": "Use 'import type { ReactNode }' instead.",
+            // FC: "Avoid FC (Functional Component) type; prefer explicit return types.",
+          },
+        },
+      ],
     },
   },
   {
-    files: ["vite.config.ts"],
-    languageOptions: {
-      parserOptions: {
-        project: "./tsconfig.node.json", // point to the tiny tsconfig
-      },
-    },
-  },
-
-  {
+    files: ["**/*.{js,mjs}"],
+    ...tseslint.configs.disableTypeChecked,
     languageOptions: {
       globals: {
         ...globals.node,
       },
-
-      sourceType: "script",
-      parserOptions: {},
     },
-
-    files: ["**/.eslintrc.{js,cjs}"],
   },
-]);
+  {
+    files: ["eslint.config.js"],
+    rules: { "import/no-unresolved": "off" },
+  }
+);

@@ -1,11 +1,11 @@
 import { useMemo, useEffect, useCallback } from "react";
+import { type NavigateOptions, useParams } from "react-router";
 
+import { useGetRepositories } from "../API/repositories";
 import RepositoriesList from "../components/repository/RepositoriesList";
 import RepositoryViewer from "../components/repository/RepositoryViewer";
-import type { Repository } from "../data/types";
-import { useGetRepositories } from "../API/repositories";
-import { type NavigateOptions, useParams } from "react-router";
 import { useAppContext } from "../context/AppContext";
+import type { Repository } from "../data/types";
 import useNavigateWithSearchParams from "../hooks/useNavigateWithSearchParams";
 
 function RepositoryPage() {

@@ -1,19 +1,20 @@
-import { useLocation } from "react-router";
-import LogoHeader from "../assets/logo-header.svg";
-import DropDown from "../components/common/DropDown";
-import WatcherIcon from "../assets/k8s-watcher.svg";
-import ShutDownButton from "../components/ShutDownButton";
+import { useEffect, useEffectEvent } from "react";
 import {
   BsArrowRepeat,
   BsBoxArrowUpRight,
   BsBraces,
   BsGithub,
 } from "react-icons/bs";
-import { useGetApplicationStatus } from "../API/other";
-import LinkWithSearchParams from "../components/LinkWithSearchParams";
+import { useLocation } from "react-router";
+
 import apiService from "../API/apiService";
+import { useGetApplicationStatus } from "../API/other";
+import WatcherIcon from "../assets/k8s-watcher.svg";
+import LogoHeader from "../assets/logo-header.svg";
+import DropDown from "../components/common/DropDown";
+import LinkWithSearchParams from "../components/LinkWithSearchParams";
+import ShutDownButton from "../components/ShutDownButton";
 import { useAppContext } from "../context/AppContext";
-import { useEffect, useEffectEvent } from "react";
 import { isNewerVersion } from "../utils";
 
 export default function Header() {

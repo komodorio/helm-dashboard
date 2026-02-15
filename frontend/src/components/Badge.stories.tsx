@@ -15,6 +15,7 @@
  */
 
 import type { Meta } from "@storybook/react-vite";
+
 import Badge from "./Badge";
 
 // We set the metadata for the story.

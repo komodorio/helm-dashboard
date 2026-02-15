@@ -1,4 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
+
 import Tabs from "./Tabs";
 
 const meta = {

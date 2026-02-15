@@ -1,3 +1,5 @@
+import { type QueryFunctionContext } from "@tanstack/react-query";
+
 import type {
   Chart,
   ChartVersion,
@@ -5,7 +7,6 @@ import type {
   ReleaseHealthStatus,
   ReleaseRevision,
 } from "../data/types";
-import { type QueryFunctionContext } from "@tanstack/react-query";
 
 interface ClustersResponse {
   AuthInfo: string;

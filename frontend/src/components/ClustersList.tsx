@@ -1,10 +1,11 @@
-import { useEffect, useEffectEvent, useMemo } from "react";
-import type { Cluster, Release } from "../data/types";
-import apiService from "../API/apiService";
 import { useQuery } from "@tanstack/react-query";
-import useCustomSearchParams from "../hooks/useCustomSearchParams";
-import { useAppContext } from "../context/AppContext";
+import { useEffect, useEffectEvent, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
+
+import apiService from "../API/apiService";
+import { useAppContext } from "../context/AppContext";
+import type { Cluster, Release } from "../data/types";
+import useCustomSearchParams from "../hooks/useCustomSearchParams";
 
 type ClustersListProps = {
   onClusterChange: (clusterName: string) => void;

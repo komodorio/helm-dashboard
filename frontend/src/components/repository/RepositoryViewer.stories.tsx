@@ -1,4 +1,5 @@
 import type { StoryFn, Meta } from "@storybook/react-vite";
+
 import RepositoryViewer from "./RepositoryViewer";
 
 const meta = {

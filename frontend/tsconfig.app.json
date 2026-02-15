@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": false
+  },
+  "include": [
+    "src",
+    "public/static",
+    ".flowbite-react/**/*",
+    ".storybook/**/*.ts",
+    "public/analytics.js",
+    "cypress"
+  ]
+}

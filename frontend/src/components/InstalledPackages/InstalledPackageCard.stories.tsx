@@ -1,4 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
+
 import InstalledPackageCard from "./InstalledPackageCard";
 
 const meta = {

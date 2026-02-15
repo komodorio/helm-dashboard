@@ -1,18 +1,21 @@
-import { useMemo, useState } from "react";
-import { useParams } from "react-router";
 import hljs from "highlight.js/lib/core";
 import yaml from "highlight.js/lib/languages/yaml";
+import { useMemo, useState } from "react";
 import { RiExternalLinkLine } from "react-icons/ri";
+import Drawer from "react-modern-drawer";
+import { useParams } from "react-router";
 
-import type { StructuredResources } from "../../API/releases";
-import { useGetResourceDescription, useGetResources } from "../../API/releases";
+import {
+  type StructuredResources,
+  useGetResourceDescription,
+  useGetResources,
+} from "../../API/releases";
 import closeIcon from "../../assets/close.png";
 
-import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 
-import Button from "../Button";
 import Badge, { getBadgeType } from "../Badge";
+import Button from "../Button";
 import Spinner from "../Spinner";
 import { Troubleshoot } from "../Troubleshoot";
 

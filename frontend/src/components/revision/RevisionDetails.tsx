@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { type UseQueryResult, useMutation } from "@tanstack/react-query";
 import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
-
+import { useEffect, useRef, useState } from "react";
 import {
   BsPencil,
   BsTrash3,
@@ -9,9 +9,9 @@ import {
   BsArrowUp,
   BsCheckCircle,
 } from "react-icons/bs";
-import type { ReleaseRevision } from "../../data/types";
-import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
 import { useNavigate, useParams, useSearchParams } from "react-router";
+
+import apiService from "../../API/apiService";
 import {
   useGetReleaseInfoByType,
   useGetLatestVersion,
@@ -19,19 +19,18 @@ import {
   useRollbackRelease,
   useTestRelease,
 } from "../../API/releases";
-
-import RevisionDiff from "./RevisionDiff";
-import RevisionResource from "./RevisionResource";
-import Tabs from "../Tabs";
-import { type UseQueryResult, useMutation } from "@tanstack/react-query";
+import type { ReleaseRevision } from "../../data/types";
+import useAlertError from "../../hooks/useAlertError";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
+import { diffConfiguration, isNewerVersion } from "../../utils";
+import Button from "../Button";
+import StatusLabel, { DeploymentStatus } from "../common/StatusLabel";
+import { InstallReleaseChartModal } from "../modal/InstallChartModal/InstallReleaseChartModal";
 import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
-import useAlertError from "../../hooks/useAlertError";
-import Button from "../Button";
-import { InstallReleaseChartModal } from "../modal/InstallChartModal/InstallReleaseChartModal";
-import { diffConfiguration, isNewerVersion } from "../../utils";
-import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
-import apiService from "../../API/apiService";
+import Tabs from "../Tabs";
+import RevisionDiff from "./RevisionDiff";
+import RevisionResource from "./RevisionResource";
 
 type RevisionTagProps = {
   caption: string;

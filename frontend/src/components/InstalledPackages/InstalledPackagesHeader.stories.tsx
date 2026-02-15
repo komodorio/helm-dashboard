@@ -1,4 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
+
 import InstalledPackagesHeader from "./InstalledPackagesHeader";
 
 const meta = {

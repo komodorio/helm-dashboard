@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import {
   lazy,
   Suspense,
@@ -7,20 +7,22 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useParams } from "react-router";
+
+import apiService from "../../../API/apiService";
+import type { LatestChartVersion } from "../../../API/interfaces";
 import { useGetVersions, useVersionData } from "../../../API/releases";
-import Modal, { ModalButtonStyle } from "../Modal";
-import { GeneralDetails } from "./GeneralDetails";
-import { useMutation } from "@tanstack/react-query";
 import { useChartRepoValues } from "../../../API/repositories";
-import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
-import { VersionToInstall } from "./VersionToInstall";
-import { isNoneEmptyArray } from "../../../utils";
 import { useDiffData } from "../../../API/shared";
 import type { InstallChartModalProps } from "../../../data/types";
-import apiService from "../../../API/apiService";
-import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
-import type { LatestChartVersion } from "../../../API/interfaces";
+import useNavigateWithSearchParams from "../../../hooks/useNavigateWithSearchParams";
+import { isNoneEmptyArray } from "../../../utils";
 import Spinner from "../../Spinner";
+import Modal, { ModalButtonStyle } from "../Modal";
+
+import { GeneralDetails } from "./GeneralDetails";
+import { InstallUpgradeTitle } from "./InstallUpgradeTitle";
+import { VersionToInstall } from "./VersionToInstall";
 
 const DefinedValues = lazy(() => import("./DefinedValues"));
 const ManifestDiff = lazy(() => import("./ManifestDiff"));

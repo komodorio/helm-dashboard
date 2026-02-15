@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { type ReactNode, Fragment, useEffect, useRef, useState } from "react";
+
 import ArrowDownIcon from "../../assets/arrow-down-icon.svg";
 
 export type DropDownItem = {
