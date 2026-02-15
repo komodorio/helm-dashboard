@@ -4,8 +4,9 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import type { HelmRepositories } from "./interfaces";
+
 import apiService from "./apiService";
+import type { HelmRepositories } from "./interfaces";
 
 // Get list of Helm repositories
 export function useGetRepositories(

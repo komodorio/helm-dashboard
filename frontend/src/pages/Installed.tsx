@@ -1,13 +1,14 @@
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router";
+
+import { useGetInstalledReleases } from "../API/releases";
+import ClustersList from "../components/ClustersList";
 import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader";
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
-import ClustersList from "../components/ClustersList";
-import { useGetInstalledReleases } from "../API/releases";
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import Spinner from "../components/Spinner";
-import useAlertError from "../hooks/useAlertError";
-import { useParams, useNavigate } from "react-router";
-import useCustomSearchParams from "../hooks/useCustomSearchParams";
 import type { Release } from "../data/types";
+import useAlertError from "../hooks/useAlertError";
+import useCustomSearchParams from "../hooks/useCustomSearchParams";
 
 function Installed() {
   const { searchParamsObject } = useCustomSearchParams();

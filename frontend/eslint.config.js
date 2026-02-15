@@ -1,26 +1,29 @@
 import js from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-import tsEslint from "typescript-eslint";
+import tseslint from "typescript-eslint";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
-// import importPlugin from "eslint-plugin-import";
+import importPlugin from "eslint-plugin-import";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
 import tscPlugin from "eslint-plugin-tsc";
 
 export default defineConfig(
+  { ignores: ["dist", "node_modules"] },
+
   js.configs.recommended,
-  tsEslint.configs.recommendedTypeChecked,
+  tseslint.configs.recommendedTypeChecked,
   // tsEslint.configs.strictTypeChecked, // The project is not ready yet
   // tsEslint.configs.stylisticTypeChecked, // Added for better 2026 coding standards, however the project is not ready yet
-  // importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
   react.configs.flat.recommended,
   react.configs.flat["jsx-runtime"],
   reactHooks.configs.flat.recommended,
   prettierRecommended,
 
   {
-    ignores: ["dist", "node_modules"],
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -37,11 +40,14 @@ export default defineConfig(
     },
     settings: {
       react: { version: "detect" },
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+          project: "./tsconfig.json",
+        },
+      },
     },
     plugins: {
-      // import: importPlugin,
-      react,
-      "react-hooks": reactHooks,
       tsc: tscPlugin,
     },
     rules: {
@@ -50,26 +56,9 @@ export default defineConfig(
       "no-debugger": "error",
       quotes: ["error", "double"],
       semi: ["error", "always"],
-      //
-      // /* ───────── Import Precision ───────── */
-      // "import/no-unresolved": "error",
-      // "import/no-duplicates": "error",
-      // "import/newline-after-import": "error",
-      // "import/order": [
-      //   "error",
-      //   {
-      //     groups: [
-      //       "builtin",
-      //       "external",
-      //       "internal",
-      //       "parent",
-      //       "sibling",
-      //       "index",
-      //     ],
-      //     "newlines-between": "always",
-      //     alphabetize: { order: "asc", caseInsensitive: true },
-      //   },
-      // ],
+
+      /* ───────── Import Precision ───────── */
+      "import/no-duplicates": ["error", { "prefer-inline": true }],
 
       /* ───────── React Precision ───────── */
       "no-restricted-properties": [
@@ -94,7 +83,7 @@ export default defineConfig(
         "error",
         {
           prefer: "type-imports",
-          fixStyle: "separate-type-imports",
+          fixStyle: "inline-type-imports",
         },
       ],
       "@typescript-eslint/no-explicit-any": "error",
@@ -118,26 +107,29 @@ export default defineConfig(
   },
 
   /* ───────── Other Config Precision ───────── */
+  // {
+  //   files: ["src/**/*.ts", "src/**/*.tsx", "cypress/**/*.ts"],
+  //   rules: {
+  //     "tsc/config": ["error", { configFile: "./tsconfig.app.json" }],
+  //   },
+  // },
+  // {
+  //   files: ["vite.config.ts", "cypress.config.ts"],
+  //   rules: {
+  //     "tsc/config": ["error", { configFile: "./tsconfig.node.json" }],
+  //   },
+  // },
   {
-    files: ["src/**/*.ts", "src/**/*.tsx", "cypress/**/*.ts"],
-    rules: {
-      "tsc/config": ["error", { configFile: "./tsconfig.app.json" }],
+    files: ["**/*.js", "**/*.mjs"],
+    ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
   {
-    files: ["vite.config.ts", "cypress.config.ts"],
-    rules: {
-      "tsc/config": ["error", { configFile: "./tsconfig.node.json" }],
-    },
-  },
-  {
-    // Disable type-aware rules for the config file itself to prevent "unsafe" errors
     files: ["eslint.config.js"],
-    rules: {
-      "@typescript-eslint/no-unsafe-argument": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unsafe-call": "off",
-    },
+    rules: { "import/no-unresolved": "off" },
   }
 );

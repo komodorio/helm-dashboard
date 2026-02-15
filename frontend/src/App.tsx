@@ -1,18 +1,20 @@
-import Header from "./layout/Header";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { type FC, useState, lazy } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { HashRouter, Outlet, Route, Routes, useParams } from "react-router";
+
+import apiService from "./API/apiService";
+import ErrorFallback from "./components/ErrorFallback";
+import GlobalErrorModal from "./components/modal/GlobalErrorModal";
+import { AppContextProvider } from "./context/AppContext";
+import {
+  ErrorModalContext,
+  type ErrorAlert,
+} from "./context/ErrorModalContext";
+import Header from "./layout/Header";
 import Installed from "./pages/Installed";
 import RepositoryPage from "./pages/Repository";
 import Revision from "./pages/Revision";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { FC } from "react";
-import { useState, lazy } from "react";
-import type { ErrorAlert } from "./context/ErrorModalContext";
-import { ErrorModalContext } from "./context/ErrorModalContext";
-import GlobalErrorModal from "./components/modal/GlobalErrorModal";
-import { AppContextProvider } from "./context/AppContext";
-import apiService from "./API/apiService";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "./components/ErrorFallback";
 
 const DocsPage = lazy(() => import("./pages/DocsPage"));
 

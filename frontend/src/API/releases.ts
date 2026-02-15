@@ -4,11 +4,13 @@ import {
   useQuery,
   type UseQueryOptions,
 } from "@tanstack/react-query";
+
 import type { ChartVersion, Release } from "../data/types";
-import type { LatestChartVersion } from "./interfaces";
-import apiService from "./apiService";
-import { getVersionManifestFormData } from "./shared";
 import { isNewerVersion } from "../utils";
+
+import apiService from "./apiService";
+import type { LatestChartVersion } from "./interfaces";
+import { getVersionManifestFormData } from "./shared";
 
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 

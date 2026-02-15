@@ -5,6 +5,7 @@
  */
 
 import type { Meta } from "@storybook/react-vite";
+
 import TextInput from "./TextInput";
 
 const meta = {

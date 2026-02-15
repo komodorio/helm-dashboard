@@ -1,7 +1,7 @@
-import { action } from "storybook/actions";
 import type { StoryObj, StoryFn, Meta } from "@storybook/react-vite";
-import type { ModalAction } from "./Modal";
-import Modal, { ModalButtonStyle } from "./Modal";
+import { action } from "storybook/actions";
+
+import Modal, { type ModalAction, ModalButtonStyle } from "./Modal";
 
 const meta = {
   /* 👇 The title prop is optional.

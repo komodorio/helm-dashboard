@@ -1,6 +1,6 @@
-import AddRepositoryModal from "../modal/AddRepositoryModal";
 import type { Repository } from "../../data/types";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
+import AddRepositoryModal from "../modal/AddRepositoryModal";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;

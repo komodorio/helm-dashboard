@@ -1,22 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import type { Release, ReleaseHealthStatus } from "../../data/types";
 import { BsArrowUpCircleFill, BsPlusCircleFill } from "react-icons/bs";
+import { useInView } from "react-intersection-observer";
+
+import apiService from "../../API/apiService";
+import type { LatestChartVersion } from "../../API/interfaces";
+import { useGetApplicationStatus } from "../../API/other";
+import { useGetLatestVersion } from "../../API/releases";
+import HelmGrayIcon from "../../assets/helm-gray-50.svg";
+import type { Release, ReleaseHealthStatus } from "../../data/types";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import { getAge } from "../../timeUtils";
+import { isNewerVersion } from "../../utils";
 import StatusLabel, {
   DeploymentStatus,
   getStatusColor,
 } from "../common/StatusLabel";
-import { useQuery } from "@tanstack/react-query";
-import apiService from "../../API/apiService";
-import HealthStatus from "./HealthStatus";
-import HelmGrayIcon from "../../assets/helm-gray-50.svg";
 import Spinner from "../Spinner";
-import { useGetLatestVersion } from "../../API/releases";
-import { isNewerVersion } from "../../utils";
-import type { LatestChartVersion } from "../../API/interfaces";
-import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
-import { useInView } from "react-intersection-observer";
-import { useGetApplicationStatus } from "../../API/other";
+
+import HealthStatus from "./HealthStatus";
 
 type InstalledPackageCardProps = {
   release: Release;

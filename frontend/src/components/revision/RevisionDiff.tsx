@@ -1,14 +1,14 @@
-import type { ChangeEvent } from "react";
-import { useMemo, useState, useRef, useEffect } from "react";
 import { Diff2HtmlUI } from "diff2html/lib/ui/js/diff2html-ui-slim.js";
-import { useGetReleaseInfoByType } from "../../API/releases";
-import { useParams } from "react-router";
-import useCustomSearchParams from "../../hooks/useCustomSearchParams";
-import parse from "html-react-parser";
 import hljs from "highlight.js/lib/core";
 import yaml from "highlight.js/lib/languages/yaml";
-import Spinner from "../Spinner";
+import parse from "html-react-parser";
+import { type ChangeEvent, useMemo, useState, useRef, useEffect } from "react";
+import { useParams } from "react-router";
+
+import { useGetReleaseInfoByType } from "../../API/releases";
+import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { diffConfiguration } from "../../utils";
+import Spinner from "../Spinner";
 
 hljs.registerLanguage("yaml", yaml);
 
@@ -136,7 +136,7 @@ function RevisionDiff({
 
   return (
     <div>
-      <div className="mb-3 flex w-full flex-row items-center justify-between rounded-sm border border-gray-200 border-revision bg-white p-2">
+      <div className="mb-3 flex w-full flex-row items-center justify-between rounded-sm border border-revision bg-white p-2">
         <div className="flex items-center">
           <input
             checked={viewMode === "view"}

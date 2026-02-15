@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import { createPortal } from "react-dom";
+
 import Spinner from "../Spinner";
 
 export enum ModalButtonStyle {

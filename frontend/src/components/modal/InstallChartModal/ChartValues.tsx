@@ -1,6 +1,7 @@
 import hljs from "highlight.js/lib/core";
-import Spinner from "../../Spinner";
 import yaml from "highlight.js/lib/languages/yaml";
+
+import Spinner from "../../Spinner";
 
 hljs.registerLanguage("yaml", yaml);
 

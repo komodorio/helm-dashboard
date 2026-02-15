@@ -1,12 +1,12 @@
+import { compare } from "compare-versions";
+import { DateTime } from "luxon";
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
 import { useParams } from "react-router";
-import { compare } from "compare-versions";
 
 import type { ReleaseRevision } from "../../data/types";
+import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
 import { getAge } from "../../timeUtils";
 import StatusLabel from "../common/StatusLabel";
-import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
-import { DateTime } from "luxon";
 
 type RevisionsListProps = {
   releaseRevisions: ReleaseRevision[];

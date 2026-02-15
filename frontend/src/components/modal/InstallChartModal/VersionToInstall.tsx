@@ -1,8 +1,12 @@
-import type { FC } from "react";
-import { useMemo, useState } from "react";
-import type { GroupBase, SingleValueProps, OptionProps } from "react-select";
-import Select, { components } from "react-select";
+import { type FC, useMemo, useState } from "react";
 import { BsCheck2 } from "react-icons/bs";
+import Select, {
+  type GroupBase,
+  type SingleValueProps,
+  type OptionProps,
+  components,
+} from "react-select";
+
 import type { NonEmptyArray } from "../../../data/types";
 
 interface Version {

@@ -1,7 +1,8 @@
 import type { Meta } from "@storybook/react-vite";
-import { action } from "storybook/actions";
-import DropDown from "./DropDown";
 import { BsSlack, BsGithub } from "react-icons/bs";
+import { action } from "storybook/actions";
+
+import DropDown from "./DropDown";
 
 const meta = {
   /* 👇 The title prop is optional.

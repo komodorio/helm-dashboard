@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
+
 import useDebounce from "../../../hooks/useDebounce";
 
 export const GeneralDetails = ({

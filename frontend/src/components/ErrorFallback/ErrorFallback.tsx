@@ -1,6 +1,7 @@
 import type { FallbackProps } from "react-error-boundary";
-import GlobalErrorModal from "../modal/GlobalErrorModal";
+
 import { useDevLogger } from "../../hooks/useDevLogger";
+import GlobalErrorModal from "../modal/GlobalErrorModal";
 
 /**
  * Error fallback component for React Error Boundary

@@ -3,6 +3,7 @@ import {
   type DurationLikeObject,
   type DateTimeMaybeValid,
 } from "luxon";
+
 import type { ReleaseRevision } from "./data/types";
 
 export function getAge(obj1: ReleaseRevision, obj2?: ReleaseRevision) {

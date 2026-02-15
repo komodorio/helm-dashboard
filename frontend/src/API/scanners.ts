@@ -7,10 +7,13 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import type { ScanResults, ScannersList } from "./interfaces";
-// @ts-expect-error unused
-import { ScanResult } from "./interfaces";
+
 import apiService from "./apiService";
+import {
+  type ScanResult,
+  type ScanResults,
+  type ScannersList,
+} from "./interfaces";
 
 // Get list of discovered scanners
 // @ts-expect-error unused

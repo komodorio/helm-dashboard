@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import ErrorFallback from "./ErrorFallback";
 import { useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+
 import Button from "../Button";
+
+import ErrorFallback from "./ErrorFallback";
 
 const meta = {
   title: "Components/ErrorFallback",

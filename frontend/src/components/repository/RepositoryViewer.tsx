@@ -1,13 +1,15 @@
-import { BsTrash3, BsArrowRepeat } from "react-icons/bs";
-import type { Chart, Repository } from "../../data/types";
-import ChartViewer from "./ChartViewer";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import apiService from "../../API/apiService";
-import Spinner from "../Spinner";
-import { useUpdateRepo } from "../../API/repositories";
 import { useEffect, useMemo, useState } from "react";
+import { BsTrash3, BsArrowRepeat } from "react-icons/bs";
 import { useNavigate } from "react-router";
+
+import apiService from "../../API/apiService";
+import { useUpdateRepo } from "../../API/repositories";
 import { useAppContext } from "../../context/AppContext";
+import type { Chart, Repository } from "../../data/types";
+import Spinner from "../Spinner";
+
+import ChartViewer from "./ChartViewer";
 
 type RepositoryViewerProps = {
   repository: Repository | undefined;

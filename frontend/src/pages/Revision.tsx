@@ -1,10 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, Suspense, lazy } from "react";
 import { useParams } from "react-router";
-import RevisionsList from "../components/revision/RevisionsList";
-import type { ReleaseRevision } from "../data/types";
-import { useQuery } from "@tanstack/react-query";
+
 import apiService from "../API/apiService";
+import RevisionsList from "../components/revision/RevisionsList";
 import Spinner from "../components/Spinner";
+import type { ReleaseRevision } from "../data/types";
 
 const RevisionDetails = lazy(
   () => import("../components/revision/RevisionDetails")
