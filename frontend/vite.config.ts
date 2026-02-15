@@ -7,7 +7,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const port = env.VITE_SERVER_PORT || 8080;
+  const port = env.VITE_SERVER_PORT || 8081;
   return {
     plugins: [
       react({ babel: { plugins: ["babel-plugin-react-compiler"] } }), // React and "babel-plugin-react-compiler" plugins should be first
