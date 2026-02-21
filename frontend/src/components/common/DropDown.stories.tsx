@@ -5,13 +5,9 @@ import { action } from "storybook/actions";
 import DropDown from "./DropDown";
 
 const meta = {
-  /* 👇 The title prop is optional.
-   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
-   * to learn how to generate automatic titles
-   */
   title: "DropDown",
   component: DropDown,
-} as unknown as Meta<typeof DropDown>;
+} satisfies Meta<typeof DropDown>;
 
 export default meta;
 
