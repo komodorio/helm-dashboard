@@ -1,10 +1,10 @@
 import js from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-import tseslint from "typescript-eslint";
+import { configs as tseslintConf } from "typescript-eslint";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
-import importPlugin from "eslint-plugin-import";
+import { flatConfigs as importXFlatConf } from "eslint-plugin-import-x";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
 // import tscPlugin from "eslint-plugin-tsc";
 
@@ -12,11 +12,11 @@ export default defineConfig(
   { ignores: ["dist", "node_modules"] },
 
   js.configs.recommended,
-  tseslint.configs.recommendedTypeChecked,
+  tseslintConf.recommendedTypeChecked,
   // tsEslint.configs.strictTypeChecked, // The project is not ready yet
   // tsEslint.configs.stylisticTypeChecked, // Added for better 2026 coding standards, however the project is not ready yet
-  importPlugin.flatConfigs.recommended,
-  importPlugin.flatConfigs.typescript,
+  importXFlatConf.recommended,
+  importXFlatConf.typescript,
   react.configs.flat.recommended,
   react.configs.flat["jsx-runtime"],
   reactHooks.configs.flat.recommended,
@@ -38,7 +38,7 @@ export default defineConfig(
     },
     settings: {
       react: { version: "detect" },
-      "import/resolver": {
+      "import-x/resolver": {
         node: true,
         typescript: {
           alwaysTryTypes: true,
@@ -57,7 +57,7 @@ export default defineConfig(
       semi: ["error", "always"],
 
       /* ───────── Import Precision ───────── */
-      "import/no-duplicates": ["error", { "prefer-inline": true }],
+      "import-x/no-duplicates": ["error", { "prefer-inline": true }],
 
       /* ───────── React Precision ───────── */
       "no-restricted-properties": [
@@ -105,7 +105,7 @@ export default defineConfig(
   },
   {
     files: ["**/*.{js,mjs}"],
-    ...tseslint.configs.disableTypeChecked,
+    ...tseslintConf.disableTypeChecked,
     languageOptions: {
       globals: {
         ...globals.node,
@@ -114,6 +114,6 @@ export default defineConfig(
   },
   {
     files: ["eslint.config.js"],
-    rules: { "import/no-unresolved": "off" },
+    rules: { "import-x/no-unresolved": "off" },
   }
 );
