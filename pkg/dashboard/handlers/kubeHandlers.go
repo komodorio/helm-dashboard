@@ -101,9 +101,20 @@ func EnhanceStatus(res *v12.Carp, err error) *v12.CarpStatus {
 	return &s
 }
 
+func applyHealthFromCondition(c *v12.CarpCondition, cond v12.CarpCondition) {
+	if cond.Status == "False" {
+		c.Status = Unhealthy
+	} else {
+		c.Status = Healthy
+	}
+	c.Reason = cond.Reason
+	c.Message = cond.Message
+}
+
 func applyCustomConditions(s *v12.CarpStatus, c *v12.CarpCondition) {
 	for _, cond := range s.Conditions {
-		if cond.Type == "Progressing" { // https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+		switch cond.Type {
+		case "Progressing": // https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 			if cond.Status == "False" {
 				c.Status = Unhealthy
 				c.Reason = cond.Reason
@@ -113,58 +124,26 @@ func applyCustomConditions(s *v12.CarpStatus, c *v12.CarpCondition) {
 				c.Reason = cond.Reason
 				c.Message = cond.Message
 			}
-		} else if cond.Type == "Available" && c.Status == Unknown {
-			if cond.Status == "False" {
-				c.Status = Unhealthy
-			} else {
-				c.Status = Healthy
-			}
-			c.Reason = cond.Reason
-			c.Message = cond.Message
-		} else if cond.Type == "DisruptionAllowed" && c.Status == Unknown { //condition for PodDisruptionBudget
-			if cond.Status == "False" {
-				c.Status = Unhealthy
-			} else {
-				c.Status = Healthy
-			}
-			c.Reason = cond.Reason
-			c.Message = cond.Message
-		} else if (cond.Type == "Established" || cond.Type == "NamesAccepted") && (c.Status == Unknown || c.Status == Healthy) { //condition for CRD
-			if cond.Status == "False" {
-				c.Status = Unhealthy
-			} else {
-				c.Status = Healthy
-			}
-			c.Reason = cond.Reason
-			c.Message = cond.Message
-		} else if cond.Type == "Ready" && c.Status == Unknown { // condition for ExternalSecret
-			if cond.Status == "False" {
-				c.Status = Unhealthy
-			} else {
-				c.Status = Healthy
-			}
-			c.Reason = cond.Reason
-			c.Message = cond.Message
-		} else if cond.Type == "Complete" && c.Status == Unknown { // condition for Job
-			if cond.Status == "True" {
+		case "Complete": // condition for Job
+			if c.Status == Unknown && cond.Status == "True" {
 				c.Status = Healthy
 				c.Reason = cond.Reason
 				c.Message = cond.Message
 			}
-		} else if cond.Type == "Failed" && c.Status == Unknown { // condition for Job
-			if cond.Status == "True" {
+		case "Failed": // condition for Job
+			if c.Status == Unknown && cond.Status == "True" {
 				c.Status = Unhealthy
 				c.Reason = cond.Reason
 				c.Message = cond.Message
 			}
-		} else if (cond.Type == "AbleToScale" || cond.Type == "ScalingActive") && c.Status == Unknown { // condition for HorizontalPodAutoscaler
-			if cond.Status == "False" {
-				c.Status = Unhealthy
-			} else {
-				c.Status = Healthy
+		case "Available", "DisruptionAllowed", "Ready", "AbleToScale", "ScalingActive":
+			if c.Status == Unknown {
+				applyHealthFromCondition(c, cond)
 			}
-			c.Reason = cond.Reason
-			c.Message = cond.Message
+		case "Established", "NamesAccepted": // condition for CRD
+			if c.Status == Unknown || c.Status == Healthy {
+				applyHealthFromCondition(c, cond)
+			}
 		}
 	}
 }
