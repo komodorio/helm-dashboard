@@ -9,6 +9,8 @@ import {
 } from "react";
 import { useParams } from "react-router";
 
+import { BsPencil, BsX } from "react-icons/bs";
+
 import apiService from "../../../API/apiService";
 import type { LatestChartVersion } from "../../../API/interfaces";
 import {
@@ -88,13 +90,18 @@ export const InstallReleaseChartModal = ({
   const selectedVersion = selectedVersionData?.version || "";
   const selectedRepo = selectedVersionData?.repository || "";
 
-  const chartAddress = useMemo(() => {
+  const [chartURL, setChartURL] = useState("");
+  const [useURLMode, setUseURLMode] = useState(false);
+
+  const repoChartAddress = useMemo(() => {
     if (!selectedVersionData || !selectedVersionData.repository) return "";
 
     return selectedVersionData.urls?.[0]?.startsWith("file://")
       ? selectedVersionData.urls[0]
       : `${selectedVersionData.repository}/${chartName}`;
   }, [selectedVersionData, chartName]);
+
+  const chartAddress = useURLMode ? chartURL : repoChartAddress || chartURL;
 
   // the original chart values
   const { data: chartValues = "" } = useChartRepoValues({
@@ -216,13 +223,48 @@ export const InstallReleaseChartModal = ({
         },
       ]}
     >
-      {versions && isNoneEmptyArray(versions) && (
-        <VersionToInstall
-          versions={versions}
-          initialVersion={selectedVersionData}
-          onSelectVersion={setSelectedVersionData}
-          showCurrentVersion
-        />
+      {!useURLMode && versions && isNoneEmptyArray(versions) ? (
+        <div className="flex items-center gap-2">
+          <VersionToInstall
+            versions={versions}
+            initialVersion={selectedVersionData}
+            onSelectVersion={setSelectedVersionData}
+            showCurrentVersion
+          />
+          <button
+            type="button"
+            className="cursor-pointer p-1 text-gray-400 hover:text-gray-600"
+            title="Switch to URL"
+            onClick={() => setUseURLMode(true)}
+          >
+            <BsPencil className="text-lg" />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <h4 className="text-lg">Chart URL:</h4>
+            <input
+              className="w-full rounded-sm border border-1 border-gray-300 bg-white px-2 py-1 text-lg"
+              value={chartURL}
+              onChange={(e) => setChartURL(e.target.value)}
+              placeholder="oci://registry-1.docker.io/example/chart"
+            />
+          </div>
+          {versions && isNoneEmptyArray(versions) && (
+            <button
+              type="button"
+              className="cursor-pointer p-1 text-gray-400 hover:text-gray-600"
+              title="Switch to repository"
+              onClick={() => {
+                setUseURLMode(false);
+                setChartURL("");
+              }}
+            >
+              <BsX className="text-2xl" />
+            </button>
+          )}
+        </div>
       )}
 
       <GeneralDetails
