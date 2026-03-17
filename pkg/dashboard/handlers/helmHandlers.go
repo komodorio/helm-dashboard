@@ -182,6 +182,16 @@ func (h *HelmHandler) Images(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, images)
 }
 
+func (h *HelmHandler) Relations(c *gin.Context) {
+	rel := h.getRelease(c)
+	if rel == nil {
+		return
+	}
+
+	graph := objects.ExtractRelations(rel.Orig.Manifest)
+	c.IndentedJSON(http.StatusOK, graph)
+}
+
 func (h *HelmHandler) RepoVersions(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c)
 	if err != nil {

@@ -24,8 +24,12 @@
     "cypress:component:open": "cypress open --component"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^2.0.4",
     "@tanstack/react-query": "^5.90.21",
+    "@types/d3-force": "^3.0.10",
+    "@xyflow/react": "^12.10.1",
     "compare-versions": "^6.1.1",
+    "d3-force": "^3.0.0",
     "diff2html": "^3.4.52",
     "flowbite-react": "^0.12.17",
     "highlight.js": "^11.11.1",

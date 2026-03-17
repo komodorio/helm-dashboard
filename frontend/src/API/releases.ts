@@ -96,6 +96,35 @@ export function useGetImages(ns: string, name: string) {
   });
 }
 
+export interface RelationNode {
+  id: string;
+  kind: string;
+  name: string;
+  inRelease: boolean;
+}
+
+export interface RelationEdge {
+  source: string;
+  target: string;
+  type: string;
+}
+
+export interface RelationGraph {
+  nodes: RelationNode[];
+  edges: RelationEdge[];
+}
+
+export function useGetRelations(ns: string, name: string) {
+  return useQuery<RelationGraph>({
+    queryKey: ["relations", ns, name],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<RelationGraph>({
+        url: `/api/helm/releases/${ns}/${name}/relations`,
+        fallback: { nodes: [], edges: [] },
+      }),
+  });
+}
+
 // List of installed k8s resources for this release
 export function useGetResources(ns: string, name: string, enabled?: boolean) {
   return useQuery<StructuredResources[]>({

@@ -31,6 +31,7 @@ import Spinner from "../Spinner";
 import Tabs from "../Tabs";
 import RevisionDiff from "./RevisionDiff";
 import RevisionImages from "./RevisionImages";
+import RevisionRelations from "./RevisionRelations";
 import RevisionResource from "./RevisionResource";
 
 type RevisionTagProps = {
@@ -83,6 +84,11 @@ const RevisionDetails = ({
       value: "images",
       label: "Images",
       content: <RevisionImages />,
+    },
+    {
+      value: "relations",
+      label: "Relations",
+      content: <RevisionRelations />,
     },
   ];
   const { context, namespace, chart } = useParams();
