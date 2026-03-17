@@ -1,6 +1,7 @@
 import type { Repository } from "../../data/types";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
+import { InstallURLChartModal } from "../modal/InstallChartModal/InstallURLChartModal";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
@@ -21,6 +22,14 @@ function RepositoriesList({
       upsertSearchParams("add_repo", "true");
     } else {
       removeSearchParam("add_repo");
+    }
+  };
+  const showInstallURLModal = searchParamsObject["install_url"] === "true";
+  const setShowInstallURLModal = (value: boolean) => {
+    if (value) {
+      upsertSearchParams("install_url", "true");
+    } else {
+      removeSearchParam("install_url");
     }
   };
 
@@ -61,6 +70,14 @@ function RepositoriesList({
         >
           + Add Repository
         </button>
+        <button
+          data-cy="install-url-button"
+          type="button"
+          className="flex h-8 w-fit cursor-pointer items-center gap-2 rounded-sm border border-gray-300 px-3 py-1 text-sm font-semibold text-muted"
+          onClick={() => setShowInstallURLModal(true)}
+        >
+          Install from URL
+        </button>
         <p className="text-xs">
           Charts developers: you can also add local directories as chart source.
           Use{" "}
@@ -71,6 +88,10 @@ function RepositoriesList({
       <AddRepositoryModal
         isOpen={showAddRepositoryModal}
         onClose={() => setShowAddRepositoryModal(false)}
+      />
+      <InstallURLChartModal
+        isOpen={showInstallURLModal}
+        onClose={() => setShowInstallURLModal(false)}
       />
     </>
   );
