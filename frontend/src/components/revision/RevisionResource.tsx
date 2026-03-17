@@ -150,11 +150,11 @@ const DescribeResource = ({
   } = resource;
 
   const { status, reason = "" } = conditions?.[0] || {};
-  const { namespace = "", chart = "" } = useParams();
+  const { namespace = "" } = useParams();
   const { data, isLoading } = useGetResourceDescription(
     resource.kind,
     namespace,
-    chart
+    name
   );
 
   const yamlFormattedData = useMemo(
