@@ -86,7 +86,7 @@ func EnhanceStatus(res *v12.Carp, err error) *v12.CarpStatus {
 		c.Reason = "Exists" //since there is no condition to check here, we can set reason as exists.
 	} else if s.Phase == "" && len(s.Conditions) > 0 {
 		applyCustomConditions(&s, &c)
-	} else if s.Phase == "Pending" {
+	} else if s.Phase == "Pending" || s.Phase == "Terminating" {
 		c.Status = Progressing
 		c.Reason = string(s.Phase)
 	} else if s.Phase == "" {
@@ -130,6 +130,34 @@ func applyCustomConditions(s *v12.CarpStatus, c *v12.CarpCondition) {
 			c.Reason = cond.Reason
 			c.Message = cond.Message
 		} else if (cond.Type == "Established" || cond.Type == "NamesAccepted") && (c.Status == Unknown || c.Status == Healthy) { //condition for CRD
+			if cond.Status == "False" {
+				c.Status = Unhealthy
+			} else {
+				c.Status = Healthy
+			}
+			c.Reason = cond.Reason
+			c.Message = cond.Message
+		} else if cond.Type == "Ready" && c.Status == Unknown { // condition for ExternalSecret
+			if cond.Status == "False" {
+				c.Status = Unhealthy
+			} else {
+				c.Status = Healthy
+			}
+			c.Reason = cond.Reason
+			c.Message = cond.Message
+		} else if cond.Type == "Complete" && c.Status == Unknown { // condition for Job
+			if cond.Status == "True" {
+				c.Status = Healthy
+				c.Reason = cond.Reason
+				c.Message = cond.Message
+			}
+		} else if cond.Type == "Failed" && c.Status == Unknown { // condition for Job
+			if cond.Status == "True" {
+				c.Status = Unhealthy
+				c.Reason = cond.Reason
+				c.Message = cond.Message
+			}
+		} else if (cond.Type == "AbleToScale" || cond.Type == "ScalingActive") && c.Status == Unknown { // condition for HorizontalPodAutoscaler
 			if cond.Status == "False" {
 				c.Status = Unhealthy
 			} else {
