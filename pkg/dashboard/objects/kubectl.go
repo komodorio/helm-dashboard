@@ -3,7 +3,9 @@ package objects
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
@@ -158,11 +160,16 @@ func (k *K8s) GetResourceInfo(kind string, namespace string, name string) (*test
 		return nil, errorx.Decorate(err, "failed to marshal k8s object into JSON")
 	}
 
-	res := new(testapiv1.Carp)
-	err = json.Unmarshal(data, &res)
+	ext := new(extendedCarp)
+	err = json.Unmarshal(data, &ext)
 	if err != nil {
 		return nil, errorx.Decorate(err, "failed to decode k8s object from JSON")
 	}
+
+	synthesizeConditions(kind, ext)
+
+	res := &ext.Carp
+	res.Status = ext.Status.CarpStatus
 
 	sort.Slice(res.Status.Conditions, func(i, j int) bool {
 		// some condition types always bubble up
@@ -180,6 +187,65 @@ func (k *K8s) GetResourceInfo(kind string, namespace string, name string) (*test
 	})
 
 	return res, nil
+}
+
+// extendedCarp extends Carp to capture numeric status fields from DaemonSet/StatefulSet
+// that are lost during standard Carp unmarshaling.
+type extendedCarp struct {
+	testapiv1.Carp
+	Status extendedCarpStatus `json:"status,omitempty"`
+}
+
+type extendedCarpStatus struct {
+	testapiv1.CarpStatus
+	// DaemonSet fields
+	DesiredNumberScheduled int `json:"desiredNumberScheduled,omitempty"`
+	NumberReady            int `json:"numberReady,omitempty"`
+	UpdatedNumberScheduled int `json:"updatedNumberScheduled,omitempty"`
+	// StatefulSet fields
+	Replicas        int `json:"replicas,omitempty"`
+	ReadyReplicas   int `json:"readyReplicas,omitempty"`
+	UpdatedReplicas int `json:"updatedReplicas,omitempty"`
+}
+
+// synthesizeConditions creates synthetic conditions for resource kinds that use
+// numeric status fields instead of conditions (DaemonSet, StatefulSet).
+func synthesizeConditions(kind string, ext *extendedCarp) {
+	kind = strings.ToLower(kind)
+
+	var desired, ready, updated int
+	switch kind {
+	case "daemonset":
+		desired = ext.Status.DesiredNumberScheduled
+		ready = ext.Status.NumberReady
+		updated = ext.Status.UpdatedNumberScheduled
+	case "statefulset":
+		desired = ext.Status.Replicas
+		ready = ext.Status.ReadyReplicas
+		updated = ext.Status.UpdatedReplicas
+	default:
+		return
+	}
+
+	status := testapiv1.ConditionStatus("True")
+	reason := "AllReady"
+	message := fmt.Sprintf("%d/%d ready", ready, desired)
+
+	if ready < desired {
+		status = "False"
+		reason = "NotAllReady"
+	} else if updated < desired {
+		status = "False"
+		reason = "UpdateInProgress"
+		message = fmt.Sprintf("%d/%d updated", updated, desired)
+	}
+
+	ext.Status.Conditions = append(ext.Status.Conditions, testapiv1.CarpCondition{
+		Type:    "Available",
+		Status:  status,
+		Reason:  reason,
+		Message: message,
+	})
 }
 
 func (k *K8s) GetResourceYAML(kind string, namespace string, name string) (string, error) {
