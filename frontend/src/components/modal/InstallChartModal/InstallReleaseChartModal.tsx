@@ -47,6 +47,7 @@ export const InstallReleaseChartModal = ({
   const navigate = useNavigateWithSearchParams();
   const [userValues, setUserValues] = useState<string>("");
   const [installError, setInstallError] = useState("");
+  const [forceUpgrade, setForceUpgrade] = useState(false);
 
   const {
     namespace: queryNamespace,
@@ -62,6 +63,7 @@ export const InstallReleaseChartModal = ({
     error: versionsError,
     data: _versions = [],
     isSuccess,
+    isLoading: isLoadingVersions,
   } = useGetVersions(chartName);
 
   const [selectedVersionData, setSelectedVersionData] = useState<VersionData>();
@@ -166,6 +168,9 @@ export const InstallReleaseChartModal = ({
       }
       formData.append("version", selectedVersion || "");
       formData.append("values", userValues || releaseValues || ""); // if userValues is empty, we use the release values
+      if (forceUpgrade) {
+        formData.append("force", "true");
+      }
       const url = `/api/helm/releases/${
         namespace ? namespace : "default"
       }/${releaseName}`;
@@ -210,6 +215,18 @@ export const InstallReleaseChartModal = ({
         />
       }
       containerClassNames="w-full text-2xl h-2/3"
+      bottomContent={
+        isUpgrade ? (
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={forceUpgrade}
+              onChange={(e) => setForceUpgrade(e.target.checked)}
+            />
+            Force upgrade
+          </label>
+        ) : undefined
+      }
       actions={[
         {
           id: "1",
@@ -223,7 +240,9 @@ export const InstallReleaseChartModal = ({
         },
       ]}
     >
-      {!useURLMode && versions && isNoneEmptyArray(versions) ? (
+      {isLoadingVersions ? (
+        <Spinner />
+      ) : !useURLMode && versions && isNoneEmptyArray(versions) ? (
         <div className="flex items-center gap-2">
           <VersionToInstall
             versions={versions}

@@ -389,7 +389,8 @@ func (h *HelmHandler) Upgrade(c *gin.Context) {
 	}
 
 	justTemplate := c.PostForm("preview") == "true"
-	rel, err := existing.Upgrade(repoChart, c.PostForm("version"), justTemplate, values)
+	force := c.PostForm("force") == "true"
+	rel, err := existing.Upgrade(repoChart, c.PostForm("version"), justTemplate, force, values)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

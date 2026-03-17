@@ -122,10 +122,9 @@ const Modal = ({
               <div className="max-h-[calc(100vh_-_200px)] gap-6 overflow-y-auto p-4">
                 {children}
               </div>
-              {bottomContent ? (
-                <div className="p-5 text-sm">{bottomContent}</div>
-              ) : (
-                <div className="flex justify-end gap-2 rounded-b border-t border-gray-200 p-6">
+              <div className="flex items-center justify-between rounded-b border-t border-gray-200 p-6">
+                <div>{bottomContent}</div>
+                <div className="flex gap-2">
                   {actions?.map((action) => (
                     <button
                       key={action.id}
@@ -145,7 +144,7 @@ const Modal = ({
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
