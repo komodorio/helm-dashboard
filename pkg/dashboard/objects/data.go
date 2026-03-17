@@ -139,6 +139,82 @@ func ParseManifests(out string) ([]*v1.Carp, error) {
 	return res, nil
 }
 
+// ContainerImage represents a container image found in a release manifest.
+type ContainerImage struct {
+	Resource string `json:"resource"`
+	Kind     string `json:"kind"`
+	Container string `json:"container"`
+	Image    string `json:"image"`
+}
+
+// ExtractImages parses a manifest and returns all container images found.
+func ExtractImages(manifest string) []ContainerImage {
+	dec := yaml.NewYAMLOrJSONDecoder(strings.NewReader(manifest), 4096)
+	var images []ContainerImage
+	for {
+		var tmp map[string]interface{}
+		if err := dec.Decode(&tmp); err != nil {
+			break
+		}
+		kind, _ := tmp["kind"].(string)
+		metadata, _ := tmp["metadata"].(map[string]interface{})
+		name, _ := metadata["name"].(string)
+
+		for _, podSpec := range findPodSpecs(kind, tmp) {
+			containers, _ := podSpec["containers"].([]interface{})
+			images = extractFromContainers(images, kind, name, containers)
+			initContainers, _ := podSpec["initContainers"].([]interface{})
+			images = extractFromContainers(images, kind, name, initContainers)
+		}
+	}
+	return images
+}
+
+func extractFromContainers(images []ContainerImage, kind, resource string, containers []interface{}) []ContainerImage {
+	for _, c := range containers {
+		cMap, ok := c.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		img, _ := cMap["image"].(string)
+		cName, _ := cMap["name"].(string)
+		if img != "" {
+			images = append(images, ContainerImage{
+				Resource:  resource,
+				Kind:      kind,
+				Container: cName,
+				Image:     img,
+			})
+		}
+	}
+	return images
+}
+
+// findPodSpecs returns the pod spec(s) from a resource, depending on kind.
+func findPodSpecs(kind string, obj map[string]interface{}) []map[string]interface{} {
+	spec, _ := obj["spec"].(map[string]interface{})
+	if spec == nil {
+		return nil
+	}
+	switch kind {
+	case "Pod":
+		return []map[string]interface{}{spec}
+	case "Deployment", "StatefulSet", "DaemonSet", "ReplicaSet", "Job":
+		tpl, _ := spec["template"].(map[string]interface{})
+		if ps, ok := tpl["spec"].(map[string]interface{}); ok {
+			return []map[string]interface{}{ps}
+		}
+	case "CronJob":
+		jobTpl, _ := spec["jobTemplate"].(map[string]interface{})
+		jobSpec, _ := jobTpl["spec"].(map[string]interface{})
+		tpl, _ := jobSpec["template"].(map[string]interface{})
+		if ps, ok := tpl["spec"].(map[string]interface{}); ok {
+			return []map[string]interface{}{ps}
+		}
+	}
+	return nil
+}
+
 func (d *DataLayer) SetContext(ctx string) error {
 	if d.KubeContext != ctx {
 		err := d.Cache.Clear()

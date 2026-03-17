@@ -30,6 +30,7 @@ import Modal, { ModalButtonStyle } from "../modal/Modal";
 import Spinner from "../Spinner";
 import Tabs from "../Tabs";
 import RevisionDiff from "./RevisionDiff";
+import RevisionImages from "./RevisionImages";
 import RevisionResource from "./RevisionResource";
 
 type RevisionTagProps = {
@@ -77,6 +78,11 @@ const RevisionDetails = ({
       value: "notes",
       label: "Notes",
       content: <RevisionDiff latestRevision={latestRevision} />,
+    },
+    {
+      value: "images",
+      label: "Images",
+      content: <RevisionImages />,
     },
   ];
   const { context, namespace, chart } = useParams();

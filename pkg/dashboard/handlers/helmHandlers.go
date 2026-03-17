@@ -172,6 +172,16 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
+func (h *HelmHandler) Images(c *gin.Context) {
+	rel := h.getRelease(c)
+	if rel == nil {
+		return
+	}
+
+	images := objects.ExtractImages(rel.Orig.Manifest)
+	c.IndentedJSON(http.StatusOK, images)
+}
+
 func (h *HelmHandler) RepoVersions(c *gin.Context) {
 	qp, err := utils.GetQueryProps(c)
 	if err != nil {

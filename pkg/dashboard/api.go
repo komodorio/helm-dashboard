@@ -162,6 +162,7 @@ func configureHelms(api *gin.RouterGroup, data *objects.DataLayer) {
 	rels.GET(":ns/:name/history", h.History)
 	rels.GET(":ns/:name/:section", h.GetInfoSection)
 	rels.GET(":ns/:name/resources", h.Resources)
+	rels.GET(":ns/:name/images", h.Images)
 	rels.POST(":ns/:name/rollback", h.Rollback)
 	rels.POST(":ns/:name/test", h.RunTests)
 

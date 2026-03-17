@@ -78,6 +78,24 @@ export function useGetReleaseManifest({
   });
 }
 
+export interface ContainerImage {
+  resource: string;
+  kind: string;
+  container: string;
+  image: string;
+}
+
+export function useGetImages(ns: string, name: string) {
+  return useQuery<ContainerImage[]>({
+    queryKey: ["images", ns, name],
+    queryFn: () =>
+      apiService.fetchWithSafeDefaults<ContainerImage[]>({
+        url: `/api/helm/releases/${ns}/${name}/images`,
+        fallback: [],
+      }),
+  });
+}
+
 // List of installed k8s resources for this release
 export function useGetResources(ns: string, name: string, enabled?: boolean) {
   return useQuery<StructuredResources[]>({
