@@ -117,13 +117,18 @@ export function useGetResourceDescription(
   type: string,
   ns: string,
   name: string,
+  apiVersion?: string,
   options?: UseQueryOptions<string>
 ) {
+  const params = new URLSearchParams({ name, namespace: ns });
+  if (apiVersion) {
+    params.set("apiVersion", apiVersion);
+  }
   return useQuery<string>({
-    queryKey: ["describe", type, ns, name],
+    queryKey: ["describe", type, ns, name, apiVersion],
     queryFn: () =>
       apiService.fetchWithDefaults<string>(
-        `/api/k8s/${type}/describe?name=${name}&namespace=${ns}`,
+        `/api/k8s/${type}/describe?${params.toString()}`,
         {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }

@@ -102,8 +102,9 @@ func RunCommand(cmd []string, env map[string]string) (string, error) {
 }
 
 type QueryProps struct {
-	Namespace string
-	Name      string
+	Namespace  string
+	Name       string
+	APIVersion string
 }
 
 func GetQueryProps(c *gin.Context) (*QueryProps, error) {
@@ -111,11 +112,30 @@ func GetQueryProps(c *gin.Context) (*QueryProps, error) {
 
 	qp.Namespace = c.Query("namespace")
 	qp.Name = c.Query("name")
+	qp.APIVersion = c.Query("apiVersion")
 	if qp.Name == "" {
 		return nil, errors.New("missing required query string parameter: name")
 	}
 
 	return &qp, nil
+}
+
+// QualifiedKind returns a group-qualified kind (e.g. "Widget.new.example.com")
+// when apiVersion contains a group, allowing kubectl to disambiguate CRDs
+// that share the same kind across different API groups.
+func QualifiedKind(kind string, apiVersion string) string {
+	if apiVersion == "" {
+		return kind
+	}
+	group := apiVersion
+	if idx := strings.Index(apiVersion, "/"); idx >= 0 {
+		group = apiVersion[:idx]
+	}
+	// Core API group (e.g. "v1") has no group prefix
+	if !strings.Contains(group, ".") {
+		return kind
+	}
+	return kind + "." + group
 }
 
 func EnvAsBool(envKey string, envDef bool) bool {

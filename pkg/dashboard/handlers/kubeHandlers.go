@@ -47,7 +47,8 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 		return // sets error inside
 	}
 
-	res, err := app.K8s.GetResourceInfo(c.Param("kind"), qp.Namespace, qp.Name)
+	kind := utils.QualifiedKind(c.Param("kind"), qp.APIVersion)
+	res, err := app.K8s.GetResourceInfo(kind, qp.Namespace, qp.Name)
 	if errors.IsNotFound(err) {
 		res = &v12.Carp{Status: v12.CarpStatus{Phase: "NotFound", Message: err.Error()}}
 		//_ = c.AbortWithError(http.StatusNotFound, err)
@@ -160,7 +161,8 @@ func (h *KubeHandler) Describe(c *gin.Context) {
 		return // sets error inside
 	}
 
-	res, err := app.K8s.DescribeResource(c.Param("kind"), qp.Namespace, qp.Name)
+	kind := utils.QualifiedKind(c.Param("kind"), qp.APIVersion)
+	res, err := app.K8s.DescribeResource(kind, qp.Namespace, qp.Name)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

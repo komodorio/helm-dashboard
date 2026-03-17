@@ -154,7 +154,8 @@ const DescribeResource = ({
   const { data, isLoading } = useGetResourceDescription(
     resource.kind,
     namespace,
-    name
+    name,
+    resource.apiVersion
   );
 
   const yamlFormattedData = useMemo(

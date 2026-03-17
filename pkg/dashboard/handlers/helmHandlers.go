@@ -159,7 +159,8 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 			if ns == "" {
 				ns = c.Param("ns")
 			}
-			info, err := app.K8s.GetResourceInfo(obj.Kind, ns, obj.Name)
+			kind := utils.QualifiedKind(obj.Kind, obj.APIVersion)
+			info, err := app.K8s.GetResourceInfo(kind, ns, obj.Name)
 			if err != nil {
 				log.Warnf("Failed to get resource info for %s %s/%s: %+v", obj.Name, ns, obj.Name, err)
 				info = &v1.Carp{}

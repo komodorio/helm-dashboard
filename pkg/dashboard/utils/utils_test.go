@@ -108,6 +108,30 @@ func TestChartAndVersion(t *testing.T) {
 	}
 }
 
+func TestQualifiedKind(t *testing.T) {
+	tests := []struct {
+		kind       string
+		apiVersion string
+		want       string
+	}{
+		{"Widget", "new.example.com/v1alpha1", "Widget.new.example.com"},
+		{"Widget", "old.example.com/v1alpha1", "Widget.old.example.com"},
+		{"Deployment", "apps/v1", "Deployment"},
+		{"ConfigMap", "v1", "ConfigMap"},
+		{"ConfigMap", "", "ConfigMap"},
+		{"Middleware", "traefik.io/v1alpha1", "Middleware.traefik.io"},
+		{"Middleware", "traefik.containo.us/v1alpha1", "Middleware.traefik.containo.us"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.kind+"/"+tt.apiVersion, func(t *testing.T) {
+			got := QualifiedKind(tt.kind, tt.apiVersion)
+			if got != tt.want {
+				t.Errorf("QualifiedKind(%q, %q) = %q, want %q", tt.kind, tt.apiVersion, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestEnvAsBool(t *testing.T) {
 	// value: "true" | "1", default: false -> expect true
 	t.Setenv("TEST", "true")
