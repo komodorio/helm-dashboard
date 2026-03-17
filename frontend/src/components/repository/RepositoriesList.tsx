@@ -1,7 +1,7 @@
 import type { Repository } from "../../data/types";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import AddRepositoryModal from "../modal/AddRepositoryModal";
-import { InstallURLChartModal } from "../modal/InstallChartModal/InstallURLChartModal";
+import { InstallRepoChartModal } from "../modal/InstallChartModal/InstallRepoChartModal";
 
 type RepositoriesListProps = {
   selectedRepository: Repository | undefined;
@@ -89,9 +89,11 @@ function RepositoriesList({
         isOpen={showAddRepositoryModal}
         onClose={() => setShowAddRepositoryModal(false)}
       />
-      <InstallURLChartModal
+      <InstallRepoChartModal
         isOpen={showInstallURLModal}
         onClose={() => setShowInstallURLModal(false)}
+        chartName=""
+        urlMode
       />
     </>
   );
