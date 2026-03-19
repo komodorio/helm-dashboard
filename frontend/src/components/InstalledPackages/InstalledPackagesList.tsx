@@ -12,11 +12,10 @@ export default function InstalledPackagesList({
   return (
     <div>
       {filteredReleases.map((installedPackage: Release) => {
+        const releaseKey = `${installedPackage.namespace}/${installedPackage.name}`;
+
         return (
-          <InstalledPackageCard
-            key={installedPackage.name}
-            release={installedPackage}
-          />
+          <InstalledPackageCard key={releaseKey} release={installedPackage} />
         );
       })}
     </div>
