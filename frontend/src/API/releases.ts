@@ -65,15 +65,14 @@ export function useGetReleaseManifest({
 }: {
   namespace: string;
   chartName: string;
-  options?: UseQueryOptions<ReleaseManifest[]>;
+  options?: UseQueryOptions<string>;
 }) {
-  return useQuery<ReleaseManifest[]>({
+  return useQuery<string>({
     queryKey: ["manifest", namespace, chartName],
     queryFn: () =>
-      apiService.fetchWithSafeDefaults<ReleaseManifest[]>({
-        url: `/api/helm/releases/${namespace}/${chartName}/manifests`,
-        fallback: [],
-      }),
+      apiService.fetchWithDefaults<string>(
+        `/api/helm/releases/${namespace}/${chartName}/manifests`
+      ),
     ...(options ?? {}),
   });
 }

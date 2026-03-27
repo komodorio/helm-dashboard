@@ -143,7 +143,7 @@ export const InstallReleaseChartModal = ({
   } = useDiffData({
     selectedRepo,
     versionsError: versionsError as unknown as string, // TODO fix it
-    currentVerManifest: currentVerManifest as unknown as string, // TODO fix it
+    currentVerManifest: currentVerManifest ?? "",
     selectedVerData,
     chart: chartAddress,
   });
