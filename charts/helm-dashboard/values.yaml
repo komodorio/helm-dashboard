@@ -125,6 +125,8 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
 
+priorityClassName: ""
+
 nodeSelector: {}
 
 extraArgs:
