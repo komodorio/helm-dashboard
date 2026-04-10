@@ -23,6 +23,9 @@ spec:
     spec:
       {{- include "helm-dashboard.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "helm-dashboard.serviceAccountName" . }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . | quote }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
