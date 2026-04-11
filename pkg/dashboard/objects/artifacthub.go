@@ -41,7 +41,7 @@ func QueryArtifactHub(chartName string) ([]*ArtifactHubResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 
 	if res.StatusCode != 200 {
 		return nil, fmt.Errorf("failed to fetch %s : %s", p.String(), res.Status)

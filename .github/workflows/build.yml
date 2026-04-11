@@ -36,7 +36,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "1.25"
       - name: Unit tests
         run: |
           go test -v -race ./... -covermode=atomic -coverprofile=coverage.out # Run all the tests with the race detector enabled
@@ -110,13 +110,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "1.25"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v7
         with:
-          # version: latest
-          skip-pkg-cache: true
-          skip-build-cache: true
           args: --timeout=5m
 
       - name: Setup Node.js environment

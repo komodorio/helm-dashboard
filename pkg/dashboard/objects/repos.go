@@ -213,7 +213,7 @@ func (r *Repositories) GetChartValues(chart string, ver string) (string, error) 
 	client := action.NewShowWithConfig(action.ShowValues, r.HelmConfig)
 	client.Version = ver
 
-	cp, err := client.ChartPathOptions.LocateChart(chart, r.Settings)
+	cp, err := client.LocateChart(chart, r.Settings)
 	if err != nil {
 		return "", err
 	}

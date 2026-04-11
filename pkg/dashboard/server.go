@@ -129,7 +129,7 @@ func (s *Server) itIsUs() bool {
 		log.Debugf("It's not us on %s: %s", s.Address, err)
 		return false
 	}
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	return strings.HasPrefix(r.Header.Get("X-Application-Name"), "Helm Dashboard")
 }
@@ -146,7 +146,7 @@ func checkUpgrade(d *objects.StatusInfo) { // TODO: check it once an hour
 		log.Warnf("Failed to check for new version: %s", err)
 		return
 	}
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	target := new(GHRelease)
 	err = json.NewDecoder(r.Body).Decode(target)
