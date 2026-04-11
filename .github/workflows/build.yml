@@ -112,11 +112,8 @@ jobs:
         with:
           go-version: "1.25"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v7
         with:
-          # version: latest
-          skip-pkg-cache: true
-          skip-build-cache: true
           args: --timeout=5m
 
       - name: Setup Node.js environment
