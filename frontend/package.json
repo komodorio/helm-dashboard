@@ -44,7 +44,7 @@
     "react-router": "^7.13.0",
     "react-select": "^5.10.2",
     "swagger-ui-react": "^5.31.2",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
