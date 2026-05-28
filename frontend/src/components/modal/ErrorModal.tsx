@@ -42,7 +42,7 @@ export default function ErrorModal({
           target="_blank"
           rel="noreferrer"
         >
-          <span className="text-link-color underline">Sign up for free.</span>
+          <span className="text-link-color underline">Sign up.</span>
         </a>
       </span>
     </div>

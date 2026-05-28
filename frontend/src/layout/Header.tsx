@@ -154,7 +154,7 @@ export default function Header() {
               rel="noopener noreferrer"
             >
               <div className="flex min-w-[25%] items-center gap-2 font-bold">
-                Upgrade your HELM experience - Free
+                Upgrade your HELM experience
                 <BsBoxArrowUpRight className="h-[14px] w-[14px]" />
               </div>
             </a>

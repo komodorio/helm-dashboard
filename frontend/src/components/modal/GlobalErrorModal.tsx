@@ -48,7 +48,7 @@ export default function GlobalErrorModal({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Sign up for free.
+            Sign up.
           </a>
         </div>
       }
