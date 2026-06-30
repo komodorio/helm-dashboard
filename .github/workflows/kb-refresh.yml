@@ -1,0 +1,81 @@
+name: KB refresh (helm-dashboard)
+
+# TWICE-DAILY batched refresh of this repo's knowledge-base record. Mirrors the mono
+# kb-refresh pattern, adapted for a single repo: on a schedule we diff
+# `kb-refresh-last..HEAD` — `kb-refresh-last` is a lightweight marker tag this workflow
+# moves to HEAD after each successful run — and if anything changed in that window we
+# trigger the KB Buildkite pipeline with CHANGED=helm-dashboard so the `repos/helm-dashboard` KB
+# record regenerates (deterministic + AI). The KB repo is updated; this repo is never
+# modified (only its lightweight marker tag is moved). No-change runs are skipped to
+# save tokens. The KB pipeline's nightly full rebuild is the backstop.
+
+on:
+  schedule:
+    - cron: '0 11,20 * * *'   # 11:00 & 20:00 UTC — batches all merges since the previous run
+  workflow_dispatch:
+
+permissions:
+  contents: write            # to move the kb-refresh-last marker tag
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history + tags to diff since last run)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes since last run
+        id: detect
+        run: |
+          MARKER="kb-refresh-last"
+          # Diff from the marker tag set by the previous successful run to HEAD.
+          # First run / missing tag -> fall back to the last 24h of history (the KB
+          # pipeline's nightly full rebuild is the backstop for anything this misses).
+          if git rev-parse -q --verify "refs/tags/${MARKER}" >/dev/null; then
+            BASE=$(git rev-list -n1 "refs/tags/${MARKER}")
+          else
+            BASE=$(git rev-list -n1 --before="24 hours ago" "$GITHUB_SHA" || true)
+          fi
+          [ -z "$BASE" ] && BASE="${GITHUB_SHA}^"
+          echo "Diff base: $BASE"
+          # Single-repo: any non-empty diff in the window -> refresh this repo's record.
+          if [ -n "$(git diff --name-only "$BASE" "$GITHUB_SHA")" ]; then
+            echo "changed=helm-dashboard" >> "$GITHUB_OUTPUT"
+            echo "Changes detected since last run -> refreshing helm-dashboard."
+          else
+            echo "changed=" >> "$GITHUB_OUTPUT"
+            echo "No changes since last run -> nothing to refresh."
+          fi
+
+      - name: Trigger knowledge-base pipeline (targeted refresh)
+        if: steps.detect.outputs.changed != ''
+        env:
+          BUILDKITE_API_TOKEN: ${{ secrets.BUILDKITE_API_TOKEN }}
+          BK_ORG: komodor               # Buildkite org slug (NOT the GitHub org "komodorio")
+          BK_PIPELINE: knowledge-base
+          CHANGED: ${{ steps.detect.outputs.changed }}
+        run: |
+          if [ -z "$BUILDKITE_API_TOKEN" ]; then echo "BUILDKITE_API_TOKEN not set — skipping."; exit 0; fi
+          payload=$(printf '{"commit":"HEAD","branch":"master","message":"KB refresh — %s","env":{"CHANGED":"%s"}}' "$CHANGED" "$CHANGED")
+          resp=$(curl -sS -w $'\n%{http_code}' -X POST \
+            "https://api.buildkite.com/v2/organizations/${BK_ORG}/pipelines/${BK_PIPELINE}/builds" \
+            -H "Authorization: Bearer ${BUILDKITE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$payload")
+          code=${resp##*$'\n'}; body=${resp%$'\n'*}
+          echo "$body"
+          if [ "$code" -ge 200 ] && [ "$code" -lt 300 ]; then
+            echo "Triggered KB refresh for: ${CHANGED} [HTTP $code]."
+          else
+            echo "::error::Buildkite trigger failed (HTTP $code): $body"; exit 1
+          fi
+
+      - name: Advance the kb-refresh-last marker
+        run: |
+          # Reached when the trigger succeeded or there was nothing to refresh (a failed
+          # trigger exits non-zero above and skips this, so the window is retried next
+          # run). Move the marker forward; pushing a lightweight tag — never the branch.
+          git tag -f kb-refresh-last "$GITHUB_SHA"
+          git push -f origin refs/tags/kb-refresh-last
