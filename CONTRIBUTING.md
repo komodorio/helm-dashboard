@@ -23,10 +23,11 @@ Add a comment on the issue and wait for the issue to be assigned before you star
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
 
 1. Fork the repo and create your branch from `main`.
-2. If you've added code that should be tested, add tests.
-3. Ensure the test suite passes.
-4. Make sure your code lints.
-5. Issue that pull request!
+2. Ensure local prerequisites are installed (Go 1.20+, Node.js 18+, and Helm 3.4+).
+3. If you've added code that should be tested, add unit or integration tests (`go test ./...` / `npm run lint`).
+4. Ensure the test suite passes (`make test`).
+5. Make sure your code lints properly.
+6. Issue that pull request!
 
 ## Any contributions you make will be under the Apache License 2.0
 
