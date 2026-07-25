@@ -80,7 +80,9 @@ This can also be specified using flag `--bind <host>`, for example `--bind=0.0.0
 
 > Precedence order: flag `--bind=<host>` > env `HD_BIND=<host>` > default value `localhost`
 
-If your port 8080 is busy, you can specify a different port to use via `--port <number>` command-line flag.
+If your port 8080 is busy, you can specify a different port via `--port <number>` flag or set `HD_PORT=<number>` environment variable.
+
+> Precedence order: flag `--port=<port>` > env `HD_PORT=<port>` > default value `8080`
 
 If you need to limit the operations to a specific namespace, please use `--namespace=...` in your command-line. You can specify multiple namespaces, separated by commas.
 
