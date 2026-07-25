@@ -2885,9 +2885,9 @@ cookie@^1.0.1:
   resolved "https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz"
   integrity sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==
 
-copy-to-clipboard@^3.3.1:
+copy-to-clipboard@^3.3.3:
   version "3.3.3"
-  resolved "https://registry.npmjs.org/copy-to-clipboard/-/copy-to-clipboard-3.3.3.tgz"
+  resolved "https://registry.yarnpkg.com/copy-to-clipboard/-/copy-to-clipboard-3.3.3.tgz#55ac43a1db8ae639a4bd99511c148cdd1b83a1b0"
   integrity sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==
   dependencies:
     toggle-selection "^1.0.6"
@@ -3260,7 +3260,7 @@ domhandler@5.0.3, domhandler@^5.0.2, domhandler@^5.0.3:
   dependencies:
     domelementtype "^2.3.0"
 
-dompurify@^3.3.2, dompurify@^3.4.11:
+dompurify@^3.3.2, dompurify@^3.4.12:
   version "3.4.11"
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.11.tgz#29c8ba496475f279ef4015784068452fb14a0680"
   integrity sha512-zhlUV12GsaRzMsf9q5M254YhA4+VuF0fG+QFqu6aYpoGlKtz+w8//jBcGVYBgQkR5GHjUomejY84AV+/uPbWdw==
@@ -4308,10 +4308,10 @@ ignore@^7.0.5:
   resolved "https://registry.npmjs.org/ignore/-/ignore-7.0.5.tgz"
   integrity sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==
 
-immutable@^3.x.x:
-  version "3.8.3"
-  resolved "https://registry.npmjs.org/immutable/-/immutable-3.8.3.tgz"
-  integrity sha512-AUY/VyX0E5XlibOmWt10uabJzam1zlYjwiEgQSDc5+UIkFNaF9WM0JxXKaNMGf+F/ffUF+7kRKXM9A7C0xXqMg==
+immutable@^4.3.9:
+  version "4.3.9"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.3.9.tgz#c98349e05e9c6e2a4d8fe88ac0b363e0d536b544"
+  integrity sha512-ObHy4YN7ycwZOUCLI1/6svfyAFu7vL8RhAvVu/bh/RZW9EPlOyDaQ9jDQWCtdqzaXUjgXZCW1migtHE7YI7UGQ==
 
 import-fresh@^3.2.1:
   version "3.3.1"
@@ -4698,14 +4698,7 @@ js-file-download@^0.4.12:
   resolved "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-yaml@=4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.2.0.tgz#2bd9e85682dd91bd469afb809d816043b3d49524"
-  integrity sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==
-  dependencies:
-    argparse "^2.0.1"
-
-js-yaml@^4.1.1, js-yaml@^4.2.0:
+js-yaml@=4.3.0, js-yaml@^4.1.1, js-yaml@^4.2.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.3.0.tgz#d1900572a7f7cf0b5f540c83673e60bad3436592"
   integrity sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==
@@ -5628,12 +5621,12 @@ randombytes@^2.1.0:
   dependencies:
     safe-buffer "^5.1.0"
 
-react-copy-to-clipboard@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.npmjs.org/react-copy-to-clipboard/-/react-copy-to-clipboard-5.1.0.tgz"
-  integrity sha512-k61RsNgAayIJNoy9yDsYzDe/yAZAzEbEgcz3DZMhF686LEyukcE1hzurxe85JandPUG+yTfGVFzuEw3xt8WP/A==
+react-copy-to-clipboard@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/react-copy-to-clipboard/-/react-copy-to-clipboard-5.1.1.tgz#76adb8be03616e99692fcf3f762365ed3fb5ff16"
+  integrity sha512-s+HrzLyJBxrpGTYXF15dTgMjAJpEPZT/Yp6NytAtZMRngejxt6Pt5WrfFxLAcsqUDU6sY1Jz6tyHwIicE1U2Xg==
   dependencies:
-    copy-to-clipboard "^3.3.1"
+    copy-to-clipboard "^3.3.3"
     prop-types "^15.8.1"
 
 react-debounce-input@=3.3.0:
@@ -6445,10 +6438,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-swagger-client@^3.37.4:
-  version "3.37.5"
-  resolved "https://registry.yarnpkg.com/swagger-client/-/swagger-client-3.37.5.tgz#2c55c034319e1aeede336524a6eeea7b35e15cd4"
-  integrity sha512-MuABJgD8vIsT5GVBTGj3HjmiEhArf58ng+YP4fo23NOJb/mKXOpKW3Rln90fnoi7ROt6IJsJy9d5kg8Yidn0/Q==
+swagger-client@^3.37.7:
+  version "3.37.7"
+  resolved "https://registry.yarnpkg.com/swagger-client/-/swagger-client-3.37.7.tgz#75cd740b6aebdebce5e7c9eada193b63d00e21ad"
+  integrity sha512-AzmF/FDSPYBcoxXarHPnqK3lSXoKH9Fh0EjLHAlP0h/D7EG1Fofl/wEuGqhYT+IBpriu3mSgWCh2xAftsYdL8w==
   dependencies:
     "@babel/runtime-corejs3" "^7.22.15"
     "@scarf/scarf" "=1.4.0"
@@ -6468,11 +6461,33 @@ swagger-client@^3.37.4:
     openapi-server-url-templating "^1.3.0"
     ramda "^0.30.1"
     ramda-adjunct "^5.1.0"
+  optionalDependencies:
+    "@swagger-api/apidom-ns-asyncapi-2" "^1.11.3"
+    "@swagger-api/apidom-ns-asyncapi-3" "^1.11.3"
+    "@swagger-api/apidom-ns-openapi-2" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-api-design-systems-json" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-api-design-systems-yaml" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-arazzo-json-1" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-arazzo-yaml-1" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-asyncapi-json-2" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-asyncapi-json-3" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-asyncapi-yaml-2" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-asyncapi-yaml-3" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-json" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-json-2" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-json-3-0" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-json-3-1" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-json-3-2" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-yaml-2" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-yaml-3-0" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-yaml-3-1" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-openapi-yaml-3-2" "^1.11.3"
+    "@swagger-api/apidom-parser-adapter-yaml-1-2" "^1.11.3"
 
 swagger-ui-react@^5.31.2:
-  version "5.32.8"
-  resolved "https://registry.yarnpkg.com/swagger-ui-react/-/swagger-ui-react-5.32.8.tgz#0608b45cf552f33fcc9b3fc5e07740c9a854861f"
-  integrity sha512-Cstx4Tq8fT5l2TBxHxts8pG+ks0qKSkuO1pwUwgrQQiZ241Mqs+KUODLVIonsYXL/gqX143rkcipUa4d0Rid7w==
+  version "5.32.11"
+  resolved "https://registry.yarnpkg.com/swagger-ui-react/-/swagger-ui-react-5.32.11.tgz#9a98015aca1101c086968df9e7d2897e93875a9a"
+  integrity sha512-84WYsBEs6vIpWXtqxq7kIrJRs2+YeZPQFULPJ/afjuHKw+rKWvwyA1uQsUC2VWq3oA9XIig3pjlMVE5xXaCDyA==
   dependencies:
     "@babel/runtime-corejs3" "^7.27.1"
     "@scarf/scarf" "=1.4.0"
@@ -6481,16 +6496,16 @@ swagger-ui-react@^5.31.2:
     classnames "^2.5.1"
     css.escape "1.5.1"
     deep-extend "0.6.0"
-    dompurify "^3.4.11"
+    dompurify "^3.4.12"
     ieee754 "^1.2.1"
-    immutable "^3.x.x"
+    immutable "^4.3.9"
     js-file-download "^0.4.12"
-    js-yaml "=4.2.0"
+    js-yaml "=4.3.0"
     lodash "^4.18.1"
     prop-types "^15.8.1"
     randexp "^0.5.3"
     randombytes "^2.1.0"
-    react-copy-to-clipboard "5.1.0"
+    react-copy-to-clipboard "5.1.1"
     react-debounce-input "=3.3.0"
     react-immutable-proptypes "2.2.0"
     react-immutable-pure-component "^2.2.0"
@@ -6503,7 +6518,7 @@ swagger-ui-react@^5.31.2:
     reselect "^5.1.1"
     serialize-error "^8.1.0"
     sha.js "^2.4.12"
-    swagger-client "^3.37.4"
+    swagger-client "^3.37.7"
     url-parse "^1.5.10"
     xml "=1.0.1"
     xml-but-prettier "^1.0.1"
