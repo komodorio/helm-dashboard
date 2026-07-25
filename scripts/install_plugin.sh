@@ -100,6 +100,9 @@ mkdir -p "releases/v${version}"
 
 install_plugin "$version" "$url" "releases/v${version}.tar.gz" "releases/v${version}"
 
+# Clean up temporary release artifacts
+rm -rf "releases/v${version}.tar.gz" "releases/v${version}"
+
 echo
 echo "Helm Dashboard is installed. To start it, run the following command:"
 echo "helm dashboard"
