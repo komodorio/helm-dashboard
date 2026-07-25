@@ -12,6 +12,7 @@
     "pre:commit": "lint-staged",
     "test": "echo \"Error: no test specified. Please use 'cypress:run' or 'cypress:open' commands\" && exit 1",
     "tsc": "tsc",
+    "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "lint": "npx eslint src/",
