@@ -1,6 +1,6 @@
 name: "dashboard"
 version: "2.1.1"
-usage: "A simplified way of working with Helm"
+usage: "Graphical Web UI for Helm release and Kubernetes resource management"
 description: "View HELM situation in nice web UI"
 command: "$HELM_PLUGIN_DIR/bin/helm-dashboard"
 ignoreFlags: false
