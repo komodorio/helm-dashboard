@@ -92,7 +92,7 @@ If you want to increase the logging verbosity and see all the debug info, use th
 
 ### Deploying Helm Dashboard on Kubernetes
 
-The official helm chart is [available here](https://github.com/komodorio/helm-charts/blob/master/charts/helm-dashboard)
+The official Helm chart is [available in the Komodor helm-charts repository](https://github.com/komodorio/helm-charts/tree/main/charts/helm-dashboard).
 
 ## Support Channels
 
