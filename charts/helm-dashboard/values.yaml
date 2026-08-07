@@ -39,6 +39,8 @@ resources:
     cpu: 1
     memory: 1Gi
 
+commonLabels: {}
+
 dashboard:
   allowWriteActions: true
 
