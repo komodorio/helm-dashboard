@@ -168,3 +168,6 @@ image:
   pullPolicy: Always
   tag: unstable
 ```
+
+<!-- Formatted with Prettier -->
+
