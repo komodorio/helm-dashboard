@@ -2,8 +2,15 @@
   "name": "dashboard",
   "version": "1.1.0",
   "type": "module",
-  "description": "",
-  "main": "index.js",
+  "description": "Frontend Web UI for Helm Dashboard",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/komodorio/helm-dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/komodorio/helm-dashboard/issues"
+  },
+  "homepage": "https://github.com/komodorio/helm-dashboard#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
