@@ -18,7 +18,7 @@ validate_command() {
 # Function to detect the latest version from GitHub API
 get_latest_version() {
     local latest_version
-    latest_version="$(curl -s "${api_repo}" | grep -oE '"name": "v[^"]+' | cut -d 'v' -f 2)"
+    latest_version="$(curl --connect-timeout 15 --retry 3 -s "${api_repo}" | grep -oE '"name": "v[^"]+' | cut -d 'v' -f 2)"
     echo "$latest_version"
 }
 
@@ -31,7 +31,7 @@ install_plugin() {
 
     # Download the plugin archive
     if validate_command "curl"; then
-        curl --fail -sSL "${plugin_url}" -o "${plugin_filename}"
+        curl --connect-timeout 15 --retry 3 --fail -sSL "${plugin_url}" -o "${plugin_filename}"
     elif validate_command "wget"; then
         wget -q "${plugin_url}" -O "${plugin_filename}"
     else
@@ -99,6 +99,9 @@ mkdir -p "bin"
 mkdir -p "releases/v${version}"
 
 install_plugin "$version" "$url" "releases/v${version}.tar.gz" "releases/v${version}"
+
+# Clean up temporary release artifacts
+rm -rf "releases/v${version}.tar.gz" "releases/v${version}"
 
 echo
 echo "Helm Dashboard is installed. To start it, run the following command:"
