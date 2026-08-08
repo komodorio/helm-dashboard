@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Stage - frontend
 FROM node:latest as frontend
 
