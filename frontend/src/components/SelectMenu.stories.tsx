@@ -31,6 +31,8 @@ export const Default: StoryObj<typeof SelectMenu> = {
       <SelectMenuItem label="Item 3" id={3} key="item3" />,
     ],
     selected: 1,
-    onSelect: (id: number) => action("onSelect")(id),
+    onSelect: (id: number) => {
+      action("onSelect")(id);
+    },
   },
 };

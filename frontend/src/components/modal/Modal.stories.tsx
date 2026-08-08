@@ -77,7 +77,9 @@ export const CustomModal: StoryObj<typeof Modal> = {
         <button
           className="bg-cyan-500 p-2"
           type="button"
-          onClick={() => action("onClick")("just a button")}
+          onClick={() => {
+            action("onClick")("just a button");
+          }}
         >
           Just a button
         </button>
