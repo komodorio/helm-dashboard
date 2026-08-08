@@ -53,3 +53,8 @@ By contributing, you agree that your contributions will be licensed under its Ap
 ## Questions?
 
 Contact us on [Slack](https://komodorkommunity.slack.com).
+
+## PR Review Checklist
+- Ensure tests pass
+- Ensure lint clean
+
