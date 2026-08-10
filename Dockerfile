@@ -38,7 +38,7 @@ WORKDIR /build/src
 RUN make build_go
 
 # Stage - runner
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine
+FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.24
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
