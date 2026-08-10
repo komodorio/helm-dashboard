@@ -50,7 +50,10 @@ jobs:
         with:
           go-version: "1.24"
       - name: git cleanup
-        run: git clean -f && git checkout frontend/yarn.lock
+        # goreleaser refuses to run on a dirty tree. `npm i` rewrites both lockfiles,
+        # so restore everything tracked rather than yarn.lock alone. No -x, to keep
+        # the built pkg/frontend/dist that the binary embeds.
+        run: git checkout -- . && git clean -fd
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
