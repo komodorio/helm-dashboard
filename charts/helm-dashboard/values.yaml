@@ -39,6 +39,10 @@ resources:
     cpu: 1
     memory: 1Gi
 
+## Labels to add to all resources managed by this chart
+##
+commonLabels: {}
+
 dashboard:
   allowWriteActions: true
 

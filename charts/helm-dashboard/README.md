@@ -68,6 +68,7 @@ The following table lists the configurable parameters of the chart and their def
 | `service.port           `             | Kubernetes service port                                                                        | `8080`                           |
 | `serviceAccount.create`               | Creates a service account                                                                      | `true`                           |
 | `serviceAccount.name`                 | Optional name for the service account                                                          | `{RELEASE_FULLNAME}`             |
+| `commonLabels`                        | Labels to add to all resources managed by this chart                                           | `{}`                             |
 | `nodeSelector`                        | Node labels for pod assignment                                                                 |                                  |
 | `affinity`                            | Affinity settings for pod assignment                                                           |                                  |
 | `tolerations`                         | Tolerations for pod assignment                                                                 |                                  |
@@ -75,6 +76,8 @@ The following table lists the configurable parameters of the chart and their def
 | `dashboard.persistence.accessModes`   | Persistent Volume access modes                                                                 | `["ReadWriteOnce"]`              |
 | `dashboard.persistence.storageClass`  | Persistent Volume storage class                                                                | `""`                             |
 | `dashboard.persistence.size`          | Persistent Volume size                                                                         | `100M`                           |
+| `dashboard.persistence.labels`        | Extra labels for the Persistent Volume Claim                                                   | `{}`                             |
+| `dashboard.persistence.annotations`   | Annotations for the Persistent Volume Claim                                                    | `{}`                             |
 | `dashboard.persistence.finalizers`    | Finalizers for the Persistent Volume Claim                                                     | `[kubernetes.io/pvc-protection]`                             |
 | `dashboard.persistence.lookupVolumeName` | Lookup volume name for the Persistent Volume Claim                                             | `true`                             |
 | `updateStrategy.type`                 | Set up update strategy for helm-dashboard installation.                                        | `RollingUpdate`                  |             

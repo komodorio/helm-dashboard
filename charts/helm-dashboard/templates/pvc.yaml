@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "helm-dashboard.labels" . | nindent 4 }}
+    {{- with .Values.dashboard.persistence.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- with .Values.dashboard.persistence.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

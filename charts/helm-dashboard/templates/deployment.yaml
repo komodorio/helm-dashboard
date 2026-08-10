@@ -20,6 +20,9 @@ spec:
       {{- end }}
       labels:
         {{- include "helm-dashboard.selectorLabels" . | nindent 8 }}
+        {{- with .Values.commonLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- include "helm-dashboard.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "helm-dashboard.serviceAccountName" . }}
