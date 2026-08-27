@@ -287,3 +287,21 @@ func TestRepositories_Containing_MalformedRepositoryConfigFile(t *testing.T) {
 		t.Fatalf("Expected error for malformed RepositoryConfig file, got nil")
 	}
 }
+
+func TestRepositories_List_NonExistentConfigFile(t *testing.T) {
+	settings := cli.New()
+	settings.RepositoryConfig = "/non/existent/path/repositories.yaml"
+
+	testRepository := &Repositories{
+		Settings:   settings,
+		HelmConfig: &action.Configuration{},
+	}
+
+	list, err := testRepository.List()
+	if err != nil {
+		t.Fatalf("Expected no error when repository file does not exist, got: %v", err)
+	}
+	if len(list) != 0 {
+		t.Fatalf("Expected empty repository list, got %d items", len(list))
+	}
+}

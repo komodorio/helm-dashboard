@@ -37,6 +37,9 @@ func (r *Repositories) load() (*repo.File, error) {
 	if err != nil && !isNotExist(err) {
 		return nil, errorx.Decorate(err, "failed to load repository list")
 	}
+	if f == nil {
+		f = repo.NewFile()
+	}
 	return f, nil
 }
 
