@@ -64,6 +64,22 @@ func (h *KubeHandler) GetResourceInfo(c *gin.Context) {
 }
 
 func EnhanceStatus(res *v12.Carp, err error) *v12.CarpStatus {
+	if res == nil {
+		c := v12.CarpCondition{
+			Type:   "hdHealth",
+			Status: Unknown,
+		}
+		if err != nil {
+			c.Reason = "ErrorGettingStatus"
+			c.Message = err.Error()
+		} else {
+			c.Reason = "NilResource"
+		}
+		return &v12.CarpStatus{
+			Conditions: []v12.CarpCondition{c},
+		}
+	}
+
 	s := res.Status
 	if s.Conditions == nil {
 		s.Conditions = []v12.CarpCondition{}

@@ -154,3 +154,17 @@ func findHDHealth(s *v1.CarpStatus) *v1.CarpCondition {
 	}
 	return nil
 }
+
+func TestEnhanceStatus_NilResource(t *testing.T) {
+	s := EnhanceStatus(nil, nil)
+	hdCond := findHDHealth(s)
+	if hdCond == nil {
+		t.Fatal("expected hdHealth condition for nil resource")
+	}
+	if hdCond.Status != Unknown {
+		t.Errorf("expected Unknown status for nil resource, got %s", hdCond.Status)
+	}
+	if hdCond.Reason != "NilResource" {
+		t.Errorf("expected NilResource reason, got %s", hdCond.Reason)
+	}
+}
