@@ -180,4 +180,40 @@ func TestEnvAsBool(t *testing.T) {
 	if EnvAsBool("TEST", true) != want {
 		t.Errorf("Env 'TEST' value '%v' should be parsed to %v", os.Getenv("TEST"), want)
 	}
+
+	// uppercase and whitespace trimming
+	t.Setenv("TEST", " TRUE ")
+	want = true
+	if EnvAsBool("TEST", false) != want {
+		t.Errorf("Env 'TEST' value ' TRUE ' should be parsed to true")
+	}
+}
+
+func TestTempFile(t *testing.T) {
+	content := "foo: bar\nkey: value"
+	fname, cleanup, err := TempFile(content)
+	if err != nil {
+		t.Fatalf("TempFile failed: %v", err)
+	}
+	defer cleanup()
+
+	data, err := os.ReadFile(fname)
+	if err != nil {
+		t.Fatalf("failed to read created temp file: %v", err)
+	}
+	if string(data) != content {
+		t.Errorf("content mismatch: got %q, want %q", string(data), content)
+	}
+
+	cleanup()
+	if _, err := os.Stat(fname); !os.IsNotExist(err) {
+		t.Errorf("expected file to be removed after cleanup")
+	}
+}
+
+func TestRunCommand_Empty(t *testing.T) {
+	_, err := RunCommand([]string{}, nil)
+	if err == nil {
+		t.Errorf("expected error for empty command")
+	}
 }

@@ -15,6 +15,8 @@ import (
 
 var FailLogLevel = log.WarnLevel // allows to suppress error logging in some situations
 
+var chartVersionRegex = regexp.MustCompile(`v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?`)
+
 type ControlChan = chan struct{}
 
 func ChartAndVersion(x string) (string, string, error) {
@@ -25,9 +27,7 @@ func ChartAndVersion(x string) (string, string, error) {
 	} else if lens == 2 {
 		return strs[0], strs[1], nil
 	} else {
-		// semver2 regex , add optional  v prefix
-		re := regexp.MustCompile(`v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?`)
-		match := re.FindString(x)
+		match := chartVersionRegex.FindString(x)
 		lastInd := strings.LastIndex(x, match)
 		return x[:lastInd-1], match, nil
 	}
@@ -38,9 +38,11 @@ func TempFile(txt string) (string, func(), error) {
 	if err != nil {
 		return "", nil, err
 	}
+	defer file.Close()
 
 	err = os.WriteFile(file.Name(), []byte(txt), 0600)
 	if err != nil {
+		_ = os.Remove(file.Name())
 		return "", nil, err
 	}
 
@@ -59,6 +61,9 @@ func (e CmdError) Error() string {
 }
 
 func RunCommand(cmd []string, env map[string]string) (string, error) {
+	if len(cmd) == 0 {
+		return "", errors.New("empty command")
+	}
 	log.Debugf("Starting command: %s", cmd)
 	prog := exec.Command(cmd[0], cmd[1:]...)
 	prog.Env = os.Environ()
@@ -140,7 +145,7 @@ func QualifiedKind(kind string, apiVersion string) string {
 
 func EnvAsBool(envKey string, envDef bool) bool {
 	validSettableValues := []string{"false", "true", "0", "1"}
-	envValue := os.Getenv(envKey)
+	envValue := strings.TrimSpace(strings.ToLower(os.Getenv(envKey)))
 	if slices.Contains(validSettableValues, envValue) {
 		return envValue == "true" || envValue == "1"
 	} else {
