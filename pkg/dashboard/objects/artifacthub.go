@@ -7,6 +7,7 @@ import (
 	neturl "net/url"
 	"os"
 	"sync"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -37,7 +38,8 @@ func QueryArtifactHub(chartName string) ([]*ArtifactHubResult, error) {
 	req.Header.Set("User-Agent", "Komodor Helm Dashboard/"+os.Getenv("HD_VERSION")) // TODO
 
 	log.Debugf("Making HTTP request: %v", req)
-	res, err := http.DefaultClient.Do(req)
+	client := &http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
