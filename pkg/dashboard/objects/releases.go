@@ -38,7 +38,7 @@ func (a *Releases) List() ([]*Release, error) {
 		log.Debugf("Listing releases in namespace: %s", ns)
 		hc, err := a.HelmConfig(ns)
 		if err != nil {
-			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", ns)
 		}
 
 		client := action.NewList(hc)
@@ -61,7 +61,7 @@ func (a *Releases) ByName(namespace string, name string) (*Release, error) {
 	log.Debugf("Getting release by ns+name: %s/%s", namespace, name)
 	hc, err := a.HelmConfig(namespace)
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", namespace)
 	}
 
 	client := action.NewGet(hc)
@@ -83,7 +83,7 @@ func (a *Releases) Install(namespace string, name string, repoChart string, vers
 
 	hc, err := a.HelmConfig(namespace)
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", namespace)
 	}
 
 	cmd := action.NewInstall(hc)
@@ -195,7 +195,7 @@ func (r *Release) History() ([]*Release, error) {
 
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.Orig.Namespace)
 	}
 
 	client := action.NewHistory(hc)
@@ -218,7 +218,7 @@ func (r *Release) Uninstall() error {
 
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
-		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.Orig.Namespace)
 	}
 
 	client := action.NewUninstall(hc)
@@ -235,7 +235,7 @@ func (r *Release) Rollback(toRevision int) error {
 
 	hc, err := r.HelmConfig(r.Orig.Namespace)
 	if err != nil {
-		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.Orig.Namespace)
 	}
 
 	client := action.NewRollback(hc)
