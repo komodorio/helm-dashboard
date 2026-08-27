@@ -15,16 +15,15 @@ type Contexted struct {
 }
 
 func (h *Contexted) GetApp(c *gin.Context) *objects.Application {
-	var app *objects.Application
 	if a, ok := c.Get(APP); ok {
-		app = a.(*objects.Application)
-	} else {
-		err := errorx.IllegalState.New("No application context found")
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return nil
+		if app, isApp := a.(*objects.Application); isApp {
+			return app
+		}
 	}
 
-	return app
+	err := errorx.IllegalState.New("No application context found")
+	_ = c.AbortWithError(http.StatusBadRequest, err)
+	return nil
 }
 
 func (h *Contexted) EnableClientCache(c *gin.Context) {
