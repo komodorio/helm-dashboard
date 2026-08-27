@@ -3,6 +3,7 @@ package objects
 import (
 	"context"
 	"errors"
+	"sync/atomic"
 	"time"
 
 	"github.com/eko/gocache/v3/marshaler"
@@ -15,8 +16,8 @@ type CacheKey = string
 
 type Cache struct {
 	Marshaler *marshaler.Marshaler `json:"-"`
-	HitCount  int
-	MissCount int
+	HitCount  int64
+	MissCount int64
 }
 
 func NewCache() *Cache {
@@ -32,6 +33,14 @@ func NewCache() *Cache {
 	}
 }
 
+func (c *Cache) GetHitCount() int64 {
+	return atomic.LoadInt64(&c.HitCount)
+}
+
+func (c *Cache) GetMissCount() int64 {
+	return atomic.LoadInt64(&c.MissCount)
+}
+
 func (c *Cache) String(key CacheKey, tags []string, callback func() (string, error)) (string, error) {
 	if tags == nil {
 		tags = make([]string, 0)
@@ -43,12 +52,12 @@ func (c *Cache) String(key CacheKey, tags []string, callback func() (string, err
 	_, err := c.Marshaler.Get(ctx, key, &out)
 	if err == nil {
 		log.Debugf("Using cached value for %s", key)
-		c.HitCount++
+		atomic.AddInt64(&c.HitCount, 1)
 		return out, nil
 	} else if !errors.Is(err, store.NotFound{}) {
 		return "", err
 	}
-	c.MissCount++
+	atomic.AddInt64(&c.MissCount, 1)
 
 	out, err = callback()
 	if err != nil {
@@ -71,7 +80,7 @@ func (c *Cache) Invalidate(tags ...CacheKey) {
 }
 
 func (c *Cache) Clear() error {
-	c.HitCount = 0
-	c.MissCount = 0
+	atomic.StoreInt64(&c.HitCount, 0)
+	atomic.StoreInt64(&c.MissCount, 0)
 	return c.Marshaler.Clear(context.Background())
 }
