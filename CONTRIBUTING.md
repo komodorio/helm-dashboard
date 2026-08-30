@@ -25,8 +25,13 @@ Pull requests are the best way to propose changes to the codebase. We actively w
 1. Fork the repo and create your branch from `main`.
 2. Ensure local prerequisites are installed (Go 1.20+, Node.js 18+, and Helm 3.4+).
 3. Follow [Conventional Commits](https://www.conventionalcommits.org/) format (`feat`, `fix`, `docs`, `refactor`, `style`, `chore`).
-4. If you've added code that should be tested, add unit or integration tests (`go test ./...` / `npm run lint`).
-5. Ensure the test suite passes (`make test`).
+4. If you've added code that should be tested, add unit or integration tests:
+   - **Backend**: `make test` or `go test ./pkg/dashboard/... -race -v`
+   - **Frontend**:
+     - Typecheck: `npm run typecheck` (inside `frontend/`)
+     - Lint & Fix: `npm run lint:fix` (inside `frontend/`)
+     - Component Tests: `npm run cypress:component` (inside `frontend/`)
+5. Ensure the test suite passes (`make test` and `npm run typecheck`).
 6. Make sure your code lints properly.
 7. Issue that pull request!
 
