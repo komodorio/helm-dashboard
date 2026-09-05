@@ -681,19 +681,31 @@ type RepoChartElement struct { // TODO: do we need it at all? there is existing 
 }
 
 func HReleaseToJSON(o *release.Release) *ReleaseElement {
-	return &ReleaseElement{
-		Name:         o.Name,
-		Namespace:    o.Namespace,
-		Revision:     strconv.Itoa(o.Version),
-		Updated:      o.Info.LastDeployed,
-		Status:       o.Info.Status,
-		Chart:        fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
-		ChartName:    o.Chart.Name(),
-		ChartVersion: o.Chart.Metadata.Version,
-		AppVersion:   o.Chart.AppVersion(),
-		Icon:         o.Chart.Metadata.Icon,
-		Description:  o.Chart.Metadata.Description,
+	if o == nil {
+		return nil
 	}
+	res := &ReleaseElement{
+		Name:      o.Name,
+		Namespace: o.Namespace,
+		Revision:  strconv.Itoa(o.Version),
+	}
+	if o.Info != nil {
+		res.Updated = o.Info.LastDeployed
+		res.Status = o.Info.Status
+	}
+	if o.Chart != nil {
+		res.ChartName = o.Chart.Name()
+		res.AppVersion = o.Chart.AppVersion()
+		if o.Chart.Metadata != nil {
+			res.ChartVersion = o.Chart.Metadata.Version
+			res.Icon = o.Chart.Metadata.Icon
+			res.Description = o.Chart.Metadata.Description
+			res.Chart = fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version)
+		} else {
+			res.Chart = o.Chart.Name()
+		}
+	}
+	return res
 }
 
 type ReleaseElement struct {
@@ -729,17 +741,29 @@ type HistoryElement struct {
 }
 
 func HReleaseToHistElem(o *release.Release) *HistoryElement {
-	return &HistoryElement{
-		Revision:    o.Version,
-		Updated:     o.Info.LastDeployed,
-		Status:      o.Info.Status,
-		Chart:       fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version),
-		AppVersion:  o.Chart.AppVersion(),
-		Description: o.Info.Description,
-		ChartName:   o.Chart.Name(),
-		ChartVer:    o.Chart.Metadata.Version,
-		HasTests:    releaseHasTests(o),
+	if o == nil {
+		return nil
 	}
+	res := &HistoryElement{
+		Revision: o.Version,
+		HasTests: releaseHasTests(o),
+	}
+	if o.Info != nil {
+		res.Updated = o.Info.LastDeployed
+		res.Status = o.Info.Status
+		res.Description = o.Info.Description
+	}
+	if o.Chart != nil {
+		res.ChartName = o.Chart.Name()
+		res.AppVersion = o.Chart.AppVersion()
+		if o.Chart.Metadata != nil {
+			res.ChartVer = o.Chart.Metadata.Version
+			res.Chart = fmt.Sprintf("%s-%s", o.Chart.Name(), o.Chart.Metadata.Version)
+		} else {
+			res.Chart = o.Chart.Name()
+		}
+	}
+	return res
 }
 
 func RevisionDiff(functor objects.SectionFn, ext string, revision1 *release.Release, revision2 *release.Release, flag bool) (string, error) {
