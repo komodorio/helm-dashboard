@@ -33,7 +33,7 @@ install_plugin() {
     if validate_command "curl"; then
         curl --connect-timeout 15 --retry 3 --fail -sSL "${plugin_url}" -o "${plugin_filename}"
     elif validate_command "wget"; then
-        wget -q "${plugin_url}" -O "${plugin_filename}"
+        wget --timeout=15 --tries=3 -q "${plugin_url}" -O "${plugin_filename}"
     else
         error_exit "Both 'curl' and 'wget' commands not found. Please install either one."
     fi
