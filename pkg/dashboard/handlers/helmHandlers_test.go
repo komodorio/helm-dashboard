@@ -12,13 +12,6 @@ import (
 func TestHReleaseToJSON(t *testing.T) {
 	now := helmtime.Time{Time: time.Now()}
 
-	t.Run("nil release", func(t *testing.T) {
-		res := HReleaseToJSON(nil)
-		if res != nil {
-			t.Errorf("expected nil for nil release, got %v", res)
-		}
-	})
-
 	t.Run("complete release", func(t *testing.T) {
 		rel := &release.Release{
 			Name:      "my-release",
@@ -79,13 +72,6 @@ func TestHReleaseToJSON(t *testing.T) {
 
 func TestHReleaseToHistElem(t *testing.T) {
 	now := helmtime.Time{Time: time.Now()}
-
-	t.Run("nil release", func(t *testing.T) {
-		res := HReleaseToHistElem(nil)
-		if res != nil {
-			t.Errorf("expected nil for nil release, got %v", res)
-		}
-	})
 
 	t.Run("complete release with tests", func(t *testing.T) {
 		rel := &release.Release{

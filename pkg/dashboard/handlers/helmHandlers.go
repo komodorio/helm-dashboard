@@ -681,9 +681,6 @@ type RepoChartElement struct { // TODO: do we need it at all? there is existing 
 }
 
 func HReleaseToJSON(o *release.Release) *ReleaseElement {
-	if o == nil {
-		return nil
-	}
 	res := &ReleaseElement{
 		Name:      o.Name,
 		Namespace: o.Namespace,
@@ -741,9 +738,6 @@ type HistoryElement struct {
 }
 
 func HReleaseToHistElem(o *release.Release) *HistoryElement {
-	if o == nil {
-		return nil
-	}
 	res := &HistoryElement{
 		Revision: o.Version,
 		HasTests: releaseHasTests(o),
