@@ -50,7 +50,7 @@
     "react-modern-drawer": "^1.4.0",
     "react-router": "^7.18.2",
     "react-select": "^5.10.2",
-    "swagger-ui-react": "^5.31.2",
+    "swagger-ui-react": "^5.33.0",
     "uuid": "^14.0.0"
   },
   "devDependencies": {
