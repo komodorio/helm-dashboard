@@ -36,6 +36,7 @@ type options struct {
 	LocalChart []string `long:"local-chart" description:"Specify location of local chart to include into UI"`
 	NoHealth   bool     `long:"no-health" description:"Disable health checks for installed charts"`
 	NoLatest   bool     `long:"no-latest" description:"Disable latest version checks for installed charts"`
+	BasePath   string   `long:"base-path" env:"HD_BASE_PATH" description:"URL path prefix to serve under, for reverse proxies that do not strip it (e.g. /helm-dashboard)"`
 }
 
 func main() {
@@ -66,6 +67,7 @@ func main() {
 		LocalCharts: opts.LocalChart,
 		NoHealth:    opts.NoHealth,
 		NoLatest:    opts.NoLatest,
+		BasePath:    normalizeBasePath(opts.BasePath),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -137,6 +139,15 @@ func parseFlags() options {
 		os.Exit(1)
 	}
 	return opts
+}
+
+// normalizeBasePath turns user input into either "" or "/prefix" without trailing slash
+func normalizeBasePath(p string) string {
+	p = strings.Trim(strings.TrimSpace(p), "/")
+	if p == "" {
+		return ""
+	}
+	return "/" + p
 }
 
 func setupLogging(verbose bool) {

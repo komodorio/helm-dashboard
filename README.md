@@ -86,6 +86,8 @@ If you need to limit the operations to a specific namespace, please use `--names
 
 If you don't want the browser tab to automatically open, add `--no-browser` flag in your command-line.
 
+The UI can be served under a URL path prefix, like `https://my.domain.com/helm-dashboard/`. If your reverse proxy strips the prefix before forwarding (e.g. ingress-nginx `rewrite-target`), nothing needs to be configured. If it forwards the full path, tell the dashboard about the prefix via `--base-path=/helm-dashboard` flag or `HD_BASE_PATH` environment variable (Helm chart value `dashboard.basePath`).
+
 If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
 
 > Disclaimer: For the sake of improving the project quality, there is user analytics collected by the tool. You can disable this collecting with `--no-analytics` option. The collection is done via DataDog RUM and Heap Analytics. Only the anonymous data is collected, no sensitive information is used.

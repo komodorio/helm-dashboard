@@ -49,6 +49,9 @@ dashboard:
   # default namespace for Helm operations
   namespace: ""
 
+  # URL path prefix to serve under, e.g. /helm-dashboard; only needed when the ingress does not strip the prefix
+  basePath: ""
+
   persistence:
     enabled: true
 

@@ -81,7 +81,7 @@ func corsMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool) *gin.Engine {
+func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool, basePath string) *gin.Engine {
 	var api *gin.Engine
 	if debug {
 		api = gin.New()
@@ -99,13 +99,14 @@ func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool)
 		api.Use(allowCORS)
 	}
 
-	configureStatic(api)
-	configureRoutes(abortWeb, data, api)
+	root := api.Group(basePath)
+	configureStatic(root)
+	configureRoutes(abortWeb, data, root)
 
 	return api
 }
 
-func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *gin.Engine) {
+func configureRoutes(abortWeb context.CancelFunc, data *objects.DataLayer, api *gin.RouterGroup) {
 	// server shutdown handler
 	api.DELETE("/", func(c *gin.Context) {
 		abortWeb()
@@ -190,18 +191,25 @@ func configureKubectls(api *gin.RouterGroup, data *objects.DataLayer) {
 	api.GET("/:kind/list", h.GetNameSpaces)
 }
 
-func configureStatic(api *gin.Engine) {
+func configureStatic(api *gin.RouterGroup) {
 	fs := http.FS(frontend.StaticFS)
 
 	api.GET("/", func(c *gin.Context) {
 		c.FileFromFS("/dist/", fs)
 	})
 
+	// files that index.html references from the dist root
+	for _, name := range []string{"logo.svg", "analytics.js"} {
+		api.GET("/"+name, func(c *gin.Context) {
+			c.FileFromFS(path.Join("dist", name), fs)
+		})
+	}
+
 	api.GET("/assets/*filepath", func(c *gin.Context) {
-		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
+		c.FileFromFS(path.Join("dist", "assets", c.Param("filepath")), fs)
 	})
 
 	api.GET("/static/*filepath", func(c *gin.Context) {
-		c.FileFromFS(path.Join("dist", c.Request.URL.Path), fs)
+		c.FileFromFS(path.Join("dist", "static", c.Param("filepath")), fs)
 	})
 }

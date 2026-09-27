@@ -31,6 +31,7 @@ type Server struct {
 	LocalCharts []string
 	NoHealth    bool
 	NoLatest    bool
+	BasePath    string
 }
 
 func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (string, utils.ControlChan, error) {
@@ -54,10 +55,10 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 
 	go data.PeriodicTasks(ctx)
 
-	api := NewRouter(cancel, data, s.Debug)
+	api := NewRouter(cancel, data, s.Debug, s.BasePath)
 	done := s.startBackgroundServer(api, ctx)
 
-	return "http://" + s.Address, done, nil
+	return "http://" + s.Address + s.BasePath + "/", done, nil
 }
 
 func (s *Server) detectClusterMode(data *objects.DataLayer) error {
