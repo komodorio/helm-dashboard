@@ -28,6 +28,8 @@ class ApiService {
     options?: RequestInit
   ): Promise<T | string> {
     let response;
+    // resolve against the page location, so the app works under any path prefix
+    url = url.replace(/^\//, "");
 
     if (this.currentCluster) {
       const headers = new Headers(options?.headers);

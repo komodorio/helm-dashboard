@@ -7,49 +7,49 @@ const BASE_ANALYTIC_MSG = {
   cache: "no-cache",
   headers: {
     "Content-Type": "application/json",
-    "api-key": "komodor.analytics@admin.com"
+    "api-key": "komodor.analytics@admin.com",
   },
   redirect: "follow",
-  referrerPolicy: "no-referrer"
+  referrerPolicy: "no-referrer",
 };
-xhr.onload = function() {
+xhr.onload = function () {
   if (xhr.readyState !== XMLHttpRequest.DONE) {
     return;
-    }
+  }
 
-    const responseTxt = xhr.responseText?.trim();
-    if (!responseTxt) {
-      console.warn("Analytics response is empty");
-      return;
-    }
+  const responseTxt = xhr.responseText?.trim();
+  if (!responseTxt) {
+    console.warn("Analytics response is empty");
+    return;
+  }
 
-    let status;
-    try {
-      status = JSON.parse(responseTxt);
-    } catch (e) {
-      console.error("Failed to parse JSON: ", xhr.responseText, e);
-      return;
-    }
+  let status;
+  try {
+    status = JSON.parse(responseTxt);
+  } catch (e) {
+    console.error("Failed to parse JSON: ", xhr.responseText, e);
+    return;
+  }
 
-    const version = status.CurVer;
-    if (status.Analytics) {
-      enableDD(version);
-      enableHeap(version, status.ClusterMode);
-      enableSegmentBackend(version, status.ClusterMode);
-    } else {
-      console.log("Analytics is disabled in this session");
-    }
+  const version = status.CurVer;
+  if (status.Analytics) {
+    enableDD(version);
+    enableHeap(version, status.ClusterMode);
+    enableSegmentBackend(version, status.ClusterMode);
+  } else {
+    console.log("Analytics is disabled in this session");
+  }
 };
-xhr.open("GET", "/status", true);
+xhr.open("GET", "status", true);
 xhr.send(null);
 
 function enableDD(version) {
-  (function(h, o, u, n, d) {
+  (function (h, o, u, n, d) {
     h = h[d] = h[d] || {
       q: [],
-      onReady: function(c) {
+      onReady: function (c) {
         h.q.push(c);
-      }
+      },
     };
     d = o.createElement(u);
     d.async = true;
@@ -63,7 +63,7 @@ function enableDD(version) {
     "https://www.datadoghq-browser-agent.com/datadog-rum-v4.js",
     "DD_RUM"
   );
-  DD_RUM.onReady(function() {
+  DD_RUM.onReady(function () {
     DD_RUM.init({
       clientToken: "pub16d64cd1c00cf073ce85af914333bf72",
       applicationId: "e75439e5-e1b3-46ba-a9e9-a2e58579a2e2",
@@ -74,24 +74,24 @@ function enableDD(version) {
       trackResources: true,
       trackLongTasks: true,
       defaultPrivacyLevel: "mask",
-      sessionReplaySampleRate: 0
+      sessionReplaySampleRate: 0,
     });
   });
 }
 
 function enableHeap(version, inCluster) {
-  (window.heap = window.heap || []),
-    (heap.load = function(e, t) {
-      (window.heap.appid = e), (window.heap.config = t = t || {});
+  ((window.heap = window.heap || []),
+    (heap.load = function (e, t) {
+      ((window.heap.appid = e), (window.heap.config = t = t || {}));
       let r = document.createElement("script");
-      (r.type = "text/javascript"),
+      ((r.type = "text/javascript"),
         (r.async = !0),
-        (r.src = "https://cdn.heapanalytics.com/js/heap-" + e + ".js");
+        (r.src = "https://cdn.heapanalytics.com/js/heap-" + e + ".js"));
       let a = document.getElementsByTagName("script")[0];
       a.parentNode.insertBefore(r, a);
       for (
-        let n = function(e) {
-            return function() {
+        let n = function (e) {
+            return function () {
               heap.push([e].concat(Array.prototype.slice.call(arguments, 0)));
             };
           },
@@ -104,18 +104,18 @@ function enableHeap(version, inCluster) {
             "removeEventProperty",
             "setEventProperties",
             "track",
-            "unsetEventProperty"
+            "unsetEventProperty",
           ],
           o = 0;
         o < p.length;
         o++
       )
         heap[p[o]] = n(p[o]);
-    });
+    }));
   heap.load("4249623943");
   window.heap.addEventProperties({
     version: version,
-    installationMode: inCluster ? "cluster" : "local"
+    installationMode: inCluster ? "cluster" : "local",
   });
 }
 
@@ -146,7 +146,7 @@ function sendData(data, eventType, userId, eventName) {
   const body = createBody(eventType, userId, data, eventName);
   return fetch(`https://api.komodor.com/analytics/segment/${eventType}`, {
     ...BASE_ANALYTIC_MSG,
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
 }
 
@@ -175,8 +175,9 @@ const getUserId = (() => {
 })();
 
 function uuid() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-    let r = Math.random() * 16 | 0, v = c === "x" ? r : (r & 0x3 | 0x8);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    let r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }

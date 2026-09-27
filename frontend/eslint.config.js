@@ -9,7 +9,7 @@ import prettierRecommended from "eslint-plugin-prettier/recommended";
 // import tscPlugin from "eslint-plugin-tsc";
 
 export default defineConfig(
-  { ignores: ["dist", "node_modules"] },
+  { ignores: ["dist", "node_modules", "public"] },
 
   js.configs.recommended,
   tseslintConf.recommendedTypeChecked,

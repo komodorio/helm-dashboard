@@ -484,7 +484,7 @@ const Uninstall = () => {
         }
       ),
     onSuccess: () => {
-      window.location.href = "/";
+      window.location.href = "./";
     },
   });
   const uninstallTitle = (

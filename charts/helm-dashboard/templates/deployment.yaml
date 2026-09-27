@@ -52,6 +52,10 @@ spec:
               value: /opt/dashboard/helm/data
             - name: DEBUG
               value: {{- ternary " '1'" "" .Values.debug }}
+            {{- with .Values.dashboard.basePath }}
+            - name: HD_BASE_PATH
+              value: {{ . | quote }}
+            {{- end }}
             {{- if .Values.dashboard.namespace }}
             - name: HELM_NAMESPACE
               value: {{ .Values.dashboard.namespace }}
@@ -62,11 +66,11 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /status
+              path: {{ with trimAll "/" .Values.dashboard.basePath }}/{{ . }}{{ end }}/status
               port: 8080
           readinessProbe:
             httpGet:
-              path: /status
+              path: {{ with trimAll "/" .Values.dashboard.basePath }}/{{ . }}{{ end }}/status
               port: 8080
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

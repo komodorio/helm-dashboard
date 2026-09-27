@@ -2,6 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // relative URLs need the trailing slash, e.g. /helm-dashboard -> /helm-dashboard/
+      if (!location.pathname.endsWith("/")) {
+        location.replace(location.pathname + "/" + location.search + location.hash);
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Helm Dashboard</title>

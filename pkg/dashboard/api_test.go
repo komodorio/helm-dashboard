@@ -91,7 +91,7 @@ func TestConfigureStatic(t *testing.T) {
 	api := gin.Default()
 
 	// Configure static routes
-	configureStatic(api)
+	configureStatic(&api.RouterGroup)
 
 	// Start the server
 	api.ServeHTTP(w, req)
@@ -119,7 +119,7 @@ func TestConfigureRoutes(t *testing.T) {
 	}
 
 	// Configure routes to API engine
-	configureRoutes(abortWeb, data, api)
+	configureRoutes(abortWeb, data, &api.RouterGroup)
 
 	// Start the server
 	api.ServeHTTP(w, req)
@@ -169,11 +169,32 @@ func TestNewRouter(t *testing.T) {
 	}
 
 	// Create a new router with the function
-	newRouter := NewRouter(abortWeb, data, false)
+	newRouter := NewRouter(abortWeb, data, false, "")
 
 	newRouter.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
+}
+
+func TestNewRouterBasePath(t *testing.T) {
+	data, err := objects.NewDataLayer([]string{"TestSpace"}, "T-1", NewHelmConfig, false)
+	assert.NilError(t, err)
+	router := NewRouter(func() {}, data, false, "/helm-dashboard")
+
+	for path, code := range map[string]int{
+		"/helm-dashboard/":             http.StatusOK,
+		"/helm-dashboard/status":       http.StatusOK,
+		"/helm-dashboard/logo.svg":     http.StatusOK,
+		"/helm-dashboard/analytics.js": http.StatusOK,
+		"/helm-dashboard":              http.StatusMovedPermanently,
+		"/status":                      http.StatusNotFound,
+	} {
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", path, nil)
+		assert.NilError(t, err)
+		router.ServeHTTP(w, req)
+		assert.Equal(t, w.Code, code, path)
+	}
 }
 
 func TestConfigureKubectls(t *testing.T) {
@@ -209,7 +230,7 @@ func TestE2E(t *testing.T) {
 
 	// Create a new router with the function
 	abortWeb := func() {}
-	newRouter := NewRouter(abortWeb, data, false)
+	newRouter := NewRouter(abortWeb, data, false, "")
 
 	// initially, we don't have any releases
 	w := httptest.NewRecorder()
