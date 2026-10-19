@@ -78,3 +78,18 @@ func TestListReleases(t *testing.T) {
 	assert.Equal(t, res[3].Orig.Name, "release4")
 	assert.Equal(t, res[4].Orig.Name, "release5")
 }
+
+func TestReleaseHelmStorageNamespace(t *testing.T) {
+	rel := NewRelease(fakeHelmNSConfigGetter, &release.Release{
+		Name:      "educates-contour",
+		Namespace: "projectcontour",
+	}, nil, "educates")
+
+	assert.Equal(t, rel.helmStorageNamespace(), "educates")
+
+	fallback := NewRelease(fakeHelmNSConfigGetter, &release.Release{
+		Name:      "plain",
+		Namespace: "default",
+	}, nil, "")
+	assert.Equal(t, fallback.helmStorageNamespace(), "default")
+}
