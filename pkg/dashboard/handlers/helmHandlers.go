@@ -59,7 +59,7 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 
 	res := []*ReleaseElement{}
 	for _, r := range rels {
-		res = append(res, HReleaseToJSON(r.Orig))
+		res = append(res, HReleaseToJSON(r.Orig, r.StorageNamespace))
 	}
 
 	c.IndentedJSON(http.StatusOK, res)
@@ -680,10 +680,14 @@ type RepoChartElement struct { // TODO: do we need it at all? there is existing 
 	IsSuggestedRepo    bool     `json:"isSuggestedRepo"`
 }
 
-func HReleaseToJSON(o *release.Release) *ReleaseElement {
+func HReleaseToJSON(o *release.Release, storageNamespace string) *ReleaseElement {
+	ns := o.Namespace
+	if storageNamespace != "" {
+		ns = storageNamespace
+	}
 	res := &ReleaseElement{
 		Name:      o.Name,
-		Namespace: o.Namespace,
+		Namespace: ns,
 		Revision:  strconv.Itoa(o.Version),
 	}
 	if o.Info != nil {
