@@ -6,7 +6,9 @@ import { useNavigate } from "react-router";
 import apiService from "../../API/apiService";
 import { useUpdateRepo } from "../../API/repositories";
 import { useAppContext } from "../../context/AppContext";
+import { POPULAR_REPOSITORIES } from "../../data/popularRepositories";
 import type { Chart, Repository } from "../../data/types";
+import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import Spinner from "../Spinner";
 
 import ChartViewer from "./ChartViewer";
@@ -19,6 +21,7 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
   const [searchValue, setSearchValue] = useState("");
   const [isRemoveLoading, setIsRemove] = useState(false);
   const { setSelectedRepo, selectedRepo } = useAppContext();
+  const { upsertSearchParams } = useCustomSearchParams();
   const queryClient = useQueryClient();
 
   const navigate = useNavigate();
@@ -75,9 +78,54 @@ function RepositoryViewer({ repository }: RepositoryViewerProps) {
 
   if (repository === undefined) {
     return (
-      <div className="display-none no-charts mt-3 rounded-sm bg-white p-4 text-sm shadow-sm">
-        Looks like you don&apos;t have any repositories installed. You can add
-        one with the &quot;Add Repository&quot; button on the left side bar.
+      <div className="custom-shadow flex flex-col gap-4 rounded-md border bg-white p-6 font-inter">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Chart Repositories
+          </h2>
+          <p className="mt-1 text-sm text-gray-600">
+            No repository is currently selected. Add one of the popular Helm
+            chart repositories below to start browsing and installing charts:
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {POPULAR_REPOSITORIES.map((repo) => (
+            <div
+              key={repo.name}
+              className="flex flex-col justify-between rounded-lg border border-gray-200 bg-gray-50/50 p-4 transition-all hover:border-sky-400 hover:shadow-xs"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-gray-900">{repo.name}</h3>
+                  <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                    helm
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">{repo.description}</p>
+                <div
+                  className="mt-2 truncate font-mono text-[11px] text-gray-400"
+                  title={repo.url}
+                >
+                  {repo.url}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                data-cy={`empty-state-add-${repo.name}`}
+                onClick={() => {
+                  upsertSearchParams("repo_name", repo.name);
+                  upsertSearchParams("repo_url", repo.url);
+                  upsertSearchParams("add_repo", "true");
+                }}
+                className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-sky-700"
+              >
+                + Add {repo.name}
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

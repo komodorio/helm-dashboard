@@ -3,6 +3,10 @@ import { useState } from "react";
 
 import apiService from "../../API/apiService";
 import { useAppContext } from "../../context/AppContext";
+import {
+  POPULAR_REPOSITORIES,
+  type SuggestedRepository,
+} from "../../data/popularRepositories";
 import useAlertError from "../../hooks/useAlertError";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import useNavigateWithSearchParams from "../../hooks/useNavigateWithSearchParams";
@@ -32,11 +36,33 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
     username: "",
     password: "",
   });
+
+  const [prevRepoName, setPrevRepoName] = useState(repo_name);
+  const [prevRepoUrl, setPrevRepoUrl] = useState(repo_url);
+
+  if (repo_name !== prevRepoName || repo_url !== prevRepoUrl) {
+    setPrevRepoName(repo_name);
+    setPrevRepoUrl(repo_url);
+    setFormData((prev) => ({
+      ...prev,
+      name: repo_name ?? prev.name,
+      url: repo_url ?? prev.url,
+    }));
+  }
+
   const [isLoading, setIsLoading] = useState(false);
   const alertError = useAlertError();
   const { setSelectedRepo } = useAppContext();
   const navigate = useNavigateWithSearchParams();
   const queryClient = useQueryClient();
+
+  const handleSelectPreset = (repo: SuggestedRepository) => {
+    setFormData((prev) => ({
+      ...prev,
+      name: repo.name,
+      url: repo.url,
+    }));
+  };
 
   const addRepository = async () => {
     const body = new FormData();
@@ -105,6 +131,25 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
         </div>
       }
     >
+      <div className="mb-5">
+        <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+          Popular Repositories (click to auto-fill)
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {POPULAR_REPOSITORIES.map((repo) => (
+            <button
+              key={repo.name}
+              type="button"
+              data-cy={`preset-repo-${repo.name}`}
+              onClick={() => handleSelectPreset(repo)}
+              className="inline-flex cursor-pointer items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-sky-500 hover:bg-sky-50 hover:text-sky-700"
+              title={`${repo.name}: ${repo.description}`}
+            >
+              + {repo.name}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="flex gap-x-3">
         <label className="flex-1" htmlFor="name">
           <div className="require mb-2 text-sm">Name</div>
