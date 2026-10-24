@@ -14,12 +14,49 @@ import { getVersionManifestFormData } from "./shared";
 
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
-export function useGetInstalledReleases(context: string) {
+export interface GetInstalledReleasesPagination {
+  offset?: number;
+  limit?: number;
+}
+
+export function useGetInstalledReleases(
+  contextOrParams:
+    | string
+    | {
+        context: string;
+        offset?: number;
+        limit?: number;
+      },
+  pagination?: GetInstalledReleasesPagination
+) {
+  const context =
+    typeof contextOrParams === "string"
+      ? contextOrParams
+      : contextOrParams.context;
+  const offset =
+    typeof contextOrParams === "string"
+      ? pagination?.offset
+      : (contextOrParams.offset ?? pagination?.offset);
+  const limit =
+    typeof contextOrParams === "string"
+      ? pagination?.limit
+      : (contextOrParams.limit ?? pagination?.limit);
+
+  const params = new URLSearchParams();
+  if (offset !== undefined) {
+    params.set("offset", offset.toString());
+  }
+  if (limit !== undefined) {
+    params.set("limit", limit.toString());
+  }
+  const queryString = params.toString();
+  const url = `/api/helm/releases${queryString ? `?${queryString}` : ""}`;
+
   return useQuery<Release[]>({
-    queryKey: ["installedReleases", context],
+    queryKey: ["installedReleases", context, offset, limit],
     queryFn: () =>
       apiService.fetchWithSafeDefaults<Release[]>({
-        url: "/api/helm/releases",
+        url,
         fallback: [],
       }),
     retry: false,

@@ -5,6 +5,7 @@ import { useGetInstalledReleases } from "../API/releases";
 import ClustersList from "../components/ClustersList";
 import InstalledPackagesHeader from "../components/InstalledPackages/InstalledPackagesHeader";
 import InstalledPackagesList from "../components/InstalledPackages/InstalledPackagesList";
+import InstalledPackagesPagination from "../components/InstalledPackages/InstalledPackagesPagination";
 import Spinner from "../components/Spinner";
 import type { Release } from "../data/types";
 import useAlertError from "../hooks/useAlertError";
@@ -27,13 +28,26 @@ function Installed() {
   };
 
   const handleClusterChange = (clusterName: string) => {
+    setCurrentPage(1);
     void clusterChange(clusterName);
   };
 
   const [filterKey, setFilterKey] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
+  const totalPages = Math.max(1, Math.ceil((data?.length ?? 0) / pageSize));
+  const effectiveCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const offset = (effectiveCurrentPage - 1) * pageSize;
+  const limit = pageSize;
+
   const alertError = useAlertError();
   const { data, isLoading, isRefetching, isError, error } =
-    useGetInstalledReleases(context ?? "");
+    useGetInstalledReleases({
+      context: context ?? "",
+      offset,
+      limit,
+    });
 
   const onError = useEffectEvent(() => {
     alertError.setShowErrorModal({
@@ -78,6 +92,24 @@ function Installed() {
     );
   }, [data, filterKey, selectedNamespaces]);
 
+  const filteredTotalPages = Math.max(
+    1,
+    Math.ceil(filteredReleases.length / pageSize)
+  );
+  const activePage = Math.min(
+    Math.max(1, effectiveCurrentPage),
+    filteredTotalPages
+  );
+
+  // TODO: When backend implements pagination metadata, extract 'total' from the API response
+  // (e.g. data.total or 'X-Total-Count' header). For now, assume total is data.length or filteredReleases.length.
+  const paginatedReleases = useMemo(() => {
+    // TODO: When backend supports server-side pagination slicing, data will already be sliced.
+    // For now, backend returns the full list, so slice client-side.
+    const start = (activePage - 1) * pageSize;
+    return filteredReleases.slice(start, start + pageSize);
+  }, [filteredReleases, activePage, pageSize]);
+
   return (
     <div className="flex w-full flex-row">
       <ClustersList
@@ -91,7 +123,10 @@ function Installed() {
         <InstalledPackagesHeader
           isLoading={isLoading || isRefetching}
           filteredReleases={filteredReleases}
-          setFilterKey={setFilterKey}
+          setFilterKey={(key) => {
+            setFilterKey(key);
+            setCurrentPage(1);
+          }}
         />
 
         {isLoading || isRefetching ? (
@@ -99,7 +134,19 @@ function Installed() {
             <Spinner />
           </div>
         ) : (
-          <InstalledPackagesList filteredReleases={filteredReleases} />
+          <>
+            <InstalledPackagesList filteredReleases={paginatedReleases} />
+            <InstalledPackagesPagination
+              currentPage={activePage}
+              totalItems={filteredReleases.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setCurrentPage(1);
+              }}
+            />
+          </>
         )}
       </div>
     </div>
