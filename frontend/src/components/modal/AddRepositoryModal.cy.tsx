@@ -38,18 +38,18 @@ describe("AddRepositoryModal preset suggestions", () => {
   it("renders popular repository suggestions and auto-fills fields when clicked", () => {
     renderModal();
 
-    cy.get("[data-cy='preset-repo-bitnami']").should("exist");
     cy.get("[data-cy='preset-repo-jetstack']").should("exist");
+    cy.get("[data-cy='preset-repo-traefik']").should("exist");
 
     cy.get("[data-cy='add-chart-name']").should("have.value", "");
     cy.get("[data-cy='add-chart-url']").should("have.value", "");
 
-    cy.get("[data-cy='preset-repo-bitnami']").click();
+    cy.get("[data-cy='preset-repo-jetstack']").click();
 
-    cy.get("[data-cy='add-chart-name']").should("have.value", "bitnami");
+    cy.get("[data-cy='add-chart-name']").should("have.value", "jetstack");
     cy.get("[data-cy='add-chart-url']").should(
       "have.value",
-      "https://charts.bitnami.com/bitnami"
+      "https://charts.jetstack.io"
     );
   });
 });

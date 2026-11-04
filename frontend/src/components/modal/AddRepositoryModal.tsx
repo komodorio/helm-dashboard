@@ -37,19 +37,6 @@ function AddRepositoryModal({ isOpen, onClose }: AddRepositoryModalProps) {
     password: "",
   });
 
-  const [prevRepoName, setPrevRepoName] = useState(repo_name);
-  const [prevRepoUrl, setPrevRepoUrl] = useState(repo_url);
-
-  if (repo_name !== prevRepoName || repo_url !== prevRepoUrl) {
-    setPrevRepoName(repo_name);
-    setPrevRepoUrl(repo_url);
-    setFormData((prev) => ({
-      ...prev,
-      name: repo_name ?? prev.name,
-      url: repo_url ?? prev.url,
-    }));
-  }
-
   const [isLoading, setIsLoading] = useState(false);
   const alertError = useAlertError();
   const { setSelectedRepo } = useAppContext();
