@@ -26,6 +26,7 @@ type Releases struct {
 	Namespaces []string
 	HelmConfig HelmNSConfigGetter
 	Settings   *cli.EnvSettings
+	K8s        *K8s
 	mx         sync.Mutex
 }
 
@@ -33,8 +34,18 @@ func (a *Releases) List() ([]*Release, error) {
 	a.mx.Lock()
 	defer a.mx.Unlock()
 
+	namespaces := a.Namespaces
+	if len(namespaces) == 1 && namespaces[0] == "" && a.K8s != nil {
+		if nsList, err := a.K8s.GetNameSpaces(); err == nil && len(nsList.Items) > 0 {
+			namespaces = make([]string, 0, len(nsList.Items))
+			for _, item := range nsList.Items {
+				namespaces = append(namespaces, item.Name)
+			}
+		}
+	}
+
 	releases := []*Release{}
-	for _, ns := range a.Namespaces {
+	for _, ns := range namespaces {
 		log.Debugf("Listing releases in namespace: %s", ns)
 		hc, err := a.HelmConfig(ns)
 		if err != nil {
@@ -43,7 +54,7 @@ func (a *Releases) List() ([]*Release, error) {
 
 		client := action.NewList(hc)
 		client.All = true
-		client.AllNamespaces = false
+		client.AllNamespaces = ns == ""
 		client.Limit = 0
 		client.SetStateMask() // required to apply proper filtering
 		rels, err := client.Run()

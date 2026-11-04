@@ -69,7 +69,7 @@ func TestHReleaseToJSON(t *testing.T) {
 		}
 	})
 
-	t.Run("storage namespace overrides release namespace", func(t *testing.T) {
+	t.Run("storage namespace tracked separately from release namespace", func(t *testing.T) {
 		rel := &release.Release{
 			Name:      "educates-contour",
 			Namespace: "projectcontour",
@@ -77,8 +77,11 @@ func TestHReleaseToJSON(t *testing.T) {
 		}
 
 		res := HReleaseToJSON(rel, "educates")
-		if res.Namespace != "educates" {
-			t.Errorf("expected storage namespace educates, got %q", res.Namespace)
+		if res.Namespace != "projectcontour" {
+			t.Errorf("expected release namespace projectcontour, got %q", res.Namespace)
+		}
+		if res.StorageNamespace != "educates" {
+			t.Errorf("expected storage namespace educates, got %q", res.StorageNamespace)
 		}
 	})
 }
