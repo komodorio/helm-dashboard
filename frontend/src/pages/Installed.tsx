@@ -36,9 +36,21 @@ function Installed() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
-  const totalPages = Math.max(1, Math.ceil((data?.length ?? 0) / pageSize));
-  const effectiveCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
-  const offset = (effectiveCurrentPage - 1) * pageSize;
+  // Reset page when cluster context or namespace changes
+  const [prevContext, setPrevContext] = useState(context);
+  if (context !== prevContext) {
+    setPrevContext(context);
+    setCurrentPage(1);
+  }
+
+  const [prevFilteredNamespace, setPrevFilteredNamespace] =
+    useState(filteredNamespace);
+  if (filteredNamespace !== prevFilteredNamespace) {
+    setPrevFilteredNamespace(filteredNamespace);
+    setCurrentPage(1);
+  }
+
+  const offset = (currentPage - 1) * pageSize;
   const limit = pageSize;
 
   const alertError = useAlertError();
@@ -92,23 +104,21 @@ function Installed() {
     );
   }, [data, filterKey, selectedNamespaces]);
 
-  const filteredTotalPages = Math.max(
-    1,
-    Math.ceil(filteredReleases.length / pageSize)
-  );
-  const activePage = Math.min(
-    Math.max(1, effectiveCurrentPage),
-    filteredTotalPages
-  );
+  // TODO: When backend implements pagination metadata, read 'total' from API response.
+  // For now, fall back to the full list length.
+  const total = filteredReleases.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  // TODO: When backend implements pagination metadata, extract 'total' from the API response
-  // (e.g. data.total or 'X-Total-Count' header). For now, assume total is data.length or filteredReleases.length.
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
+
   const paginatedReleases = useMemo(() => {
     // TODO: When backend supports server-side pagination slicing, data will already be sliced.
     // For now, backend returns the full list, so slice client-side.
-    const start = (activePage - 1) * pageSize;
+    const start = (currentPage - 1) * pageSize;
     return filteredReleases.slice(start, start + pageSize);
-  }, [filteredReleases, activePage, pageSize]);
+  }, [filteredReleases, currentPage, pageSize]);
 
   return (
     <div className="flex w-full flex-row">
@@ -129,7 +139,7 @@ function Installed() {
           }}
         />
 
-        {isLoading || isRefetching ? (
+        {isLoading ? (
           <div className="py-2">
             <Spinner />
           </div>
@@ -137,8 +147,8 @@ function Installed() {
           <>
             <InstalledPackagesList filteredReleases={paginatedReleases} />
             <InstalledPackagesPagination
-              currentPage={activePage}
-              totalItems={filteredReleases.length}
+              currentPage={currentPage}
+              totalItems={total}
               pageSize={pageSize}
               onPageChange={setCurrentPage}
               onPageSizeChange={(newSize) => {

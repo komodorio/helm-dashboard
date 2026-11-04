@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   useMutation,
   type UseMutationOptions,
   useQuery,
@@ -14,34 +15,17 @@ import { getVersionManifestFormData } from "./shared";
 
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
-export interface GetInstalledReleasesPagination {
+export interface GetInstalledReleasesParams {
+  context: string;
   offset?: number;
   limit?: number;
 }
 
-export function useGetInstalledReleases(
-  contextOrParams:
-    | string
-    | {
-        context: string;
-        offset?: number;
-        limit?: number;
-      },
-  pagination?: GetInstalledReleasesPagination
-) {
-  const context =
-    typeof contextOrParams === "string"
-      ? contextOrParams
-      : contextOrParams.context;
-  const offset =
-    typeof contextOrParams === "string"
-      ? pagination?.offset
-      : (contextOrParams.offset ?? pagination?.offset);
-  const limit =
-    typeof contextOrParams === "string"
-      ? pagination?.limit
-      : (contextOrParams.limit ?? pagination?.limit);
-
+export function useGetInstalledReleases({
+  context,
+  offset,
+  limit,
+}: GetInstalledReleasesParams) {
   const params = new URLSearchParams();
   if (offset !== undefined) {
     params.set("offset", offset.toString());
@@ -59,6 +43,7 @@ export function useGetInstalledReleases(
         url,
         fallback: [],
       }),
+    placeholderData: keepPreviousData,
     retry: false,
   });
 }
