@@ -118,3 +118,28 @@ func TestListReleases_StorageNamespace(t *testing.T) {
 	assert.Equal(t, res[0].StorageNamespace, "educates")
 	assert.Equal(t, res[0].helmStorageNamespace(), "educates")
 }
+
+func TestListReleases_DefaultAllNamespaces(t *testing.T) {
+	fakeStorage = storage.Init(driver.NewMemory())
+	err := fakeStorage.Create(&release.Release{
+		Name:      "test-release",
+		Namespace: "default",
+		Version:   1,
+		Info: &release.Info{
+			Status: release.StatusDeployed,
+		},
+	})
+	assert.NilError(t, err)
+
+	releases := &Releases{
+		Namespaces: []string{""},
+		HelmConfig: fakeHelmNSConfigGetter,
+	}
+
+	res, err := releases.List()
+	assert.NilError(t, err)
+	assert.Equal(t, len(res), 1)
+	assert.Equal(t, res[0].Orig.Name, "test-release")
+	assert.Equal(t, res[0].Orig.Namespace, "default")
+	assert.Equal(t, res[0].helmStorageNamespace(), "default")
+}

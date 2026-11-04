@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strconv"
 	"sync"
 
 	"github.com/joomcode/errorx"
@@ -34,29 +35,60 @@ func (a *Releases) List() ([]*Release, error) {
 	a.mx.Lock()
 	defer a.mx.Unlock()
 
-	namespaces := a.Namespaces
-	if len(namespaces) == 1 && namespaces[0] == "" && a.K8s != nil {
-		if nsList, err := a.K8s.GetNameSpaces(); err == nil && len(nsList.Items) > 0 {
-			namespaces = make([]string, 0, len(nsList.Items))
-			for _, item := range nsList.Items {
-				namespaces = append(namespaces, item.Name)
-			}
-		}
-	}
-
 	releases := []*Release{}
-	for _, ns := range namespaces {
-		log.Debugf("Listing releases in namespace: %s", ns)
-		hc, err := a.HelmConfig(ns)
+
+	if len(a.Namespaces) == 1 && a.Namespaces[0] == "" {
+		hc, err := a.HelmConfig("")
 		if err != nil {
 			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 		}
 
 		client := action.NewList(hc)
 		client.All = true
-		client.AllNamespaces = ns == ""
+		client.AllNamespaces = true
 		client.Limit = 0
-		client.SetStateMask() // required to apply proper filtering
+		client.SetStateMask()
+		rels, err := client.Run()
+		if err != nil {
+			return nil, errorx.Decorate(err, "failed to get list of releases")
+		}
+
+		var storageMap map[string]string
+		if a.K8s != nil {
+			driver := os.Getenv("HELM_DRIVER")
+			var lookupErr error
+			storageMap, lookupErr = a.K8s.GetReleaseStorageNamespaces(driver)
+			if lookupErr != nil {
+				log.Warnf("Failed to query release storage metadata cluster-wide, falling back to release namespace: %v", lookupErr)
+			}
+		}
+
+		for _, r := range rels {
+			storageNS := ""
+			if storageMap != nil {
+				key := r.Name + "#" + strconv.Itoa(r.Version)
+				storageNS = storageMap[key]
+			}
+			if storageNS == "" {
+				storageNS = r.Namespace
+			}
+			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings, storageNS))
+		}
+		return releases, nil
+	}
+
+	for _, ns := range a.Namespaces {
+		log.Debugf("Listing releases in namespace: %s", ns)
+		hc, err := a.HelmConfig(ns)
+		if err != nil {
+			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", ns)
+		}
+
+		client := action.NewList(hc)
+		client.All = true
+		client.AllNamespaces = false
+		client.Limit = 0
+		client.SetStateMask()
 		rels, err := client.Run()
 		if err != nil {
 			return nil, errorx.Decorate(err, "failed to get list of releases")

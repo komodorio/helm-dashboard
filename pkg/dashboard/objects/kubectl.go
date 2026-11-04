@@ -43,14 +43,23 @@ type cfgProxyObject struct {
 }
 
 func (p *cfgProxyObject) ToRESTConfig() (*rest.Config, error) {
+	if p == nil || p.Impl == nil {
+		return nil, errors.New("no REST client getter configured")
+	}
 	return p.Impl.ToRESTConfig()
 }
 
 func (p *cfgProxyObject) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
+	if p == nil || p.Impl == nil {
+		return nil, errors.New("no REST client getter configured")
+	}
 	return p.Impl.ToDiscoveryClient()
 }
 
 func (p *cfgProxyObject) ToRESTMapper() (meta.RESTMapper, error) {
+	if p == nil || p.Impl == nil {
+		return nil, errors.New("no REST client getter configured")
+	}
 	return p.Impl.ToRESTMapper()
 }
 
@@ -96,6 +105,50 @@ func (k *K8s) GetNameSpaces() (res *corev1.NamespaceList, err error) {
 	}
 
 	return lst, nil
+}
+
+func (k *K8s) GetReleaseStorageNamespaces(driver string) (map[string]string, error) {
+	if k == nil || k.Factory == nil {
+		return nil, errors.New("k8s factory not initialized")
+	}
+
+	clientset, err := k.Factory.KubernetesClientSet()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get KubernetesClientSet")
+	}
+
+	res := make(map[string]string)
+	opts := metav1.ListOptions{
+		LabelSelector: "owner=helm",
+	}
+
+	if driver == "configmap" || driver == "configmaps" {
+		cms, err := clientset.CoreV1().ConfigMaps("").List(context.Background(), opts)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to list release configmaps")
+		}
+		for _, cm := range cms.Items {
+			name := cm.Labels["name"]
+			version := cm.Labels["version"]
+			if name != "" && version != "" {
+				res[name+"#"+version] = cm.Namespace
+			}
+		}
+	} else {
+		secrets, err := clientset.CoreV1().Secrets("").List(context.Background(), opts)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to list release secrets")
+		}
+		for _, s := range secrets.Items {
+			name := s.Labels["name"]
+			version := s.Labels["version"]
+			if name != "" && version != "" {
+				res[name+"#"+version] = s.Namespace
+			}
+		}
+	}
+
+	return res, nil
 }
 
 func (k *K8s) DescribeResource(kind string, ns string, name string) (string, error) {

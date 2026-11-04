@@ -157,7 +157,7 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 		for _, obj := range res {
 			ns := obj.Namespace
 			if ns == "" {
-				if rel != nil && rel.Orig != nil && rel.Orig.Namespace != "" {
+				if rel.Orig.Namespace != "" {
 					ns = rel.Orig.Namespace
 				} else {
 					ns = c.Param("ns")
