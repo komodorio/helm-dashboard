@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   useMutation,
   type UseMutationOptions,
   useQuery,
@@ -14,14 +15,35 @@ import { getVersionManifestFormData } from "./shared";
 
 export const HD_RESOURCE_CONDITION_TYPE = "hdHealth"; // it's our custom condition type, only one exists
 
-export function useGetInstalledReleases(context: string) {
+export interface GetInstalledReleasesParams {
+  context: string;
+  offset?: number;
+  limit?: number;
+}
+
+export function useGetInstalledReleases({
+  context,
+  offset,
+  limit,
+}: GetInstalledReleasesParams) {
+  const params = new URLSearchParams();
+  if (offset !== undefined) {
+    params.set("offset", offset.toString());
+  }
+  if (limit !== undefined) {
+    params.set("limit", limit.toString());
+  }
+  const queryString = params.toString();
+  const url = `/api/helm/releases${queryString ? `?${queryString}` : ""}`;
+
   return useQuery<Release[]>({
-    queryKey: ["installedReleases", context],
+    queryKey: ["installedReleases", context, offset, limit],
     queryFn: () =>
       apiService.fetchWithSafeDefaults<Release[]>({
-        url: "/api/helm/releases",
+        url,
         fallback: [],
       }),
+    placeholderData: keepPreviousData,
     retry: false,
   });
 }
