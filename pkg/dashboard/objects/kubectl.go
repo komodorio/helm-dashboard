@@ -43,23 +43,14 @@ type cfgProxyObject struct {
 }
 
 func (p *cfgProxyObject) ToRESTConfig() (*rest.Config, error) {
-	if p == nil || p.Impl == nil {
-		return nil, errors.New("no REST client getter configured")
-	}
 	return p.Impl.ToRESTConfig()
 }
 
 func (p *cfgProxyObject) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
-	if p == nil || p.Impl == nil {
-		return nil, errors.New("no REST client getter configured")
-	}
 	return p.Impl.ToDiscoveryClient()
 }
 
 func (p *cfgProxyObject) ToRESTMapper() (meta.RESTMapper, error) {
-	if p == nil || p.Impl == nil {
-		return nil, errors.New("no REST client getter configured")
-	}
 	return p.Impl.ToRESTMapper()
 }
 
@@ -74,6 +65,9 @@ type K8s struct {
 }
 
 func NewK8s(helmConfig *action.Configuration, namespaces []string) (*K8s, error) {
+	if helmConfig == nil || helmConfig.RESTClientGetter == nil {
+		return nil, nil
+	}
 	factory := cmdutil.NewFactory(&cfgProxyObject{Impl: helmConfig.RESTClientGetter})
 
 	return &K8s{
@@ -107,48 +101,71 @@ func (k *K8s) GetNameSpaces() (res *corev1.NamespaceList, err error) {
 	return lst, nil
 }
 
-func (k *K8s) GetReleaseStorageNamespaces(driver string) (map[string]string, error) {
+// ExtractSecretStorageNamespaces returns a sorted slice of unique namespaces holding release secrets.
+func ExtractSecretStorageNamespaces(secrets []corev1.Secret) []string {
+	seen := make(map[string]bool)
+	var res []string
+	for _, s := range secrets {
+		if s.Namespace != "" && !seen[s.Namespace] {
+			seen[s.Namespace] = true
+			res = append(res, s.Namespace)
+		}
+	}
+	sort.Strings(res)
+	return res
+}
+
+// ExtractConfigMapStorageNamespaces returns a sorted slice of unique namespaces holding release configmaps.
+func ExtractConfigMapStorageNamespaces(cms []corev1.ConfigMap) []string {
+	seen := make(map[string]bool)
+	var res []string
+	for _, cm := range cms {
+		if cm.Namespace != "" && !seen[cm.Namespace] {
+			seen[cm.Namespace] = true
+			res = append(res, cm.Namespace)
+		}
+	}
+	sort.Strings(res)
+	return res
+}
+
+func (k *K8s) GetReleaseStorageNamespaces(driver string) ([]string, error) {
 	if k == nil || k.Factory == nil {
 		return nil, errors.New("k8s factory not initialized")
 	}
 
-	clientset, err := k.Factory.KubernetesClientSet()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get KubernetesClientSet")
-	}
-
-	res := make(map[string]string)
+	driver = strings.ToLower(strings.TrimSpace(driver))
 	opts := metav1.ListOptions{
 		LabelSelector: "owner=helm",
 	}
 
-	if driver == "configmap" || driver == "configmaps" {
-		cms, err := clientset.CoreV1().ConfigMaps("").List(context.Background(), opts)
+	switch driver {
+	case "", "secret", "secrets":
+		clientset, err := k.Factory.KubernetesClientSet()
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to list release configmaps")
+			return nil, errors.Wrap(err, "failed to get KubernetesClientSet")
 		}
-		for _, cm := range cms.Items {
-			name := cm.Labels["name"]
-			version := cm.Labels["version"]
-			if name != "" && version != "" {
-				res[name+"#"+version] = cm.Namespace
-			}
-		}
-	} else {
 		secrets, err := clientset.CoreV1().Secrets("").List(context.Background(), opts)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to list release secrets")
 		}
-		for _, s := range secrets.Items {
-			name := s.Labels["name"]
-			version := s.Labels["version"]
-			if name != "" && version != "" {
-				res[name+"#"+version] = s.Namespace
-			}
-		}
-	}
+		return ExtractSecretStorageNamespaces(secrets.Items), nil
 
-	return res, nil
+	case "configmap", "configmaps":
+		clientset, err := k.Factory.KubernetesClientSet()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get KubernetesClientSet")
+		}
+		cms, err := clientset.CoreV1().ConfigMaps("").List(context.Background(), opts)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to list release configmaps")
+		}
+		return ExtractConfigMapStorageNamespaces(cms.Items), nil
+
+	default:
+		log.Infof("HELM_DRIVER '%s' does not support cluster-wide storage discovery, skipping lookup", driver)
+		return nil, nil
+	}
 }
 
 func (k *K8s) DescribeResource(kind string, ns string, name string) (string, error) {

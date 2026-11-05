@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"path"
-	"strconv"
 	"sync"
 
 	"github.com/joomcode/errorx"
@@ -35,9 +34,23 @@ func (a *Releases) List() ([]*Release, error) {
 	a.mx.Lock()
 	defer a.mx.Unlock()
 
+	targetNamespaces := a.Namespaces
+	clusterWide := len(a.Namespaces) == 1 && a.Namespaces[0] == ""
+
+	if clusterWide && a.K8s != nil {
+		driver := os.Getenv("HELM_DRIVER")
+		storageNSs, lookupErr := a.K8s.GetReleaseStorageNamespaces(driver)
+		if lookupErr != nil {
+			log.Warnf("Failed to query release storage metadata cluster-wide, falling back to all-namespaces listing: %v", lookupErr)
+		} else if len(storageNSs) > 0 {
+			targetNamespaces = storageNSs
+			clusterWide = false
+		}
+	}
+
 	releases := []*Release{}
 
-	if len(a.Namespaces) == 1 && a.Namespaces[0] == "" {
+	if clusterWide {
 		hc, err := a.HelmConfig("")
 		if err != nil {
 			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
@@ -53,31 +66,13 @@ func (a *Releases) List() ([]*Release, error) {
 			return nil, errorx.Decorate(err, "failed to get list of releases")
 		}
 
-		var storageMap map[string]string
-		if a.K8s != nil {
-			driver := os.Getenv("HELM_DRIVER")
-			var lookupErr error
-			storageMap, lookupErr = a.K8s.GetReleaseStorageNamespaces(driver)
-			if lookupErr != nil {
-				log.Warnf("Failed to query release storage metadata cluster-wide, falling back to release namespace: %v", lookupErr)
-			}
-		}
-
 		for _, r := range rels {
-			storageNS := ""
-			if storageMap != nil {
-				key := r.Name + "#" + strconv.Itoa(r.Version)
-				storageNS = storageMap[key]
-			}
-			if storageNS == "" {
-				storageNS = r.Namespace
-			}
-			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings, storageNS))
+			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings, r.Namespace))
 		}
 		return releases, nil
 	}
 
-	for _, ns := range a.Namespaces {
+	for _, ns := range targetNamespaces {
 		log.Debugf("Listing releases in namespace: %s", ns)
 		hc, err := a.HelmConfig(ns)
 		if err != nil {

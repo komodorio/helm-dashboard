@@ -10,6 +10,8 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage"
 	"helm.sh/helm/v3/pkg/storage/driver"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var (
@@ -142,4 +144,72 @@ func TestListReleases_DefaultAllNamespaces(t *testing.T) {
 	assert.Equal(t, res[0].Orig.Name, "test-release")
 	assert.Equal(t, res[0].Orig.Namespace, "default")
 	assert.Equal(t, res[0].helmStorageNamespace(), "default")
+}
+
+func TestExtractSecretStorageNamespaces(t *testing.T) {
+	secrets := []corev1.Secret{
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sh.helm.release.v1.redis.v1",
+				Namespace: "team-a",
+				Labels:    map[string]string{"name": "redis", "version": "1", "owner": "helm"},
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sh.helm.release.v1.redis.v2",
+				Namespace: "team-a",
+				Labels:    map[string]string{"name": "redis", "version": "2", "owner": "helm"},
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sh.helm.release.v1.redis.v1",
+				Namespace: "team-b",
+				Labels:    map[string]string{"name": "redis", "version": "1", "owner": "helm"},
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sh.helm.release.v1.app.v1",
+				Namespace: "storage-ns",
+				Labels:    map[string]string{"name": "app", "version": "1", "owner": "helm"},
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "empty-ns",
+				Namespace: "",
+			},
+		},
+	}
+
+	res := ExtractSecretStorageNamespaces(secrets)
+	assert.DeepEqual(t, res, []string{"storage-ns", "team-a", "team-b"})
+}
+
+func TestExtractConfigMapStorageNamespaces(t *testing.T) {
+	cms := []corev1.ConfigMap{
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sh.helm.release.v1.db.v1",
+				Namespace: "production",
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sh.helm.release.v1.db.v2",
+				Namespace: "production",
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sh.helm.release.v1.frontend.v1",
+				Namespace: "staging",
+			},
+		},
+	}
+
+	res := ExtractConfigMapStorageNamespaces(cms)
+	assert.DeepEqual(t, res, []string{"production", "staging"})
 }
