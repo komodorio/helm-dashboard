@@ -28,7 +28,6 @@ function Installed() {
   };
 
   const handleClusterChange = (clusterName: string) => {
-    setCurrentPage(1);
     void clusterChange(clusterName);
   };
 

@@ -1,5 +1,4 @@
 import {
-  keepPreviousData,
   useMutation,
   type UseMutationOptions,
   useQuery,
@@ -43,7 +42,8 @@ export function useGetInstalledReleases({
         url,
         fallback: [],
       }),
-    placeholderData: keepPreviousData,
+    placeholderData: (prev, prevQuery) =>
+      prevQuery?.queryKey[1] === context ? prev : undefined,
     retry: false,
   });
 }

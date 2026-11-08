@@ -1,6 +1,6 @@
 import { Pagination } from "flowbite-react";
 
-type InstalledPackagesPaginationProps = {
+export type InstalledPackagesPaginationProps = {
   currentPage: number;
   totalItems: number;
   pageSize: number;

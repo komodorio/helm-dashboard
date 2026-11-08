@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import InstalledPackagesPagination from "./InstalledPackagesPagination";
+import InstalledPackagesPagination, {
+  type InstalledPackagesPaginationProps,
+} from "./InstalledPackagesPagination";
 
 const meta = {
   title: "InstalledPackages/InstalledPackagesPagination",
@@ -11,35 +13,57 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function PaginationWithState(props: {
-  totalItems: number;
-  initialPageSize?: number;
-}) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(props.initialPageSize ?? 10);
+function PaginationWithState(args: InstalledPackagesPaginationProps) {
+  const [currentPage, setCurrentPage] = useState(args.currentPage);
+  const [pageSize, setPageSize] = useState(args.pageSize);
 
   return (
     <InstalledPackagesPagination
+      {...args}
       currentPage={currentPage}
-      totalItems={props.totalItems}
       pageSize={pageSize}
-      onPageChange={setCurrentPage}
+      onPageChange={(page) => {
+        setCurrentPage(page);
+        args.onPageChange(page);
+      }}
       onPageSizeChange={(newSize) => {
         setPageSize(newSize);
         setCurrentPage(1);
+        args.onPageSizeChange(newSize);
       }}
     />
   );
 }
 
 export const Default: Story = {
-  render: () => <PaginationWithState totalItems={45} initialPageSize={10} />,
+  args: {
+    currentPage: 1,
+    totalItems: 45,
+    pageSize: 10,
+    onPageChange: () => {},
+    onPageSizeChange: () => {},
+  },
+  render: (args) => <PaginationWithState {...args} />,
 };
 
 export const SinglePage: Story = {
-  render: () => <PaginationWithState totalItems={8} initialPageSize={10} />,
+  args: {
+    currentPage: 1,
+    totalItems: 8,
+    pageSize: 10,
+    onPageChange: () => {},
+    onPageSizeChange: () => {},
+  },
+  render: (args) => <PaginationWithState {...args} />,
 };
 
 export const ManyPages: Story = {
-  render: () => <PaginationWithState totalItems={240} initialPageSize={10} />,
+  args: {
+    currentPage: 1,
+    totalItems: 240,
+    pageSize: 10,
+    onPageChange: () => {},
+    onPageSizeChange: () => {},
+  },
+  render: (args) => <PaginationWithState {...args} />,
 };
