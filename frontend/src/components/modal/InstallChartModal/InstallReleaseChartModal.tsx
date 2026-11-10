@@ -117,6 +117,7 @@ export const InstallReleaseChartModal = ({
       namespace,
       release: String(releaseName),
       revision: latestRevision ? latestRevision : undefined,
+      context: selectedCluster,
     });
 
   // This hold the selected version manifest, we use it for the diff
@@ -128,12 +129,14 @@ export const InstallReleaseChartModal = ({
       releaseValues,
       namespace,
       releaseName,
+      context: selectedCluster,
     });
 
   const { data: currentVerManifest, error: currentVerManifestError } =
     useGetReleaseManifest({
       namespace,
       chartName: _releaseName || "",
+      context: selectedCluster,
     });
 
   const {

@@ -28,5 +28,6 @@ func (h *Contexted) GetApp(c *gin.Context) *objects.Application {
 }
 
 func (h *Contexted) EnableClientCache(c *gin.Context) {
-	c.Header("Cache-Control", "max-age=43200")
+	c.Header("Cache-Control", "private, max-age=43200")
+	c.Header("Vary", "X-Kubecontext")
 }

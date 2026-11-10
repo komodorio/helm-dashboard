@@ -84,13 +84,16 @@ export function useGetReleaseManifest({
   namespace,
   chartName,
   options,
+  context,
 }: {
   namespace: string;
   chartName: string;
+  context?: string;
   options?: UseQueryOptions<string>;
 }) {
+  const cluster = context || apiService.currentCluster;
   return useQuery<string>({
-    queryKey: ["manifest", namespace, chartName],
+    queryKey: ["manifest", cluster, namespace, chartName],
     queryFn: () =>
       apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${namespace}/${chartName}/manifests`
@@ -106,9 +109,10 @@ export interface ContainerImage {
   image: string;
 }
 
-export function useGetImages(ns: string, name: string) {
+export function useGetImages(ns: string, name: string, context?: string) {
+  const cluster = context || apiService.currentCluster;
   return useQuery<ContainerImage[]>({
-    queryKey: ["images", ns, name],
+    queryKey: ["images", cluster, ns, name],
     queryFn: () =>
       apiService.fetchWithSafeDefaults<ContainerImage[]>({
         url: `/api/helm/releases/${ns}/${name}/images`,
@@ -135,9 +139,10 @@ export interface RelationGraph {
   edges: RelationEdge[];
 }
 
-export function useGetRelations(ns: string, name: string) {
+export function useGetRelations(ns: string, name: string, context?: string) {
+  const cluster = context || apiService.currentCluster;
   return useQuery<RelationGraph>({
-    queryKey: ["relations", ns, name],
+    queryKey: ["relations", cluster, ns, name],
     queryFn: () =>
       apiService.fetchWithSafeDefaults<RelationGraph>({
         url: `/api/helm/releases/${ns}/${name}/relations`,
@@ -147,9 +152,15 @@ export function useGetRelations(ns: string, name: string) {
 }
 
 // List of installed k8s resources for this release
-export function useGetResources(ns: string, name: string, enabled?: boolean) {
+export function useGetResources(
+  ns: string,
+  name: string,
+  enabled?: boolean,
+  context?: string
+) {
+  const cluster = context || apiService.currentCluster;
   return useQuery<StructuredResources[]>({
-    queryKey: ["resources", ns, name],
+    queryKey: ["resources", cluster, ns, name],
     queryFn: () =>
       apiService.fetchWithSafeDefaults<StructuredResources[]>({
         url: `/api/helm/releases/${ns}/${name}/resources?health=true`,
@@ -186,14 +197,16 @@ export function useGetResourceDescription(
   ns: string,
   name: string,
   apiVersion?: string,
-  options?: UseQueryOptions<string>
+  options?: UseQueryOptions<string>,
+  context?: string
 ) {
+  const cluster = context || apiService.currentCluster;
   const params = new URLSearchParams({ name, namespace: ns });
   if (apiVersion) {
     params.set("apiVersion", apiVersion);
   }
   return useQuery<string>({
-    queryKey: ["describe", type, ns, name, apiVersion],
+    queryKey: ["describe", cluster, type, ns, name, apiVersion],
     queryFn: () =>
       apiService.fetchWithDefaults<string>(
         `/api/k8s/${type}/describe?${params.toString()}`,
@@ -243,9 +256,10 @@ export function useGetReleaseInfoByType(
   additionalParams = "",
   options?: UseQueryOptions<string>
 ) {
-  const { chart, namespace, tab, revision } = params;
+  const { chart, namespace, tab, revision, context } = params;
+  const cluster = context || apiService.currentCluster;
   return useQuery<string>({
-    queryKey: [tab, namespace, chart, revision, additionalParams],
+    queryKey: [tab, cluster, namespace, chart, revision, additionalParams],
     queryFn: () =>
       apiService.fetchWithDefaults<string>(
         `/api/helm/releases/${namespace}/${chart}/${tab}?revision=${revision}${additionalParams}`,
@@ -327,16 +341,27 @@ export function useChartReleaseValues({
   revision,
   options,
   version,
+  context,
 }: {
   namespace?: string;
   release: string;
   userDefinedValue?: string;
   revision?: number;
   version?: string;
+  context?: string;
   options?: UseQueryOptions<string>;
 }) {
+  const cluster = context || apiService.currentCluster;
   return useQuery<string>({
-    queryKey: ["values", namespace, release, userDefinedValue, version],
+    queryKey: [
+      "values",
+      cluster,
+      namespace,
+      release,
+      userDefinedValue,
+      version,
+      revision,
+    ],
     queryFn: () =>
       apiService.fetchWithDefaults(
         `/api/helm/releases/${namespace}/${release}/values?${"userDefined=true"}${
@@ -365,6 +390,7 @@ export const useVersionData = ({
   releaseName,
   isInstallRepoChart = false,
   enabled = true,
+  context,
 }: {
   version: string;
   userValues: string;
@@ -374,9 +400,12 @@ export const useVersionData = ({
   releaseName: string;
   isInstallRepoChart?: boolean;
   enabled?: boolean;
+  context?: string;
 }) => {
+  const cluster = context || apiService.currentCluster;
   return useQuery<{ [key: string]: string }>({
     queryKey: [
+      cluster,
       version,
       userValues,
       chartAddress,
@@ -422,6 +451,7 @@ interface ReleaseInfoParams {
   tab: string;
   namespace?: string;
   revision?: string;
+  context?: string;
 }
 
 export interface StructuredResources {

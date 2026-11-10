@@ -117,6 +117,7 @@ export const InstallRepoChartModal = ({
       releaseName,
       isInstallRepoChart: true,
       enabled: Boolean(chartAddress),
+      context: selectedCluster,
     });
 
   const {

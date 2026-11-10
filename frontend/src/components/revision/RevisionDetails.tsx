@@ -383,6 +383,7 @@ const Rollback = ({
         namespace,
         revision: rollbackRevision.toString(),
         tab: "manifests",
+        context,
       },
       `&revisionDiff=${installedRevision.revision}`
     );

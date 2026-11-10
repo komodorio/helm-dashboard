@@ -76,7 +76,8 @@ func TestEnableCacheControl(t *testing.T) {
 		},
 	}
 	h.EnableClientCache(con)
-	assert.Equal(t, w.Header().Get("Cache-Control"), "max-age=43200")
+	assert.Equal(t, w.Header().Get("Cache-Control"), "private, max-age=43200")
+	assert.Equal(t, w.Header().Get("Vary"), "X-Kubecontext")
 }
 
 func TestConfigureStatic(t *testing.T) {
