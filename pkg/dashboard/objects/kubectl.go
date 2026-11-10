@@ -66,7 +66,7 @@ type K8s struct {
 
 func NewK8s(helmConfig *action.Configuration, namespaces []string) (*K8s, error) {
 	if helmConfig == nil || helmConfig.RESTClientGetter == nil {
-		return nil, nil
+		return nil, errors.New("RESTClientGetter is required to initialize K8s client")
 	}
 	factory := cmdutil.NewFactory(&cfgProxyObject{Impl: helmConfig.RESTClientGetter})
 
