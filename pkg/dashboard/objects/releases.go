@@ -20,6 +20,7 @@ import (
 	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"golang.org/x/sync/errgroup"
 )
 
 type Releases struct {
@@ -72,25 +73,41 @@ func (a *Releases) List() ([]*Release, error) {
 		return releases, nil
 	}
 
+	var (
+		listEg errgroup.Group
+		listMx sync.Mutex
+	)
+	listEg.SetLimit(8)
 	for _, ns := range targetNamespaces {
-		log.Debugf("Listing releases in namespace: %s", ns)
-		hc, err := a.HelmConfig(ns)
-		if err != nil {
-			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", ns)
-		}
+		ns := ns
+		listEg.Go(func() error {
+			log.Debugf("Listing releases in namespace: %s", ns)
+			hc, err := a.HelmConfig(ns)
+			if err != nil {
+				return errorx.Decorate(err, "failed to get helm config for namespace '%s'", ns)
+			}
 
-		client := action.NewList(hc)
-		client.All = true
-		client.AllNamespaces = false
-		client.Limit = 0
-		client.SetStateMask()
-		rels, err := client.Run()
-		if err != nil {
-			return nil, errorx.Decorate(err, "failed to get list of releases")
-		}
-		for _, r := range rels {
-			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings, ns))
-		}
+			client := action.NewList(hc)
+			client.All = true
+			client.AllNamespaces = false
+			client.Limit = 0
+			client.SetStateMask()
+			rels, err := client.Run()
+			if err != nil {
+				return errorx.Decorate(err, "failed to get list of releases")
+			}
+			found := make([]*Release, 0, len(rels))
+			for _, r := range rels {
+				found = append(found, NewRelease(a.HelmConfig, r, a.Settings, ns))
+			}
+			listMx.Lock()
+			releases = append(releases, found...)
+			listMx.Unlock()
+			return nil
+		})
+	}
+	if err := listEg.Wait(); err != nil {
+		return nil, err
 	}
 	return releases, nil
 }
