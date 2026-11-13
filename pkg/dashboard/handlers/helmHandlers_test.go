@@ -32,7 +32,7 @@ func TestHReleaseToJSON(t *testing.T) {
 			},
 		}
 
-		res := HReleaseToJSON(rel)
+		res := HReleaseToJSON(rel, "")
 		if res == nil {
 			t.Fatal("expected non-nil ReleaseElement")
 		}
@@ -57,7 +57,7 @@ func TestHReleaseToJSON(t *testing.T) {
 			Version:   2,
 		}
 
-		res := HReleaseToJSON(rel)
+		res := HReleaseToJSON(rel, "")
 		if res == nil {
 			t.Fatal("expected non-nil ReleaseElement")
 		}
@@ -68,6 +68,22 @@ func TestHReleaseToJSON(t *testing.T) {
 			t.Errorf("expected empty chart fields, got: %+v", res)
 		}
 	})
+}
+
+func TestHReleaseToJSON_StorageNamespace(t *testing.T) {
+	rel := &release.Release{
+		Name:      "educates-contour",
+		Namespace: "projectcontour",
+		Version:   1,
+	}
+
+	res := HReleaseToJSON(rel, "educates")
+	if res.Namespace != "projectcontour" {
+		t.Errorf("expected release namespace projectcontour, got %q", res.Namespace)
+	}
+	if res.StorageNamespace != "educates" {
+		t.Errorf("expected storage namespace educates, got %q", res.StorageNamespace)
+	}
 }
 
 func TestHReleaseToHistElem(t *testing.T) {

@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -22,6 +23,12 @@ import (
 	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/storage"
 	"helm.sh/helm/v3/pkg/storage/driver"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/discovery"
+	fakediscovery "k8s.io/client-go/discovery/fake"
+	"k8s.io/client-go/rest"
+	clienttesting "k8s.io/client-go/testing"
 )
 
 var inMemStorage *storage.Storage
@@ -394,6 +401,61 @@ func TestE2E(t *testing.T) {
 	assert.Equal(t, w.Body.String(), "[]")
 }
 
+type fakeRoundTripper struct{}
+
+func (f *fakeRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	header := make(http.Header)
+	header.Set("Content-Type", "application/json")
+	var body string
+
+	switch {
+	case strings.Contains(req.URL.Path, "secrets"):
+		body = `{"kind":"SecretList","apiVersion":"v1","metadata":{},"items":[]}`
+	case strings.Contains(req.URL.Path, "configmaps"):
+		body = `{"kind":"ConfigMapList","apiVersion":"v1","metadata":{},"items":[]}`
+	case strings.HasSuffix(req.URL.Path, "/api/v1"):
+		body = `{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"v1","resources":[]}`
+	default:
+		return &http.Response{
+			StatusCode: http.StatusNotFound,
+			Header:     header,
+			Body:       io.NopCloser(strings.NewReader(`{"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"not found","reason":"NotFound","code":404}`)),
+		}, nil
+	}
+
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Header:     header,
+		Body:       io.NopCloser(strings.NewReader(body)),
+	}, nil
+}
+
+type fakeCachedDiscovery struct {
+	*fakediscovery.FakeDiscovery
+}
+
+func (f *fakeCachedDiscovery) Fresh() bool { return true }
+func (f *fakeCachedDiscovery) Invalidate() {}
+
+type fakeRESTClientGetter struct{}
+
+func (f *fakeRESTClientGetter) ToRESTConfig() (*rest.Config, error) {
+	return &rest.Config{
+		Host:      "http://fake-k8s-server",
+		Transport: &fakeRoundTripper{},
+	}, nil
+}
+
+func (f *fakeRESTClientGetter) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
+	return &fakeCachedDiscovery{
+		FakeDiscovery: &fakediscovery.FakeDiscovery{Fake: &clienttesting.Fake{}},
+	}, nil
+}
+
+func (f *fakeRESTClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
+	return meta.NewDefaultRESTMapper([]schema.GroupVersion{}), nil
+}
+
 func getFakeHelmConfig(settings *cli.EnvSettings, _ string) (*action.Configuration, error) {
 	settings.RepositoryConfig = repoFile
 
@@ -403,10 +465,11 @@ func getFakeHelmConfig(settings *cli.EnvSettings, _ string) (*action.Configurati
 	}
 
 	return &action.Configuration{
-		Releases:       inMemStorage,
-		KubeClient:     &kubefake.FailingKubeClient{PrintingKubeClient: kubefake.PrintingKubeClient{Out: os.Stderr}},
-		Capabilities:   chartutil.DefaultCapabilities,
-		RegistryClient: registryClient,
-		Log:            log.Infof,
+		RESTClientGetter: &fakeRESTClientGetter{},
+		Releases:         inMemStorage,
+		KubeClient:       &kubefake.FailingKubeClient{PrintingKubeClient: kubefake.PrintingKubeClient{Out: os.Stderr}},
+		Capabilities:     chartutil.DefaultCapabilities,
+		RegistryClient:   registryClient,
+		Log:              log.Infof,
 	}, nil
 }
