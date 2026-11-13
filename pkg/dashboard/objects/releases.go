@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"sort"
 	"sync"
 
 	"github.com/joomcode/errorx"
@@ -70,6 +71,7 @@ func (a *Releases) List() ([]*Release, error) {
 		for _, r := range rels {
 			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings, r.Namespace))
 		}
+		sortReleases(releases)
 		return releases, nil
 	}
 
@@ -109,7 +111,24 @@ func (a *Releases) List() ([]*Release, error) {
 	if err := listEg.Wait(); err != nil {
 		return nil, err
 	}
+	sortReleases(releases)
 	return releases, nil
+}
+
+func sortReleases(releases []*Release) {
+	sort.Slice(releases, func(i, j int) bool {
+		var nameI, nameJ string
+		if releases[i].Orig != nil {
+			nameI = releases[i].Orig.Name
+		}
+		if releases[j].Orig != nil {
+			nameJ = releases[j].Orig.Name
+		}
+		if nameI != nameJ {
+			return nameI < nameJ
+		}
+		return releases[i].StorageNamespace < releases[j].StorageNamespace
+	})
 }
 
 func (a *Releases) ByName(namespace string, name string) (*Release, error) {

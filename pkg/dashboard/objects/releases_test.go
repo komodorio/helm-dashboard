@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -94,6 +95,41 @@ func TestReleaseHelmStorageNamespace(t *testing.T) {
 		Namespace: "default",
 	}, nil, "")
 	assert.Equal(t, fallback.helmStorageNamespace(), "default")
+}
+
+func TestListReleases_RepeatedListingOrder(t *testing.T) {
+	fakeStorage = storage.Init(driver.NewMemory())
+	for i := 0; i < 5; i++ {
+		err := fakeStorage.Create(&release.Release{
+			Name: fmt.Sprintf("release-%d", i),
+			Info: &release.Info{
+				Status: release.StatusDeployed,
+			},
+		})
+		assert.NilError(t, err)
+	}
+
+	releases := &Releases{
+		Namespaces: []string{"ns-z", "ns-a", "ns-m", "ns-b", "ns-y", "ns-c", "ns-x", "ns-d"},
+		HelmConfig: fakeHelmNSConfigGetter,
+	}
+
+	var baseline []string
+	for attempt := 0; attempt < 25; attempt++ {
+		res, err := releases.List()
+		assert.NilError(t, err)
+		assert.Equal(t, len(res), 40)
+
+		keys := make([]string, len(res))
+		for i, r := range res {
+			keys[i] = fmt.Sprintf("%s/%s", r.Orig.Name, r.StorageNamespace)
+		}
+		if attempt == 0 {
+			baseline = keys
+			continue
+		}
+		assert.DeepEqual(t, keys, baseline)
+	}
 }
 
 func TestListReleases_StorageNamespace(t *testing.T) {
