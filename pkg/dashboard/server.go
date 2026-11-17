@@ -52,7 +52,8 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 		return "", nil, errorx.Decorate(err, "Failed to detect cluster mode")
 	}
 
-	s.seedRepositories(data)
+	// Seeding runs in the background so a slow or unreachable repository cannot delay the listener.
+	go s.seedRepositories(data)
 
 	go checkUpgrade(data.StatusInfo)
 
