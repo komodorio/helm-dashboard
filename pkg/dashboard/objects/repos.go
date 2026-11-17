@@ -10,6 +10,7 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
@@ -122,6 +123,72 @@ func (r *Repositories) Add(name string, url string, username string, password st
 	if err := f.WriteFile(repoFile, 0644); err != nil {
 		return err
 	}
+	return nil
+}
+
+type seedRepository struct {
+	Name     string `yaml:"name"`
+	URL      string `yaml:"url"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
+
+type seedRepositoriesFile struct {
+	Repositories []seedRepository `yaml:"repositories"`
+}
+
+func loadSeedRepositories(path string) ([]seedRepository, error) {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, errorx.Decorate(err, "failed to read repositories file")
+	}
+
+	var cfg seedRepositoriesFile
+	if err := yaml.Unmarshal(raw, &cfg); err != nil {
+		return nil, errorx.Decorate(err, "failed to parse repositories file")
+	}
+
+	return cfg.Repositories, nil
+}
+
+func (r *Repositories) SeedFromFile(path string) error {
+	entries, err := loadSeedRepositories(path)
+	if err != nil {
+		return err
+	}
+
+	current, err := r.List()
+	if err != nil {
+		return errorx.Decorate(err, "failed to list existing repositories")
+	}
+
+	existing := make(map[string]struct{}, len(current))
+	for _, item := range current {
+		existing[item.Name()] = struct{}{}
+	}
+
+	seen := make(map[string]struct{}, len(entries))
+	for _, entry := range entries {
+		if entry.Name != "" {
+			if _, dup := seen[entry.Name]; dup {
+				log.Warnf("Skipping duplicate repository %q in %s", entry.Name, path)
+				continue
+			}
+			seen[entry.Name] = struct{}{}
+
+			if _, ok := existing[entry.Name]; ok {
+				log.Infof("Repository %q already exists, skipping seed entry", entry.Name)
+				continue
+			}
+		}
+
+		if err := r.Add(entry.Name, entry.URL, entry.Username, entry.Password); err != nil {
+			log.Warnf("Failed to seed repository %q (%s): %v", entry.Name, entry.URL, err)
+			continue
+		}
+		log.Infof("Seeded repository %q (%s)", entry.Name, entry.URL)
+	}
+
 	return nil
 }
 

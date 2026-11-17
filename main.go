@@ -25,18 +25,19 @@ var (
 )
 
 type options struct {
-	Version    bool     `long:"version" description:"Show tool version"`
-	Verbose    bool     `short:"v" long:"verbose" description:"Show verbose debug information"`
-	NoBrowser  bool     `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
-	NoTracking bool     `long:"no-analytics" description:"Disable user analytics (Heap, DataDog etc.)"`
-	BindHost   string   `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
-	Port       uint     `short:"p" long:"port" description:"Port to start server on" default:"8080"`
-	Namespace  string   `short:"n" long:"namespace" description:"Namespace for HELM operations"`
-	Devel      bool     `long:"devel" description:"Include development versions of charts"`
-	LocalChart []string `long:"local-chart" description:"Specify location of local chart to include into UI"`
-	NoHealth   bool     `long:"no-health" description:"Disable health checks for installed charts"`
-	NoLatest   bool     `long:"no-latest" description:"Disable latest version checks for installed charts"`
-	BasePath   string   `long:"base-path" env:"HD_BASE_PATH" description:"URL path prefix to serve under, for reverse proxies that do not strip it (e.g. /helm-dashboard)"`
+	Version          bool     `long:"version" description:"Show tool version"`
+	Verbose          bool     `short:"v" long:"verbose" description:"Show verbose debug information"`
+	NoBrowser        bool     `short:"b" long:"no-browser" description:"Do not attempt to open Web browser upon start"`
+	NoTracking       bool     `long:"no-analytics" description:"Disable user analytics (Heap, DataDog etc.)"`
+	BindHost         string   `long:"bind" description:"Host binding to start server (default: localhost)"` // default should be printed but not assigned as the precedence: flag > env > default
+	Port             uint     `short:"p" long:"port" description:"Port to start server on" default:"8080"`
+	Namespace        string   `short:"n" long:"namespace" description:"Namespace for HELM operations"`
+	Devel            bool     `long:"devel" description:"Include development versions of charts"`
+	LocalChart       []string `long:"local-chart" description:"Specify location of local chart to include into UI"`
+	NoHealth         bool     `long:"no-health" description:"Disable health checks for installed charts"`
+	NoLatest         bool     `long:"no-latest" description:"Disable latest version checks for installed charts"`
+	BasePath         string   `long:"base-path" env:"HD_BASE_PATH" description:"URL path prefix to serve under, for reverse proxies that do not strip it (e.g. /helm-dashboard)"`
+	RepositoriesFile string   `long:"repositories-file" description:"YAML file of repositories to add on in-cluster startup"`
 }
 
 func main() {
@@ -58,16 +59,17 @@ func main() {
 	setupLogging(opts.Verbose)
 
 	server := dashboard.Server{
-		Version:     version,
-		Namespaces:  strings.Split(opts.Namespace, ","),
-		Address:     fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
-		Debug:       opts.Verbose,
-		NoTracking:  opts.NoTracking,
-		Devel:       opts.Devel,
-		LocalCharts: opts.LocalChart,
-		NoHealth:    opts.NoHealth,
-		NoLatest:    opts.NoLatest,
-		BasePath:    normalizeBasePath(opts.BasePath),
+		Version:          version,
+		Namespaces:       strings.Split(opts.Namespace, ","),
+		Address:          fmt.Sprintf("%s:%d", opts.BindHost, opts.Port),
+		Debug:            opts.Verbose,
+		NoTracking:       opts.NoTracking,
+		Devel:            opts.Devel,
+		LocalCharts:      opts.LocalChart,
+		NoHealth:         opts.NoHealth,
+		NoLatest:         opts.NoLatest,
+		BasePath:         normalizeBasePath(opts.BasePath),
+		RepositoriesFile: opts.RepositoriesFile,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

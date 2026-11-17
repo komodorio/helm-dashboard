@@ -22,16 +22,17 @@ import (
 )
 
 type Server struct {
-	Version     string
-	Namespaces  []string
-	Address     string
-	Debug       bool
-	NoTracking  bool
-	Devel       bool
-	LocalCharts []string
-	NoHealth    bool
-	NoLatest    bool
-	BasePath    string
+	Version          string
+	Namespaces       []string
+	Address          string
+	Debug            bool
+	NoTracking       bool
+	Devel            bool
+	LocalCharts      []string
+	NoHealth         bool
+	NoLatest         bool
+	BasePath         string
+	RepositoriesFile string
 }
 
 func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (string, utils.ControlChan, error) {
@@ -51,6 +52,9 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 		return "", nil, errorx.Decorate(err, "Failed to detect cluster mode")
 	}
 
+	// Seeding runs in the background so a slow or unreachable repository cannot delay the listener.
+	go s.seedRepositories(data)
+
 	go checkUpgrade(data.StatusInfo)
 
 	go data.PeriodicTasks(ctx)
@@ -59,6 +63,27 @@ func (s *Server) StartServer(ctx context.Context, cancel context.CancelFunc) (st
 	done := s.startBackgroundServer(api, ctx)
 
 	return "http://" + s.Address + s.BasePath + "/", done, nil
+}
+
+func (s *Server) seedRepositories(data *objects.DataLayer) {
+	if s.RepositoriesFile == "" {
+		return
+	}
+
+	if !data.StatusInfo.ClusterMode {
+		log.Warnf("Ignoring --repositories-file %q outside in-cluster mode", s.RepositoriesFile)
+		return
+	}
+
+	app, err := data.AppForCtx("")
+	if err != nil {
+		log.Warnf("Failed to initialize application for seeding repositories from %q: %v", s.RepositoriesFile, err)
+		return
+	}
+
+	if err := app.Repositories.SeedFromFile(s.RepositoriesFile); err != nil {
+		log.Warnf("Failed to seed repositories from %q: %v", s.RepositoriesFile, err)
+	}
 }
 
 func (s *Server) detectClusterMode(data *objects.DataLayer) error {
