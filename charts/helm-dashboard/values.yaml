@@ -52,6 +52,15 @@ dashboard:
   # URL path prefix to serve under, e.g. /helm-dashboard; only needed when the ingress does not strip the prefix
   basePath: ""
 
+  # Helm chart repositories to seed on in-cluster startup
+  repositories: []
+  # - name: Komodor
+  #   url: https://helm-charts.komodor.io
+  # - name: argo
+  #   url: https://argoproj.github.io/helm-chart
+  #   username: ""
+  #   password: ""
+
   persistence:
     enabled: true
 

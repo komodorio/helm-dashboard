@@ -1,8 +1,12 @@
 package objects
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"gotest.tools/v3/assert"
@@ -286,4 +290,122 @@ func TestRepositories_Containing_MalformedRepositoryConfigFile(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error for malformed RepositoryConfig file, got nil")
 	}
+}
+
+func TestSeedPreconfigured(t *testing.T) {
+	indexBytes, err := os.ReadFile("./testdata/testing-index.yaml")
+	assert.NilError(t, err)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasSuffix(r.URL.Path, "/index.yaml") {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "application/x-yaml")
+		_, _ = w.Write(indexBytes)
+	}))
+	t.Cleanup(srv.Close)
+
+	t.Run("happy path", func(t *testing.T) {
+		t.Setenv("HELM_CACHE_HOME", t.TempDir())
+		testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+		seedFile := filepath.Join(t.TempDir(), "repositories.yaml")
+		content := "repositories:\n" +
+			"  - name: \"komodor\"\n" +
+			"    url: \"" + srv.URL + "\"\n" +
+			"  - name: \"argo\"\n" +
+			"    url: \"" + srv.URL + "/argo\"\n" +
+			"    username: \"alice\"\n" +
+			"    password: \"secret\"\n"
+		assert.NilError(t, os.WriteFile(seedFile, []byte(content), 0600))
+
+		assert.NilError(t, testRepository.SeedFromFile(seedFile))
+
+		r1, err := testRepository.Get("komodor")
+		assert.NilError(t, err)
+		assert.Equal(t, r1.URL(), srv.URL)
+
+		r2, err := testRepository.Get("argo")
+		assert.NilError(t, err)
+		assert.Equal(t, r2.URL(), srv.URL+"/argo")
+	})
+
+	t.Run("already present skipped", func(t *testing.T) {
+		t.Setenv("HELM_CACHE_HOME", t.TempDir())
+		testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+		seedFile := filepath.Join(t.TempDir(), "repositories.yaml")
+		content := "repositories:\n" +
+			"  - name: \"charts\"\n" +
+			"    url: \"" + srv.URL + "/other\"\n" +
+			"  - name: \"localnew\"\n" +
+			"    url: \"" + srv.URL + "\"\n"
+		assert.NilError(t, os.WriteFile(seedFile, []byte(content), 0600))
+
+		assert.NilError(t, testRepository.SeedFromFile(seedFile))
+
+		existing, err := testRepository.Get("charts")
+		assert.NilError(t, err)
+		assert.Equal(t, existing.URL(), "https://charts.helm.sh/stable")
+
+		added, err := testRepository.Get("localnew")
+		assert.NilError(t, err)
+		assert.Equal(t, added.URL(), srv.URL)
+	})
+
+	t.Run("rejected entry does not abort rest", func(t *testing.T) {
+		t.Setenv("HELM_CACHE_HOME", t.TempDir())
+		testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+		seedFile := filepath.Join(t.TempDir(), "repositories.yaml")
+		content := "repositories:\n" +
+			"  - name: \"bad-auth\"\n" +
+			"    url: \"" + srv.URL + "\"\n" +
+			"    username: \"useronly\"\n" +
+			"    password: \"\"\n" +
+			"  - name: \"valid-after\"\n" +
+			"    url: \"" + srv.URL + "\"\n"
+		assert.NilError(t, os.WriteFile(seedFile, []byte(content), 0600))
+
+		assert.NilError(t, testRepository.SeedFromFile(seedFile))
+
+		_, err := testRepository.Get("bad-auth")
+		assert.Assert(t, err != nil)
+
+		added, err := testRepository.Get("valid-after")
+		assert.NilError(t, err)
+		assert.Equal(t, added.URL(), srv.URL)
+	})
+
+	t.Run("duplicate name in file", func(t *testing.T) {
+		t.Setenv("HELM_CACHE_HOME", t.TempDir())
+		testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+		seedFile := filepath.Join(t.TempDir(), "repositories.yaml")
+		content := "repositories:\n" +
+			"  - name: \"dup\"\n" +
+			"    url: \"" + srv.URL + "/first\"\n" +
+			"  - name: \"dup\"\n" +
+			"    url: \"" + srv.URL + "/second\"\n"
+		assert.NilError(t, os.WriteFile(seedFile, []byte(content), 0600))
+
+		assert.NilError(t, testRepository.SeedFromFile(seedFile))
+
+		dup, err := testRepository.Get("dup")
+		assert.NilError(t, err)
+		assert.Equal(t, dup.URL(), srv.URL+"/first")
+	})
+
+	t.Run("missing and malformed files return error", func(t *testing.T) {
+		testRepository := initRepository(t, validRepositoryConfigPath, false)
+
+		err := testRepository.SeedFromFile(filepath.Join(t.TempDir(), "does-not-exist.yaml"))
+		assert.Assert(t, err != nil)
+
+		malformed := filepath.Join(t.TempDir(), "malformed.yaml")
+		assert.NilError(t, os.WriteFile(malformed, []byte("repositories: ["), 0600))
+		err = testRepository.SeedFromFile(malformed)
+		assert.Assert(t, err != nil)
+	})
 }

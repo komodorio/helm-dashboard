@@ -39,6 +39,9 @@ spec:
           {{- with .Values.extraArgs }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.dashboard.repositories }}
+            - --repositories-file=/etc/helm-dashboard/repositories.yaml
+          {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ include "helm-dashboard.image" . }}"
@@ -77,6 +80,12 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /opt/dashboard/helm
+            {{- if .Values.dashboard.repositories }}
+            - name: repositories
+              mountPath: /etc/helm-dashboard/repositories.yaml
+              subPath: repositories.yaml
+              readOnly: true
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -96,5 +105,10 @@ spec:
             claimName: {{ include "helm-dashboard.fullname" . }}
         {{- else }}
           emptyDir: { }
+        {{- end }}
+        {{- if .Values.dashboard.repositories }}
+        - name: repositories
+          secret:
+            secretName: {{ include "helm-dashboard.fullname" . }}-repositories
         {{- end }}
 
