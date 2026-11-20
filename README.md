@@ -88,6 +88,8 @@ If you don't want the browser tab to automatically open, add `--no-browser` flag
 
 The UI can be served under a URL path prefix, like `https://my.domain.com/helm-dashboard/`. If your reverse proxy strips the prefix before forwarding (e.g. ingress-nginx `rewrite-target`), nothing needs to be configured. If it forwards the full path, tell the dashboard about the prefix via `--base-path=/helm-dashboard` flag or `HD_BASE_PATH` environment variable (Helm chart value `dashboard.basePath`).
 
+The API is same-origin only by default: the bundled UI, the CLI and `curl` are unaffected, but a web page on another origin cannot read the API or send it state-changing requests. If you serve the UI from a different origin (for example a separate dev server, or a reverse proxy on another host), allow those origins with the `HD_CORS` environment variable, a comma-separated list of exact origins, for example `HD_CORS=http://localhost:5173,https://helm.example.com`. Only listed origins are allowed; it never permits all origins.
+
 If you want to increase the logging verbosity and see all the debug info, use the `--verbose` flag.
 
 > Disclaimer: For the sake of improving the project quality, there is user analytics collected by the tool. You can disable this collecting with `--no-analytics` option. The collection is done via DataDog RUM and Heap Analytics. Only the anonymous data is collected, no sensitive information is used.
