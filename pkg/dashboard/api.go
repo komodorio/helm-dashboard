@@ -4,12 +4,14 @@ import (
 	"context"
 	"html"
 	"net/http"
+	"net/url"
+	"os"
 	"path"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/handlers"
 	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/objects"
-	"github.com/komodorio/helm-dashboard/v2/pkg/dashboard/utils"
 	"github.com/komodorio/helm-dashboard/v2/pkg/frontend"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,10 +24,78 @@ func noCache(c *gin.Context) {
 	c.Next()
 }
 
-func allowCORS(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
-	c.Header("Access-Control-Allow-Headers", "*")
-	c.Next()
+// parseCORSAllowlist reads HD_CORS as a comma-separated list of exact origins
+// (e.g. "http://localhost:5173,https://helm.example.com"). It is opt-in and never
+// wildcards: cross-origin browser access is allowed only for listed origins.
+func parseCORSAllowlist(env string) map[string]bool {
+	allowed := map[string]bool{}
+	for _, o := range strings.Split(env, ",") {
+		if o = strings.TrimSpace(o); o != "" {
+			allowed[o] = true
+		}
+	}
+	return allowed
+}
+
+// corsAllowlist reflects CORS headers only for origins explicitly listed in HD_CORS.
+// With HD_CORS unset the API is same-origin only, which is what the bundled UI,
+// the CLI and curl use. This replaces the former unconditional wildcard that let
+// any website read the API's responses in a victim's browser.
+func corsAllowlist(allowed map[string]bool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if origin := c.GetHeader("Origin"); origin != "" && allowed[origin] {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Vary", "Origin")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "X-Kubecontext, Content-Type")
+		}
+
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	}
+}
+
+// sameOriginGuard rejects state-changing requests that are not same-origin, which
+// stops a foreign web page from forging install/upgrade/uninstall/repo-add calls
+// against a victim's locally running dashboard (CSRF). It relies first on the
+// browser-set Sec-Fetch-Site header, then falls back to an Origin/Referer host
+// match for older browsers. Non-browser clients (no Origin/Referer/Sec-Fetch-Site)
+// are unaffected.
+func sameOriginGuard() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		switch c.Request.Method {
+		case http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch:
+			if !isSameOrigin(c) {
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "cross-origin request rejected"})
+				return
+			}
+		}
+		c.Next()
+	}
+}
+
+func isSameOrigin(c *gin.Context) bool {
+	switch c.GetHeader("Sec-Fetch-Site") {
+	case "same-origin", "none":
+		return true
+	case "same-site", "cross-site":
+		return false
+	}
+
+	for _, h := range []string{c.GetHeader("Origin"), c.GetHeader("Referer")} {
+		if h == "" {
+			continue
+		}
+		u, err := url.Parse(h)
+		return err == nil && u.Host == c.Request.Host
+	}
+
+	// No browser-origin signal at all: a non-browser client such as the CLI or curl.
+	return true
 }
 
 func errorHandler(c *gin.Context) {
@@ -65,22 +135,6 @@ func contextSetter(data *objects.DataLayer) gin.HandlerFunc {
 	}
 }
 
-// Middleware for CORS
-func corsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "*")
-
-		// Handle preflight requests
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusOK)
-			return
-		}
-
-		c.Next()
-	}
-}
 func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool, basePath string) *gin.Engine {
 	var api *gin.Engine
 	if debug {
@@ -93,11 +147,8 @@ func NewRouter(abortWeb context.CancelFunc, data *objects.DataLayer, debug bool,
 	api.Use(contextSetter(data))
 	api.Use(noCache)
 	api.Use(errorHandler)
-	api.Use(corsMiddleware())
-
-	if utils.EnvAsBool("HD_CORS", false) {
-		api.Use(allowCORS)
-	}
+	api.Use(corsAllowlist(parseCORSAllowlist(os.Getenv("HD_CORS"))))
+	api.Use(sameOriginGuard())
 
 	root := api.Group(basePath)
 	configureStatic(root)

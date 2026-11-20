@@ -410,3 +410,65 @@ func getFakeHelmConfig(settings *cli.EnvSettings, _ string) (*action.Configurati
 		Log:            log.Infof,
 	}, nil
 }
+
+func runMiddleware(method string, headers map[string]string, mw gin.HandlerFunc) *httptest.ResponseRecorder {
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req := httptest.NewRequest(method, "http://localhost:8080/api/helm/releases/ns", nil)
+	req.Host = "localhost:8080"
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	ctx.Request = req
+	mw(ctx)
+	return w
+}
+
+func TestSameOriginGuardBlocksCrossOriginWrite(t *testing.T) {
+	// Forged cross-origin simple POST: browser sends Sec-Fetch-Site: cross-site.
+	w := runMiddleware(http.MethodPost, map[string]string{"Sec-Fetch-Site": "cross-site"}, sameOriginGuard())
+	assert.Equal(t, w.Code, http.StatusForbidden)
+
+	// Cross-origin via Origin host mismatch (older browser, no Sec-Fetch-Site).
+	w = runMiddleware(http.MethodPost, map[string]string{"Origin": "https://evil.attacker.example"}, sameOriginGuard())
+	assert.Equal(t, w.Code, http.StatusForbidden)
+
+	// Cross-origin DELETE is blocked too.
+	w = runMiddleware(http.MethodDelete, map[string]string{"Sec-Fetch-Site": "cross-site"}, sameOriginGuard())
+	assert.Equal(t, w.Code, http.StatusForbidden)
+}
+
+func TestSameOriginGuardAllowsLegitimateWrite(t *testing.T) {
+	// The bundled UI: same-origin fetch.
+	w := runMiddleware(http.MethodPost, map[string]string{"Sec-Fetch-Site": "same-origin"}, sameOriginGuard())
+	assert.Equal(t, w.Code, http.StatusOK)
+
+	// Older browser, same-origin by host match.
+	w = runMiddleware(http.MethodPost, map[string]string{"Origin": "http://localhost:8080"}, sameOriginGuard())
+	assert.Equal(t, w.Code, http.StatusOK)
+
+	// Non-browser client (CLI/curl): no browser-origin signal at all.
+	w = runMiddleware(http.MethodPost, map[string]string{}, sameOriginGuard())
+	assert.Equal(t, w.Code, http.StatusOK)
+
+	// Reads are never guarded.
+	w = runMiddleware(http.MethodGet, map[string]string{"Sec-Fetch-Site": "cross-site"}, sameOriginGuard())
+	assert.Equal(t, w.Code, http.StatusOK)
+}
+
+func TestCORSAllowlistNoWildcard(t *testing.T) {
+	// HD_CORS unset: a foreign origin gets no ACAO, so the browser cannot read responses.
+	w := runMiddleware(http.MethodGet, map[string]string{"Origin": "https://evil.attacker.example"}, corsAllowlist(parseCORSAllowlist("")))
+	assert.Equal(t, w.Header().Get("Access-Control-Allow-Origin"), "")
+
+	// Listed origin is reflected exactly (never "*").
+	allow := parseCORSAllowlist("http://localhost:5173, https://helm.example.com")
+	w = runMiddleware(http.MethodGet, map[string]string{"Origin": "http://localhost:5173"}, corsAllowlist(allow))
+	assert.Equal(t, w.Header().Get("Access-Control-Allow-Origin"), "http://localhost:5173")
+	assert.Equal(t, w.Header().Get("Vary"), "Origin")
+
+	// An unlisted origin is still refused even when an allowlist exists.
+	w = runMiddleware(http.MethodGet, map[string]string{"Origin": "https://evil.attacker.example"}, corsAllowlist(allow))
+	assert.Equal(t, w.Header().Get("Access-Control-Allow-Origin"), "")
+}
