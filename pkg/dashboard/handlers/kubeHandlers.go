@@ -80,12 +80,12 @@ func EnhanceStatus(res *v12.Carp, err error) *v12.CarpStatus {
 	if err != nil {
 		c.Reason = "ErrorGettingStatus"
 		c.Message = err.Error()
-	} else if s.Phase == "Error" {
+	} else if s.Phase == "Error" || s.Phase == "Failed" {
 		c.Status = Unhealthy
-	} else if slices.Contains([]string{"Available", "Active", "Established", "Bound", "Ready"}, string(s.Phase)) {
+	} else if slices.Contains([]string{"Available", "Active", "Established", "Bound", "Ready", "Succeeded"}, string(s.Phase)) {
 		c.Status = Healthy
 		c.Reason = "Exists" //since there is no condition to check here, we can set reason as exists.
-	} else if s.Phase == "" && len(s.Conditions) > 0 {
+	} else if (s.Phase == "" || s.Phase == "Running") && len(s.Conditions) > 0 { // a running Pod is judged by its Ready condition
 		applyCustomConditions(&s, &c)
 	} else if s.Phase == "Pending" || s.Phase == "Terminating" {
 		c.Status = Progressing
