@@ -26,7 +26,7 @@ type Application struct {
 func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter, namespaces []string, devel bool) (*Application, error) {
 	hc, err := helmConfig(settings.Namespace())
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", settings.Namespace())
 	}
 
 	k8s, err := NewK8s(hc, namespaces)
