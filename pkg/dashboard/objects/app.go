@@ -46,6 +46,7 @@ func NewApplication(settings *cli.EnvSettings, helmConfig HelmNSConfigGetter, na
 			Namespaces: namespaces,
 			Settings:   settings,
 			HelmConfig: helmConfig,
+			K8s:        k8s,
 		},
 		Repositories: &Repositories{
 			Settings:          settings,

@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"sort"
 	"sync"
 
 	"github.com/joomcode/errorx"
@@ -20,12 +21,14 @@ import (
 	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/apimachinery/pkg/apis/testapigroup/v1"
+	"golang.org/x/sync/errgroup"
 )
 
 type Releases struct {
 	Namespaces []string
 	HelmConfig HelmNSConfigGetter
 	Settings   *cli.EnvSettings
+	K8s        *K8s
 	mx         sync.Mutex
 }
 
@@ -33,10 +36,24 @@ func (a *Releases) List() ([]*Release, error) {
 	a.mx.Lock()
 	defer a.mx.Unlock()
 
+	targetNamespaces := a.Namespaces
+	clusterWide := len(a.Namespaces) == 1 && a.Namespaces[0] == ""
+
+	if clusterWide && a.K8s != nil {
+		driver := os.Getenv("HELM_DRIVER")
+		storageNSs, lookupErr := a.K8s.GetReleaseStorageNamespaces(driver)
+		if lookupErr != nil {
+			log.Warnf("Failed to query release storage metadata cluster-wide, falling back to all-namespaces listing: %v", lookupErr)
+		} else if len(storageNSs) > 0 {
+			targetNamespaces = storageNSs
+			clusterWide = false
+		}
+	}
+
 	releases := []*Release{}
-	for _, ns := range a.Namespaces {
-		log.Debugf("Listing releases in namespace: %s", ns)
-		hc, err := a.HelmConfig(ns)
+
+	if clusterWide {
+		hc, err := a.HelmConfig("")
 		if err != nil {
 			return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
 		}
@@ -45,16 +62,73 @@ func (a *Releases) List() ([]*Release, error) {
 		client.All = true
 		client.AllNamespaces = true
 		client.Limit = 0
-		client.SetStateMask() // required to apply proper filtering
+		client.SetStateMask()
 		rels, err := client.Run()
 		if err != nil {
 			return nil, errorx.Decorate(err, "failed to get list of releases")
 		}
+
 		for _, r := range rels {
-			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings))
+			releases = append(releases, NewRelease(a.HelmConfig, r, a.Settings, r.Namespace))
 		}
+		sortReleases(releases)
+		return releases, nil
 	}
+
+	var (
+		listEg errgroup.Group
+		listMx sync.Mutex
+	)
+	listEg.SetLimit(8)
+	for _, ns := range targetNamespaces {
+		ns := ns
+		listEg.Go(func() error {
+			log.Debugf("Listing releases in namespace: %s", ns)
+			hc, err := a.HelmConfig(ns)
+			if err != nil {
+				return errorx.Decorate(err, "failed to get helm config for namespace '%s'", ns)
+			}
+
+			client := action.NewList(hc)
+			client.All = true
+			client.AllNamespaces = false
+			client.Limit = 0
+			client.SetStateMask()
+			rels, err := client.Run()
+			if err != nil {
+				return errorx.Decorate(err, "failed to get list of releases")
+			}
+			found := make([]*Release, 0, len(rels))
+			for _, r := range rels {
+				found = append(found, NewRelease(a.HelmConfig, r, a.Settings, ns))
+			}
+			listMx.Lock()
+			releases = append(releases, found...)
+			listMx.Unlock()
+			return nil
+		})
+	}
+	if err := listEg.Wait(); err != nil {
+		return nil, err
+	}
+	sortReleases(releases)
 	return releases, nil
+}
+
+func sortReleases(releases []*Release) {
+	sort.Slice(releases, func(i, j int) bool {
+		var nameI, nameJ string
+		if releases[i].Orig != nil {
+			nameI = releases[i].Orig.Name
+		}
+		if releases[j].Orig != nil {
+			nameJ = releases[j].Orig.Name
+		}
+		if nameI != nameJ {
+			return nameI < nameJ
+		}
+		return releases[i].StorageNamespace < releases[j].StorageNamespace
+	})
 }
 
 func (a *Releases) ByName(namespace string, name string) (*Release, error) {
@@ -70,7 +144,7 @@ func (a *Releases) ByName(namespace string, name string) (*Release, error) {
 		return nil, errorx.Decorate(err, "failed to get helm release")
 	}
 
-	return NewRelease(a.HelmConfig, rel, a.Settings), nil
+	return NewRelease(a.HelmConfig, rel, a.Settings, namespace), nil
 }
 
 func (a *Releases) Install(namespace string, name string, repoChart string, version string, justTemplate bool, values map[string]interface{}) (*release.Release, error) {
@@ -184,18 +258,29 @@ type Release struct {
 	Settings          *cli.EnvSettings
 	HelmConfig        HelmNSConfigGetter
 	Orig              *release.Release
+	StorageNamespace  string
 	revisions         []*Release
 	mx                sync.Mutex
 	restoredChartPath string
+}
+
+func (r *Release) helmStorageNamespace() string {
+	if r.StorageNamespace != "" {
+		return r.StorageNamespace
+	}
+	if r.Orig != nil {
+		return r.Orig.Namespace
+	}
+	return ""
 }
 
 func (r *Release) History() ([]*Release, error) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
-	hc, err := r.HelmConfig(r.Orig.Namespace)
+	hc, err := r.HelmConfig(r.helmStorageNamespace())
 	if err != nil {
-		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return nil, errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.helmStorageNamespace())
 	}
 
 	client := action.NewHistory(hc)
@@ -206,7 +291,7 @@ func (r *Release) History() ([]*Release, error) {
 
 	r.revisions = []*Release{}
 	for _, rev := range revs {
-		r.revisions = append(r.revisions, NewRelease(r.HelmConfig, rev, r.Settings))
+		r.revisions = append(r.revisions, NewRelease(r.HelmConfig, rev, r.Settings, r.StorageNamespace))
 	}
 
 	return r.revisions, nil
@@ -216,9 +301,9 @@ func (r *Release) Uninstall() error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
-	hc, err := r.HelmConfig(r.Orig.Namespace)
+	hc, err := r.HelmConfig(r.helmStorageNamespace())
 	if err != nil {
-		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.helmStorageNamespace())
 	}
 
 	client := action.NewUninstall(hc)
@@ -233,9 +318,9 @@ func (r *Release) Rollback(toRevision int) error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
-	hc, err := r.HelmConfig(r.Orig.Namespace)
+	hc, err := r.HelmConfig(r.helmStorageNamespace())
 	if err != nil {
-		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", "")
+		return errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.helmStorageNamespace())
 	}
 
 	client := action.NewRollback(hc)
@@ -252,13 +337,14 @@ func (r *Release) RunTests() (string, error) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
-	hc, err := r.HelmConfig(r.Orig.Namespace)
+	storageNS := r.helmStorageNamespace()
+	hc, err := r.HelmConfig(storageNS)
 	if err != nil {
-		return "", errorx.Decorate(err, "failed to get helm config for namespace '%s'", r.Orig.Namespace)
+		return "", errorx.Decorate(err, "failed to get helm config for namespace '%s'", storageNS)
 	}
 
 	client := action.NewReleaseTesting(hc)
-	client.Namespace = r.Orig.Namespace
+	client.Namespace = storageNS
 
 	rel, err := client.Run(r.Orig.Name)
 	if err != nil {
@@ -319,9 +405,9 @@ func (r *Release) Upgrade(repoChart string, version string, justTemplate bool, f
 		}
 	}
 
-	ns := r.Settings.Namespace()
-	if r.Orig != nil {
-		ns = r.Orig.Namespace
+	ns := r.helmStorageNamespace()
+	if ns == "" {
+		ns = r.Settings.Namespace()
 	}
 
 	hc, err := r.HelmConfig(ns)
@@ -420,10 +506,14 @@ func checkIfInstallable(ch *chart.Chart) error {
 	return errors.Errorf("%s charts are not installable", ch.Metadata.Type)
 }
 
-func NewRelease(hc HelmNSConfigGetter, orig *release.Release, settings *cli.EnvSettings) *Release {
+func NewRelease(hc HelmNSConfigGetter, orig *release.Release, settings *cli.EnvSettings, storageNamespace string) *Release {
+	if storageNamespace == "" && orig != nil {
+		storageNamespace = orig.Namespace
+	}
 	return &Release{
-		HelmConfig: hc,
-		Orig:       orig,
-		Settings:   settings,
+		HelmConfig:       hc,
+		Orig:             orig,
+		Settings:         settings,
+		StorageNamespace: storageNamespace,
 	}
 }

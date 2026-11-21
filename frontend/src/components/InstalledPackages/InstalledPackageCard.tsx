@@ -68,9 +68,10 @@ export default function InstalledPackageCard({
   };
 
   const onClick = async () => {
-    const { name, namespace } = release;
+    const { name, namespace, storageNamespace } = release;
+    const routingNamespace = storageNamespace || namespace;
     await navigate(
-      `/${namespace}/${name}/installed/revision/${release.revision}`,
+      `/${routingNamespace}/${name}/installed/revision/${release.revision}`,
       {
         state: release,
       }

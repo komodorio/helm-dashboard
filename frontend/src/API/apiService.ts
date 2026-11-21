@@ -139,8 +139,9 @@ class ApiService {
   }): Promise<ReleaseHealthStatus[]> => {
     if (!release) return [];
 
+    const ns = release.storageNamespace || release.namespace;
     return await this.fetchWithSafeDefaults<ReleaseHealthStatus[]>({
-      url: `/api/helm/releases/${release.namespace}/${release.name}/resources?health=true`,
+      url: `/api/helm/releases/${ns}/${release.name}/resources?health=true`,
       fallback: [],
     });
   };

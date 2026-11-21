@@ -59,7 +59,7 @@ func (h *HelmHandler) GetReleases(c *gin.Context) {
 
 	res := []*ReleaseElement{}
 	for _, r := range rels {
-		res = append(res, HReleaseToJSON(r.Orig))
+		res = append(res, HReleaseToJSON(r.Orig, r.StorageNamespace))
 	}
 
 	c.IndentedJSON(http.StatusOK, res)
@@ -157,7 +157,11 @@ func (h *HelmHandler) Resources(c *gin.Context) {
 		for _, obj := range res {
 			ns := obj.Namespace
 			if ns == "" {
-				ns = c.Param("ns")
+				if rel.Orig.Namespace != "" {
+					ns = rel.Orig.Namespace
+				} else {
+					ns = c.Param("ns")
+				}
 			}
 			kind := utils.QualifiedKind(obj.Kind, obj.APIVersion)
 			info, err := app.K8s.GetResourceInfo(kind, ns, obj.Name)
@@ -680,11 +684,12 @@ type RepoChartElement struct { // TODO: do we need it at all? there is existing 
 	IsSuggestedRepo    bool     `json:"isSuggestedRepo"`
 }
 
-func HReleaseToJSON(o *release.Release) *ReleaseElement {
+func HReleaseToJSON(o *release.Release, storageNamespace string) *ReleaseElement {
 	res := &ReleaseElement{
-		Name:      o.Name,
-		Namespace: o.Namespace,
-		Revision:  strconv.Itoa(o.Version),
+		Name:             o.Name,
+		Namespace:        o.Namespace,
+		StorageNamespace: storageNamespace,
+		Revision:         strconv.Itoa(o.Version),
 	}
 	if o.Info != nil {
 		res.Updated = o.Info.LastDeployed
@@ -706,17 +711,18 @@ func HReleaseToJSON(o *release.Release) *ReleaseElement {
 }
 
 type ReleaseElement struct {
-	Name         string         `json:"name"`
-	Namespace    string         `json:"namespace"`
-	Revision     string         `json:"revision"`
-	Updated      helmtime.Time  `json:"updated"`
-	Status       release.Status `json:"status"`
-	Chart        string         `json:"chart"`
-	ChartName    string         `json:"chartName"`
-	ChartVersion string         `json:"chartVersion"`
-	AppVersion   string         `json:"app_version"`
-	Icon         string         `json:"icon"`
-	Description  string         `json:"description"`
+	Name             string         `json:"name"`
+	Namespace        string         `json:"namespace"`
+	StorageNamespace string         `json:"storageNamespace,omitempty"`
+	Revision         string         `json:"revision"`
+	Updated          helmtime.Time  `json:"updated"`
+	Status           release.Status `json:"status"`
+	Chart            string         `json:"chart"`
+	ChartName        string         `json:"chartName"`
+	ChartVersion     string         `json:"chartVersion"`
+	AppVersion       string         `json:"app_version"`
+	Icon             string         `json:"icon"`
+	Description      string         `json:"description"`
 }
 
 type RepositoryElement struct {

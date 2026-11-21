@@ -35,6 +35,7 @@ export type Release = {
   id: string;
   name: string;
   namespace: string;
+  storageNamespace?: string;
   revision: number;
   updated: string;
   status: DeploymentStatus;
