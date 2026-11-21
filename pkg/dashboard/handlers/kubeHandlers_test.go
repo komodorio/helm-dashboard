@@ -146,6 +146,42 @@ func TestEnhanceStatus_Namespace_Terminating(t *testing.T) {
 	}
 }
 
+func TestEnhanceStatus_Pod_Phases(t *testing.T) {
+	podReady := func(status v1.ConditionStatus) []v1.CarpCondition {
+		return []v1.CarpCondition{
+			{Type: "Initialized", Status: "True"},
+			{Type: "Ready", Status: status},
+			{Type: "ContainersReady", Status: status},
+			{Type: "PodScheduled", Status: "True"},
+		}
+	}
+
+	tests := []struct {
+		name   string
+		status v1.CarpStatus
+		want   v1.ConditionStatus
+	}{
+		{"running and ready", v1.CarpStatus{Phase: "Running", Conditions: podReady("True")}, Healthy},
+		{"running but not ready", v1.CarpStatus{Phase: "Running", Conditions: podReady("False")}, Unhealthy},
+		{"succeeded", v1.CarpStatus{Phase: "Succeeded"}, Healthy},
+		{"failed", v1.CarpStatus{Phase: "Failed"}, Unhealthy},
+		{"pending", v1.CarpStatus{Phase: "Pending"}, Progressing},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := EnhanceStatus(&v1.Carp{Status: tt.status}, nil)
+			hdCond := findHDHealth(s)
+			if hdCond == nil {
+				t.Fatal("expected hdHealth condition")
+			}
+			if hdCond.Status != tt.want {
+				t.Errorf("expected %s, got %s", tt.want, hdCond.Status)
+			}
+		})
+	}
+}
+
 func findHDHealth(s *v1.CarpStatus) *v1.CarpCondition {
 	for i, c := range s.Conditions {
 		if c.Type == "hdHealth" {
